@@ -91,7 +91,7 @@ class Adm_servers extends CI_Controller {
 			$local_tpl_data = array();
 			$error_msg = FALSE;
 
-			switch($type){
+			switch ($type) {
 				case 'dedicated_servers':
 					$this->load->model('servers/dedicated_servers');
 				
@@ -101,9 +101,9 @@ class Adm_servers extends CI_Controller {
 					$parse_file = 'adm_servers/dedicated_servers.html';				// В этом файле обычно меню
 					$parse_list_file = 'adm_servers/dedicated_servers_list.html';	// Шаблон списка
 					
-					if($tpl_list = $this->dedicated_servers->tpl_data_ds()){
+					if ($tpl_list = $this->dedicated_servers->tpl_data_ds()) {
 						$local_tpl_data['ds_list'] = $tpl_list;
-					}else{
+					} else {
 						$error_msg = '<p>' . lang('adm_servers_ds_unavailable') .'</p>';
 					}
 					
@@ -1187,6 +1187,7 @@ class Adm_servers extends CI_Controller {
 				
 			case 'game_types':
 				$this->load->model('servers/game_types');
+				$this->load->model('servers/games');
 				
 				if(!$gt_list = $this->game_types->get_gametypes_list(array('id' => $id))){
 					$this->show_message(lang('adm_servers_game_type_not_found'), site_url('adm_servers/view/game_types'));
@@ -1198,6 +1199,16 @@ class Adm_servers extends CI_Controller {
 					
 				$tpl_list = $this->game_types->tpl_data_game_types();
 				$local_tpl_data = $tpl_list[0];
+				
+				
+				/* Делаем список с играми */
+				$games_list = $this->games->get_games_list();
+				
+				foreach($games_list as $list) {
+					$options[$list['code']] = $list['name'];
+				}
+				
+				$local_tpl_data['gt_code'] = form_dropdown('game_code', $options, $gt_list[0]['game_code']);
 				
 				$local_tpl_data['cfg_list'] 	= array();
 				$local_tpl_data['cdir_list'] 	= array();
@@ -1749,7 +1760,7 @@ class Adm_servers extends CI_Controller {
 						$local_tpl_data['message'] = lang('adm_servers_error_game_type_edit');
 					}
 
-					$local_tpl_data['link'] = site_url('adm_servers/view/game_types/' . $id);
+					$local_tpl_data['link'] = site_url('adm_servers/edit/game_types/' . $id);
 					$local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_game_types');
 					break;
 			}

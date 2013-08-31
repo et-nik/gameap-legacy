@@ -163,7 +163,7 @@ class Dedicated_servers extends Servers {
 		
 		if($this->ds_list){
 		
-			foreach ($this->ds_list as $dedicated_servers){
+			foreach ($this->ds_list as $dedicated_servers) {
 				$num++;
 				
 				$tpl_data[$num]['ds_name'] = $dedicated_servers['name'];
@@ -174,7 +174,13 @@ class Dedicated_servers extends Servers {
 				$tpl_data[$num]['ds_ram'] = $dedicated_servers['ram'];
 				$tpl_data[$num]['ds_cpu'] = $dedicated_servers['cpu'];
 				$tpl_data[$num]['ds_id'] = $dedicated_servers['id'];
-				$tpl_data[$num]['servers_count'] = NULL;
+				
+				/* Количество игровых серверов */
+				$this->db->count_all();
+				
+				$this->db->where('id', $dedicated_servers['id']);
+				$this->db->from('servers');
+				$tpl_data[$num]['servers_count'] = $this->db->count_all_results();
 				
 			}
 			
