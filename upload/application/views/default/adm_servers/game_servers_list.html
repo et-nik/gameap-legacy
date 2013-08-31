@@ -1,0 +1,19 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<p class="hr">{lang_adm_servers_game_servers}</p>
+<table class="zebra" width="100%">
+
+	<tr>
+		<th><strong>{lang_name}</strong></th>
+		<th><strong>{lang_game}</strong></th>
+		<th><strong>{lang_ip}:{lang_port}</strong></th>
+		<th><strong>{lang_commands}</strong></th>
+	</tr>
+{servers_list}
+	<tr>
+		<td>{server_name}</td>
+		<td>{server_game}</td>
+		<td>{server_ip}:{server_port}</td>
+		<td><a class="small awesome" href="{site_url}adm_servers/edit/game_servers/{server_id}">{lang_control}</a>&nbsp;<a class="red small awesome" href="{site_url}adm_servers/delete/game_servers/{server_id}">X</a></td>
+	</tr>
+{/servers_list}
+</table>

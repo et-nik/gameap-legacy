@@ -1,0 +1,175 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="awesome" href="{site_url}adm_servers/view/game_servers">« {lang_adm_servers_game_servers}</a>&nbsp;
+<a class="awesome" href="{site_url}admin/settings/server/{server_id}">{lang_adm_servers_game_server_settings}</a>
+<a class="awesome" href="{site_url}adm_servers/reinstall_game_server/{server_id}">{lang_adm_servers_reinstall}</a>
+<a class="awesome" onclick="$('#popup').arcticmodal()">{lang_server_control_last_actions}</a>
+<h2>{lang_adm_servers_game_server_control}</h2>
+
+<p>{lang_adm_servers_game_servers_documentation}</p>
+
+<div style="display: none;">
+    <div class="box-modal" id="popup">
+        <div class="box-modal_close arcticmodal-close">close</div>
+			
+        
+			<table width="100%" class="zebra">
+				<tbody>
+					<tr>
+						<td colspan="5"><p class="hr"><strong>{lang_server_control_last_actions}</strong></p></td>
+					</tr>
+				</tbody>
+				<tr>
+					<th><strong>{lang_time}</strong></th>
+					<th><strong>{lang_action}</strong></th>
+					<th><strong>{lang_command}</strong></th>
+					<th><strong>{lang_user}</strong></th>
+					<th>&nbsp;</td>
+				</tr>
+			{log_list}
+				<tr>
+					<td width="20%">{log_date}</td>
+					<td width="20%">{log_type}</td>
+					<td width="20%">{log_command}</td>
+					<td width="20%">{log_user_name}</td>
+					<td><a class="small awesome" href={site_url}log_view/view/server/{log_id}>{lang_view}</a></td>
+				</tr>
+			{/log_list}
+			</table>
+    </div>
+</div>
+
+	<table class="zebra" width="100%">
+		
+		<tr>
+			<td><p class="hr">{lang_information}</p></td>
+			<td></td>
+		</tr>
+
+		<tr>
+			<td colspan="2">
+				<ul>
+				{information}
+				<li>{text}</li>
+				{/information}
+				</ul>
+			</td>
+		</tr>
+	</table>
+	<br />
+	
+<form action="{site_url}adm_servers/edit/game_servers/{server_id}" method="post" accept-charset="utf-8">
+<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />	
+
+    <ul class="tabs">
+        <li><a href="#base_parameters">{lang_base_parameters}</a></li>
+        <li><a href="#start_parameters">{lang_adm_servers_start_parameters}</a></li>
+    </ul>
+		
+    
+        <div id="base_parameters" class="tab_content">
+			<table class="zebra" width="100%">
+				<tr>
+					<td width="40%"><p class="hr">{lang_base_parameters}</p></td>
+					<td></td>
+				</tr>
+
+				<tr>
+					<td width="40%">{lang_name}:</td>
+					<td><input type="text" name="name" value="{server_name}" /></td>
+				</tr>
+
+				<tr>
+					<td>{lang_game}:</td>
+					<td>{server_game}</td>
+				</tr>
+
+				<tr>
+					<td>{lang_dedicated_server}:</td>
+					<td>{ds_name}</td>
+				</tr>
+
+				<tr>
+					<td>{lang_adm_servers_game_type}:</td>
+					<td>{game_type_dropdown}</td>
+				</tr>
+
+				<tr>
+					<td>{lang_adm_servers_connect_data}:</td>
+					<td><input type="text" name="server_ip" value="{server_ip}" />:<input type="text" name="server_port" value="{server_port}" size="6" /></td>
+				</tr>
+
+				<tr>
+					<td>{lang_adm_servers_server_dir}:<br /><span class="description">[ {lang_adm_servers_server_dir_desc} ]</span></td>
+					<td>{script_path}/<input type="text" name="dir" value="{server_dir}" /></td>
+				</tr>
+
+				<tr>
+					<td>{lang_adm_servers_rcon_password}:<br /><span class="description">[ {lang_leave_blank} ]</span></td>
+					<td><input type="text" name="rcon" /></td>
+				</tr>
+
+				<tr>
+					<td>{lang_adm_servers_server_enabled}:</td>
+					<td>{server_enabled_checkbox}</td>
+				</tr>
+				</table>
+        </div>
+        
+        <div id="start_parameters" class="tab_content">
+			<table class="zebra" width="100%">
+				<tr>
+					<td colspan="2"><p class="hr">{lang_adm_servers_start_parameters}</p></td>
+				</tr>
+
+				<?php if($this->servers->server_data['os'] != 'Windows'): ?>
+				<tr>
+					<td>{lang_adm_servers_screen_name}:</td>
+					<td><input type="text" name="screen_name" value="{screen_name}"/></td>
+				</tr>
+
+				<tr>
+					<td>{lang_adm_servers_user_start}:</td>
+					<td><input type="text" name="su_user" value="{su_user}" /></td>
+				</tr>
+
+				<?php endif; ?>
+
+				<tr>
+					<td width="45%">{lang_adm_servers_command_start}:</td>
+					<td><textarea style="height:50px" rows="2" name="script_start">{script_start}</textarea></td>
+				</tr>
+
+				<tr>
+					<td>{lang_adm_servers_command_stop}:</td>
+					<td><textarea style="height:50px" name="script_stop">{script_stop}</textarea></td>
+				</tr>
+
+				<tr>
+					<td>{lang_adm_servers_command_restart}:</td>
+					<td><textarea style="height:50px" name="script_restart">{script_restart}</textarea></td>
+				</tr>
+
+				<tr>
+					<td>{lang_adm_servers_command_status}:</td>
+					<td><textarea style="height:50px" name="script_status">{script_status}</textarea></td>
+				</tr>
+
+				<tr>
+					<td>{lang_adm_servers_command_update}:</td>
+					<td><textarea style="height:50px" name="script_update">{script_update}</textarea></td>
+				</tr>
+
+				<tr>
+					<td>{lang_adm_servers_command_get_console}:</td>
+					<td><textarea style="height:50px" name="script_get_console">{script_get_console}</textarea></td>
+				</tr>
+
+				<tr>
+					<td colspan="2">{lang_adm_servers_start_parameters_desc}</td>
+				</tr>
+
+			</table>
+		</div>
+
+<input class="button" type="submit" name="edit_gs" value="{lang_save}" />
+</form>

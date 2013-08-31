@@ -1,0 +1,21 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+{games_list}
+	<p class="hr">{game_name}</p>
+
+	<table class="zebra" width="100%">
+
+		<tr>
+			<th><strong>{lang_adm_servers_game_type}</strong></th>
+			<th><strong>{lang_adm_servers_disk_size}</strong></th>
+			<th>&nbsp;</th>
+		</tr>
+	{gt_list}
+		<tr>
+			<td>{gt_name}</td>
+			<td>{gt_size}</td>
+			<td><a class="small awesome" href="{site_url}adm_servers/edit/game_types/{gt_id}">{lang_control}</a>
+			&nbsp;<a class="red small awesome" href="{site_url}adm_servers/delete/game_types/{gt_id}">X</a></td>
+		</tr>
+	{/gt_list}
+	</table>
+{/games_list}

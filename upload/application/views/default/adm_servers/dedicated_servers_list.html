@@ -1,0 +1,30 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<p class="hr">{lang_adm_servers_dedicated_servers}</p>
+<table width="100%" class="zebra">
+	<thead>
+	<tr>
+		<td><strong>{lang_name}</strong></td>
+		<td><strong>{lang_adm_servers_location}</strong></td>
+		<td><strong>{lang_adm_servers_provider}</strong></td>
+		<td><strong>{lang_ip}</strong></td>
+		<td><strong>{lang_os}</strong></td>
+		<td><strong>RAM</strong></td>
+		<td><strong>CPU</strong></td>
+		<td><strong>{lang_adm_servers_count_game_servers}</strong></td>
+		<td><strong>{lang_commands}</strong></td>
+	</tr>
+	</thead>
+{ds_list}
+	<tr>
+		<td>{ds_name}</td>
+		<td>{ds_location}</td>
+		<td>{ds_provider}</td>
+		<td>{ds_ip}</td>
+		<td>{ds_os}</td>
+		<td>{ds_ram} Mb</td>
+		<td>{ds_cpu} Mhz</td>
+		<td>{servers_count}</td>
+		<td><a class="small awesome" href="{site_url}adm_servers/edit/dedicated_servers/{ds_id}">{lang_control}</a>&nbsp;<a class="red small awesome" href="{site_url}adm_servers/delete/dedicated_servers/{ds_id}">X</a></td>
+	</tr>
+{/ds_list}
+</table>

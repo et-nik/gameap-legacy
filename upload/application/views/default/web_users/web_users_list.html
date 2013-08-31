@@ -1,0 +1,24 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<br /><br />
+<table width="100%" class="zebra">
+	<tr>
+		<td width="15%"><strong>{lang_login}</strong></td>
+		<td width="15%"><strong>{lang_profile_registered}</strong></td>
+		<td width="20%"><strong>{lang_profile_last_visit}</strong></td>
+		<td><strong>{lang_commands}</strong></td>
+	</tr>
+{users_list}
+	<tr>
+		<td>{login}</td>
+		<td>{user_reg_date}</td>
+		<td>{user_last_auth}</td>
+		<td>
+			<a class="small awesome" href="{site_url}admin/users_control/base_privileges/{id}">{lang_users_base_privileges}</a>
+			<a class="small awesome" href="{site_url}admin/users_control/servers_privileges/{id}">{lang_users_servers_privileges}</a>
+			<a class="yellow small awesome" href="{site_url}admin/users_control/edit/{id}">{lang_edit}</a>
+			<a class="red small awesome" href="{site_url}admin/users_control/delete/{id}">{lang_delete}</a>
+		</td>
+
+	</tr>
+{/users_list}
+</table>

@@ -1,0 +1,17 @@
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+$config['base_url'] 			= '';
+$config['language'] 			= 'russian';
+$config['template'] 			= 'default';
+$config['style'] 				= 'default';
+$config['encryption_key'] 		= 'DFpd5SDDqac04';
+
+$config['local_os'] 			= 'Linux';
+$config['local_script_path'] 	= '/home/servers';
+$config['local_steamcmd_path'] 	= '/home/servers';
+$config['system_email'] 		= 'no-reply@example.com';
+
+$config['register_users'] 		= FALSE;
+
+/* End of file gameap_config.php */
+/* Location: ./application/config/gameap_config.php */
