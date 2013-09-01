@@ -1,9 +1,8 @@
 GameAP
 ======
 
-Free Game Admin Panel
+A free web-panel, allows you manage your GoldSRC and Source servers easy. You can startup/stop/restart server and edit or view any servers files and much more. Its works on Linux and Windows OS.
 
-Work with Linux and Windows game servers.
 
 Server Requirements
 ======
