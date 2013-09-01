@@ -12,7 +12,6 @@
 # 
 # Параметры запуска
 #
-# server.sh command dir name port
 # @command - команда (start|stop|restart|status)
 # @dir - директория относительно скрипта
 # @name - имя для screen
@@ -21,13 +20,13 @@
 # @start_command - команда для сервера (напр. 'hlds_run -game valve +ip 127.0.0.1 +port 27015 +map crossfire')
 # @user - пользователь, под которым будет запущен игровой сервер (если пусто, то будет использован root)
 #
+# Example:
+# ./server.sh start /home/hl_server screen_hldm 127.0.0.1 27015 "hlds_run -game valve +ip 127.0.0.1 +port 27015 +map crossfire" user
+#
+#
 #
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
-
-# Раскомментируйте строчку ниже, если не запускается игровой сервер
-# во многих случаях, особенно для виртуальных серверов, это помогает
-#export CPU_MHZ=2000
 
 # Directory
 DIR=$2
@@ -49,7 +48,7 @@ COMMAND=$6
 
 if [[ $7 == '' ]]
 then
-	USER='root'
+	USER=$(whoami)
 else
 	USER=$7
 fi
@@ -60,14 +59,15 @@ case "$1" in
 		then
 		echo "Server is already running"
     else
-		sleep 2
+		su $USER -c "cd $DIR; screen -m -d -S $NAME ./$COMMAND -pidfile ./${PIDFILE_NAME}"
+		sleep 4
+		
 		if [ -e ${PIDFILE} ] && [ $(ps -p $(cat ${PIDFILE})|wc -l) = "2" ] ;
 			then
-		   echo "Server started"
+			echo "Server started"
 		else
 		   echo "Server not started"
 		fi
-		su $USER -c "cd $DIR; screen -m -d -S $NAME ./$COMMAND"
     fi
     ;;
 
@@ -85,14 +85,14 @@ case "$1" in
     if [[ `su $USER -c "screen -ls |grep $NAME"` ]]
        then
        kill `ps aux | grep -v grep | grep -i $USER | grep -i screen | grep -i $NAME | awk '{print $2}'`
+       
+       sleep 2
+
+		su $USER -c "cd $DIR; screen -m -d -S $NAME ./$COMMAND"
+		echo "Server restarted"
     else
        echo "Coulnd't find a running server"
     fi
-
-    sleep 2
-
-    su $USER -c "cd $DIR; screen -m -d -S $NAME ./$COMMAND"
-    echo "Server restarted"
     ;;
  status)
     if [ -e ${PIDFILE} ] && [ $(ps -p $(cat ${PIDFILE})|wc -l) = "2" ] ;
