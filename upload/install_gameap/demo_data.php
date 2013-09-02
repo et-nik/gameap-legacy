@@ -431,7 +431,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "2",
@@ -460,7 +460,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "3",
@@ -489,7 +489,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "4",
@@ -518,7 +518,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "5",
@@ -547,7 +547,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "6",
@@ -576,7 +576,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "7",
@@ -605,7 +605,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "8",
@@ -634,7 +634,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "9",
@@ -663,7 +663,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "10",
@@ -692,7 +692,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "11",
@@ -721,7 +721,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "12",
@@ -750,7 +750,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "13",
@@ -779,7 +779,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "14",
@@ -808,7 +808,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "15",
@@ -837,7 +837,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "16",
@@ -866,7 +866,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "17",
@@ -895,7 +895,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "18",
@@ -924,7 +924,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "19",
@@ -953,7 +953,7 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "20",
@@ -982,4 +982,4 @@ $data = array(
 		'kick_cmd' => "kick #{id}",
 		'game_types' => "",
 );
-$this->games->add_game($data);
+$this->game_types->add_game_type($data);

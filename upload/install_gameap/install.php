@@ -412,7 +412,20 @@ switch($page) {
 		
 		/* Демо данные */
 		require_once 'install_gameap/demo_data.php';
+
+
+		// If the migrations table is missing, make it
+		if (!$this->db->table_exists('migrations')) {
+			$this->dbforge->add_field(array(
+				'version' => array('type' => 'INT', 'constraint' => 3),
+			));
+
+			$this->dbforge->create_table('migrations', TRUE);
+
+			
+		}
 		
+		$this->db->insert('migrations', array('version' => 1));
 		
 		/*------------*/
 		/* ADMIN ADD  */
