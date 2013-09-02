@@ -159,6 +159,26 @@ $lang['adm_servers_log_directories']				= 'Server log directories';
 $lang['adm_servers_alias']							= 'Alias';
 $lang['adm_servers_aliases']						= 'Aliases';
 $lang['adm_servers_only_for_admins']				= 'For admins only';
-$lang['adm_servers_server_will_be_reinstalled']		= 'Сервер будет переустановлен в ближайшее время';
+$lang['adm_servers_server_will_be_reinstalled']		= 'Server will be reinstalled soon';
 $lang['adm_servers_reinstall']						= 'Reinstall server';
-$lang['adm_servers_reinstall_gs_confirm']			= 'Will be reinstall server? (Files to be deleted)';
+$lang['adm_servers_reinstall_gs_confirm']			= 'Do you want reinstall server? (All files will be deleted)';
+
+// 0.7.2
+$lang['adm_servers_players_control']				= 'Actions on players commands';
+$lang['adm_servers_rcon_commands']					= 'RCON commands';
+$lang['adm_servers_kick_cmd']						= 'Kick player command';
+$lang['adm_servers_kick_cmd_desc']					= 'You can use following shortcodes: {id} - player id';
+$lang['adm_servers_ban_cmd']						= 'Ban player command';
+$lang['adm_servers_ban_cmd_desc']					= 'You can use following shortcodes: {id} - player id, {time} - ban time, {reason} - ban reason';
+$lang['adm_servers_chname_cmd']						= 'Change nick command';
+$lang['adm_servers_chname_cmd_desc']				= 'You can use following shortcodes: {id} - player id, {name} - new player nick';
+$lang['adm_servers_chmap_cmd']						= 'Change map command';
+$lang['adm_servers_chmap_cmd_desc']					= 'You can use following shotcodes: {map} - new map';
+$lang['adm_servers_passwd_cmd']						= 'Set password command';
+$lang['adm_servers_passwd_cmd_desc']				= 'You can use following shortcodes: {password} - new password';
+$lang['adm_servers_sendmsg_cmd']					= 'Chat say command';
+$lang['adm_servers_sendmsg_cmd_desc']				= "You can use following shortcodes: {msg} - message to say";
+$lang['adm_servers_srestart_cmd']					= 'Soft restart command';
+
+$lang['adm_servers_aliases_for_command']			= 'Startup command aliases';
+$lang['adm_servers_aliases_edit']					= 'Edit aliases';

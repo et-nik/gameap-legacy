@@ -40,7 +40,7 @@ if(!$command){
 	echo "Site: http://hldm.org \n";
 	echo "----------------------------- \n\n";
 	echo "Options: \n";
-	echo "server.exe <start|stop|restart|status> <dir> <ip> <port> <name> <server_start_commands>\n\n";
+	echo "server.exe <start|stop|restart|status> <dir> <name> <ip> <port> <name> <server_start_commands>\n\n";
 	echo "Example: \n";
 	echo "server.exe start dir hlds 127.0.0.1 27015 \"hlds.exe -game valve +map crossfire +sv_lan 0 +maxplayers 16\"\n";
 		
@@ -71,7 +71,7 @@ if(isset($start_command)) {
 if(file_exists('psexec.exe')) {
 	$psexec = 'psexec.exe -s -i -w "' . $dir . '" -d ';
 } elseif(file_exists('paexec.exe')) {
-	$psexec = 'paexec.exe \\localhost -s -d -w "' . $dir . '" -d ';
+	$psexec = 'paexec.exe \\\\localhost -s -d -w "' . $dir . '" -d ';
 } else {
 	echo "psexec.exe and paexec.exe not found\n";
 	$psexec = 'start /D "' . $dir . '" /I ';

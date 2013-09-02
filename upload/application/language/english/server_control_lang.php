@@ -17,7 +17,7 @@ $lang['server_control_new_task_success'] 				= 'New task added successfully';
 $lang['server_control_task_delete_confirm'] 			= 'Do you want delete this task?';
 $lang['server_control_task_saved'] 						= 'Task settings changed successfully';
 
-// РџРµСЂРёРѕРґ РїРѕРІС‚РѕСЂР° РґР»СЏ Р·Р°РґР°РЅРёСЏ
+// Период повтора для задания
 $lang['server_control_never'] 							= 'Never';
 $lang['server_control_day'] 							= '24 hours';
 $lang['server_control_two_day'] 						= '2 days';
@@ -63,3 +63,6 @@ $lang['server_control_param_for_command'] 				= 'Param for command';
 $lang['server_control_execution_date'] 					= 'Start date';
 $lang['server_control_execution_date_desc'] 			= 'Exp: 29-06-2013 12:32';
 $lang['server_control_repeat_period'] 					= 'Repeat frequency';
+
+// 0.7.2
+$lang['server_control_command_not_set'] 				= 'Control command not set';

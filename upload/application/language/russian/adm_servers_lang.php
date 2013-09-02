@@ -179,5 +179,7 @@ $lang['adm_servers_passwd_cmd_desc']				= 'Используйте следующ
 $lang['adm_servers_sendmsg_cmd']					= 'Команда отправки сообщения в чат';
 $lang['adm_servers_sendmsg_cmd_desc']				= "Используйте следующие шоткоды: {msg} - сообщение";
 $lang['adm_servers_srestart_cmd']					= 'Команда мягкого рестарта';
+$lang['adm_servers_start_parameter']				= 'Параметры запуска сервера';
 
 $lang['adm_servers_aliases_for_command']			= 'Алиасы для команды запуска';
+$lang['adm_servers_aliases_edit']					= 'Редактировать алиасы';
