@@ -46,6 +46,8 @@ class Adm_servers extends CI_Controller {
         $this->load->model('servers');
 		$this->load->model('servers/games');
 		$this->load->model('servers/game_types');
+		
+		$this->load->helper('string');
 
 		$games_list = $this->games->get_games_list();
 		$game_types_list = $this->game_types->get_gametypes_list();
