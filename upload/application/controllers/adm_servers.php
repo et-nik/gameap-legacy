@@ -50,22 +50,6 @@ $this->load->model('servers/game_types');
 $games_list = $this->games->get_games_list();
 $game_types_list = $this->game_types->get_gametypes_list();
 
-
-foreach ($game_types_list as &$array) {
-
-	echo '$data = array(' . "\n";
-	
-	foreach ($array as $key => &$value) {
-		$value = str_replace('"', '\\"', $value);
-		echo '		\'' . $key . '\' => "' . $value . '",' . "\n";
-	}
-	
-	echo ');' . "\n";
-	echo '$this->games->add_game($data);' . "\n\n";
-}
-
-exit;
-        
         if($this->users->check_user()) {
 			
 			//Base Template
