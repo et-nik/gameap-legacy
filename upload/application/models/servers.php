@@ -1252,7 +1252,7 @@ class Servers extends CI_Model {
 	function get_remote_files($server_data, $dir, $file_time = FALSE, $file_size = FALSE)
 	{
 		
-		$connection = ftp_connect($server_data['ftp_serv']);
+		$connection = ftp_connect($server_data['ftp_host']);
 		
 		if(ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])){
 			
@@ -1421,7 +1421,7 @@ class Servers extends CI_Model {
 		
 		$server_data = $this->server_data;
 		
-		$connection = ftp_connect($server_data['ftp_serv']);
+		$connection = ftp_connect($server_data['ftp_host']);
 		
 		if(ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])){
 			
@@ -1500,7 +1500,7 @@ class Servers extends CI_Model {
 		
 		$server_data = $this->server_data;
 		
-		$connection = ftp_connect($server_data['ftp_serv']);
+		$connection = ftp_connect($server_data['ftp_host']);
 		
 		if(!$connection) {
 			$this->errors = 'Ошибка соединения с ftp сервером';
