@@ -350,6 +350,48 @@ $fields = array(
 							'type' => 'TINYTEXT',
 		),
 		
+		'kick_cmd' => array(
+							'type' => 'VARCHAR',
+							'constraint' => 64,
+							'default' => '',
+		),
+						  
+		'ban_cmd' => array(
+							'type' => 'VARCHAR',
+							'constraint' => 64,
+							'default' => '',
+		),
+						  
+		'chname_cmd' => array(
+							'type' => 'VARCHAR',
+							'constraint' => 64,
+							'default' => '',
+		),
+		
+		'srestart_cmd' => array(
+							'type' => 'VARCHAR',
+							'constraint' => 64,
+							'default' => '',
+		),
+						  
+		'chmap_cmd' => array(
+							'type' => 'VARCHAR',
+							'constraint' => 64,
+							'default' => '',
+		),
+						 
+		'sendmsg_cmd' => array(
+							'type' => 'VARCHAR',
+							'constraint' => 64,
+							'default' => '',
+		),
+						  
+		'passwd_cmd' => array(
+							'type' => 'VARCHAR',
+							'constraint' => 64,
+							'default' => '',
+		),
+		
 		'game_types' => array(
 							'type' => 'TINYTEXT',
 		),
@@ -549,25 +591,10 @@ $fields = array(
 							'type' => 'TINYTEXT',
 		),
 		
-		'script_stop' => array(
-							'type' => 'TINYTEXT',
-		),
-		
-		'script_restart' => array(
-							'type' => 'TINYTEXT',
-		),
-		
-		'script_status' => array(
-							'type' => 'TINYTEXT',
-		),
-		
-		'script_update' => array(
-							'type' => 'TINYTEXT',
-		),
-		
-		'script_get_console' => array(
-							'type' => 'TINYTEXT',
-		),
+		'start_command' => array(
+								 'type' => 'TEXT',
+								 'default' => '',
+						  ),
 		
 		'aliases' => array(
 							'type' => 'TEXT',
