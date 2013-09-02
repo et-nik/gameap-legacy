@@ -44,11 +44,11 @@ class Adm_servers extends CI_Controller {
         $this->lang->load('main');
         
         $this->load->model('servers');
-$this->load->model('servers/games');
-$this->load->model('servers/game_types');
+		$this->load->model('servers/games');
+		$this->load->model('servers/game_types');
 
-$games_list = $this->games->get_games_list();
-$game_types_list = $this->game_types->get_gametypes_list();
+		$games_list = $this->games->get_games_list();
+		$game_types_list = $this->game_types->get_gametypes_list();
 
         if($this->users->check_user()) {
 			
@@ -1113,28 +1113,10 @@ $game_types_list = $this->game_types->get_gametypes_list();
 				}
 				
 				$local_tpl_data['game_type_dropdown'] = array();
+				$local_tpl_data['aliases_list'] = array();
 				
 				$server_aliases = json_decode($this->servers->server_data['aliases'], TRUE);
-				
-				/* Список алиасов */
-				if($json_decode = json_decode($gametypes_list[$gt_key]['aliases'], TRUE)) {
 
-					$i = 0;
-					foreach($json_decode as $array) {
-						$local_tpl_data['aliases_list'][$i]['alias'] 		= $array['alias'];
-						$local_tpl_data['aliases_list'][$i]['desc'] 		= $array['desc'];
-						
-						if (isset($server_aliases['alias'])) {
-							$local_tpl_data['aliases_list'][$i]['alias_value'] 	= $server_aliases['alias'];
-						} else {
-							$local_tpl_data['aliases_list'][$i]['alias_value'] 	= '<' . lang('value_not_set') . '>';
-						}
-						
-						$i ++;
-					}
-
-				}
-				
 				$local_tpl_data['game_type_dropdown'] 		= form_dropdown('game_type', $options, $this->servers->server_data['game_type']);
 				$local_tpl_data['server_enabled_checkbox'] 	= form_checkbox('enabled', 'accept', $this->servers->server_data['enabled']);
 				
@@ -1249,16 +1231,26 @@ $game_types_list = $this->game_types->get_gametypes_list();
 				$server_aliases = json_decode($this->servers->server_data['aliases'], TRUE);
 
 				/* Прогон по алиасам */
+				
 				if ($allowable_aliases && !empty($allowable_aliases)) {
 					$empty_alias = '';
 					
 					/* Если параметр пуст, то выводим сообщение с предупреждением */
+					$i = 0;
 					foreach ($allowable_aliases as $alias) {
+						$local_tpl_data['aliases_list'][$i]['alias'] 		= $alias['alias'];
+						$local_tpl_data['aliases_list'][$i]['desc'] 		= $alias['desc'];
+						
 						if(!isset($server_aliases[$alias['alias']]) OR empty($server_aliases[$alias['alias']])) {
 							$empty_alias .= '"' . $alias['desc'] . '", ';
+							$local_tpl_data['aliases_list'][$i]['alias_value'] 	= '<' . lang('value_not_set') . '>';
+						} else {
+							$local_tpl_data['aliases_list'][$i]['alias_value'] 	= $server_aliases[$alias['alias']];
 						}
+						$i ++;
 					}
 				}
+				
 				
 				if ($empty_alias != '') {
 					$local_tpl_data['information'][]['text'] = lang('adm_servers_gs_empty_settings') . ': ' . $empty_alias;

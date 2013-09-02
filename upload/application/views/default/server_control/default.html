@@ -112,7 +112,7 @@ if($this->users->user_privileges['srv_restart'] == 1
 		</form>
 	<?php endif; ?>
 
-	<?php if ($this->servers->server_data['chmap_cmd']): ?>
+	<?php if ($this->servers->server_data['chmap_cmd'] && $this->servers->server_data['maps_list'] ): ?>
 		<p class="hr"><strong>{lang_maps}</strong></p>
 		<form action="{site_url}server_command/rcon/changemap/{server_id}/" method="post" accept-charset="utf-8">
 			<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />

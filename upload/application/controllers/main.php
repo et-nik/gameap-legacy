@@ -37,8 +37,8 @@ class Main extends CI_Controller {
         
         $this->lang->load('auth');
 
-        $data = array();
-        $data['code'] = '';
+        $this->tpl_data = array();
+        $this->tpl_data['code'] = '';
 
         /* 
          * Проверяем пользователя 
@@ -49,13 +49,13 @@ class Main extends CI_Controller {
 		}
 		
 		/* Пользователь не авторизован, показываем ему форму авторизации */
-		$data['menu'] = '';
-        $data['title'] = '';
-        $data['profile'] = '';
-        $this->tpl_data['title'] 	= lang('auth_title_index');
-		$this->tpl_data['heading'] 	= lang('auth_heading');
+		$this->tpl_data['menu'] 		= '';
+        $this->tpl_data['profile'] 		= '';
+        $this->tpl_data['content'] 		= '';
+        $this->tpl_data['title'] 		= lang('auth_title_index');
+		$this->tpl_data['heading'] 		= lang('auth_heading');
 
 
-        $this->parser->parse('login.html', $data);
+        $this->parser->parse('login.html', $this->tpl_data);
 	}
 }
