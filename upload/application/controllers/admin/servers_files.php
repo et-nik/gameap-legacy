@@ -490,10 +490,12 @@ class Servers_files extends CI_Controller {
 						$log_data['msg'] = 'Upload file success';
 						$log_data['log_data'] = 'Directory: ' . $s_content_dirs[$dir_id]['path'] . ' File name: ' . $file_data['orig_name'] . "\n";
 						$this->panel_log->save_log($log_data);
+						
+						return TRUE;
 					}
 					
 				} else {
-					// Файл была загружен на локальный сервер
+					// Файл был загружен на локальный сервер
 					
 					$message = lang('server_files_upload_successful', $file_data['orig_name'], $s_content_dirs[$dir_id]['path']);
 					$this->show_message($message, site_url('admin/servers_files/server/' . $server_id), 'Далее');

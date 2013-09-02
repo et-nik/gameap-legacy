@@ -29,6 +29,7 @@
 	<li><a href="#fast_rcon" onclick="return false;">Fast Rcon</a></li>
 	<li><a href="#aliases" onclick="return false;">{lang_adm_servers_aliases}</a></li>
 	<li><a href="#start_parameters" onclick="return false;">{lang_adm_servers_start_parameters}</a></li>
+	<li><a href="#rcon_control_parameters" onclick="return false;">{lang_adm_servers_rcon_commands}</a></li>
 </ul>
 
 <div id="config_files" class="tab_content">
@@ -210,6 +211,53 @@
 		</table>
 		
 	</div>
+	
+	<div id="rcon_control_parameters" class="tab_content">
+		<table class="zebra" width="100%">
+			<tbody>
+				<tr>
+					<td width="45%"><p class="hr"><span class="description">[ {lang_adm_servers_rcon_commands} ]</span></p></td>
+					<td></td>
+				</tr>
+			</tbody>
+			<tr>
+				<td>{lang_adm_servers_kick_cmd}:<br /><span class="description">[ {lang_adm_servers_kick_cmd_desc} ]</span></td>
+				<td><input style="width: 50%" type="text" name="kick_cmd" value="{kick_cmd}" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_ban_cmd}:<br /><span class="description">[ {lang_adm_servers_ban_cmd_desc} ]</span></td>
+				<td><input style="width: 50%" type="text" name="ban_cmd" value="{ban_cmd}" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_chname_cmd}:<br /><span class="description">[ {lang_adm_servers_chname_cmd_desc} ]</span></td>
+				<td><input style="width: 50%" type="text" name="chname_cmd" value="{chname_cmd}" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_srestart_cmd}:<br /><span class="description">[ {lang_adm_servers_srestart_cmd_desc} ]</span></td>
+				<td><input style="width: 50%" type="text" name="srestart_cmd" value="{srestart_cmd}" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_chmap_cmd}:<br /><span class="description">[ {lang_adm_servers_chmap_cmd_desc} ]</span></td>
+				<td><input style="width: 50%" type="text" name="chmap_cmd" value="{chmap_cmd}" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_sendmsg_cmd}:<br /><span class="description">[ {lang_adm_servers_sendmsg_cmd_desc} ]</span></td>
+				<td><input style="width: 50%" type="text" name="sendmsg_cmd" value="{sendmsg_cmd}" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_passwd_cmd}:<br /><span class="description">[ {lang_adm_servers_passwd_cmd_desc} ]</span></td>
+				<td><input style="width: 50%" type="text" name="passwd_cmd" value="{passwd_cmd}" /></td>
+			</tr>
+
+		</table>
+	</div>
+
 
 	<script type="text/javascript">
 		
@@ -246,8 +294,7 @@
 	}
 		
 	</script>
-
-
+	
 	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
 	<p align="center"><input class="button" type="submit" value="{lang_save}" /></p>
 </form>

@@ -62,3 +62,6 @@ $lang['server_control_param_for_command'] 				= 'Параметры для ко�
 $lang['server_control_execution_date'] 					= 'Дата выполнения';
 $lang['server_control_execution_date_desc'] 			= 'Пример: 29-06-2013 12:32';
 $lang['server_control_repeat_period'] 					= 'Период повтора';
+
+// 0.7.2
+$lang['server_control_command_not_set'] 				= 'Команда не задана';

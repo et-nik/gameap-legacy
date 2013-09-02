@@ -52,8 +52,8 @@ class Main extends CI_Controller {
 		$data['menu'] = '';
         $data['title'] = '';
         $data['profile'] = '';
-        $data['content'] = '';
-        $data['heading'] = 'Вход в админпанель';
+        $this->tpl_data['title'] 	= lang('auth_title_index');
+		$this->tpl_data['heading'] 	= lang('auth_heading');
 
 
         $this->parser->parse('login.html', $data);

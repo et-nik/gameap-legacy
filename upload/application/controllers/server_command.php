@@ -40,7 +40,9 @@ class Server_command extends CI_Controller {
             redirect('auth');
         }
     }
-	
+    
+    // -----------------------------------
+    
 	// Отображение информационного сообщения
     private function show_message($message = 'Ошибка', $link = FALSE, $link_text = 'Вернуться')
     {
@@ -98,49 +100,73 @@ class Server_command extends CI_Controller {
 			*/
 			switch($command){
 				case 'pl_ban':
-					$privileges = (bool)($this->users->servers_privileges['PLAYERS_BAN']);
+					$privileges = (bool)($this->users->servers_privileges['PLAYERS_BAN']); 	// Привилегии
+					$isset = (bool)$this->servers->server_data['ban_cmd'];		// Задана ли команда
+					
 					$submit_name = 'submit_ban';
 					$template_file = 'player_ban.html';
 
 					break;
+					
 				case 'pl_kick':
 					$privileges = (bool)($this->users->servers_privileges['PLAYERS_KICK']);
+					$isset = (bool)$this->servers->server_data['kick_cmd'];		// Задана ли команда
+					
 					$submit_name = 'submit_kick';
 					$template_file = 'player_kick.html';
 					break;
+					
 				case 'pl_changename':
 					$privileges = (bool)($this->users->servers_privileges['PLAYERS_CH_NAME']);
+					$isset = (bool)$this->servers->server_data['chname_cmd'];
+					
 					$submit_name = 'submit_changename';
 					$template_file = 'player_changename.html';
 					break;
+					
 				case 'send_msg';
 					$privileges = (bool)($this->users->servers_privileges['SERVER_CHAT_MSG']);
+					$isset = (bool)$this->servers->server_data['sendmsg_cmd'];
+					
 					$submit_name = 'submit_sendmsg';
 					$template_file = 'send_msg.html';
 					break;
+					
 				case 'changemap';
 					$privileges = (bool)($this->users->servers_privileges['CHANGE_MAP']);
+					$isset = (bool)$this->servers->server_data['chmap_cmd'];
+					
 					$submit_name = 'submit_changemap';
 					//$template_file = 'send_msg.html';
 					break;
+					
 				case 'restart':
 					$privileges = (bool)($this->users->servers_privileges['SERVER_SOFT_RESTART']);
-					//$template_file = 'player_changename.html';'
+					$isset = (bool)$this->servers->server_data['restart_cmd'];
+
 					$submit_name = 'submit_restart';
 					$no_submit_name = TRUE;
 					break;
+					
 				case 'set_password':
 					$privileges = (bool)($this->users->servers_privileges['SERVER_SET_PASSWORD']);
+					$isset = (bool)$this->servers->server_data['passwd_cmd'];
+					
 					$submit_name = 'submit_set_password';
 					break;
+					
 				case 'fast':
 					/* Fast RCON */
 					$privileges = (bool)$this->users->servers_privileges['FAST_RCON'];
+					$isset = TRUE;
 					//$submit_name = 'submit_set_password';
 					$no_submit_name = TRUE;
 					break;
+					
 				case 'rcon_command':
 					$privileges = (bool)($this->users->servers_privileges['RCON_SEND']);
+					$isset = TRUE;
+					
 					$submit_name = 'submit_rcon';
 					//$template_file = 'player_changename.html';
 					break;
@@ -148,6 +174,11 @@ class Server_command extends CI_Controller {
 				
 			if($privileges) {
 				/* Пользователь прошел проверку на привилегии */
+				
+				if (!$isset) {
+					$this->show_message(lang('server_control_command_not_set'));
+					return FALSE;
+				}
 			
 				if(!$no_submit_name && !$this->input->post($submit_name)) {
 						
@@ -172,33 +203,41 @@ class Server_command extends CI_Controller {
 							$this->form_validation->set_rules('time', 'время', 'trim|max_length[2]|integer');
 							$this->form_validation->set_rules('time_multiply', 'отсчет времени', 'trim|max_length[6]|integer');
 							break;
+							
 						case 'pl_kick':
 							$no_form_vallidation = TRUE;
 							break;
+							
 						case 'pl_changename':
 							$this->form_validation->set_rules('new_name', 'новое имя', 'trim|required|max_length[32]|min_length[1]|xss_clean');
 							break;
+							
 						case 'send_msg';
 							$this->form_validation->set_rules('msg_text', 'текст', 'trim|required|max_length[64]|min_length[1]|xss_clean');
 							break;
+							
 						case 'changemap';
 							$this->form_validation->set_rules('map', 'карта', 'trim|required|max_length[64]|min_length[1]|xss_clean');
 							break;
+							
 						case 'restart':
 							$no_form_vallidation = TRUE;
 							break;
+							
 						case 'set_password':
 							$this->form_validation->set_rules('password', 'пароль', 'trim|max_length[32]|min_length[1]|xss_clean');
 							break;
+							
 						case 'fast':
 							$no_form_vallidation = TRUE;
 							break;
+							
 						case 'rcon_command';
 							$this->form_validation->set_rules('rcon_command', 'команда', 'trim|required|max_length[64]|min_length[1]|xss_clean');
 							break;
 					}
 						
-					if(!$no_form_vallidation) {
+					if (!$no_form_vallidation) {
 						$form_validate = $this->form_validation->run();
 					} else {
 						
@@ -226,24 +265,31 @@ class Server_command extends CI_Controller {
 								$pl_ban_reason = translit($this->input->post('reason', TRUE));
 								$pl_ban_time = $this->input->post('time', TRUE) * $this->input->post('time_multiply', TRUE);
 								break;
+								
 							case 'pl_kick':
 								// empty
 								break;
+								
 							case 'pl_changename':
 								$pl_newname = translit($this->input->post('new_name', TRUE));
 								break;
+								
 							case 'send_msg';
 								$msg_text = translit($this->input->post('msg_text', TRUE));
 								break;
+								
 							case 'changemap';
 								$map = translit($this->input->post('map', TRUE));
 								break;
+								
 							case 'restart';
 								// empty
 								break;
+								
 							case 'set_password':
 								$password = translit($this->input->post('password', TRUE));
 								break;
+								
 							case 'fast':
 								$fast_rcon = json_decode($this->servers->server_data['fast_rcon'], TRUE);
 									
@@ -256,6 +302,7 @@ class Server_command extends CI_Controller {
 								$rcon_command = $fast_rcon[$id]['rcon_command'];
 									
 								break;
+								
 							case 'rcon_command';
 								$rcon_command = translit($this->input->post('rcon_command', TRUE));
 									
@@ -284,57 +331,82 @@ class Server_command extends CI_Controller {
 							
 							
 						if(@$rcon_connect) {
-							$player_id = (int)$this->uri->rsegment(5);
+							$player_id = (int)$id;
 								
 							switch($command){
 								case 'pl_ban':
 									/*
 									 * Параметры команды amx_ban могут быть разными,
 									 * в зависимости от версии плагина на сервере
-									 * в данном случае это:
+									 * 
+									 * Шаблоны команд хранятся в игровых модификациях
 									 * 
 									 * Usage:  amx_ban <time in mins> <steamID or nickname or #authid or IP> <reason>
 									 * 
 									*/
-									$rcon_command = "amx_ban $pl_ban_time #$player_id \"$pl_ban_reason\"";
+									$rcon_command = $this->servers->server_data['ban_cmd'];
+									$rcon_command = str_replace('{id}', $player_id, $rcon_command);
+									$rcon_command = str_replace('{time}', $pl_ban_time, $rcon_command);
+									$rcon_command = str_replace('{reason}', $pl_ban_reason, $rcon_command);
+									
 									$rcon_string = $this->valve_rcon->command($rcon_command);
 									$message = lang('server_command_ban_command_sended');
 									break;
+									
 								case 'pl_kick':
-									$rcon_command = "kick #$player_id";
+									$rcon_command = $this->servers->server_data['kick_cmd'];
+									$rcon_command = str_replace('{id}', $player_id, $rcon_command);
+									
 									$rcon_string = $this->valve_rcon->command($rcon_command);
-									// screen -S '$screen_name' -X stuff '$command\r'
 									$message = lang('server_command_kick_command_sended');
 									break;
+									
 								case 'pl_changename':
-									$rcon_command = "amx_nick #$player_id \"$pl_newname\"";
+									$rcon_command = $this->servers->server_data['chname_cmd'];
+									$rcon_command = str_replace('{id}', $player_id, $rcon_command);
+									$rcon_command = str_replace('{name}', $pl_newname, $rcon_command);
+									
 									$rcon_string = $this->valve_rcon->command($rcon_command);
 									$message = lang('server_command_nickchange_command_sended');
 									break;
+									
 								case 'send_msg':
-									$rcon_command = "amx_say " . $this->users->user_login . ": $msg_text";
+									$rcon_command = $this->servers->server_data['sendmsg_cmd'];
+									$rcon_command = str_replace('{msg}', $msg_text, $rcon_command);
+
 									$rcon_string = $this->valve_rcon->command($rcon_command);
 									$message = lang('server_command_msg_command_sended');
 									break;
+									
 								case 'changemap':
-									$rcon_command = "changelevel $map";
+									$rcon_command = $this->servers->server_data['chmap_cmd'];
+									$rcon_command = str_replace('{map}', $map, $rcon_command);
+
 									$rcon_string = $this->valve_rcon->command($rcon_command);
 									$message = lang('server_command_mapchange_command_sended', $map);
 									break;
+									
 								case 'restart':
-									$rcon_command = "restart";
+									$rcon_command = $this->servers->server_data['srestart_cmd'];
+									
 									$rcon_string = $this->valve_rcon->command($rcon_command);
 									$message = lang('server_command_restart_cmd_sended');
 									break;
+									
 								case 'set_password':
-									$rcon_command = "sv_password \"$password\"";
-									$rcon_string = $this->valve_rcon->command("sv_password \"$password\"");
+									$rcon_command = $this->servers->server_data['passwd_cmd'];
+									$rcon_command = str_replace('{password}', $password, $rcon_command);
+									$rcon_command = str_replace('{pass}', $password, $rcon_command);
+
+									$rcon_string = $this->valve_rcon->command($rcon_command);
 									$message = lang('server_command_password_set');
 									break;
+									
 								case 'fast':
 									$rcon_string = $this->valve_rcon->command("$rcon_command");
 									$message = lang('Команда отправлена на сервер');
 									break;
+									
 								case 'rcon_command':
 									$rcon_string = $this->valve_rcon->command("$rcon_command");
 									$message = lang('Команда отправлена на сервер');

@@ -20,7 +20,6 @@
  *
  * @package		Game AdminPanel
  * @category	Controllers
- * @category	Controllers
  * @author		Nikita Kuznetsov (ET-NiK)
  * @sinse		0.7
  */

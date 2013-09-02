@@ -7,10 +7,30 @@
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
  * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
- * @license		http://gameap.ru/license.html
- * @link		http://gameap.ru
+ * @license		http://www.gameap.ru/license.html
+ * @link		http://www.gameap.ru
  * @filesource
 */
+
+/**
+ * Управление серверами
+ *
+ * Контроллер управляет выделенными серверами, игровыми серверами,
+ * играми и игровыми модификациями.
+ * Позволяет производить следующие действия: добавление, редактирование,
+ * удаление, дублирование игровой модификации.
+ * 
+ * Установку игровых серверов производит модуль cron, adm_servers лишь
+ * делает запись о том, что сервер нужно установить.
+ * 
+ * Переустановка игровых серверов делается заданием значения 0 поля
+ * installed таблицы servers.
+ *
+ * @package		Game AdminPanel
+ * @category	Controllers
+ * @author		Nikita Kuznetsov (ET-NiK)
+ */
+ 
 class Adm_servers extends CI_Controller {
 	
 	public function __construct()
@@ -22,6 +42,29 @@ class Adm_servers extends CI_Controller {
         $this->lang->load('adm_servers');
         $this->lang->load('server_control');
         $this->lang->load('main');
+        
+        $this->load->model('servers');
+$this->load->model('servers/games');
+$this->load->model('servers/game_types');
+
+$games_list = $this->games->get_games_list();
+$game_types_list = $this->game_types->get_gametypes_list();
+
+
+foreach ($game_types_list as &$array) {
+
+	echo '$data = array(' . "\n";
+	
+	foreach ($array as $key => &$value) {
+		$value = str_replace('"', '\\"', $value);
+		echo '		\'' . $key . '\' => "' . $value . '",' . "\n";
+	}
+	
+	echo ');' . "\n";
+	echo '$this->games->add_game($data);' . "\n\n";
+}
+
+exit;
         
         if($this->users->check_user()) {
 			
@@ -41,6 +84,8 @@ class Adm_servers extends CI_Controller {
 			
 			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, TRUE);
 			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), TRUE);
+			
+			
         
         } else {
 			redirect('auth');
@@ -244,17 +289,22 @@ class Adm_servers extends CI_Controller {
 	*/
 	public function add($type = 'dedicated_servers', $param_1 = FALSE, $param_2 = FALSE)
 	{
-		if($this->users->auth_id){
+		if($this->users->auth_id) {
 			// Пользователь авторизован
 			
 			$local_tpl_data = array();
 			$error_msg = FALSE;
-
+			
 			/* Параметры для форм, задание правил проверки
 			 * title страниц, файлы шаблонов 
 			*/
-			switch($type){
+			switch ($type) {
 				case 'dedicated_servers':
+				
+					/* --------------------------------------------	*/
+					/* 				Выделенные серверы 				*/
+					/* --------------------------------------------	*/
+					
 					$this->load->model('servers/dedicated_servers');
 				
 					// Добавление выделенного сервера
@@ -292,6 +342,11 @@ class Adm_servers extends CI_Controller {
 					break;
 					
 				case 'game_servers':
+				
+					/* --------------------------------------------	*/
+					/* 				Игровые серверы 				*/
+					/* --------------------------------------------	*/
+					
 					$this->load->model('servers/dedicated_servers');
 					$this->load->model('servers/games');
 					
@@ -326,14 +381,8 @@ class Adm_servers extends CI_Controller {
 					
 					$this->form_validation->set_rules('screen_name', lang('dedicated_server'), 'trim|max_length[64]|min_length[3]|xss_clean');
 					$this->form_validation->set_rules('su_user', lang('adm_servers_user_start'), 'trim|max_length[64]|xss_clean');
-					
-					$this->form_validation->set_rules('script_start', lang('adm_servers_command_start'), 'trim|max_length[256]|xss_clean');
-					$this->form_validation->set_rules('script_stop', lang('adm_servers_command_stop'), 'trim|max_length[256]|xss_clean');
-					$this->form_validation->set_rules('script_restart', lang('adm_servers_command_restart'), 'trim|max_length[256]|xss_clean');
-					$this->form_validation->set_rules('script_status', lang('adm_servers_command_status'), 'trim|max_length[256]|xss_clean');
-					$this->form_validation->set_rules('script_update', lang('adm_servers_command_update'), 'trim|max_length[256]|xss_clean');
-					$this->form_validation->set_rules('script_get_console', lang('adm_servers_command_get_console'), 'trim|max_length[256]|xss_clean');
-					
+					$this->form_validation->set_rules('start_command', lang('adm_servers_command_start'), 'trim|max_length[512]|xss_clean');
+
 					$ds_id = (int)$this->input->post('ds_id');
 					
 					/* Проверка, существует ли DS */
@@ -341,11 +390,15 @@ class Adm_servers extends CI_Controller {
 						$this->tpl_data['content'] .= '<p>' . lang('adm_servers_selected_ds_unavailable') . '</p>';
 						return FALSE;
 					}
-					
-					
+
 					break;
 					
 				case 'games':
+					
+					/* --------------------------------------------	*/
+					/* 				Игры			 				*/
+					/* --------------------------------------------	*/
+					
 					$this->load->model('servers/games');
 				
 					$this->tpl_data['title'] 	= lang('adm_servers_title_add_game');
@@ -365,6 +418,11 @@ class Adm_servers extends CI_Controller {
 					break;
 				
 				case 'game_types':
+				
+					/* --------------------------------------------	*/
+					/* 				Игровые моды					*/
+					/* --------------------------------------------	*/
+					
 					$this->load->model('servers/game_types');
 					$this->load->model('servers/games');
 				
@@ -391,16 +449,14 @@ class Adm_servers extends CI_Controller {
 					redirect('');
 					break;
 			}
-			
+
 			/* Проверяем форму */
 			if ($this->form_validation->run() == FALSE) {
-				
-				//$this->show_message(validation_errors(), $link = 'javascript:history.back()');
-				
-				if(!isset($tpl_file_add)){
+
+				if (!isset($tpl_file_add)) {
 					$this->show_message('', $link = 'javascript:history.back()');
 					return FALSE;
-				}else{
+				} else {
 					$local_tpl_data['message'] = '';
 					$local_tpl_data['back_link_txt'] = lang('back');
 					$local_tpl_data['link'] = 'javascript:history.back()';
@@ -424,7 +480,10 @@ class Adm_servers extends CI_Controller {
 
 				switch($type){
 					case 'dedicated_servers':
-						/* Удаленные серверы */
+					
+						/* --------------------------------------------	*/
+						/* 				Выделенные серверы 				*/
+						/* --------------------------------------------	*/
 					
 						$sql_data['name'] = $this->input->post('name');
 						$sql_data['os'] = $this->input->post('os');
@@ -507,7 +566,10 @@ class Adm_servers extends CI_Controller {
 						break;
 
 					case 'game_servers':
-						/* Игровые серверы */
+					
+						/* --------------------------------------------	*/
+						/* 				Игровые серверы 				*/
+						/* --------------------------------------------	*/
 						
 						$this->load->model('servers/dedicated_servers');
 						$this->load->model('servers/game_types');
@@ -519,7 +581,7 @@ class Adm_servers extends CI_Controller {
 						//if(!$this->input->post('server_ip')){
 						//	$sql_data['server_ip'] = $this->input->post('server_ip');
 						//}
-						
+
 						$sql_data['server_ip'] 		= $this->input->post('server_ip');
 						$sql_data['server_port'] 	= $this->input->post('server_port');
 						$sql_data['enabled'] 		= (int)(bool)$this->input->post('enabled');
@@ -531,41 +593,75 @@ class Adm_servers extends CI_Controller {
 						$sql_data['dir'] 			= $this->input->post('dir');
 						$sql_data['ds_id'] 			= $this->input->post('ds_id');
 						
-						$sql_data['screen_name'] 	= $this->input->post('screen_name');
-						$sql_data['su_user'] 		= $this->input->post('su_user');
+						//~ $sql_data['screen_name'] 	= $this->input->post('screen_name');
+						//~ $sql_data['su_user'] 		= $this->input->post('su_user');
+						//~ $sql_data['start_command'] 	= $this->input->post('start_command');
 						
-						//$sql_data['script_path'] 	= $this->input->post('script_path');
-						$sql_data['script_start'] 	= $this->input->post('script_start');
-						$sql_data['script_stop'] 	= $this->input->post('script_stop');
-						$sql_data['script_restart'] = $this->input->post('script_restart');
-						$sql_data['script_status'] 	= $this->input->post('script_status');
-						$sql_data['script_update'] 	= $this->input->post('script_update');
-						$sql_data['script_get_console'] 	= $this->input->post('script_get_console');
 						
+						if (!$sql_data['ds_id']) {
+							$where = array('id' => $sql_data['ds_id']);
+							$this->dedicated_servers->get_ds_list($where);
+						}
+						
+						if ($sql_data['ds_id'] && !$this->dedicated_servers->ds_list) {
+							$this->show_message(lang('adm_servers_selected_ds_unavailable'));
+							return FALSE;
+						}
+						
+						$this->games->get_games_list(array('code' => $sql_data['game']), 1);
+						
+						if (!$this->games->games_list) {
+							$this->show_message(lang('adm_servers_game_not_found'));
+							return FALSE;
+						}
+
+						if ($this->input->post('start_command')) {
+							$sql_data['start_command'] 	= $this->input->post('start_command');
+						} else {
+							/* Присвоение стандартных параметров */
+							
+							if ($sql_data['ds_id']) {
+								$os = $this->dedicated_servers->ds_list[0]['os'];
+							} else {
+								$os = $this->config->config['local_os'];
+							}
+							
+							if (strtolower($os)) {
+								
+								switch (strtolower($this->games->games_list[0]['engine'])) {
+									case 'source':
+										$sql_data['start_command'] 	= 'srcds.exe -console -game {game} +ip {ip} +port {port} +map de_dust2';
+										break;
+									
+									case 'goldsource':
+										$sql_data['start_command'] 	= 'hlds.exe -console -game {game} +ip {ip} +port {port} +map de_dust2';
+										break;
+								}
+								
+							} else {
+								
+								switch (strtolower($this->games->games_list[0]['engine'])) {
+									case 'source':
+										$sql_data['start_command'] 	= 'srcds_run -game {game} +ip {ip} +port {port} +map de_dust2';
+										break;
+									
+									case 'goldsource':
+										$sql_data['start_command'] 	= 'hlds_run -console -game {game} +ip {ip} +port {port} +map de_dust2';
+										break;
+								}
+							}
+						}
+						
+						/* Присваиваем значения пути к картам и  имя scren  */
+						$sql_data['screen_name'] = $sql_data['game'] . '_' . random_string('alnum', 6) . '_' . $sql_data['server_port'];
 						$sql_data['maps_path'] = '/' . $sql_data['game'] . '/maps';
 						
 						/* Чтобы ид модификации был правильный и подходил для выбранной игры */
 						$where = array('id' => $sql_data['game_type'], 'game_code' => $sql_data['game']);
-						if(!$this->game_types->get_gametypes_list($where, 1)) {
+						if (!$this->game_types->get_gametypes_list($where, 1)) {
 							$this->show_message(lang('adm_servers_game_type_select_wrong'));
 							return FALSE;
 						}
-						
-						/* Если некоторые данные не заполнены, то берем их из данных о
-						 * модификации */
-						/*
-						if($sql_data['script_start'] == ''
-							OR $sql_data['script_stop'] == ''
-							OR $sql_data['script_restart'] == ''
-							OR $sql_data['script_status'] == ''
-						) {
-							$this->game_types->get_gametypes_list(array('id' => $sql_data['game_type']), 1);
-							
-							if($sql_data['script_start'] == '') {
-								$sql_data['script_start'] = $this->game_types->game_types_list[0]['script_start'];
-							}
-						}
-						*/
 
 						$local_tpl_data = array();
 						
@@ -583,6 +679,10 @@ class Adm_servers extends CI_Controller {
 						break;
 						
 					case 'games':
+						
+						/* --------------------------------------------	*/
+						/* 				Игры							*/
+						/* --------------------------------------------	*/
 						
 						$sql_data['code'] 			= $this->input->post('code');
 						$sql_data['start_code'] 	= $this->input->post('start_code');
@@ -612,6 +712,10 @@ class Adm_servers extends CI_Controller {
 					
 					case 'game_types':
 					
+						/* --------------------------------------------	*/
+						/* 				Игровые модификации				*/
+						/* --------------------------------------------	*/
+					
 						$sql_data['game_code'] = $this->input->post('code');
 						$sql_data['name'] = $this->input->post('name');
 						$sql_data['disk_size'] = $this->input->post('disk_size');
@@ -633,7 +737,7 @@ class Adm_servers extends CI_Controller {
 			
 			}
 
-		}else{
+		} else {
 			redirect('');
 		}
 		
@@ -675,6 +779,11 @@ class Adm_servers extends CI_Controller {
 				
 				switch($type) {
 					case 'dedicated_servers':
+					
+						/* --------------------------------------------	*/
+						/* 				Выделенные серверы 				*/
+						/* --------------------------------------------	*/
+					
 						$this->load->model('servers/dedicated_servers');
 						
 						if (!$this->dedicated_servers->get_ds_list(array('id' => $id))) {
@@ -699,6 +808,10 @@ class Adm_servers extends CI_Controller {
 						break;
 						
 					case 'game_servers':
+						/* --------------------------------------------	*/
+						/* 				Игровые серверы 				*/
+						/* --------------------------------------------	*/
+					
 						if(!$this->servers->get_server_data($id)) {
 							$this->show_message(lang('adm_servers_server_not_found'), site_url('adm_servers/view/game_servers'));
 							return FALSE;
@@ -731,6 +844,11 @@ class Adm_servers extends CI_Controller {
 						break;
 						
 					case 'games':
+						
+						/* --------------------------------------------	*/
+						/* 				Игры			 				*/
+						/* --------------------------------------------	*/
+					
 						$this->load->model('servers/games');
 						
 						if(!$this->games->get_games_list(array('code' => $id))) {
@@ -755,6 +873,11 @@ class Adm_servers extends CI_Controller {
 						break;
 						
 					case 'game_types':
+						
+						/* --------------------------------------------	*/
+						/* 				Игровые модификации				*/
+						/* --------------------------------------------	*/
+					
 						$this->load->model('servers/game_types');
 						
 						if(!$this->game_types->get_gametypes_list(array('id' => $id))) {
@@ -847,6 +970,11 @@ class Adm_servers extends CI_Controller {
 		
 		switch($type){
 			case 'dedicated_servers':
+			
+				/* --------------------------------------------	*/
+				/* 				Выделенные серверы 				*/
+				/* --------------------------------------------	*/
+					
 				$this->load->model('servers/dedicated_servers');
 				
 				if (!$this->dedicated_servers->get_ds_list(array('id' => $id), 1)) {
@@ -927,6 +1055,11 @@ class Adm_servers extends CI_Controller {
 				break;
 				
 			case 'game_servers':
+				
+				/* --------------------------------------------	*/
+				/* 				Игровые серверы					*/
+				/* --------------------------------------------	*/
+				
 				$this->load->model('servers/dedicated_servers');
 				$this->load->model('servers/games');
 				$this->load->model('servers/game_types');
@@ -955,20 +1088,9 @@ class Adm_servers extends CI_Controller {
 				$local_tpl_data['su_user'] 				= $this->servers->server_data['su_user'];
 				$local_tpl_data['server_dir'] 			= $this->servers->server_data['dir'];
 				$local_tpl_data['game_type_id']			= $this->servers->server_data['game_type'];
+				$local_tpl_data['server_start_code']		= $this->servers->server_data['start_code'];
 				
-				/* Если будет пусто, то будут вписаны данные из типа игры
-				 * чтобы в textarea оставались пустые данные, берем их не из $this->servers->server_data
-				 * а из $this->servers->servers_list[0] 
-				 * 
-				 * P.S. Не знаю даже как удобнее, но при запуске сервера, данные
-				 * будут браться из типа игры.
-				*/
-				$local_tpl_data['script_start'] 		= $this->servers->servers_list[0]['script_start'];
-				$local_tpl_data['script_stop'] 			= $this->servers->servers_list[0]['script_stop'];
-				$local_tpl_data['script_restart'] 		= $this->servers->servers_list[0]['script_restart'];
-				$local_tpl_data['script_status'] 		= $this->servers->servers_list[0]['script_status'];
-				$local_tpl_data['script_update'] 		= $this->servers->servers_list[0]['script_update'];
-				$local_tpl_data['script_get_console'] 	= $this->servers->servers_list[0]['script_get_console'];
+				$local_tpl_data['start_command'] 		= $this->servers->server_data['start_command'];
 				
 				/* Получаем абсолютный путь к корневой директории с сервером и к исполняемым файлам */
 				if ($this->servers->server_data['ds_id'] === '0') {
@@ -994,20 +1116,46 @@ class Adm_servers extends CI_Controller {
 				$where = array('game_code' => $servers_list[0]['server_game']);
 				$gametypes_list = $this->game_types->get_gametypes_list($where);
 				
+				$i = 0;
 				foreach($gametypes_list as $list) {
 					$options[$list['id']] = $list['name'];
+					
+					/* Узнаем ключ в массиве модификации которой принадлежит этот сервер */
+					if ($list['id'] == $this->servers->server_data['game_type']) {
+						$gt_key = $i;
+					}
+					
+					$i ++;
+				}
+				
+				$local_tpl_data['game_type_dropdown'] = array();
+				
+				$server_aliases = json_decode($this->servers->server_data['aliases'], TRUE);
+				
+				/* Список алиасов */
+				if($json_decode = json_decode($gametypes_list[$gt_key]['aliases'], TRUE)) {
+
+					$i = 0;
+					foreach($json_decode as $array) {
+						$local_tpl_data['aliases_list'][$i]['alias'] 		= $array['alias'];
+						$local_tpl_data['aliases_list'][$i]['desc'] 		= $array['desc'];
+						
+						if (isset($server_aliases['alias'])) {
+							$local_tpl_data['aliases_list'][$i]['alias_value'] 	= $server_aliases['alias'];
+						} else {
+							$local_tpl_data['aliases_list'][$i]['alias_value'] 	= '<' . lang('value_not_set') . '>';
+						}
+						
+						$i ++;
+					}
+
 				}
 				
 				$local_tpl_data['game_type_dropdown'] 		= form_dropdown('game_type', $options, $this->servers->server_data['game_type']);
 				$local_tpl_data['server_enabled_checkbox'] 	= form_checkbox('enabled', 'accept', $this->servers->server_data['enabled']);
 				
 				// Заменяем двойные кавычки на html символы
-				$local_tpl_data['script_start'] 	= str_replace('"', '&quot;', $local_tpl_data['script_start'] );
-				$local_tpl_data['script_stop'] 		= str_replace('"', '&quot;', $local_tpl_data['script_stop'] );
-				$local_tpl_data['script_restart'] 	= str_replace('"', '&quot;', $local_tpl_data['script_restart'] );
-				$local_tpl_data['script_status'] 	= str_replace('"', '&quot;', $local_tpl_data['script_status'] );
-				$local_tpl_data['script_update'] 	= str_replace('"', '&quot;', $local_tpl_data['script_update'] );
-				$local_tpl_data['script_get_console'] 	= str_replace('"', '&quot;', $local_tpl_data['script_get_console'] );
+				$local_tpl_data['start_command'] 	= str_replace('"', '&quot;', $local_tpl_data['start_command'] );
 				
 				/* Информация о DS */
 				if ($this->servers->server_data['ds_id']) {
@@ -1136,29 +1284,30 @@ class Adm_servers extends CI_Controller {
 				 * --------------------------------------------
 				 * Правила для формы
 				 * --------------------------------------------
-				*/	
-				$this->form_validation->set_rules('name', 'название', 'trim|required|max_length[64]|min_length[3]|xss_clean');
-					
-				$this->form_validation->set_rules('server_ip', 'IP сервера', 'trim|max_length[64]|min_length[4]|xss_clean');
-				$this->form_validation->set_rules('server_port', 'порт сервера', 'trim|required|integer|max_length[6]|min_length[2]|xss_clean');
+				*/
+				$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
 				
-				$this->form_validation->set_rules('rcon', 'RCON пароль', 'trim|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('game_type', 'модификация (тип игры)', 'trim|required|integer|xss_clean');
-				$this->form_validation->set_rules('dir', 'директория сервера', 'trim|required|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('server_ip', lang('ip'), 'trim|max_length[64]|min_length[4]|xss_clean');
+				$this->form_validation->set_rules('server_port', lang('port'), 'trim|required|integer|max_length[6]|min_length[2]|xss_clean');
 				
-				$this->form_validation->set_rules('screen_name', 'имя screen', 'trim|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('su_user', 'Пользователь Linux', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('rcon', 'RCON password', 'trim|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('game_type', lang('adm_servers_game_type'), 'trim|required|integer|xss_clean');
+				$this->form_validation->set_rules('dir', lang('adm_servers_server_dir'), 'trim|required|max_length[64]|xss_clean');
 				
-				$this->form_validation->set_rules('script_start', 'команда запуска', 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_stop', 'команда остановки', 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_restart', 'команда перезагрузки', 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_status', 'команда проверки статуса', 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_update', 'команда обновления', 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_get_console', 'команда получения консоли', 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('screen_name', lang('dedicated_server'), 'trim|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('su_user', lang('adm_servers_user_start'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('start_command', lang('adm_servers_command_start'), 'trim|max_length[512]|xss_clean');
+				
+				
 				
 				break;
 				
 			case 'games':
+			
+				/* --------------------------------------------	*/
+				/* 				Игры							*/
+				/* --------------------------------------------	*/
+				
 				$this->load->model('servers/games');
 				
 				if(!$this->games->get_games_list(array('code' => $id), 1)){
@@ -1186,6 +1335,11 @@ class Adm_servers extends CI_Controller {
 				break;
 				
 			case 'game_types':
+				
+				/* --------------------------------------------	*/
+				/* 				Игровые модификации				*/
+				/* --------------------------------------------	*/
+				
 				$this->load->model('servers/game_types');
 				$this->load->model('servers/games');
 				
@@ -1289,7 +1443,7 @@ class Adm_servers extends CI_Controller {
 				 * Данные для проверки формы 
 				*/
 				
-				$this->form_validation->set_rules('name', 'название', 'trim|required|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
 				$this->form_validation->set_rules('game_code', 'код игры', 'trim|required|max_length[32]|min_length[3]|xss_clean');
 				
 				/* Параметры запуска */
@@ -1326,6 +1480,15 @@ class Adm_servers extends CI_Controller {
 				$this->form_validation->set_rules('alias_desc[]', 'описание алиаса', 'trim|max_length[64]|xss_clean');
 				$this->form_validation->set_rules('alias_only_admins[]', 'только для администраторов', 'trim|xss_clean');
 				
+				/* Сведения для управления игроками */
+				$this->form_validation->set_rules('kick_cmd', 		lang('adm_servers_kick_cmd'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('ban_cmd', 		lang('adm_servers_ban_cmd'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('chname_cmd', 	lang('adm_servers_chname_cmd'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('srestart_cmd', 	lang('adm_servers_srestart_cmd'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('chmap_cmd', 		lang('adm_servers_chmap_cmd'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('sendmsg_cmd', 	lang('adm_servers_sendmsg_cmd'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('passwd_cmd', 	lang('adm_servers_passwd_cmd'), 'trim|max_length[64]|xss_clean');
+				
 				break;
 			default:
 				redirect('');
@@ -1345,13 +1508,15 @@ class Adm_servers extends CI_Controller {
 			$this->tpl_data['content'] .= $this->parser->parse($tpl_file_edit, $local_tpl_data, TRUE);
 		} else {
 			
-			//------------------------------------
-			//		Форма проверена, все впорядке
-			//------------------------------------
+			// Форма проверена, все впорядке
 			
 			switch($type){
 				case 'dedicated_servers':
-					/* Выделенные серверы */
+				
+					/* --------------------------------------------	*/
+					/* 				Выделенные серверы 				*/
+					/* --------------------------------------------	*/
+					
 					if($this->input->post('edit_ds')){
 						
 							// Форма проверена, все хорошо, добавляем сервер
@@ -1449,8 +1614,12 @@ class Adm_servers extends CI_Controller {
 					
 					
 					break;
+					
 				case 'game_servers':
-					/* Игровые серверы */
+				
+					/* --------------------------------------------	*/
+					/* 				Игровые серверы					*/
+					/* --------------------------------------------	*/
 					
 					$sql_data['name'] = $this->input->post('name');
 					
@@ -1466,14 +1635,8 @@ class Adm_servers extends CI_Controller {
 					
 					$sql_data['screen_name'] = $this->input->post('screen_name');
 					$sql_data['su_user'] = $this->input->post('su_user');
-					
-					$sql_data['script_start'] = $this->input->post('script_start');
-					$sql_data['script_stop'] = $this->input->post('script_stop');
-					$sql_data['script_restart'] = $this->input->post('script_restart');
-					$sql_data['script_status'] = $this->input->post('script_status');
-					$sql_data['script_update'] = $this->input->post('script_update');
-					$sql_data['script_get_console'] = $this->input->post('script_get_console');
-					
+					$sql_data['start_command'] = $this->input->post('start_command');
+
 					/* Чтобы ид модификации был правильный и подходил для выбранной игры */
 					$where = array('id' => $sql_data['game_type'], 'game_code' => $this->servers->server_data['game']);
 					if(!$this->game_types->get_gametypes_list($where, 1)) {
@@ -1500,7 +1663,10 @@ class Adm_servers extends CI_Controller {
 					
 					break;
 				case 'games':
-					/* Игры */
+				
+					/* --------------------------------------------	*/
+					/* 				Игры			 				*/
+					/* --------------------------------------------	*/
 					
 					$sql_data['name'] 			= $this->input->post('name');
 					$sql_data['code'] 			= $this->input->post('code');
@@ -1528,7 +1694,10 @@ class Adm_servers extends CI_Controller {
 					break;
 				
 				case 'game_types':
-					/* Типы игр */
+				
+					/* --------------------------------------------	*/
+					/* 				Игровые модификации				*/
+					/* --------------------------------------------	*/
 					
 					$sql_data['name'] 				= $this->input->post('name');
 					$sql_data['game_code'] 			= $this->input->post('game_code');
@@ -1542,6 +1711,14 @@ class Adm_servers extends CI_Controller {
 					$sql_data['script_status'] 		= $this->input->post('script_status');
 					$sql_data['script_update'] 		= $this->input->post('script_update');
 					$sql_data['script_get_console'] = $this->input->post('script_get_console');
+					
+					$sql_data['kick_cmd'] 			= $this->input->post('kick_cmd');
+					$sql_data['ban_cmd'] 			= $this->input->post('ban_cmd');
+					$sql_data['chname_cmd'] 		= $this->input->post('chname_cmd');
+					$sql_data['srestart_cmd'] 		= $this->input->post('srestart_cmd');
+					$sql_data['chmap_cmd'] 			= $this->input->post('chmap_cmd');
+					$sql_data['sendmsg_cmd'] 		= $this->input->post('sendmsg_cmd');
+					$sql_data['passwd_cmd'] 		= $this->input->post('passwd_cmd');
 					
 					/*
 					 * ----------------------------
@@ -1719,7 +1896,11 @@ class Adm_servers extends CI_Controller {
 					$aliases_list['only_admins'] = $this->input->post('alias_only_admins');
 					$aliases_list['delete'] 	= $this->input->post('alias_delete');
 					
+					/* Массив с системными алиасами. Их использовать нельзя */
+					$sys_aliases = array('id', 'script_path', 'command', 'game_dir', 'dir', 'name', 'ip', 'port', 'game', 'user');
+					
 					if(!empty($aliases_list['alias'])) {
+						
 						$i = -1;
 						foreach($aliases_list['alias'] as $alias) {
 							$i ++;
@@ -1741,6 +1922,11 @@ class Adm_servers extends CI_Controller {
 							
 							/* Значение должно быть удалено */
 							if(isset($aliases_list['delete'][$i])) {
+								continue;
+							}
+							
+							/* Алиас не должен быть системным */
+							if(in_array($alias, $sys_aliases)) {
 								continue;
 							}
 							

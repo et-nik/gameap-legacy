@@ -126,6 +126,14 @@ class Game_types extends CI_Model {
 					$tpl_data[$num]['script_status'] 	= str_replace('"', '&quot;', $game_types['script_status'] );
 					$tpl_data[$num]['script_update'] 	= str_replace('"', '&quot;', $game_types['script_update'] );
 					$tpl_data[$num]['script_get_console'] 	= str_replace('"', '&quot;', $game_types['script_get_console'] );
+					
+					$tpl_data[$num]['kick_cmd'] 		= str_replace('"', '&quot;', $game_types['kick_cmd'] );
+					$tpl_data[$num]['ban_cmd'] 			= str_replace('"', '&quot;', $game_types['ban_cmd'] );
+					$tpl_data[$num]['chname_cmd'] 		= str_replace('"', '&quot;', $game_types['chname_cmd'] );
+					$tpl_data[$num]['srestart_cmd'] 	= str_replace('"', '&quot;', $game_types['srestart_cmd'] );
+					$tpl_data[$num]['chmap_cmd'] 		= str_replace('"', '&quot;', $game_types['chmap_cmd'] );
+					$tpl_data[$num]['sendmsg_cmd'] 		= str_replace('"', '&quot;', $game_types['sendmsg_cmd'] );
+					$tpl_data[$num]['passwd_cmd'] 		= str_replace('"', '&quot;', $game_types['passwd_cmd'] );
 				}
 				
 			}

@@ -475,7 +475,8 @@ $fields = array(
 		
 		'screen_name' => array(
 							'type' 			=> 'CHAR',
-							'constraint' 	=> 64, 
+							'constraint' 	=> 64,
+							'default'		=> '',
 		),
 		
 		'game' => array(
@@ -541,6 +542,7 @@ $fields = array(
 		'su_user' => array(
 							'type' 			=> 'CHAR',
 							'constraint'	=> 32,
+							'default'		=> '',
 		),
 		
 		'script_start' => array(

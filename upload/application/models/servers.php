@@ -181,6 +181,13 @@ class Servers extends CI_Model {
         return TRUE;
     }
     
+    function _strip_quotes($string) {
+		$string = str_replace('"', '', $string);
+		$string = str_replace('\'', '', $string);
+		
+		return $string;
+	}
+    
     //-----------------------------------------------------------
     
     /*
@@ -221,16 +228,17 @@ class Servers extends CI_Model {
 		if(empty($server_data['screen_name'])) {
 			$server_data['screen_name'] = 'null';
 		}
-
-		$command = str_replace('{id}', $server_data['id'] , $command);				// ID сервера
-		$command = str_replace('{script_path}', $server_data['script_path'] , $command);
-		$command = str_replace('{game_dir}', $server_data['dir']  , $command);		// Директория с игрой
-		$command = str_replace('{dir}', $server_data['script_path'] . '/' . $server_data['dir']  , $command);			// Корневая директория (где скрипт запуска)
-		$command = str_replace('{name}', $server_data['screen_name'] , $command);	// Имя скрина
-		$command = str_replace('{ip}', $server_data['server_ip'] , $command);		// IP сервера для коннекта (может не совпадать с ip дедика)
-		$command = str_replace('{port}', $server_data['server_port'] , $command);	// Порт сервера для коннекта
-		$command = str_replace('{game}', $server_data['start_code'] , $command);	// Игра
-		$command = str_replace('{user}', $server_data['su_user'] , $command);		// Пользователь
+		
+		$command = str_replace('{command}', 	$this->_strip_quotes($server_data['start_command']) , $command);							// Команда запуска игрового сервера (напр. "hlds_run -game valve +ip 127.0.0.1 +port 27015 +map crossfire")
+		$command = str_replace('{id}', 			$this->_strip_quotes($server_data['id']) 			, $command);							// ID сервера
+		$command = str_replace('{script_path}', $this->_strip_quotes($server_data['script_path']) 	, $command);
+		$command = str_replace('{game_dir}', 	$this->_strip_quotes($server_data['dir'])  			, $command);							// Директория с игрой
+		$command = str_replace('{dir}', 		$this->_strip_quotes($server_data['script_path'] . '/' . $server_data['dir'])  , $command);	// Корневая директория (где скрипт запуска)
+		$command = str_replace('{name}', 		$this->_strip_quotes($server_data['screen_name']) 	, $command);							// Имя скрина
+		$command = str_replace('{ip}', 			$this->_strip_quotes($server_data['server_ip']) 	, $command);							// IP сервера для коннекта (может не совпадать с ip дедика)
+		$command = str_replace('{port}', 		$this->_strip_quotes($server_data['server_port']) 	, $command);							// Порт сервера для коннекта
+		$command = str_replace('{game}', 		$this->_strip_quotes($server_data['start_code']) 	, $command);							// Игра
+		$command = str_replace('{user}', 		$this->_strip_quotes($server_data['su_user']) 		, $command);							// Пользователь
 
 		/*-------------------*/
 		/* Замена по алиасам */
@@ -892,6 +900,7 @@ class Servers extends CI_Model {
 
 	
 	//-----------------------------------------------------------
+	
 	/**
      * Получение данных сервера
      * 
@@ -933,7 +942,7 @@ class Servers extends CI_Model {
 			 * принимается за локальный
 			 * 
 			*/
-			if(!$no_get_ds && $this->server_data['ds_id']) {
+			if (!$no_get_ds && $this->server_data['ds_id']) {
 
 				$where = array('id' => $this->server_data['ds_id']);
 				$this->dedicated_servers->get_ds_list($where, 1);
@@ -947,7 +956,6 @@ class Servers extends CI_Model {
 				
 				$this->server_data['control_protocol'] = $this->server_ds_data['control_protocol'];
 
-				$this->server_data['ssh_serv'] = $this->server_ds_data['ssh_host']; // Оставлено, чтобы избежать ошибок. В будущем надо удалить.
 				$this->server_data['ssh_host'] = $this->server_ds_data['ssh_host'];
 				$this->server_data['ssh_login'] = $this->server_ds_data['ssh_login'];
 				$this->server_data['ssh_password'] = $this->server_ds_data['ssh_password'];
@@ -959,7 +967,6 @@ class Servers extends CI_Model {
 				$this->server_data['telnet_password'] = $this->server_ds_data['telnet_password'];
 				$this->server_data['telnet_path'] = $this->server_ds_data['telnet_path'];
 				
-				$this->server_data['ftp_serv'] = $this->server_ds_data['ftp_host']; // Оставлено, чтобы избежать ошибок. В будущем надо удалить.
 				$this->server_data['ftp_host'] = $this->server_ds_data['ftp_host'];
 				$this->server_data['ftp_login'] = $this->server_ds_data['ftp_login'];
 				$this->server_data['ftp_password'] = $this->server_ds_data['ftp_password'];
@@ -967,15 +974,17 @@ class Servers extends CI_Model {
 				$this->server_data['ftp_path'] = $this->server_ds_data['ftp_path'];
 				
 				/* Определение пути до скрипта и до steamcmd */
-				switch ($this->server_data['control_protocol']){
+				switch ($this->server_data['control_protocol']) {
 					case 'local':
 						$this->server_data['script_path'] 	= $this->config->config['local_script_path'];
 						$this->server_data['steamcmd_path'] = $this->config->config['local_steamcmd_path'];
 						break;
+						
 					case 'telnet':
 						$this->server_data['script_path'] 	= $this->server_ds_data['telnet_path'];
 						$this->server_data['steamcmd_path'] = $this->server_ds_data['steamcmd_path'];
 						break;
+
 					default:
 						// По умолчанию SSH
 						$this->server_data['script_path'] 	= $this->server_ds_data['ssh_path'];
@@ -992,7 +1001,7 @@ class Servers extends CI_Model {
 				$this->server_data['local_server'] 	= 1;
 			}
 			
-			if(!$no_get_game && $this->server_data['game']){
+			if (!$no_get_game && $this->server_data['game']) {
 				$where = array('code' => $this->server_data['game']);
 				$this->games->get_games_list($where, 1);
 				
@@ -1002,12 +1011,12 @@ class Servers extends CI_Model {
 				$this->server_data['engine'] = $this->server_game_data['engine'];
 				$this->server_data['engine_version'] = $this->server_game_data['engine_version'];
 				
-			}else{
+			} else {
 				/* Информация об игре не найдена */
 				
 			}
 			
-			if(!$no_get_gt && $this->server_data['game_type']) {
+			if (!$no_get_gt && $this->server_data['game_type']) {
 				$where = array('id' => $this->server_data['game_type']);
 				$this->game_types->get_gametypes_list($where, 1);
 
@@ -1023,57 +1032,37 @@ class Servers extends CI_Model {
 					$execfile = $this->game_types->game_types_list['0']['execfile_windows'];
 				} else {
 					$execfile = $this->game_types->game_types_list['0']['execfile_linux'];
+					
+					/* Добавляем к линуксу ./ в случае необходимости */
+					if (stripos($execfile, './') === FALSE) {
+						$execfile = './' . $execfile;
+					}
+					
 				}
 				
-				/* Если данные запуска пусты */
-				if(empty($this->server_data['script_start'])) {
-					$this->server_data['script_start'] = $execfile . ' ' . $this->game_types->game_types_list['0']['script_start'];
-				}
+				$this->server_data['script_start'] 		= $execfile . ' ' . $this->game_types->game_types_list['0']['script_start'];
+				$this->server_data['script_stop'] 		= $execfile . ' ' . $this->game_types->game_types_list['0']['script_stop'];
+				$this->server_data['script_restart'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_restart'];
+				$this->server_data['script_status'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_status'];
+				$this->server_data['script_update'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_update'];
+				$this->server_data['script_get_console'] = $execfile . ' ' . $this->game_types->game_types_list['0']['script_get_console'];
 				
-				if(empty($this->server_data['script_stop'])) {
-					$this->server_data['script_stop'] = $execfile . ' ' . $this->game_types->game_types_list['0']['script_stop'];
-				}
+				$this->server_data['kick_cmd'] 		= $this->game_types->game_types_list['0']['kick_cmd'];
+				$this->server_data['ban_cmd'] 		= $this->game_types->game_types_list['0']['ban_cmd'];
+				$this->server_data['chname_cmd'] 	= $this->game_types->game_types_list['0']['chname_cmd'];
+				$this->server_data['srestart_cmd'] 	= $this->game_types->game_types_list['0']['srestart_cmd'];
+				$this->server_data['chmap_cmd'] 	= $this->game_types->game_types_list['0']['chmap_cmd'];
+				$this->server_data['sendmsg_cmd'] 	= $this->game_types->game_types_list['0']['sendmsg_cmd'];
+				$this->server_data['passwd_cmd'] 	= $this->game_types->game_types_list['0']['passwd_cmd'];
+
 				
-				if(empty($this->server_data['script_restart'])) {
-					$this->server_data['script_restart'] = $execfile . ' ' . $this->game_types->game_types_list['0']['script_restart'];
-				}
-				
-				if(empty($this->server_data['script_status'])) {
-					$this->server_data['script_status'] = $execfile . ' ' . $this->game_types->game_types_list['0']['script_status'];
-				}
-				
-				if(empty($this->server_data['script_update'])) {
-					$this->server_data['script_update'] = $execfile . ' ' . $this->game_types->game_types_list['0']['script_update'];
-				}
-				
-				if(empty($this->server_data['script_get_console'])) {
-					$this->server_data['script_get_console'] = $execfile . ' ' . $this->game_types->game_types_list['0']['script_get_console'];
-				}
-				
-			
-				//print_r($this->server_data);
-				//exit;
-				
-			}else{
+			} else {
 				/* Информация о модификации игры не найдена */
 				
 			}
-			
-			
-			//print_r($this->config->config['local_os']);
 
-			/* 
-			 * Получение информации об игре 
-			 * 
-			 * Выборка идет по коду игры, он тоже должен быть указан
-			 * 
-			*/
-			//if(!$no_get_game && $this->server_data['game']){
-			//	$query = $this->db->get_where('games', array('code' => $this->server_data['game']), 1);
-			//	$this->server_game_data = $query->row_array();
-			//}
 			
-		}else{
+		} else {
 			return FALSE;
 		}
 
@@ -1081,6 +1070,7 @@ class Servers extends CI_Model {
 	}
 	
 	//-----------------------------------------------------------
+	
 	/**
      * Получение данных сервера для шаблона
      * (вырезаны ненужные данные - пароли и пр.)
@@ -1093,7 +1083,7 @@ class Servers extends CI_Model {
 		
 		$tpl_data = array();
 		
-		if(!isset($this->servers_list)){
+		if (!isset($this->servers_list)) {
 			$this->get_game_servers_list();
 		}
 		
