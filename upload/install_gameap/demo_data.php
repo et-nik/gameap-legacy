@@ -38,28 +38,6 @@ $data = array(
 $this->games->add_game($data);
 
 $data = array(
-		'code' => "cstrike",
-		'start_code' => "cstrike",
-		'name' => "Counter-Strike 1.6",
-		'engine' => "GoldSource",
-		'engine_version' => "1",
-		'app_id' => "90",
-		'app_set_config' => "",
-);
-$this->games->add_game($data);
-
-$data = array(
-		'code' => "czero",
-		'start_code' => "czero",
-		'name' => "Counter-Strike: Condition Zero",
-		'engine' => "GoldSource",
-		'engine_version' => "1",
-		'app_id' => "90",
-		'app_set_config' => "90 mod czero",
-);
-$this->games->add_game($data);
-
-$data = array(
 		'code' => "czero",
 		'start_code' => "czero",
 		'name' => "Counter-Strike: Condition Zero",
@@ -77,28 +55,6 @@ $data = array(
 		'engine' => "Source",
 		'engine_version' => "1",
 		'app_id' => "740",
-		'app_set_config' => "",
-);
-$this->games->add_game($data);
-
-$data = array(
-		'code' => "csgo",
-		'start_code' => "csgo",
-		'name' => "Counter-Strike: Global Offensive",
-		'engine' => "Source",
-		'engine_version' => "1",
-		'app_id' => "740",
-		'app_set_config' => "",
-);
-$this->games->add_game($data);
-
-$data = array(
-		'code' => "cssource",
-		'start_code' => "cstrike",
-		'name' => "Counter-Strike: Source",
-		'engine' => "Source",
-		'engine_version' => "1",
-		'app_id' => "232330",
 		'app_set_config' => "",
 );
 $this->games->add_game($data);
@@ -126,17 +82,6 @@ $data = array(
 $this->games->add_game($data);
 
 $data = array(
-		'code' => "dod",
-		'start_code' => "dod",
-		'name' => "Day of Defeat",
-		'engine' => "GoldSource",
-		'engine_version' => "1",
-		'app_id' => "90",
-		'app_set_config' => "90 mod dod",
-);
-$this->games->add_game($data);
-
-$data = array(
 		'code' => "dods",
 		'start_code' => "dods",
 		'name' => "Day of Defeat: Source",
@@ -147,16 +92,6 @@ $data = array(
 );
 $this->games->add_game($data);
 
-$data = array(
-		'code' => "dods",
-		'start_code' => "dods",
-		'name' => "Day of Defeat: Source",
-		'engine' => "Source",
-		'engine_version' => "1",
-		'app_id' => "232290",
-		'app_set_config' => "",
-);
-$this->games->add_game($data);
 
 $data = array(
 		'code' => "dmc",
@@ -165,28 +100,6 @@ $data = array(
 		'engine' => "GoldSource",
 		'engine_version' => "1",
 		'app_id' => "0",
-		'app_set_config' => "",
-);
-$this->games->add_game($data);
-
-$data = array(
-		'code' => "dmc",
-		'start_code' => "dmc",
-		'name' => "Deathmatch Classic",
-		'engine' => "GoldSource",
-		'engine_version' => "1",
-		'app_id' => "0",
-		'app_set_config' => "",
-);
-$this->games->add_game($data);
-
-$data = array(
-		'code' => "garrysmod",
-		'start_code' => "garrysmod",
-		'name' => "Garry's Mod",
-		'engine' => "Source",
-		'engine_version' => "1",
-		'app_id' => "4020",
 		'app_set_config' => "",
 );
 $this->games->add_game($data);
@@ -214,17 +127,6 @@ $data = array(
 $this->games->add_game($data);
 
 $data = array(
-		'code' => "valve",
-		'start_code' => "valve",
-		'name' => "Half-Life 1",
-		'engine' => "GoldSource",
-		'engine_version' => "1",
-		'app_id' => "90",
-		'app_set_config' => "",
-);
-$this->games->add_game($data);
-
-$data = array(
 		'code' => "hl2mp",
 		'start_code' => "hl2mp",
 		'name' => "Half-Life 2",
@@ -232,28 +134,6 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "232370",
 		'app_set_config' => "",
-);
-$this->games->add_game($data);
-
-$data = array(
-		'code' => "hl2mp",
-		'start_code' => "hl2mp",
-		'name' => "Half-Life 2",
-		'engine' => "Source",
-		'engine_version' => "1",
-		'app_id' => "232370",
-		'app_set_config' => "",
-);
-$this->games->add_game($data);
-
-$data = array(
-		'code' => "gearbox",
-		'start_code' => "gearbox",
-		'name' => "Half-Life: Opposing Force",
-		'engine' => "GoldSource",
-		'engine_version' => "1",
-		'app_id' => "90",
-		'app_set_config' => "90 mod gearbox",
 );
 $this->games->add_game($data);
 
@@ -280,28 +160,6 @@ $data = array(
 $this->games->add_game($data);
 
 $data = array(
-		'code' => "l4d",
-		'start_code' => "l4d",
-		'name' => "Left 4 Dead",
-		'engine' => "Source",
-		'engine_version' => "1",
-		'app_id' => "0",
-		'app_set_config' => "",
-);
-$this->games->add_game($data);
-
-$data = array(
-		'code' => "l4d2",
-		'start_code' => "l4d2",
-		'name' => "Left 4 Dead 2",
-		'engine' => "Source",
-		'engine_version' => "1",
-		'app_id' => "222860",
-		'app_set_config' => "",
-);
-$this->games->add_game($data);
-
-$data = array(
 		'code' => "l4d2",
 		'start_code' => "l4d2",
 		'name' => "Left 4 Dead 2",
@@ -323,27 +181,6 @@ $data = array(
 );
 $this->games->add_game($data);
 
-$data = array(
-		'code' => "ricochet",
-		'start_code' => "ricochet",
-		'name' => "Ricochet",
-		'engine' => "GoldSource",
-		'engine_version' => "1",
-		'app_id' => "90",
-		'app_set_config' => "90 mod ricochet",
-);
-$this->games->add_game($data);
-
-$data = array(
-		'code' => "svencoop",
-		'start_code' => "svencoop",
-		'name' => "Sven Co-op",
-		'engine' => "GoldSource",
-		'engine_version' => "1",
-		'app_id' => "0",
-		'app_set_config' => "",
-);
-$this->games->add_game($data);
 
 $data = array(
 		'code' => "svencoop",
@@ -364,28 +201,6 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "232250",
 		'app_set_config' => "",
-);
-$this->games->add_game($data);
-
-$data = array(
-		'code' => "tf2",
-		'start_code' => "tf",
-		'name' => "Team Fortress 2",
-		'engine' => "Source",
-		'engine_version' => "1",
-		'app_id' => "232250",
-		'app_set_config' => "",
-);
-$this->games->add_game($data);
-
-$data = array(
-		'code' => "tfc",
-		'start_code' => "tfc",
-		'name' => "Team Fortress Classic",
-		'engine' => "GoldSource",
-		'engine_version' => "1",
-		'app_id' => "90",
-		'app_set_config' => "90 mod tfc",
 );
 $this->games->add_game($data);
 
