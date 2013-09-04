@@ -435,8 +435,9 @@ button.minimal:active {
 .arcticmodal-error { padding: 20px; border-radius: 10px; background: #000; color: #fff; }
 .arcticmodal-loading { width: 80px; height: 80px; border-radius: 10px; background: #000 url(loading.gif) no-repeat 50% 50%; }
 
-/* Вкладки */
-
+/* ------------------------ */
+/* 			Вкладки 		*/
+/* ------------------------ */
 ul.tabs {
 	margin: 0;
 	padding: 0;
@@ -492,5 +493,32 @@ ul.tabs li.active, ul.tabs li.active a:hover  {
 }
 .tab_content {
 	padding: 20px;
+}
+
+
+/* ------------------------ */
+/* 			Гармошка 		*/
+/* ------------------------ */
+
+.accordion {
+	border-bottom: solid 1px #c4c4c4;
+}
+.accordion h3 {
+	background: #FFF url(../images/arrow-square.gif) no-repeat right -51px;
+	
+	border-bottom: 1px solid #D0D0D0;
+	line-height: 32px;
+	padding: 0 50px 0 50px;
+	margin: 0;
+}
+.accordion h3:hover {
+	background-color: #F4F2F2;
+}
+.accordion h3.active {
+	background-position: right 5px;
+}
+
+.accordion div {
+	margin: 25px 0 25px 0;
 }
 
