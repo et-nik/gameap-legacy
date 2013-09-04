@@ -44,18 +44,27 @@ class Server_command extends CI_Controller {
     // -----------------------------------
     
 	// Отображение информационного сообщения
-    private function show_message($message = 'Ошибка', $link = FALSE, $link_text = 'Вернуться')
-    {
-        if(!$link) {
+	private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+	{
+		
+		if (!$message) {
+			$message = lang('error');
+		}
+		
+		if (!$link) {
 			$link = site_url('admin');
 		}
-        
-        $local_tpl_data['message'] = $message;
-        $local_tpl_data['link'] = $link;
-        $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
-        $this->parser->parse('main.html', $this->tpl_data);
-    }
+		
+		if (!$link_text) {
+			$link_text = lang('back');
+		}
+	
+		$local_tpl_data['message'] = $message;
+		$local_tpl_data['link'] = $link;
+		$local_tpl_data['back_link_txt'] = $link_text;
+		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
+		$this->parser->parse('main.html', $this->tpl_data);
+	}
     
 	/*
 	 * 

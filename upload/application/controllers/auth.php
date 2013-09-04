@@ -37,13 +37,22 @@ class Auth extends CI_Controller {
 		$this->tpl_data['heading'] 	= lang('auth_heading');
     }
     
-	// Отображение информационного сообщения
-    private function show_message($message = 'Ошибка', $link = FALSE, $link_text = 'Вернуться')
+    // Отображение информационного сообщения
+    private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
     {
-        if(!$link) {
+        
+        if (!$message) {
+			$message = lang('error');
+		}
+		
+        if (!$link) {
 			$link = site_url('auth/in');
 		}
-        
+		
+		if (!$link_text) {
+			$link_text = lang('back');
+		}
+
         $local_tpl_data['message'] = $message;
         $local_tpl_data['link'] = $link;
         $local_tpl_data['back_link_txt'] = $link_text;

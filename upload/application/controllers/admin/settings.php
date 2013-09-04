@@ -35,8 +35,21 @@ class Settings extends CI_Controller {
     }
     
     // Отображение информационного сообщения
-    private function show_message($message = 'Ошибка', $link = 'javascript:history.back()', $link_text = 'Вернуться')
+    private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
     {
+        
+        if (!$message) {
+			$message = lang('error');
+		}
+		
+        if (!$link) {
+			$link = 'javascript:history.back()';
+		}
+		
+		if (!$link_text) {
+			$link_text = lang('back');
+		}
+
         $local_tpl_data['message'] = $message;
         $local_tpl_data['link'] = $link;
         $local_tpl_data['back_link_txt'] = $link_text;
