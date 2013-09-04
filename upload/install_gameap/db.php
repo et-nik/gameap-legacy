@@ -268,6 +268,7 @@ $fields = array(
 		),
 );
 
+$this->dbforge->add_key('code', TRUE);
 $this->dbforge->add_field($fields);
 $this->dbforge->create_table('games');
 
