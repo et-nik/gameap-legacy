@@ -1540,7 +1540,7 @@ class Servers extends CI_Model {
 		// Определяем временный файл
 		$temp_file = tempnam(sys_get_temp_dir(), basename($file));
 
-		if(!file_put_contents($temp_file, $data)) {
+		if (file_put_contents($temp_file, $data) == FALSE) {
 			$this->errors = 'Ошибка записи временного файла';
 			return FALSE;
 		}
