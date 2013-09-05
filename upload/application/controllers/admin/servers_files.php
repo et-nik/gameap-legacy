@@ -288,7 +288,7 @@ class Servers_files extends CI_Controller {
 					$file_contents = $this->servers->read_remote_file($file);
 				}
 				
-				if(!$file_contents) {
+				if($file_contents === FALSE) {
 					$adm_message = '';
 					
 					// Отображаем админу дополнительную информацию

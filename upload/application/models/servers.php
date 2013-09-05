@@ -1423,7 +1423,7 @@ class Servers extends CI_Model {
 		
 		$connection = ftp_connect($server_data['ftp_host']);
 		
-		if(ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])){
+		if (ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])) {
 			
 			// Определяем временный файл
 			$temp_file = tempnam(sys_get_temp_dir(), basename($file));
@@ -1442,7 +1442,7 @@ class Servers extends CI_Model {
 			unlink($temp_file);
 			
 			return $file_contents;
-		}else{
+		} else {
 			return FALSE;
 		}
 	}
@@ -1540,7 +1540,7 @@ class Servers extends CI_Model {
 		// Определяем временный файл
 		$temp_file = tempnam(sys_get_temp_dir(), basename($file));
 
-		if (file_put_contents($temp_file, $data) == FALSE) {
+		if (file_put_contents($temp_file, $data) === FALSE) {
 			$this->errors = 'Ошибка записи временного файла';
 			return FALSE;
 		}
