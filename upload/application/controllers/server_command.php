@@ -151,7 +151,7 @@ class Server_command extends CI_Controller {
 					
 				case 'restart':
 					$privileges = (bool)($this->users->servers_privileges['SERVER_SOFT_RESTART']);
-					$isset = (bool)$this->servers->server_data['restart_cmd'];
+					$isset = (bool)$this->servers->server_data['srestart_cmd'];
 
 					$submit_name = 'submit_restart';
 					$no_submit_name = TRUE;
