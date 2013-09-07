@@ -73,19 +73,16 @@ class Servers_files extends CI_Controller {
     */
     public function index()
     {
-        if ($this->users->user_id) {
-			
-			/* Загружаем модель */
-			$this->load->model('servers');
-			
-			$this->servers->get_server_list($this->users->user_id);
-			
-			$local_tpl_data['servers_list'] = $this->servers->tpl_data();
-			$local_tpl_data['url'] 			= site_url('admin/servers_files/server');
-				
-			$this->tpl_data['content'] .= $this->parser->parse('servers/select_server.html', $local_tpl_data, TRUE);
-		}
+		/* Загружаем модель */
+		$this->load->model('servers');
 		
+		$this->servers->get_server_list($this->users->auth_id);
+		
+		$local_tpl_data['servers_list'] = $this->servers->tpl_data();
+		$local_tpl_data['url'] 			= site_url('admin/servers_files/server');
+			
+		$this->tpl_data['content'] .= $this->parser->parse('servers/select_server.html', $local_tpl_data, TRUE);
+			
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 	
@@ -99,7 +96,7 @@ class Servers_files extends CI_Controller {
     */
 	public function server($server_id = FALSE)
     {
-		if($this->users->user_id){
+		if($this->users->auth_id){
 			
 			/* 
 			 * Если не указан id сервера, то перенаправляем на

@@ -77,10 +77,10 @@ class Index extends CI_Controller {
 						
 					/* Работает ли сервер */
 					if($this->servers->server_status($this->server_data['server_ip'], $this->server_data['server_port'])) {
-						$server_status['string'] = '<img src="' . base_url() . '/themes/' . $template . '/' . $style . '/images/bullet_green.png" alt="' . lang('enabled') . '"/>';
+						$server_status['string'] = '<img src="' . base_url() . '/themes/system/images/bullet_green.png" alt="' . lang('enabled') . '"/>';
 						$this->server_data['server_status'] = 1;
 					} else {
-						$server_status['string'] = '<img src="' . base_url() . '/themes/' . $template . '/' . $style . '/images/bullet_red.png" alt="' . lang('disabled') . '"/>';
+						$server_status['string'] = '<img src="' . base_url() . '/themes/system/images/bullet_red.png" alt="' . lang('disabled') . '"/>';
 						$this->server_data['server_status'] = 0;
 					}
 						

@@ -212,6 +212,9 @@ class Logs extends Servers {
 			}
 			
 			if($files_list){	
+				
+				$files_list = array_reverse($files_list);
+				
 				foreach ($files_list as $file) {
 					/* Достижение лимита */
 					if($num == $limit){
@@ -261,13 +264,14 @@ class Logs extends Servers {
 		/* Определение, является сервер локальным или удаленным */
 		if($this->servers->server_data['local_server']) {
 			// Сервер локальный
-			$dir = set_realpath($this->servers->server_data['local_path'] . '/' . $this->servers->server_data['dir'] . '/' . $log_path);
+			$dir = $this->servers->server_data['local_path'] . '/' . $this->servers->server_data['dir'] . '/' . $log_path . '/';
 			$file_contents = $this->servers->read_local_file($dir . $file_name);
+			
 			
 		} else {
 			
 			// Сервер удаленный
-			$dir = set_realpath($this->servers->server_data['ftp_path'] . '/' . $this->servers->server_data['dir'] . '/' . $log_path);
+			$dir = $this->servers->server_data['ftp_path'] . '/' . $this->servers->server_data['dir'] . '/' . $log_path . '/';
 			$file_contents = $this->servers->read_remote_file($dir . $file_name);
 		}
 

@@ -36,7 +36,6 @@ class Servers extends CI_Model {
         $this->load->helper('safety');
     }
 
-    /* hlftp j8p9B7ctU65APuEy */
 	//-----------------------------------------------------------
     function get_chat($ftp_hostname, $ftp_username, $ftp_password, $ftp_path, $ftp_id)
     {

@@ -65,7 +65,7 @@ class Auth extends CI_Controller {
 			// Удаление старой капчи
 			$expiration = time()-7200; // Двухчасовое ограничение
 			
-			$this->db->delete('capthca', array('captcha_time <' => $expiration));
+			$this->db->delete('captcha', array('captcha_time <' => $expiration));
 			
 			// Проверяем капчу
 			$query = $this->db->get_where('captcha', array('word' => $word, 'ip_address' => $this->input->ip_address(), 'captcha_time >' => $expiration), 1);

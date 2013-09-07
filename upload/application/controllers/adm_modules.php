@@ -39,6 +39,8 @@ class Adm_modules extends CI_Controller {
 	public function __construct()
     {
         parent::__construct();
+        
+        $this->load->database();
         $this->load->model('users');
         
         if ($this->users->check_user()) {
@@ -54,6 +56,8 @@ class Adm_modules extends CI_Controller {
 			$this->tpl_data['content'] 	= '';
 			
 			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, TRUE);
+		} else {
+			redirect('auth/in');
 		}
 	}
 	
@@ -202,7 +206,7 @@ class Adm_modules extends CI_Controller {
 	public function update_list()
 	{
 		if ($this->_update_list()) {
-			$this->_show_message('Modules list updated');
+			$this->_show_message('Modules list updated', site_url('adm_modules'));
 			return TRUE;
 		} else {
 			$this->_show_message('Modules list update failure');
