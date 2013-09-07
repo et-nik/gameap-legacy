@@ -421,11 +421,17 @@ switch($page) {
 			));
 
 			$this->dbforge->create_table('migrations', TRUE);
-
-			
 		}
 		
-		$this->db->insert('migrations', array('version' => 1));
+		include_once 'application/config/migration.php';
+		
+		if (isset($config['migration_version']) {
+			$m_version = $config['migration_version'];
+		} else {
+			$m_version = 0;
+		}
+		
+		$this->db->insert('migrations', array('version' => $m_version));
 		
 		/*------------*/
 		/* ADMIN ADD  */
