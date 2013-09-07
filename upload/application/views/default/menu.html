@@ -32,32 +32,29 @@
 	    </li>
 	<?php endif; ?>
 		
-		<?php /*
-		* Отображение меню модулей
-		* Функция в разработке
-		<?php if ($this->users->auth_data['is_admin'] OR count($this->modules->modules) > 0 ): ?>
+		<?php /* <меню с модулями> */ ?>
+		
+		<?php $this->gameap_modules->get_menu_modules(); ?>
+		
+		<?php if (count($this->gameap_modules->menu) > 0 OR $this->users->auth_data['is_admin']): ?>
 		<li class='has-sub'><a href="#">{lang_menu_modules}</a>
 			<ul>
-				<?php if ($this->users->auth_data['is_admin']): ?>
-				<li><a href="{site_url}modules">{lang_menu_control_modules}</a></li>
-				
-				<?php 
-				if(!empty($this->modules->modules_data)) { 
-					foreach ($this->modules->modules_data as $module) {
-						if (file_exists((APPPATH . 'controllers/modules/' . $module['file'] . '.php'))) {
-							echo '<li><a href="{site_url}modules/' . $module['file'] . '">' . $module['name'] . '</a></li>';
-						}
+				<?php
+				if(isset($this->gameap_modules->menu) && !empty($this->gameap_modules->menu)) { 
+					foreach ($this->gameap_modules->menu as $module) {
+						echo '<li><a href="{site_url}' . $module['short_name'] . '">' . $module['name'] . '</a></li>';
 					}
 				}
 				?>
 				
+				<?php if ($this->users->auth_data['is_admin']): ?>
+					<li><a href="{site_url}adm_modules">{lang_menu_control_modules}</a></li>
 				<?php endif; ?>
 			</ul>
 		</li>
 		<?php endif; ?>
-		* 
-		*/ 
-		?>
+		
+		<?php /* </меню с модулями> */ ?>
 		
 		<li class='has-sub'><a href="{site_url}adminpanel">{lang_menu_gameap}</a>
 			<ul>

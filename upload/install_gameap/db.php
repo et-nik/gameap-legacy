@@ -461,25 +461,17 @@ $this->dbforge->create_table('logs');
 /*----------------------------------*/
 
 $fields = array(
-		'id' => array(
-							'type' => 'INT',
-							'constraint' => 16, 
-							'auto_increment' => TRUE
-		),
-		
-		'name' => array(
+		'short_name' => array(
 							'type' => 'CHAR',
 							'constraint' => 32, 
 		),
-
-		'file' => array(
+		
+		'name' => array(
 							'type' => 'TINYTEXT',
 		),
 		
-		'enabled' => array(
-							'type' => 'INT',
-							'constraint' => 1, 
-							'default'	=> 1,
+		'description' => array(
+							'type' => 'TINYTEXT',
 		),
 		
 		'version' => array(
@@ -487,6 +479,15 @@ $fields = array(
 							'constraint' => 64, 
 		),
 		
+		'show_in_menu' => array(
+							'type' => 'INT',
+							'constraint' => 1, 
+		),
+		
+		'access' => array(
+							'type' => 'TINYTEXT', 
+		),
+
 		'developer' => array(
 							'type' => 'CHAR',
 							'constraint' => 64, 
@@ -496,13 +497,21 @@ $fields = array(
 							'type' => 'TINYTEXT',
 		),
 		
-		'information' => array(
+		'email' => array(
+							'type' => 'TINYTEXT',
+		),
+		
+		'copyright' => array(
+							'type' => 'TINYTEXT',
+		),
+		
+		'license' => array(
 							'type' => 'TINYTEXT',
 		),
 );
 
 $this->dbforge->add_field($fields);
-$this->dbforge->add_key('id', TRUE);
+$this->dbforge->add_key('short_name', TRUE);
 $this->dbforge->create_table('modules');
 
 /*----------------------------------*/

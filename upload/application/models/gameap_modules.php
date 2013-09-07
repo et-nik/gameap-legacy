@@ -35,7 +35,7 @@ class Gameap_modules extends CI_Model {
         parent::__construct();
         
         /* Получение списка модулей */
-        $this->get_modules_list();
+        $this->get_modules_data();
     }
     
     // ----------------------------------------------------------
@@ -62,6 +62,20 @@ class Gameap_modules extends CI_Model {
     function add_module($data)
     {
 		if ($this->db->insert('modules', $data)) {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+	
+	// ----------------------------------------------------------
+	
+	/**
+	 * Очищает список модулей из базы данных
+	*/
+	function clean_modules()
+    {
+		if ($this->db->empty_table('modules')) {
 			return TRUE;
 		} else {
 			return FALSE;
@@ -102,16 +116,34 @@ class Gameap_modules extends CI_Model {
 	 * 
 	 * @return array
 	 */
-	function get_modules_list() {
+	function get_modules_list($for_menu = FALSE, $access = '') {
 		
 		//~ if(empty($this->modules_data)) {
 			//~ $this->get_cache_modules_data();
 		//~ }
 		
+		if (!empty($this->modules_list)) {
+			return $this->modules_list;
+		}
+		
 		if (!empty($this->modules_data)) {
-			foreach ($this->modules_data as $module) {
-				$this->modules_list[] = str_replace(' ', '_', strtolower($module['name']));	
+			$this->get_modules_data();
+		}
+		
+		$i = 0;
+		foreach ($this->modules_data as $module) {
+			
+			if ($for_menu) {
+				if ($module['show_in_menu']) {
+					$this->modules_list[$i] = str_replace(' ', '_', strtolower($module['short_name']));	
+				}
+				
+			} else {
+				$this->modules_list[$i] = str_replace(' ', '_', strtolower($module['short_name']));	
 			}
+			
+			$i++;
+			
 		}
 		
 		return $this->modules_list;
@@ -121,20 +153,47 @@ class Gameap_modules extends CI_Model {
      * Получение меню из модулей
      * 
     */
-	//~ function get_menu_modules()
-    //~ {
-		//~ if (empty($this->modules_list)) {
-			//~ /* Получение списка модулей */
-			//~ $this->get_cache_modules_list();
-		//~ }
-		//~ 
-		//~ $i = -1;
-		//~ foreach ($this->modules_list as $module) {
-			//~ $i++;
-			//~ $this->menu[][$i];
-			//~ 
-		//~ }
-		//~ 
-		//~ 
-	//~ }
+	function get_menu_modules()
+    {
+		if (!empty($this->modules_data)) {
+			$this->get_modules_data();
+		}
+		
+		/* Определение прав пользователя */
+		if ($this->users->auth_data['is_admin']) {
+			$access_level = 100;
+		} elseif ($this->users->auth_privileges['srv_global']) {
+			$access_level = 90;
+		} else {
+			$access_level = 1;
+		}
+		
+		$i = 0;
+		foreach ($this->modules_data as $module) {
+			
+			
+			if ($module['show_in_menu']) {
+				
+				if (strtolower($module['access']) == 'user' && $access_level < 1) {
+					$i ++;
+					continue;
+				} elseif (strtolower($module['access']) == 'srv_global' && $access_level < 90)  {
+					$i ++;
+					continue;
+				} elseif (strtolower($module['access']) == 'admin' && $access_level < 100)  {
+					$i ++;
+					continue;
+				}
+				
+				
+				$this->menu[$i]['short_name'] 	= strtolower($module['short_name']);	
+				$this->menu[$i]['name'] 		= $module['name'];	
+			}
+			
+			$i++;
+		}
+		
+		return $this->menu;
+		
+	}
 }

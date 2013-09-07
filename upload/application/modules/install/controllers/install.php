@@ -20,6 +20,12 @@ class Install extends MX_Controller {
 	var $user_data = array();
 	var $server_data = array();
 	
+	$autoload = array(
+        'helper'    => array('url', 'form', 'safety'),
+        'libraries' => array('form_validation'),
+        'model' => array('users', 'password', 'servers', 'servers/dedicated_servers', 'servers/games', 'servers/game_types'),
+    );
+	
 	public function __construct()
     {
         parent::__construct();
@@ -30,17 +36,6 @@ class Install extends MX_Controller {
         if(!file_exists('install_gameap') OR !file_exists('install_gameap/install.php') OR !file_exists('install_gameap/db.php')) {
 			show_404();
 		}
-		
-		/* Загрузка нужных библиотек */
-		$this->load->library('form_validation');
-        $this->load->model('users');
-        $this->load->helper('safety');
-        $this->load->model('password');
-        
-        $this->load->model('servers');
-        $this->load->model('servers/dedicated_servers');
-        $this->load->model('servers/games');
-        $this->load->model('servers/game_types');
     }
     
     // Отображение информационного сообщения

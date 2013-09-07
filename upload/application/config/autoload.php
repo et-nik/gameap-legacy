@@ -109,7 +109,7 @@ $autoload['language'] = array('main');
 |
 */
 
-$autoload['model'] = array('panel_log');
+$autoload['model'] = array('panel_log', 'gameap_modules');
 
 
 /* End of file autoload.php */
