@@ -615,6 +615,11 @@ class Users extends CI_Model {
 		
 		$admin_list = $this->get_users_list(array('is_admin' => '1'), 1000);
 		
+		if (!empty($admin_list)) {
+			// Админов нет
+			return FALSE;
+		}
+		
 		foreach($admin_list as $admin_data) {
 			$email_list[] = $admin_data['email'];
 		}
