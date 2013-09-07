@@ -6,7 +6,7 @@
 	<tr>
 		<th><strong>{lang_server_name}</strong></th>
 		<th><strong>{lang_server_ip}</strong></th>
-		<?php if(in_array('commercial_module', $this->modules->modules_list)): ?><th><strong>{lang_main_server_expires}</strong></th><?php endif; ?>
+		<?php if(module_exists('commercial_module')): ?><th><strong>{lang_main_server_expires}</strong></th><?php endif; ?>
 		<th><strong>{lang_status}</strong></th>
 		<th width="30%"><strong>{lang_commands}</strong></th>
 	</tr>
