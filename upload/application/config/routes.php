@@ -47,8 +47,6 @@ $route['admin/(:any)'] = "admin/$1";
 $route['ajax'] = "ajax/index";
 $route['ajax/(:any)'] = "ajax/$1";
 
-$route['modules'] = "modules/index";
-$route['modules/(:any)'] = "modules/$1";
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

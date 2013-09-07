@@ -35,7 +35,7 @@ class Settings extends CI_Controller {
     }
     
     // Отображение информационного сообщения
-    private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
     {
         
         if (!$message) {
@@ -80,7 +80,7 @@ class Settings extends CI_Controller {
     {
 
 		if(!$server_id) {
-			$this->show_message('Сервер не найден');
+			$this->_show_message('Сервер не найден');
 			return FALSE;
 		}
 		
@@ -91,13 +91,13 @@ class Settings extends CI_Controller {
 		$this->users->get_server_privileges($server_id);
 		
 		if(!$this->servers->server_data) {
-			$this->show_message(lang('settings_server_not_found'));
+			$this->_show_message(lang('settings_server_not_found'));
 			return FALSE;
 		}
 		
 		/* Пользователь должен быть админом либо иметь привилегии настройки */			
 		if(!$this->users->auth_data['is_admin'] && !$this->users->servers_privileges['SERVER_SETTINGS']) {
-			$this->show_message(lang('settings_not_privileges_for_server'));
+			$this->_show_message(lang('settings_not_privileges_for_server'));
 			return FALSE;
 		}
 		
@@ -207,7 +207,7 @@ class Settings extends CI_Controller {
 			$log_data['msg'] = 'Edit settings';
 			$this->panel_log->save_log($log_data);
             
-            $this->show_message(lang('settings_saved'), site_url('admin/server_control/main/' . $server_id), lang('next'));
+            $this->_show_message(lang('settings_saved'), site_url('admin/server_control/main/' . $server_id), lang('next'));
             return TRUE;
             
 		}

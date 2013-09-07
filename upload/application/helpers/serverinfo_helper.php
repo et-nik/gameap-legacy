@@ -1,4 +1,5 @@
-<?php
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+
 
 // Simple Source/GoldSRC server info collector by morpheus
 function cutchar(&$string)

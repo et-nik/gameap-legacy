@@ -7,8 +7,8 @@
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
  * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
- * @license		http://gameap.ru/license.html
- * @link		http://gameap.ru
+ * @license		http://www.gameap.ru/license.html
+ * @link		http://www.gameap.ru
  * @filesource
 */
 class Auth extends CI_Controller {
@@ -38,7 +38,7 @@ class Auth extends CI_Controller {
     }
     
     // Отображение информационного сообщения
-    private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
     {
         
         if (!$message) {
@@ -158,7 +158,7 @@ class Auth extends CI_Controller {
 			
 			/* Защита от брутфорса по одному ip */
 			if(count($this->panel_log->get_log(array('date >' => time() - 300, 'ip' => $_SERVER['REMOTE_ADDR'], 'msg' => 'Authorization Failed'))) > 5 ) {
-				$this->show_message(lang('auth_repeat_enter_wrong_password'));
+				$this->_show_message(lang('auth_repeat_enter_wrong_password'));
 				return FALSE;
 			}
 			
@@ -202,10 +202,10 @@ class Auth extends CI_Controller {
 							$this->email->message($email_message);
 			
 							if($this->email->send()) {
-								$this->show_message(lang('auth_bruteforce_email_send'));
+								$this->_show_message(lang('auth_bruteforce_email_send'));
 								$log_data['msg'] = 'Bruteforce. Reset code sended';
 							} else {
-								$this->show_message(lang('auth_bruteforce_authorization_error'));
+								$this->_show_message(lang('auth_bruteforce_authorization_error'));
 								$log_data['msg'] = 'Bruteforce. Reset code send failure';
 							}
 							
@@ -217,7 +217,7 @@ class Auth extends CI_Controller {
 							$this->panel_log->save_log($log_data);
 							return FALSE;
 						} else {
-							$this->show_message(lang('auth_bruteforce_email_send'));
+							$this->_show_message(lang('auth_bruteforce_email_send'));
 							return FALSE;
 						}
 						// Код неверный
@@ -332,7 +332,7 @@ class Auth extends CI_Controller {
         $this->tpl_data['title'] 	= lang('auth_heading_register');
         
         if(!$this->config->config['register_users']) {
-			$this->show_message(lang('auth_registration_closed'), site_url());
+			$this->_show_message(lang('auth_registration_closed'), site_url());
 			return FALSE;
 		}
 
@@ -386,7 +386,7 @@ class Auth extends CI_Controller {
 				$log_data['msg'] = 'Registration Failed';
 				$this->panel_log->save_log($log_data);
 				
-				$this->show_message(lang('auth_captcha_enter_wrong'), site_url('auth/register'));
+				$this->_show_message(lang('auth_captcha_enter_wrong'), site_url('auth/register'));
 				return FALSE;
 			}
 			
@@ -419,7 +419,7 @@ class Auth extends CI_Controller {
 			$log_data['msg'] = 'Registration Successful';
 			$this->panel_log->save_log($log_data);
 			
-			$this->show_message(lang('auth_registration_successful'));
+			$this->_show_message(lang('auth_registration_successful'));
 			return TRUE;
 			
 		}
@@ -486,7 +486,7 @@ class Auth extends CI_Controller {
 					$log_data['user_name'] = $user_list[0]['login'];
 					$this->panel_log->save_log($log_data);
 					
-					$this->show_message(lang('auth_recovery_msg_send') . ' ' . $user_list[0]['email'], site_url('auth/in'), 'Далее');
+					$this->_show_message(lang('auth_recovery_msg_send') . ' ' . $user_list[0]['email'], site_url('auth/in'), 'Далее');
 					
 					/* Пригодится для дебага */
 					//echo $this->email->print_debugger();
@@ -498,7 +498,7 @@ class Auth extends CI_Controller {
 					$user_data['password'] = $old_password;
 					$this->users->update_user($user_data, $user_list['0']['id']);
 					
-					$this->show_message(lang('auth_recovery_msg_send_error'), site_url('auth/in'), 'Далее');
+					$this->_show_message(lang('auth_recovery_msg_send_error'), site_url('auth/in'), 'Далее');
 					
 					// Пишем логи
 					$log_data['msg'] = 'Mail Send Error';				// Сообщение для логов
@@ -526,7 +526,7 @@ class Auth extends CI_Controller {
 			$email = $this->input->post('email');
 			
 			if(!$login && !$email){
-				$this->show_message(lang('auth_enter_login_or_email'), 'javascript:history.back()');
+				$this->_show_message(lang('auth_enter_login_or_email'), 'javascript:history.back()');
 				return FALSE;
 			}
 
@@ -540,7 +540,7 @@ class Auth extends CI_Controller {
 			
 			/* Существует ли пользователь */
 			if(empty($user_list)){
-				$this->show_message(lang('auth_user_not_found'), 'javascript:history.back()');
+				$this->_show_message(lang('auth_user_not_found'), 'javascript:history.back()');
 				return FALSE;
 			}
 				
@@ -563,10 +563,10 @@ class Auth extends CI_Controller {
 			$this->email->message(lang('auth_recovery_mail_goto_link') . ': ' . $url_recovery);	
 				
 			if($this->email->send()){
-				$this->show_message(lang('recovery_recovery_msg_accept_send') . ' ' . $user_list[0]['email'] , site_url('auth/in'), 'Далее');
+				$this->_show_message(lang('recovery_recovery_msg_accept_send') . ' ' . $user_list[0]['email'] , site_url('auth/in'), 'Далее');
 				$log_data['msg'] = 'Send Recovery Code. Email: ' . $user_list[0]['email'];
 			}else{
-				$this->show_message(lang('auth_recovery_msg_send_error'), site_url('auth/in'), 'Далее');
+				$this->_show_message(lang('auth_recovery_msg_send_error'), site_url('auth/in'), 'Далее');
 				$log_data['msg'] = 'Mail Send Error';				// Сообщение для логов
 			}
 				

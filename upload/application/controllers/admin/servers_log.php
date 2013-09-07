@@ -52,7 +52,7 @@ class Servers_log extends CI_Controller {
     }
     
     // Отображение информационного сообщения
-    private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
     {
         
         if (!$message) {
@@ -125,7 +125,7 @@ class Servers_log extends CI_Controller {
 			
 			/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
 			if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']){
-				$this->show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_log'));
+				$this->_show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_log'));
 				return FALSE;
 			}
 			
@@ -133,7 +133,7 @@ class Servers_log extends CI_Controller {
 			$this->users->get_server_privileges($server_id);
 			
 			if(!$this->users->servers_privileges['LOGS_VIEW']){
-				$this->show_message(lang('servers_log_no_privileges'), site_url('admin/servers_log'));
+				$this->_show_message(lang('servers_log_no_privileges'), site_url('admin/servers_log'));
 				return FALSE;
 			}
 			
@@ -180,7 +180,7 @@ class Servers_log extends CI_Controller {
 			$ldir_list = json_decode($this->servers->server_data['log_dirs'], TRUE);
 			
 			if(!array_key_exists($id_dir, $ldir_list)){
-				$this->show_message(lang('servers_log_dir_unavailable'), site_url('admin/servers_log'));
+				$this->_show_message(lang('servers_log_dir_unavailable'), site_url('admin/servers_log'));
 				return FALSE;
 			}
 			
@@ -201,7 +201,7 @@ class Servers_log extends CI_Controller {
 				/* Небыло ли ошибок */
 				if($this->logs->errors) {
 					// Ошибки были, выводим их
-					$this->show_message($this->logs->errors, site_url('admin/servers_log'));
+					$this->_show_message($this->logs->errors, site_url('admin/servers_log'));
 					
 					// Сохраняем логи ошибок
 					
@@ -269,7 +269,7 @@ class Servers_log extends CI_Controller {
 			
 			/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
 			if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']){
-				$this->show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_log'));
+				$this->_show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_log'));
 				return FALSE;
 			}
 			
@@ -277,7 +277,7 @@ class Servers_log extends CI_Controller {
 			$this->users->get_server_privileges($server_id);
 			
 			if(!$this->users->servers_privileges['LOGS_VIEW']){
-				$this->show_message(lang('servers_log_no_privileges'), site_url('admin/servers_log'));
+				$this->_show_message(lang('servers_log_no_privileges'), site_url('admin/servers_log'));
 				return FALSE;
 			}
 			
@@ -287,7 +287,7 @@ class Servers_log extends CI_Controller {
 			$ldir_list = json_decode($this->servers->server_data['log_dirs'], TRUE);
 			
 			if (!array_key_exists($id_dir, $ldir_list)) {
-				$this->show_message(lang('servers_log_dir_unavailable'), site_url('admin/servers_log'));
+				$this->_show_message(lang('servers_log_dir_unavailable'), site_url('admin/servers_log'));
 				return FALSE;
 			}
 			
@@ -299,7 +299,7 @@ class Servers_log extends CI_Controller {
 			$allowed_types = explode('|', $file_ext);
 			$file_ext = end(explode(".", $file_log));
 			if(!in_array($file_ext, $allowed_types)){
-				$this->show_message(lang('servers_log_file_type_unavailable'), site_url('admin/servers_log'));
+				$this->_show_message(lang('servers_log_file_type_unavailable'), site_url('admin/servers_log'));
 				return FALSE;
 			}
 			
@@ -307,7 +307,7 @@ class Servers_log extends CI_Controller {
 			$log_content = $this->logs->get_log($dir, $file_log);
 			
 			if(!$log_content) {
-				$this->show_message($this->servers->errors);
+				$this->_show_message($this->servers->errors);
 				
 				/* Сохраняем логи */
 				$log_data['type'] = 'server_files';

@@ -42,7 +42,7 @@ class Servers_files extends CI_Controller {
     }
     
     // Отображение информационного сообщения
-    private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
     {
         
         if (!$message) {
@@ -122,7 +122,7 @@ class Servers_files extends CI_Controller {
 			if(!$this->users->servers_privileges['UPLOAD_CONTENTS']
 			&& !$this->users->servers_privileges['CHANGE_CONFIG']
 			){
-				$this->show_message(lang('server_files_no_privileges'), site_url('admin/servers_files'));
+				$this->_show_message(lang('server_files_no_privileges'), site_url('admin/servers_files'));
 				return FALSE;
 			}
 			
@@ -131,7 +131,7 @@ class Servers_files extends CI_Controller {
 			
 			/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
 			if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']){
-				$this->show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_files'));
+				$this->_show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_files'));
 				return FALSE;
 			}
 			
@@ -234,7 +234,7 @@ class Servers_files extends CI_Controller {
 			
 			/* Проверка привилегий на правку конфигов */
 			if (!$this->users->servers_privileges['CHANGE_CONFIG']) {
-				$this->show_message(lang('server_files_no_cfg_privileges'));
+				$this->_show_message(lang('server_files_no_cfg_privileges'));
 				return FALSE;
 			}
 			
@@ -245,7 +245,7 @@ class Servers_files extends CI_Controller {
 			
 			/* Проверяем, правильно ли указан ID конфигурационного файла */
 			if (!array_key_exists($cfg_id, $s_cfg_files)) {
-				$this->show_message(lang('server_files_cfg_not_found'));
+				$this->_show_message(lang('server_files_cfg_not_found'));
 				return FALSE;
 			}
 			
@@ -296,7 +296,7 @@ class Servers_files extends CI_Controller {
 						$adm_message = '<p align="center">' . lang('file') . ': <strong>"' . $file . '"</strong></p>';
 					}
 					
-					$this->show_message($this->servers->errors . $adm_message);
+					$this->_show_message($this->servers->errors . $adm_message);
 					
 					/* Сохраняем логи */
 					$log_data['type'] = 'server_files';
@@ -344,7 +344,7 @@ class Servers_files extends CI_Controller {
 						$adm_message = '<p align="center">' . lang('file') . ': <strong>"' . $file . '"</strong></p>';
 					}
 					
-					$this->show_message($this->servers->errors . $adm_message);
+					$this->_show_message($this->servers->errors . $adm_message);
 					
 					/* Сохраняем логи */
 					$log_data['type'] = 'server_files';
@@ -358,7 +358,7 @@ class Servers_files extends CI_Controller {
 					return FALSE;
 				}
 				
-				$this->show_message(lang('server_files_data_writed'), site_url('admin/servers_files/server/' . $server_id), lang('next'));
+				$this->_show_message(lang('server_files_data_writed'), site_url('admin/servers_files/server/' . $server_id), lang('next'));
 				
 				// Пишем логи
 				
@@ -412,7 +412,7 @@ class Servers_files extends CI_Controller {
 			
 			/* Проверка привилегий на правку конфигов */
 			if (!$this->users->servers_privileges['UPLOAD_CONTENTS']) {
-				$this->show_message(lang('server_files_no_cfg_privileges'));
+				$this->_show_message(lang('server_files_no_cfg_privileges'));
 				return FALSE;
 			}
 			
@@ -421,7 +421,7 @@ class Servers_files extends CI_Controller {
 			
 			/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
 			if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']){
-				$this->show_message(lang('server_files_ftp_not_set'));
+				$this->_show_message(lang('server_files_ftp_not_set'));
 				return FALSE;
 			}
 			
@@ -429,7 +429,7 @@ class Servers_files extends CI_Controller {
 			
 			/* Проверяем, правильно ли указан ID контент директории */
 			if(!array_key_exists($dir_id, $s_content_dirs)){
-				$this->show_message(lang('server_files_content_dir_not_found'));
+				$this->_show_message(lang('server_files_content_dir_not_found'));
 				return FALSE;
 			}
 			
@@ -468,7 +468,7 @@ class Servers_files extends CI_Controller {
 					if(!$this->servers->upload_remote_file($file_data['full_path'], $remote_file)) {
 						unlink($file_data['full_path']);
 						
-						$this->show_message($this->servers->errors);
+						$this->_show_message($this->servers->errors);
 						
 						/* Сохраняем логи */
 						$log_data['type'] = 'server_files';
@@ -489,7 +489,7 @@ class Servers_files extends CI_Controller {
 						$this->servers->edit_game_server($this->servers->server_data['id'], $server_data);
 						
 						$message = lang('server_files_upload_successful', $file_data['orig_name'], $s_content_dirs[$dir_id]['path']);
-						$this->show_message($message, site_url('admin/servers_files/server/' . $server_id), lang('server_files_upload_successful'));
+						$this->_show_message($message, site_url('admin/servers_files/server/' . $server_id), lang('server_files_upload_successful'));
 					
 						/* Сохраняем логи */
 						$log_data['type'] = 'server_files';
@@ -507,7 +507,7 @@ class Servers_files extends CI_Controller {
 					// Файл был загружен на локальный сервер
 					
 					$message = lang('server_files_upload_successful', $file_data['orig_name'], $s_content_dirs[$dir_id]['path']);
-					$this->show_message($message, site_url('admin/servers_files/server/' . $server_id), 'Далее');
+					$this->_show_message($message, site_url('admin/servers_files/server/' . $server_id), 'Далее');
 					
 					/* Сохраняем логи */
 					$log_data['type'] = 'server_files';

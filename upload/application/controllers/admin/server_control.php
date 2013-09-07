@@ -63,7 +63,7 @@ class Server_control extends CI_Controller {
     }
     
 	// Отображение информационного сообщения
-    private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
     {
         
         if (!$message) {
@@ -102,7 +102,7 @@ class Server_control extends CI_Controller {
         if($this->users->user_id){
             
             if(!$server_id) {
-				$this->show_message(lang('server_control_empty_server_id'));
+				$this->_show_message(lang('server_control_empty_server_id'));
 				return FALSE;
 			} else {
 					$server_id = (int)$server_id;
@@ -113,12 +113,12 @@ class Server_control extends CI_Controller {
 			$this->users->get_server_privileges($server_id);
 					
 			if(!$this->users->auth_servers_privileges['VIEW']) {
-				$this->show_message(lang('server_control_server_not_found'));
+				$this->_show_message(lang('server_control_server_not_found'));
 				return FALSE;
 			}
 					
 			if(!$this->servers->server_data) {
-				$this->show_message(lang('server_control_server_not_found'));
+				$this->_show_message(lang('server_control_server_not_found'));
 				return FALSE;
 			}
 
@@ -349,7 +349,7 @@ class Server_control extends CI_Controller {
 		$local_tpl_data = array();
 		
 		if(!$server_id) {
-				$this->show_message(lang('server_control_empty_server_id'));
+				$this->_show_message(lang('server_control_empty_server_id'));
 				return FALSE;
 		} else {
 				$server_id = (int)$server_id;
@@ -361,13 +361,13 @@ class Server_control extends CI_Controller {
 		
 		/* Проверочки */
 		if(!$this->users->auth_servers_privileges['VIEW']) {
-			$this->show_message(lang('server_control_server_not_found'));
+			$this->_show_message(lang('server_control_server_not_found'));
 			return FALSE;
 		} elseif(!$this->servers->server_data) {
-			$this->show_message(lang('server_control_server_not_found'));
+			$this->_show_message(lang('server_control_server_not_found'));
 			return FALSE;
 		} elseif(!$this->users->auth_servers_privileges['TASK_MANAGE']) {
-			$this->show_message(lang('server_control_no_task_privileges'));
+			$this->_show_message(lang('server_control_no_task_privileges'));
 			return FALSE;
 		}
 		
@@ -393,7 +393,7 @@ class Server_control extends CI_Controller {
 
 			
 			if(!$sql_data['date_perform'] = human_to_unix($this->input->post('date_perform'))) {
-				$this->show_message(lang('server_control_date_unavailable'), 'javascript:history.back()');
+				$this->_show_message(lang('server_control_date_unavailable'), 'javascript:history.back()');
 				return FALSE;
 			}
 			
@@ -410,7 +410,7 @@ class Server_control extends CI_Controller {
 			$log_data['log_data'] = 'Name: ' . $sql_data['name'];
 			$this->panel_log->save_log($log_data);
 			
-			$this->show_message(lang('server_control_new_task_success'), site_url('admin/server_control/main/' . $server_id), 'Далее');
+			$this->_show_message(lang('server_control_new_task_success'), site_url('admin/server_control/main/' . $server_id), 'Далее');
 			return TRUE;
 			
 		}
@@ -429,7 +429,7 @@ class Server_control extends CI_Controller {
     function delete_task($task_id, $confirm = FALSE)
     {
 		if(!$task_id) {
-				$this->show_message(lang('server_control_empty_task_id'));
+				$this->_show_message(lang('server_control_empty_task_id'));
 				return FALSE;
 		} else {
 				$task_id = (int)$task_id;
@@ -446,13 +446,13 @@ class Server_control extends CI_Controller {
 		if($query->num_rows > 0){
 			$task_list = $query->result_array();
 		} else {
-			$this->show_message(lang('server_control_task_not_found'));
+			$this->_show_message(lang('server_control_task_not_found'));
 			return FALSE;
 		}
 		
 		/* Задание может не относится к серверу, такие нам не нужны */
 		if(!$task_list[0]['server_id']) {
-			$this->show_message(lang('server_control_task_not_found'));
+			$this->_show_message(lang('server_control_task_not_found'));
 			return FALSE;
 		}
 		
@@ -462,13 +462,13 @@ class Server_control extends CI_Controller {
 		
 		/* Проверочки */
 		if(!$this->users->auth_servers_privileges['VIEW']) {
-			$this->show_message(lang('server_control_task_not_found'));
+			$this->_show_message(lang('server_control_task_not_found'));
 			return FALSE;
 		} elseif(!$this->servers->server_data) {
-			$this->show_message(lang('server_control_task_not_found'));
+			$this->_show_message(lang('server_control_task_not_found'));
 			return FALSE;
 		} elseif(!$this->users->auth_servers_privileges['TASK_MANAGE']) {
-			$this->show_message(lang('server_control_no_task_privileges'));
+			$this->_show_message(lang('server_control_no_task_privileges'));
 			return FALSE;
 		}
 
@@ -492,7 +492,7 @@ class Server_control extends CI_Controller {
 			$log_data['log_data'] = '';
 			$this->panel_log->save_log($log_data);
 			
-			$this->show_message(lang('server_control_task_saved'), site_url('/admin/server_control/main/' . $task_list[0]['server_id']), 'Далее');
+			$this->_show_message(lang('server_control_task_saved'), site_url('/admin/server_control/main/' . $task_list[0]['server_id']), 'Далее');
 			return TRUE;
 		}
 		
@@ -511,7 +511,7 @@ class Server_control extends CI_Controller {
     {
 		
 		if(!$task_id) {
-			$this->show_message(lang('server_control_empty_task_id'));
+			$this->_show_message(lang('server_control_empty_task_id'));
 			return FALSE;
 		} else {
 			$task_id = (int)$task_id;
@@ -530,13 +530,13 @@ class Server_control extends CI_Controller {
 		if($query->num_rows > 0){
 			$task_list = $query->result_array();
 		} else {
-			$this->show_message(lang('server_control_task_not_found'));
+			$this->_show_message(lang('server_control_task_not_found'));
 			return FALSE;
 		}
 		
 		/* Задание может не относится к серверу, такие нам не нужны */
 		if(!$task_list[0]['server_id']) {
-			$this->show_message(lang('server_control_task_not_found'));
+			$this->_show_message(lang('server_control_task_not_found'));
 			return FALSE;
 		}
 		
@@ -546,13 +546,13 @@ class Server_control extends CI_Controller {
 		
 		/* Проверочки */
 		if(!$this->users->auth_servers_privileges['VIEW']) {
-			$this->show_message(lang('server_control_task_not_found'));
+			$this->_show_message(lang('server_control_task_not_found'));
 			return FALSE;
 		} elseif(!$this->servers->server_data) {
-			$this->show_message(lang('server_control_task_not_found'));
+			$this->_show_message(lang('server_control_task_not_found'));
 			return FALSE;
 		} elseif(!$this->users->auth_servers_privileges['TASK_MANAGE']) {
-			$this->show_message(lang('server_control_no_task_privileges'));
+			$this->_show_message(lang('server_control_no_task_privileges'));
 			return FALSE;
 		}
 		
@@ -600,7 +600,7 @@ class Server_control extends CI_Controller {
 			$sql_data['time_add'] = $this->input->post('time_add');
 			
 			if(!$sql_data['date_perform'] = human_to_unix($this->input->post('date_perform'))) {
-				$this->show_message(lang('server_control_date_unavailable'), 'javascript:history.back()');
+				$this->_show_message(lang('server_control_date_unavailable'), 'javascript:history.back()');
 				return FALSE;
 			}
 			
@@ -621,7 +621,7 @@ class Server_control extends CI_Controller {
 			$log_data['log_data'] = 'Name: ' . $sql_data['name'];
 			$this->panel_log->save_log($log_data);
 			
-			$this->show_message(lang('server_control_task_saved'), site_url('/admin/server_control/main/' . $task_list[0]['server_id']), 'Далее');
+			$this->_show_message(lang('server_control_task_saved'), site_url('/admin/server_control/main/' . $task_list[0]['server_id']), 'Далее');
 			return TRUE;
 		}
 		

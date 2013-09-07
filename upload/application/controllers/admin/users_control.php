@@ -46,7 +46,7 @@ class Users_control extends CI_Controller {
     }
     
     // Отображение информационного сообщения
-    private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
     {
         
         if (!$message) {
@@ -158,7 +158,7 @@ class Users_control extends CI_Controller {
 				);
 			
 				if ($this->users->add_user($sql_data)) {   
-					$this->show_message(lang('users_usr_add_sucessful'), site_url('admin/users_control'), lang('users_back_to_users'));
+					$this->_show_message(lang('users_usr_add_sucessful'), site_url('admin/users_control'), lang('users_back_to_users'));
 					return TRUE;
 				}
 				
@@ -194,12 +194,12 @@ class Users_control extends CI_Controller {
             }else{
                 
                 if (!$user_id) {
-					$this->show_message(lang('users_empty_id'));
+					$this->_show_message(lang('users_empty_id'));
 					return FALSE;
                 }
                 
                 if (!$this->users->user_live($user_id, 'ID')) {
-					$this->show_message(lang('users_id_unavailable'));
+					$this->_show_message(lang('users_id_unavailable'));
 					return FALSE;
 				}
                 
@@ -288,17 +288,17 @@ class Users_control extends CI_Controller {
 				}
                 
                 if (!$user_id) {
-					$this->show_message(lang('users_empty_id'));
+					$this->_show_message(lang('users_empty_id'));
 					return FALSE;
                 }
                 
                 if (!$this->users->user_live($user_id, 'ID')) {
-					$this->show_message(lang('users_id_unavailable'));
+					$this->_show_message(lang('users_id_unavailable'));
 					return FALSE;
 				}
 
                 if(!$server_id){
-					$this->show_message(lang('users_empty_id_server'));
+					$this->_show_message(lang('users_empty_id_server'));
 					return FALSE;
                 }
 
@@ -343,7 +343,7 @@ class Users_control extends CI_Controller {
             }else{
                 
                 if (!$user_id) {
-					$this->show_message(lang('users_empty_id'));
+					$this->_show_message(lang('users_empty_id'));
 					return FALSE;
                 }
                 
@@ -354,7 +354,7 @@ class Users_control extends CI_Controller {
                 
                 /* В целях безопасности, редактировать администратора может только он сам */
                 if ($user_data['is_admin'] == 1 AND $user_data['id'] != $this->users->user_id) {
-					$this->show_message(lang('users_edit_admin_denied'), site_url('admin/users_control'));
+					$this->_show_message(lang('users_edit_admin_denied'), site_url('admin/users_control'));
 					return FALSE;
 				}
                 
@@ -438,7 +438,7 @@ class Users_control extends CI_Controller {
 						}
 						
 						$this->users->delete_user($user_id);
-						$this->show_message(lang('users_usr_deleted'), site_url('admin/users_control'));
+						$this->_show_message(lang('users_usr_deleted'), site_url('admin/users_control'));
 						return TRUE;
 					}
 				} else {
@@ -464,17 +464,17 @@ class Users_control extends CI_Controller {
     {
 		//Проверка, есть ли права на добавление
 		if(!$this->users->auth_privileges['usr_edit_privileges']) {
-			$this->show_message(lang('users_no_privileges_for_edit_privileges'), site_url('admin'));
+			$this->_show_message(lang('users_no_privileges_for_edit_privileges'), site_url('admin'));
 			return FALSE;
 		}
 		
 		if(!$user_id) {
-			$this->show_message(lang('users_empty_id'), site_url('admin/users_control'));
+			$this->_show_message(lang('users_empty_id'), site_url('admin/users_control'));
 			return FALSE;
 		}
 		
 		if(!$this->users->get_user_data($user_id, TRUE)){
-			$this->show_message(lang('users_id_unavailable'), site_url('admin/users_control'));
+			$this->_show_message(lang('users_id_unavailable'), site_url('admin/users_control'));
 			return FALSE;
 		}
 
@@ -517,7 +517,7 @@ class Users_control extends CI_Controller {
 			$user_data['privileges'] = json_encode($new_privileges);
 
 			if($this->users->update_user($user_data, $user_id)) {
-				$this->show_message(lang('users_base_privileges_saved'), site_url('admin/users_control') , lang('next'));
+				$this->_show_message(lang('users_base_privileges_saved'), site_url('admin/users_control') , lang('next'));
 				
 				/* Отправляем информацию админам */
 				$subject = lang('users_mail_subject_change_privileges');
@@ -525,7 +525,7 @@ class Users_control extends CI_Controller {
 				$this->users->admin_msg($subject, $message);
 				return TRUE;
 			} else {
-				$this->show_message(lang('unknown_error'));
+				$this->_show_message(lang('unknown_error'));
 				return FALSE;
 			}
 		}

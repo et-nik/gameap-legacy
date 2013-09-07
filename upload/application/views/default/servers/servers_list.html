@@ -21,7 +21,7 @@
 		<tr>
 			<td>{server_name}</td>
 			<td>{server_ip}</td>
-			<?php if(in_array('commercial_module', $this->modules->modules_list)): ?><td>{server_expires}</td><?php endif; ?>
+			<?php if(module_exists('commercial_module')): ?><td>{server_expires}</td><?php endif; ?>
 			<td>{server_status}</td>
 			<td>{commands}</td>
 		</tr>

@@ -40,7 +40,7 @@ class Profile extends CI_Controller {
     }
     
     // Отображение информационного сообщения
-    private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
     {
         
         if (!$message) {
@@ -176,21 +176,21 @@ class Profile extends CI_Controller {
 		$this->tpl_data['heading'] = lang('profile_server_privileges');
 			
 		if(!$server_id) {
-			$this->show_message(lang('profile_empty_server_id'), site_url('admin/profile'));
+			$this->_show_message(lang('profile_empty_server_id'), site_url('admin/profile'));
 			return FALSE;
 		}
 		
 		$this->servers->get_server_data($server_id, TRUE, TRUE, TRUE);
 		
 		if(!$this->servers->server_data) {
-			$this->show_message(lang('profile_server_not_found'), site_url('admin/profile'));
+			$this->_show_message(lang('profile_server_not_found'), site_url('admin/profile'));
 			return FALSE;
 		}
 
 		$user_privileges = $this->users->get_server_privileges($server_id, FALSE);
 		
 		if(!$this->users->auth_servers_privileges['VIEW']) {
-			$this->show_message(lang('profile_server_not_found'), site_url('admin/profile'));
+			$this->_show_message(lang('profile_server_not_found'), site_url('admin/profile'));
 			return FALSE;
 		}
 

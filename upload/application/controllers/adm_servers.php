@@ -52,7 +52,7 @@ class Adm_servers extends CI_Controller {
 		$games_list = $this->games->get_games_list();
 		$game_types_list = $this->game_types->get_gametypes_list();
 
-        if($this->users->check_user()) {
+        if ($this->users->check_user()) {
 			
 			//Base Template
 			$this->tpl_data['title'] 	= lang('adm_servers_title_index');
@@ -79,7 +79,7 @@ class Adm_servers extends CI_Controller {
     }
 
     // Отображение информационного сообщения
-    private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
     {
         
         if (!$message) {
@@ -356,7 +356,7 @@ class Adm_servers extends CI_Controller {
 					$local_tpl_data['games_list'] = $this->games->tpl_data_games();
 					
 					if(empty($this->games->games_list)) {
-						$this->show_message(lang('adm_servers_empty_games_list', base_url() . 'adm_servers/add/games'));
+						$this->_show_message(lang('adm_servers_empty_games_list', base_url() . 'adm_servers/add/games'));
 						return FALSE;
 					}
 					
@@ -434,7 +434,7 @@ class Adm_servers extends CI_Controller {
 					}
 					
 					if(empty($this->games->games_list)) {
-						$this->show_message(lang('adm_servers_empty_games_list', base_url() . 'adm_servers/add/games'));
+						$this->_show_message(lang('adm_servers_empty_games_list', base_url() . 'adm_servers/add/games'));
 						return FALSE;
 					}
 					
@@ -449,7 +449,7 @@ class Adm_servers extends CI_Controller {
 			if ($this->form_validation->run() == FALSE) {
 
 				if (!isset($tpl_file_add)) {
-					$this->show_message('', $link = 'javascript:history.back()');
+					$this->_show_message('', $link = 'javascript:history.back()');
 					return FALSE;
 				} else {
 					$local_tpl_data['message'] = '';
@@ -524,7 +524,7 @@ class Adm_servers extends CI_Controller {
 							
 							/* Если не удалось соединиться или неверные данные */
 							if (!$connection OR !ssh2_auth_password($connection, $sql_data['ssh_login'], $ssh_password)) {
-								$this->show_message(lang('adm_servers_ssh_data_unavailable'), 'javascript:history.back()');
+								$this->_show_message(lang('adm_servers_ssh_data_unavailable'), 'javascript:history.back()');
 								return FALSE;
 							}
 							
@@ -543,7 +543,7 @@ class Adm_servers extends CI_Controller {
 							
 							/* Если не удалось соединиться или неверные данные */
 							if (!$connection OR !ftp_login($connection, $sql_data['ftp_login'], $ftp_password)) {
-								$this->show_message(lang('adm_servers_ftp_data_unavailable'), 'javascript:history.back()');
+								$this->_show_message(lang('adm_servers_ftp_data_unavailable'), 'javascript:history.back()');
 								return FALSE;
 							}
 						}
@@ -599,14 +599,14 @@ class Adm_servers extends CI_Controller {
 						}
 						
 						if ($sql_data['ds_id'] && !$this->dedicated_servers->ds_list) {
-							$this->show_message(lang('adm_servers_selected_ds_unavailable'));
+							$this->_show_message(lang('adm_servers_selected_ds_unavailable'));
 							return FALSE;
 						}
 						
 						$this->games->get_games_list(array('code' => $sql_data['game']), 1);
 						
 						if (!$this->games->games_list) {
-							$this->show_message(lang('adm_servers_game_not_found'));
+							$this->_show_message(lang('adm_servers_game_not_found'));
 							return FALSE;
 						}
 
@@ -654,7 +654,7 @@ class Adm_servers extends CI_Controller {
 						/* Чтобы ид модификации был правильный и подходил для выбранной игры */
 						$where = array('id' => $sql_data['game_type'], 'game_code' => $sql_data['game']);
 						if (!$this->game_types->get_gametypes_list($where, 1)) {
-							$this->show_message(lang('adm_servers_game_type_select_wrong'));
+							$this->_show_message(lang('adm_servers_game_type_select_wrong'));
 							return FALSE;
 						}
 
@@ -782,12 +782,12 @@ class Adm_servers extends CI_Controller {
 						$this->load->model('servers/dedicated_servers');
 						
 						if (!$this->dedicated_servers->get_ds_list(array('id' => $id))) {
-							$this->show_message(lang('adm_servers_selected_ds_unavailable'), site_url('adm_servers/view/dedicated_servers'));
+							$this->_show_message(lang('adm_servers_selected_ds_unavailable'), site_url('adm_servers/view/dedicated_servers'));
 							return FALSE;
 						}
 						
 						if ($this->servers->get_server_list(FALSE, FALSE, array('ds_id' => $id))) {
-							$this->show_message(lang('adm_servers_ds_contains_game_servers'), site_url('adm_servers/view/dedicated_servers'));
+							$this->_show_message(lang('adm_servers_ds_contains_game_servers'), site_url('adm_servers/view/dedicated_servers'));
 							return FALSE;
 						}
 
@@ -808,7 +808,7 @@ class Adm_servers extends CI_Controller {
 						/* --------------------------------------------	*/
 					
 						if(!$this->servers->get_server_data($id)) {
-							$this->show_message(lang('adm_servers_server_not_found'), site_url('adm_servers/view/game_servers'));
+							$this->_show_message(lang('adm_servers_server_not_found'), site_url('adm_servers/view/game_servers'));
 							return FALSE;
 						}
 						
@@ -847,12 +847,12 @@ class Adm_servers extends CI_Controller {
 						$this->load->model('servers/games');
 						
 						if(!$this->games->get_games_list(array('code' => $id))) {
-							$this->show_message(lang('adm_servers_game_not_found'), site_url('adm_servers/view/games'));
+							$this->_show_message(lang('adm_servers_game_not_found'), site_url('adm_servers/view/games'));
 							return FALSE;
 						}
 						
 						if($this->servers->get_server_list(FALSE, FALSE, array('game' => $id))) {
-							$this->show_message(lang('adm_servers_game_contains_game_servers'), site_url('adm_servers/view/games'));
+							$this->_show_message(lang('adm_servers_game_contains_game_servers'), site_url('adm_servers/view/games'));
 							return FALSE;
 						}
 						
@@ -876,12 +876,12 @@ class Adm_servers extends CI_Controller {
 						$this->load->model('servers/game_types');
 						
 						if(!$this->game_types->get_gametypes_list(array('id' => $id))) {
-							$this->show_message(lang('adm_servers_game_type_not_found'), site_url('adm_servers/view/game_types'));
+							$this->_show_message(lang('adm_servers_game_type_not_found'), site_url('adm_servers/view/game_types'));
 							return FALSE;
 						}
 						
 						if($this->servers->get_server_list(FALSE, FALSE, array('game_type' => $id))) {
-							$this->show_message(lang('adm_servers_game_type_contains_game_servers'), site_url('adm_servers/view/game_types'));
+							$this->_show_message(lang('adm_servers_game_type_contains_game_servers'), site_url('adm_servers/view/game_types'));
 							return FALSE;
 						}
 						
@@ -973,7 +973,7 @@ class Adm_servers extends CI_Controller {
 				$this->load->model('servers/dedicated_servers');
 				
 				if (!$this->dedicated_servers->get_ds_list(array('id' => $id), 1)) {
-					$this->show_message(lang('adm_servers_server_not_found'), site_url('adm_servers/view/dedicated_servers'));
+					$this->_show_message(lang('adm_servers_server_not_found'), site_url('adm_servers/view/dedicated_servers'));
 					return FALSE;
 				}
 				
@@ -1061,12 +1061,12 @@ class Adm_servers extends CI_Controller {
 				$this->load->helper('form');
 				
 				//if(!$game_servers_list = $this->servers->get_game_servers_list(array('id' => $id), 1)){
-				//	$this->show_message('Сервера с таким ID не существует', '/adm_servers/view/game_servers');
+				//	$this->_show_message('Сервера с таким ID не существует', '/adm_servers/view/game_servers');
 				//	return FALSE;
 				//}
 				
 				if(!$this->servers->get_server_data($id)){
-					$this->show_message(lang('adm_servers_server_not_found'), site_url('adm_servers/view/game_servers'));
+					$this->_show_message(lang('adm_servers_server_not_found'), site_url('adm_servers/view/game_servers'));
 					return FALSE;
 				}
 
@@ -1298,7 +1298,7 @@ class Adm_servers extends CI_Controller {
 				$this->load->model('servers/games');
 				
 				if(!$this->games->get_games_list(array('code' => $id), 1)){
-					$this->show_message(lang('adm_servers_game_not_found'), site_url('adm_servers/view/games'));
+					$this->_show_message(lang('adm_servers_game_not_found'), site_url('adm_servers/view/games'));
 					return FALSE;
 				}
 				
@@ -1331,7 +1331,7 @@ class Adm_servers extends CI_Controller {
 				$this->load->model('servers/games');
 				
 				if(!$gt_list = $this->game_types->get_gametypes_list(array('id' => $id))){
-					$this->show_message(lang('adm_servers_game_type_not_found'), site_url('adm_servers/view/game_types'));
+					$this->_show_message(lang('adm_servers_game_type_not_found'), site_url('adm_servers/view/game_types'));
 					return FALSE;
 				}
 				
@@ -1561,7 +1561,7 @@ class Adm_servers extends CI_Controller {
 						
 						/* Если не удалось соединиться или неверные данные */
 						if (!$connection OR !ssh2_auth_password($connection, $sql_data['ssh_login'], $ssh_password)) {
-							$this->show_message(lang('adm_servers_ssh_data_unavailable'), 'javascript:history.back()');
+							$this->_show_message(lang('adm_servers_ssh_data_unavailable'), 'javascript:history.back()');
 							return FALSE;
 						}
 						
@@ -1585,7 +1585,7 @@ class Adm_servers extends CI_Controller {
 						
 						/* Если не удалось соединиться или неверные данные */
 						if (!$connection OR !ftp_login($connection, $sql_data['ftp_login'], $ftp_password)) {
-							$this->show_message(lang('adm_servers_ftp_data_unavailable'), 'javascript:history.back()');
+							$this->_show_message(lang('adm_servers_ftp_data_unavailable'), 'javascript:history.back()');
 							return FALSE;
 						}
 					}
@@ -1627,7 +1627,7 @@ class Adm_servers extends CI_Controller {
 					/* Чтобы ид модификации был правильный и подходил для выбранной игры */
 					$where = array('id' => $sql_data['game_type'], 'game_code' => $this->servers->server_data['game']);
 					if(!$this->game_types->get_gametypes_list($where, 1)) {
-						$this->show_message(lang('adm_servers_game_type_select_wrong'));
+						$this->_show_message(lang('adm_servers_game_type_select_wrong'));
 						return FALSE;
 					}
 					
@@ -1972,7 +1972,7 @@ class Adm_servers extends CI_Controller {
 		$local_tpl_data['games_list'] = $this->games->tpl_data_games();
 		
 		if(empty($this->games->games_list)) {
-			$this->show_message(lang('adm_servers_empty_games_list', base_url() . 'adm_servers/add/games'));
+			$this->_show_message(lang('adm_servers_empty_games_list', base_url() . 'adm_servers/add/games'));
 			return FALSE;
 		}
 		
@@ -2020,7 +2020,7 @@ class Adm_servers extends CI_Controller {
 			}
 			
 			if(!$new_gs['server_ip'] && $new_gs['ds_id'] !== '0') {
-				$this->show_message(lang('adm_servers_selected_ds_unavailable'));
+				$this->_show_message(lang('adm_servers_selected_ds_unavailable'));
 				return FALSE;
 			}
 			
@@ -2032,7 +2032,7 @@ class Adm_servers extends CI_Controller {
 			/* Чтобы ид модификации был правильный и подходил для выбранной игры */
 			$where = array('id' => $new_gs['game_type'], 'game_code' => $new_gs['game']);
 			if(!$this->game_types->get_gametypes_list($where, 1)) {
-				$this->show_message(lang('adm_servers_game_type_select_wrong'));
+				$this->_show_message(lang('adm_servers_game_type_select_wrong'));
 				return FALSE;
 			}
 			
@@ -2089,14 +2089,14 @@ class Adm_servers extends CI_Controller {
 					/*
 					 * Для игры не задан или не существует парамера app_update для SteamCMD
 					*/
-					$this->show_message(lang('adm_servers_no_steamcmd_data'));
+					$this->_show_message(lang('adm_servers_no_steamcmd_data'));
 					return FALSE;
 				}
 				
 				
 			} else {
 				// Игры не существует
-				$this->show_message(lang('adm_servers_base_not_contains_game'));
+				$this->_show_message(lang('adm_servers_base_not_contains_game'));
 				return FALSE;
 			}
 			
@@ -2115,7 +2115,7 @@ class Adm_servers extends CI_Controller {
 				//~ OR !$this->servers->server_data['ssh_password']
 				//~ )
 			//~ ){
-				//~ $this->show_message(lang('server_command_ssh_not_set'));
+				//~ $this->_show_message(lang('server_command_ssh_not_set'));
 				//~ return FALSE;	
 			//~ }
 			//~ 
@@ -2126,7 +2126,7 @@ class Adm_servers extends CI_Controller {
 			//~ && $this->servers->server_data['control_protocol'] == 'ssh'
 			//~ && (!in_array('ssh2', $ext_list))
 			//~ ){
-				//~ $this->show_message(lang('server_command_ssh_not_module'));
+				//~ $this->_show_message(lang('server_command_ssh_not_module'));
 				//~ return FALSE;	
 			//~ }
 			//~ 
@@ -2147,16 +2147,16 @@ class Adm_servers extends CI_Controller {
 				//~ OR !$this->servers->server_data['telnet_password']
 				//~ )
 			//~ ){
-				//~ $this->show_message(lang('server_command_telnet_not_set'));
+				//~ $this->_show_message(lang('server_command_telnet_not_set'));
 				//~ return FALSE;	
 			//~ }
 			
 			// Добавление сервера
 			if($this->servers->add_game_server($new_gs)) {
-				$this->show_message(lang('adm_servers_server_to_be_installed'), site_url('adm_servers/edit/game_servers/' . mysql_insert_id()), lang('adm_servers_go_to_settings'));
+				$this->_show_message(lang('adm_servers_server_to_be_installed'), site_url('adm_servers/edit/game_servers/' . mysql_insert_id()), lang('adm_servers_go_to_settings'));
 				return TRUE;
 			} else {
-				$this->show_message(lang('adm_servers_add_game_failed'));
+				$this->_show_message(lang('adm_servers_add_game_failed'));
 				return FALSE;
 			}
 			
@@ -2199,7 +2199,7 @@ class Adm_servers extends CI_Controller {
 		$local_tpl_data['content'] = '';
 		
 		if(!$this->servers->get_server_data($id)){
-			$this->show_message(lang('adm_servers_server_not_found'), site_url('adm_servers/view/game_servers'));
+			$this->_show_message(lang('adm_servers_server_not_found'), site_url('adm_servers/view/game_servers'));
 			return FALSE;
 		}
 		
@@ -2239,10 +2239,10 @@ class Adm_servers extends CI_Controller {
 					//~ }
 				//~ }
 				
-				$this->show_message(lang('adm_servers_server_will_be_reinstalled'), site_url('adm_servers/edit/game_servers/' . $id), lang('next'));
+				$this->_show_message(lang('adm_servers_server_will_be_reinstalled'), site_url('adm_servers/edit/game_servers/' . $id), lang('next'));
 				return TRUE;
 			} else {
-				$this->show_message(lang('adm_servers_error_server_edit'), site_url('adm_servers/edit/game_servers/' . $id), lang('next'));
+				$this->_show_message(lang('adm_servers_error_server_edit'), site_url('adm_servers/edit/game_servers/' . $id), lang('next'));
 				return FALSE;
 			}
 			
@@ -2274,13 +2274,13 @@ class Adm_servers extends CI_Controller {
 		$local_tpl_data['games_list'] = $this->games->tpl_data_games();
 					
 		if(empty($this->games->games_list)) {
-			$this->show_message(lang('adm_servers_empty_games_list', base_url() . 'adm_servers/add/games'));
+			$this->_show_message(lang('adm_servers_empty_games_list', base_url() . 'adm_servers/add/games'));
 			return FALSE;
 		}
 		
 		/* Существует ли модификация */
 		if(!$gt_list = $this->game_types->get_gametypes_list(array('id' => $id))){
-			$this->show_message(lang('adm_servers_game_type_not_found'), site_url('adm_servers/view/game_types'));
+			$this->_show_message(lang('adm_servers_game_type_not_found'), site_url('adm_servers/view/game_types'));
 			return FALSE;
 		}
 		
@@ -2291,7 +2291,7 @@ class Adm_servers extends CI_Controller {
 
 			/* Если были ошибки проверки формы, то отображаем ошибки, если нет, то отображаем форму */
 			if ($validation_errors = validation_errors()) {
-				$this->show_message();
+				$this->_show_message();
 				return FALSE;
 			} else {
 				$this->tpl_data['content'] = $this->parser->parse('adm_servers/dublicate_game_type.html', $local_tpl_data, TRUE);
@@ -2309,7 +2309,7 @@ class Adm_servers extends CI_Controller {
 				$local_tpl_data['message'] = lang('adm_servers_add_game_type_failed');
 			}
 			
-			$this->show_message($local_tpl_data['message'], site_url('adm_servers/edit/game_types/' . mysql_insert_id()), lang('next')); 
+			$this->_show_message($local_tpl_data['message'], site_url('adm_servers/edit/game_types/' . mysql_insert_id()), lang('next')); 
 			return TRUE;
 		}
 		

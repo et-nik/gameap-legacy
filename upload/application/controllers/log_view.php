@@ -38,7 +38,7 @@ class Log_view extends CI_Controller {
     }
     
     // Отображение информационного сообщения
-	private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+	function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
 	{
 		
 		if (!$message) {
@@ -64,10 +64,10 @@ class Log_view extends CI_Controller {
     {
 		/* Проверочки */
 		if(!$type) {
-			$this->show_message(lang('log_view_type_param_not_specified'));
+			$this->_show_message(lang('log_view_type_param_not_specified'));
 			return FALSE;
 		} elseif(!$id) {
-			$this->show_message(lang('log_view_id_param_not_specified'));
+			$this->_show_message(lang('log_view_id_param_not_specified'));
 			return FALSE;
 		}
 		
@@ -81,7 +81,7 @@ class Log_view extends CI_Controller {
 				
 				/* Лог должен быть найден и относиться к серверу */
 				if(!$log_list OR !$log_list[0]['server_id']) {
-					$this->show_message(lang('log_view_record_not_found'));
+					$this->_show_message(lang('log_view_record_not_found'));
 					return FALSE;
 				}
 				
@@ -90,7 +90,7 @@ class Log_view extends CI_Controller {
 				
 				/* Если сервер, указанный в логе не найден */
 				if(!$this->servers->server_data) {
-					$this->show_message(lang('log_view_record_not_found'));
+					$this->_show_message(lang('log_view_record_not_found'));
 				}
 				
 				/* Если пользователь не админ, то делаем проверочки на права доступа к логам */
@@ -100,13 +100,13 @@ class Log_view extends CI_Controller {
 					
 					/* У пользователя на этот сервер должны быть права */
 					if(!$this->users->servers_privileges['VIEW']) {
-						$this->show_message(lang('log_view_record_not_found'));
+						$this->_show_message(lang('log_view_record_not_found'));
 						return FALSE;
 					}
 					
 					/* Если пользователю нельзя видеть rcon пароль */
 					if(!$this->users->servers_privileges['CHANGE_RCON'] && strtolower($log_list[0]['command']) == 'rcon_password') {
-						$this->show_message(lang('log_view_log_access_denied'), '/admin/server_control/main/' . $log_list[0]['server_id']);
+						$this->_show_message(lang('log_view_log_access_denied'), '/admin/server_control/main/' . $log_list[0]['server_id']);
 						return FALSE;
 					}
 				}
@@ -129,7 +129,7 @@ class Log_view extends CI_Controller {
 				
 				break;
 			default:
-				$this->show_message(lang('log_view_type_param_wrong'));
+				$this->_show_message(lang('log_view_type_param_wrong'));
 				return FALSE;
 				break;
 		}

@@ -52,7 +52,7 @@ class Adminpanel extends CI_Controller {
     }
     
     // Отображение информационного сообщения
-    private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
     {
         
         if (!$message) {
@@ -141,13 +141,13 @@ class Adminpanel extends CI_Controller {
 			
 			if (!isset($available_version) OR !isset($download_url)) {
 				/* Не удалось получить версию */
-				$this->show_message('<p align="center">' . lang('ap_error_check_version') . '</p>');
+				$this->_show_message('<p align="center">' . lang('ap_error_check_version') . '</p>');
 				return FALSE;
 			}
 			
 		} else {
 			/* Не удалось получить версию */
-			$this->show_message('<p align="center">' . lang('ap_error_check_version') . '</p>');
+			$this->_show_message('<p align="center">' . lang('ap_error_check_version') . '</p>');
 			return FALSE;
 		}
 
@@ -165,7 +165,7 @@ class Adminpanel extends CI_Controller {
 					if (!$this->migration->latest()) {
 						show_error($this->migration->error_string());
 					} else {
-						$this->show_message('Update successful', site_url('adminpanel/update'), lang('next'));
+						$this->_show_message('Update successful', site_url('adminpanel/update'), lang('next'));
 						return TRUE;
 					}
 					
@@ -266,10 +266,10 @@ class Adminpanel extends CI_Controller {
 			}
 								
 			if($this->email->send()) {
-				$this->show_message(lang('ap_error_msg_sended'), site_url('/admin'), lang('next'));
+				$this->_show_message(lang('ap_error_msg_sended'), site_url('/admin'), lang('next'));
 				return TRUE;
 			} else {
-				$this->show_message(lang('ap_error_send_mail'));
+				$this->_show_message(lang('ap_error_send_mail'));
 				//echo $this->email->print_debugger();
 				return FALSE;
 			}

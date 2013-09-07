@@ -3,6 +3,7 @@
  * CodeIgniter
  *
  * An open source application development framework for PHP 5.1.6 or newer
+ * Modify by ET-NiK
  *
  * @package		CodeIgniter
  * @author		ExpressionEngine Dev Team
@@ -84,15 +85,22 @@ class CI_URI {
 	 */
 	function _fetch_uri_string()
 	{
+		// Is the request coming from the command line?
+		/*
+		 * Условие ниже находилось внутри условия
+		 * if (strtoupper($this->config->item('uri_protocol')) == 'AUTO')
+		 * поэтому при использовании uri_protocol работа через 
+		 * командную строку была невозможна.
+		 * 
+		*/
+		if (php_sapi_name() == 'cli' or defined('STDIN'))
+		{
+			$this->_set_uri_string($this->_parse_cli_args());
+			return;
+		}
+			
 		if (strtoupper($this->config->item('uri_protocol')) == 'AUTO')
 		{
-			// Is the request coming from the command line?
-			if (php_sapi_name() == 'cli' or defined('STDIN'))
-			{
-				$this->_set_uri_string($this->_parse_cli_args());
-				return;
-			}
-
 			// Let's try the REQUEST_URI first, this will work in most situations
 			if ($uri = $this->_detect_uri())
 			{

@@ -44,7 +44,7 @@ class Server_command extends CI_Controller {
     // -----------------------------------
     
 	// Отображение информационного сообщения
-	private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+	function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
 	{
 		
 		if (!$message) {
@@ -185,7 +185,7 @@ class Server_command extends CI_Controller {
 				/* Пользователь прошел проверку на привилегии */
 				
 				if (!$isset) {
-					$this->show_message(lang('server_control_command_not_set'));
+					$this->_show_message(lang('server_control_command_not_set'));
 					return FALSE;
 				}
 			
@@ -262,7 +262,7 @@ class Server_command extends CI_Controller {
 						
 					// Проверяем заполненные поля
 					if (!$form_validate) {
-						$this->show_message(lang('server_command_form_unavailable'), site_url('admin/server_control/main/' . $server_id));
+						$this->_show_message(lang('server_command_form_unavailable'), site_url('admin/server_control/main/' . $server_id));
 						return FALSE;
 					} else {
 							
@@ -304,7 +304,7 @@ class Server_command extends CI_Controller {
 									
 								// Существует ли команда
 								if(!$fast_rcon OR !array_key_exists($id, $fast_rcon)){
-									$this->show_message(lang('server_command_rcon_command_not_found'), site_url('admin/server_control/main/' . $server_id));
+									$this->_show_message(lang('server_command_rcon_command_not_found'), site_url('admin/server_control/main/' . $server_id));
 									return FALSE;
 								}
 									
@@ -316,7 +316,7 @@ class Server_command extends CI_Controller {
 								$rcon_command = translit($this->input->post('rcon_command', TRUE));
 									
 								if(!$this->check_rcon_command($rcon_command)) {
-									$this->show_message(lang('server_command_rcon_command_access_denied'), site_url('admin/server_control/main/' . $server_id));
+									$this->_show_message(lang('server_command_rcon_command_access_denied'), site_url('admin/server_control/main/' . $server_id));
 									return FALSE;
 								}
 									
@@ -324,7 +324,7 @@ class Server_command extends CI_Controller {
 						}
 							
 						if(!$this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['server_port'])) {
-							$this->show_message(lang('server_command_server_down'), site_url('admin/server_control/main/' . $server_id));
+							$this->_show_message(lang('server_command_server_down'), site_url('admin/server_control/main/' . $server_id));
 							return FALSE;
 						}
 							
@@ -448,7 +448,7 @@ class Server_command extends CI_Controller {
 							$message = 'Error';
 						}
 							
-						$this->show_message($message, site_url('admin/server_control/main/' . $server_id), 'Далее');
+						$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), 'Далее');
 						return TRUE;
 					}
 					
@@ -456,7 +456,7 @@ class Server_command extends CI_Controller {
 				}
 					
 			} else {
-				$this->show_message(lang('server_command_no_players_privileges'), site_url('admin'), 'Далее');
+				$this->_show_message(lang('server_command_no_players_privileges'), site_url('admin'), 'Далее');
 				return FALSE;
 			}	
 
@@ -541,7 +541,7 @@ class Server_command extends CI_Controller {
 			
 			if(strtolower($this->servers->server_data['os']) == 'windows') {
 				/* Еще одна причина не использовать Windows */
-				$this->show_message(lang('server_command_not_available_for_windows'), site_url('admin/server_control/main/' . $id), 'Далее');
+				$this->_show_message(lang('server_command_not_available_for_windows'), site_url('admin/server_control/main/' . $id), 'Далее');
 				return FALSE;
 			}
 			
@@ -549,12 +549,12 @@ class Server_command extends CI_Controller {
 			$this->users->get_server_privileges($this->servers->server_data['id']);
 			
 			if(!$this->users->servers_privileges['CONSOLE_VIEW']) {
-				$this->show_message(lang('server_command_no_console_privileges'), site_url('admin/server_control/main/' . $id));
+				$this->_show_message(lang('server_command_no_console_privileges'), site_url('admin/server_control/main/' . $id));
 				return FALSE;
 			}
 			
 			if(!$this->servers->server_status()) {
-				$this->show_message(lang('server_command_server_down'), site_url('admin/server_control/main/' . $id));
+				$this->_show_message(lang('server_command_server_down'), site_url('admin/server_control/main/' . $id));
 				return FALSE;
 			}
 			
@@ -578,7 +578,7 @@ class Server_command extends CI_Controller {
 				OR !$this->servers->server_data['ssh_password']
 				)
 			){
-				$this->show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
+				$this->_show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
 				return FALSE;	
 			}
 			
@@ -589,7 +589,7 @@ class Server_command extends CI_Controller {
 			&& $this->servers->server_data['control_protocol'] == 'ssh'
 			&& (!in_array('ssh2', $ext_list))
 			){
-				$this->show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
+				$this->_show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
 				return FALSE;	
 			}
 			
@@ -610,12 +610,12 @@ class Server_command extends CI_Controller {
 				OR !$this->servers->server_data['telnet_password']
 				)
 			){
-				$this->show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
+				$this->_show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
 				return FALSE;	
 			}
 			
 			if(!$this->servers->server_data['script_get_console']) {
-				$this->show_message(lang('server_command_console_not_param'), site_url('admin/server_control/main/' . $id));
+				$this->_show_message(lang('server_command_console_not_param'), site_url('admin/server_control/main/' . $id));
 				return FALSE;
 			}
 			
@@ -647,14 +647,14 @@ class Server_command extends CI_Controller {
 						$adm_message = '';
 					}
 					
-					$this->show_message($message . $adm_message);
+					$this->_show_message($message . $adm_message);
 					
 					return FALSE;
 				} else {
 					$file_contents = str_replace("\n", "<br>", $file_contents);
 					$file_contents = '<p>' . lang('server_command_console') . ':</p><p align="left"><code>' . $file_contents . '</code></p>';
 					
-					$this->show_message($file_contents, site_url('admin/server_control/main/' . $id));
+					$this->_show_message($file_contents, site_url('admin/server_control/main/' . $id));
 					return TRUE;
 					//$this->tpl_data['content'] = '<code>' . $file_contents. '</code>';
 				}
@@ -667,12 +667,12 @@ class Server_command extends CI_Controller {
 					$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . array_pop($this->servers->commands) . '</code></p>';
 				}
 				
-				$this->show_message($message, site_url('admin/server_control/main/' . $id));
+				$this->_show_message($message, site_url('admin/server_control/main/' . $id));
 				return FALSE;
 			}
 			
 		} else {
-			$this->show_message(lang('server_command_server_not_found'), site_url('admin'), 'Далее');
+			$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), 'Далее');
 			return FALSE;
 		}
 		
@@ -733,7 +733,7 @@ class Server_command extends CI_Controller {
 					OR !$this->servers->server_data['ssh_password']
 					)
 				) {
-					$this->show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
 					return FALSE;	
 				}
 				
@@ -744,7 +744,7 @@ class Server_command extends CI_Controller {
 				&& $this->servers->server_data['control_protocol'] == 'ssh'
 				&& (!in_array('ssh2', $ext_list))
 				) {
-					$this->show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
 					return FALSE;	
 				}
 				
@@ -765,7 +765,7 @@ class Server_command extends CI_Controller {
 					OR !$this->servers->server_data['telnet_password']
 					)
 				){
-					$this->show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
 					return FALSE;	
 				}
 				
@@ -849,7 +849,7 @@ class Server_command extends CI_Controller {
 						$this->panel_log->save_log($log_data);
 					}
 					
-					$this->show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
 					return TRUE;
 					
 				} else {
@@ -860,11 +860,11 @@ class Server_command extends CI_Controller {
 				}
 				
 			}else{
-				$this->show_message(lang('server_command_no_start_privileges'), site_url('admin/server_control/main/' . $id), 'Далее');
+				$this->_show_message(lang('server_command_no_start_privileges'), site_url('admin/server_control/main/' . $id), 'Далее');
 				return FALSE;
 			}
 		} else {
-			$this->show_message(lang('server_command_server_not_found'), site_url('admin'), 'Далее');
+			$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), 'Далее');
 			return FALSE;
 		}
 
@@ -927,7 +927,7 @@ class Server_command extends CI_Controller {
 						OR !$this->servers->server_data['ssh_password']
 						)
 					){
-						$this->show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
+						$this->_show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
 						return FALSE;	
 					}
 					
@@ -938,7 +938,7 @@ class Server_command extends CI_Controller {
 					&& $this->servers->server_data['control_protocol'] == 'ssh'
 					&& (!in_array('ssh2', $ext_list))
 					){
-						$this->show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
+						$this->_show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
 						return FALSE;	
 					}
 					
@@ -959,7 +959,7 @@ class Server_command extends CI_Controller {
 						OR !$this->servers->server_data['telnet_password']
 						)
 					){
-						$this->show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
+						$this->_show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
 						return FALSE;	
 					}
 					
@@ -1036,7 +1036,7 @@ class Server_command extends CI_Controller {
 							$this->panel_log->save_log($log_data);
 						}
 						
-						$this->show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
+						$this->_show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
 						return TRUE;
 						
 					}else{
@@ -1047,11 +1047,11 @@ class Server_command extends CI_Controller {
 					}
 					
 				}else{
-						$this->show_message(lang('server_command_no_stop_privileges'), site_url('admin/server_control/main/' . $id), 'Далее');
+						$this->_show_message(lang('server_command_no_stop_privileges'), site_url('admin/server_control/main/' . $id), 'Далее');
 						return FALSE;
 				}
 			} else {
-				$this->show_message(lang('server_command_server_not_found'), site_url('admin'), 'Далее');
+				$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), 'Далее');
 				return FALSE;
 			}
 		}
@@ -1114,7 +1114,7 @@ class Server_command extends CI_Controller {
 					OR !$this->servers->server_data['ssh_password']
 					)
 				){
-					$this->show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
 					return FALSE;	
 				}
 				
@@ -1125,7 +1125,7 @@ class Server_command extends CI_Controller {
 				&& $this->servers->server_data['control_protocol'] == 'ssh'
 				&& (!in_array('ssh2', $ext_list))
 				){
-					$this->show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
 					return FALSE;	
 				}
 				
@@ -1146,13 +1146,13 @@ class Server_command extends CI_Controller {
 					OR !$this->servers->server_data['telnet_password']
 					)
 				){
-					$this->show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
 					return FALSE;	
 				}
 				
 				/* Заданы ли параметры запуска */
 				if(!$this->servers->server_data['script_restart']){
-					$this->show_message(lang('server_command_restart_not_param'), site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message(lang('server_command_restart_not_param'), site_url('admin/server_control/main/' . $id), 'Далее');
 					return FALSE;	
 				}
 
@@ -1221,7 +1221,7 @@ class Server_command extends CI_Controller {
 						$this->panel_log->save_log($log_data);
 					}
 					
-					$this->show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
 					return TRUE;
 					
 				}else{
@@ -1232,14 +1232,14 @@ class Server_command extends CI_Controller {
 				}
 			}else{
 					$message = lang('server_command_no_restart_privileges');
-					$this->show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
 					return FALSE;
 					
 					break;
 			}
 		}else{
 			$message = lang('server_command_server_not_found');
-			$this->show_message($message, site_url('admin'), 'Далее');
+			$this->_show_message($message, site_url('admin'), 'Далее');
 			return FALSE;
 		}
 	
@@ -1293,7 +1293,7 @@ class Server_command extends CI_Controller {
 					OR !$this->servers->server_data['ssh_password']
 					)
 				){
-					$this->show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
 					return FALSE;	
 				}
 				
@@ -1304,7 +1304,7 @@ class Server_command extends CI_Controller {
 				&& $this->servers->server_data['control_protocol'] == 'ssh'
 				&& (!in_array('ssh2', $ext_list))
 				){
-					$this->show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
 					return FALSE;	
 				}
 				
@@ -1325,7 +1325,7 @@ class Server_command extends CI_Controller {
 					OR !$this->servers->server_data['telnet_password']
 					)
 				){
-					$this->show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
 					return FALSE;	
 				}
 				
@@ -1370,7 +1370,7 @@ class Server_command extends CI_Controller {
 						$this->panel_log->save_log($log_data);
 					}
 					
-					$this->show_message($message, site_url('admin/server_control/main/' . $server_id), 'Далее');
+					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), 'Далее');
 					return TRUE;
 					
 				}else{
@@ -1381,7 +1381,7 @@ class Server_command extends CI_Controller {
 				}
 			}else{
 					$message = lang('server_command_no_update_privileges');
-					$this->show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
 					return FALSE;
 					
 					break;
@@ -1389,7 +1389,7 @@ class Server_command extends CI_Controller {
 		}else{
 			$message = lang('server_command_server_not_found');
 			
-			$this->show_message($message, site_url('admin'));
+			$this->_show_message($message, site_url('admin'));
 			return FALSE;
 		}
 		
