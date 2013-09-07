@@ -20,7 +20,7 @@ class Install extends MX_Controller {
 	var $user_data = array();
 	var $server_data = array();
 	
-	$autoload = array(
+	var $autoload = array(
         'helper'    => array('url', 'form', 'safety'),
         'libraries' => array('form_validation'),
         'model' => array('users', 'password', 'servers', 'servers/dedicated_servers', 'servers/games', 'servers/game_types'),
