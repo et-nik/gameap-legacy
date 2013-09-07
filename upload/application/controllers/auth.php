@@ -71,29 +71,23 @@ class Auth extends CI_Controller {
 			$query = $this->db->get_where('captcha', array('word' => $word, 'ip_address' => $this->input->ip_address(), 'captcha_time >' => $expiration), 1);
 			
 			if($query->num_rows > 0) {
-				return FALSE;
+				return TRUE;
 			}
 			
-			return TRUE;
+			return FALSE;
 	}
 	
 	public function index()
 	{
 		// Обычно библиотека запущена
         // $this->load->library('parser');
+        
         $this->tpl_data['code'] = '';
 
         /* Проверяем пользователя */
-        $check = $this->users->check_user();
-
-        if (!$check) {
-            //$data['content'] = $this->parser->parse('login.html', $data, TRUE);
+        if (!$this->users->check_user()) {
             redirect('auth/in');
         } else {
-			
-			/* После header в этом случае
-			 * команды exit не нужно
-			*/
 			redirect('admin');
         }
 	}
@@ -344,7 +338,7 @@ class Auth extends CI_Controller {
 		$this->form_validation->set_rules('image', 'капча', 'trim|required|max_length[12]|xss_clean');
         
         /* Проверка формы */
-		if ($this->form_validation->run() == FALSE){
+		if ($this->form_validation->run() == FALSE) {
 			
 			// Слово для капчи
 			$cap['word'] = rand(1000, 9999);
@@ -364,15 +358,14 @@ class Auth extends CI_Controller {
 			$this->tpl_data['captcha'] = $captcha['image'];
 			
 			$data = array(
-				'captcha_time'	=> $captcha['time'],
+				'captcha_time'	=> time(),
 				'ip_address'	=> $this->input->ip_address(),
 				'word'	 		=> $captcha['word']
 			);
 			
-			$query = $this->db->insert_string('captcha', $data);
-			$this->db->query($query);
+			$query = $this->db->insert('captcha', $data);
             
-             $this->parser->parse('register.html', $this->tpl_data);
+            $this->parser->parse('register.html', $this->tpl_data);
         } else {
 			
 			// Загрузка модели для шифровки пароля
