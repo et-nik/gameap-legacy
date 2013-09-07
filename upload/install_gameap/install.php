@@ -23,7 +23,7 @@
  * @author		Nikita Kuznetsov (ET-NiK)
  * @sinse		0.7
  */
- 
+
 $this->lang->load('install');
 
 $template				= file_get_contents('install_gameap/template.html');
@@ -425,7 +425,7 @@ switch($page) {
 		
 		include_once 'application/config/migration.php';
 		
-		if (isset($config['migration_version']) {
+		if (isset($config['migration_version'])) {
 			$m_version = $config['migration_version'];
 		} else {
 			$m_version = 0;

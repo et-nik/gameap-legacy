@@ -9,6 +9,7 @@
 |	http://codeigniter.com/user_guide/general/hooks.html
 |
 */
+
 $hook['post_controller'][] = array(
   'class'    => 'Tpl_replace',
   'function' => 'parse_lang',

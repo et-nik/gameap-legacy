@@ -34,8 +34,21 @@ class Gameap_modules extends CI_Model {
         // Call the Model constructor
         parent::__construct();
         
-        /* Получение списка модулей */
-        $this->get_modules_data();
+        /* 
+         * Получение списка модулей 
+         * 
+         * Когда база данных не инициализирована, получать список модулей нет необходимости 
+         * Это может быть, например при установке панели.
+         * 
+        */
+        if (file_exists(APPPATH . 'config/database.php')) {
+			
+			if (!isset($this->db)) {
+				$this->load->database();
+			}
+			
+			$this->get_modules_data();
+		}
     }
     
     // ----------------------------------------------------------
