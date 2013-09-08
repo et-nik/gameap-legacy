@@ -94,6 +94,9 @@ class Adm_modules extends CI_Controller {
 		
 		if ($map = directory_map(APPPATH . 'modules')) {
 			
+			/* Получение списка старых модулей */
+			$old_modules_list = $this->gameap_modules->get_modules_list();
+			
 			/* Очищаем список модулей из базы */
 			$this->gameap_modules->clean_modules();
 			
@@ -109,11 +112,17 @@ class Adm_modules extends CI_Controller {
 					continue;
 				}
 				
+				/* Если модуль небыл установлен до этого и существуют правила установки */
+				if (!in_array($key, $old_modules_list) && file_exists(APPPATH . 'modules/' . $key . '/module_install.php')) {
+					/* Инклудим файл с правилами установки */
+					include_once APPPATH . 'modules/' . $key . '/module_install.php';
+				}
+				
 				/* Поиск файла с информацией о модулей */
 				if (file_exists(APPPATH . 'modules/' . $key . '/module_info.php')) {
 					
 					/* Инклудим файл с инфой */
-					include APPPATH . 'modules/' . $key . '/module_info.php';
+					include_once APPPATH . 'modules/' . $key . '/module_info.php';
 					
 					$sql_data['short_name'] 	= $key;
 					$sql_data['name']			= $module_info['name'];
