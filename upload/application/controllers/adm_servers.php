@@ -621,7 +621,7 @@ class Adm_servers extends CI_Controller {
 								$os = $this->config->config['local_os'];
 							}
 							
-							if (strtolower($os)) {
+							if (strtolower($os) == 'windows') {
 								
 								switch (strtolower($this->games->games_list[0]['engine'])) {
 									case 'source':
