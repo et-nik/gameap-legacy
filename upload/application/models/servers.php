@@ -362,9 +362,10 @@ class Servers extends CI_Model {
 					/* Проверка существования исполняемого файла */
 					$script_file = explode(' ', $cmd_arr);
 					$script_file = $script_file[0];
+					$script_file = str_replace('./', '', $script_file);
 					
 					if (!file_exists($path . '/' . $script_file)) {
-						$result .= 'Error: ' . $script_file . ' file not found';
+						$result .= 'Error: ' . $path . '/' . $script_file . ' file not found';
 						continue;
 					}
 					
@@ -377,9 +378,10 @@ class Servers extends CI_Model {
 				/* Проверка существования исполняемого файла */
 				$script_file = explode(' ', $command);
 				$script_file = $script_file[0];
+				$script_file = str_replace('./', '', $script_file);
 				
 				if (!file_exists($path . '/' . $script_file)) {
-					$result = 'Error: ' . $script_file . ' file not found';
+					$result = 'Error: ' . $path . '/' . $script_file . ' file not found';
 					return $result;
 				}
 				
@@ -461,14 +463,15 @@ class Servers extends CI_Model {
 					/* Проверка существования исполняемого файла и прав на выполнение */
 					$script_file = explode(' ', $cmd_arr);
 					$script_file = $script_file[0];
+					$script_file = str_replace('./', '', $script_file);
 					
 					if (!file_exists($path . '/' . $script_file)) {
-						$result .= 'Error: ' . $script_file . ' file not found';
+						$result .= 'Error: ' . $path . '/' . $script_file . ' file not found';
 						continue;
 					}
 					
 					if (!is_executable($path . '/' . $script_file)) {
-						$result .= 'Error: ' . $script_file . ' file not executable';
+						$result .= 'Error: ' . $path . '/' . $script_file . ' file not executable';
 						continue;
 					}
 					
@@ -483,14 +486,15 @@ class Servers extends CI_Model {
 				/* Проверка существования исполняемого файла и прав на выполнение */
 				$script_file = explode(' ', $command);
 				$script_file = $script_file[0];
+				$script_file = str_replace('./', '', $script_file);
 				
 				if (!file_exists($path . '/' . $script_file)) {
-					$result = 'Error: ' . $script_file . ' file not found';
+					$result = 'Error: ' . $path . '/' . $script_file . ' file not found';
 					return $result;
 				}
 				
 				if (!is_executable($path . '/' . $script_file)) {
-					$result = 'Error: ' . $script_file . ' file not executable';
+					$result = 'Error: ' . $path . '/' . $script_file . ' file not executable';
 					return $result;
 				}
 				
