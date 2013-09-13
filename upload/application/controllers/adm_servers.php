@@ -131,6 +131,31 @@ class Adm_servers extends CI_Controller {
 	// -----------------------------------------------------------
 	
 	/**
+	 * Проверка FTP
+	 * 
+	*/
+	function _check_ftp($ftp_host, $ftp_login, $ftp_password) {
+		
+		// Разделяем на Host:Port
+		$ftp_host = explode(':', $ftp_host);
+							
+		if(!isset($ftp_host[1])) {
+			$ftp_host[1] = 21;
+		}
+
+		$connection = ftp_connect($ftp_host[0], $ftp_host[1]);
+
+		/* Если не удалось соединиться или неверные данные */
+		if (!$connection OR !ftp_login($connection, $ftp_login, $ftp_password)) {
+			return FALSE;
+		} else {
+			return TRUE;
+		}
+	}
+	
+	// -----------------------------------------------------------
+	
+	/**
 	 * Данные по умолчанию для игрового сервера
 	 * 
 	 * @param array - некоторые данные о сервере (такие как ОС, движок и др.)
@@ -185,31 +210,6 @@ class Adm_servers extends CI_Controller {
 		$data['maps_path'] = '/' . $this->games->games_list[0]['start_code'] . '/maps';
 		
 		return $data;
-	}
-	
-	// -----------------------------------------------------------
-	
-	/**
-	 * Проверка FTP
-	 * 
-	*/
-	function _check_ftp($ftp_host, $ftp_login, $ftp_password) {
-		
-		// Разделяем на Host:Port
-		$ftp_host = explode(':', $ftp_host);
-							
-		if(!isset($ftp_host[1])) {
-			$ftp_host[1] = 21;
-		}
-
-		$connection = ftp_connect($ftp_host[0], $ftp_host[1]);
-
-		/* Если не удалось соединиться или неверные данные */
-		if (!$connection OR !ftp_login($connection, $ftp_login, $ftp_password)) {
-			return FALSE;
-		} else {
-			return TRUE;
-		}
 	}
 	
 	// -----------------------------------------------------------
