@@ -77,6 +77,8 @@ class Adm_servers extends CI_Controller {
 			redirect('auth');
         }
     }
+    
+    // -----------------------------------------------------------
 
     // Отображение информационного сообщения
     function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
@@ -101,12 +103,125 @@ class Adm_servers extends CI_Controller {
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
+    // -----------------------------------------------------------
+	
+	/**
+	 * Проверка SSH
+	 * 
+	*/
+    function _check_ssh($ssh_host, $ssh_login, $ssh_password) {
+		
+		// Разделяем на Host:Port
+		$ssh_host = explode(':', $ssh_host);
+							
+		if(!isset($ssh_host[1])) {
+			$ssh_host[1] = 22;
+		}
+		
+		$connection = ssh2_connect($ssh_host[0], $ssh_host[1]);
+		
+		/* Если не удалось соединиться или неверные данные */
+		if (!$connection OR !ssh2_auth_password($connection, $ssh_login, $ssh_password)) {
+			return FALSE;
+		} else {
+			return TRUE;
+		}
+	}
+	
+	// -----------------------------------------------------------
+	
+	/**
+	 * Данные по умолчанию для игрового сервера
+	 * 
+	 * @param array - некоторые данные о сервере (такие как ОС, движок и др.)
+	 * @return array
+	 * 
+	*/
+	function _gs_default_data($data) {
+		
+		if (!$this->dedicated_servers->ds_list && $data['ds_id'] !== 0) {
+			$where = array('id' => $data['ds_id']);
+			$this->dedicated_servers->get_ds_list($where, 1);
+		}
+		
+		if (!$this->games->games_list) {
+			$where = array('code' => $data['game']);
+			$this->games->get_games_list($where, 1);
+		}
+		
+		if ($data['ds_id']) {
+			$os = $this->dedicated_servers->ds_list[0]['os'];
+		} else {
+			$os = $this->config->config['local_os'];
+		}
+		
+		if (strtolower($os) == 'windows') {
+			
+			switch (strtolower($this->games->games_list[0]['engine'])) {
+				case 'source':
+					$data['start_command'] 	= 'srcds.exe -console -game {game} +ip {ip} +port {port} +map de_dust2';
+					break;
+				
+				case 'goldsource':
+					$data['start_command'] 	= 'hlds.exe -console -game {game} +ip {ip} +port {port} +map de_dust2';
+					break;
+			}
+			
+		} else {
+			
+			switch (strtolower($this->games->games_list[0]['engine'])) {
+				case 'source':
+					$data['start_command'] 	= 'srcds_run -game {game} +ip {ip} +port {port} +map de_dust2';
+					break;
+				
+				case 'goldsource':
+					$data['start_command'] 	= 'hlds_run -console -game {game} +ip {ip} +port {port} +map de_dust2';
+					break;
+			}
+		}
+		
+		/* Присваиваем значения пути к картам и имя scren  */
+		$data['screen_name'] = $data['game'] . '_' . random_string('alnum', 6) . '_' . $data['server_port'];
+		$data['maps_path'] = '/' . $this->games->games_list[0]['start_code'] . '/maps';
+		
+		return $data;
+	}
+	
+	// -----------------------------------------------------------
+	
+	/**
+	 * Проверка FTP
+	 * 
+	*/
+	function _check_ftp($ftp_host, $ftp_login, $ftp_password) {
+		
+		// Разделяем на Host:Port
+		$ftp_host = explode(':', $ftp_host);
+							
+		if(!isset($ftp_host[1])) {
+			$ftp_host[1] = 21;
+		}
+
+		$connection = ftp_connect($ftp_host[0], $ftp_host[1]);
+
+		/* Если не удалось соединиться или неверные данные */
+		if (!$connection OR !ftp_login($connection, $ftp_login, $ftp_password)) {
+			return FALSE;
+		} else {
+			return TRUE;
+		}
+	}
+	
+	// -----------------------------------------------------------
+    
     //Главная
     public function index()
     {
 		
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
+	
+	// -----------------------------------------------------------
 	
 	/**
 	 * Просмотр списка
@@ -262,7 +377,8 @@ class Adm_servers extends CI_Controller {
 		$this->parser->parse('main.html', $this->tpl_data);
 		
 	}
-
+	
+	// -----------------------------------------------------------
 	
 	/**
 	 * Добавление
@@ -510,39 +626,16 @@ class Adm_servers extends CI_Controller {
 						 * Проверка указандых данных ssh, telnet, ftp
 						 * чтобы пароль подходил
 						*/
-						
-						if(!empty($sql_data['ssh_host'])) {
-							$ssh_data = explode(':', $sql_data['ssh_host']);
+						if (!empty($sql_data['ssh_host'])) {
 							
-							if(!isset($ssh_data[1])) {
-								$ssh_data[1] = 22;
-							}
-							
-							$connection = ssh2_connect($ssh_data[0], $ssh_data[1]);
-
-							$ssh_password = $sql_data['ssh_password'];
-							
-							/* Если не удалось соединиться или неверные данные */
-							if (!$connection OR !ssh2_auth_password($connection, $sql_data['ssh_login'], $ssh_password)) {
+							if (FALSE == $this->_check_ssh($sql_data['ssh_host'], $sql_data['ssh_login'], $sql_data['ssh_password'])) {
 								$this->_show_message(lang('adm_servers_ssh_data_unavailable'), 'javascript:history.back()');
 								return FALSE;
 							}
-							
 						}
 						
 						if(!empty($sql_data['ftp_host'])) {
-							$ftp_data = explode(':', $sql_data['ftp_host']);
-							
-							if(!isset($ftp_data[1])) {
-								$ftp_data[1] = 21;
-							}
-	
-							$connection = ftp_connect($ftp_data[0], $ftp_data[1]);
-							
-							$ftp_password = $sql_data['ftp_password'];
-							
-							/* Если не удалось соединиться или неверные данные */
-							if (!$connection OR !ftp_login($connection, $sql_data['ftp_login'], $ftp_password)) {
+							if (FALSE == $this->_check_ftp($sql_data['ftp_host'], $sql_data['ftp_login'], $sql_data['ftp_password'])) {
 								$this->_show_message(lang('adm_servers_ftp_data_unavailable'), 'javascript:history.back()');
 								return FALSE;
 							}
@@ -609,48 +702,14 @@ class Adm_servers extends CI_Controller {
 							$this->_show_message(lang('adm_servers_game_not_found'));
 							return FALSE;
 						}
+						
+						/* Присвоение стандартных параметров */
+						$sql_data = $this->_gs_default_data($sql_data);
 
 						if ($this->input->post('start_command')) {
 							$sql_data['start_command'] 	= $this->input->post('start_command');
-						} else {
-							/* Присвоение стандартных параметров */
-							
-							if ($sql_data['ds_id']) {
-								$os = $this->dedicated_servers->ds_list[0]['os'];
-							} else {
-								$os = $this->config->config['local_os'];
-							}
-							
-							if (strtolower($os) == 'windows') {
-								
-								switch (strtolower($this->games->games_list[0]['engine'])) {
-									case 'source':
-										$sql_data['start_command'] 	= 'srcds.exe -console -game {game} +ip {ip} +port {port} +map de_dust2';
-										break;
-									
-									case 'goldsource':
-										$sql_data['start_command'] 	= 'hlds.exe -console -game {game} +ip {ip} +port {port} +map de_dust2';
-										break;
-								}
-								
-							} else {
-								
-								switch (strtolower($this->games->games_list[0]['engine'])) {
-									case 'source':
-										$sql_data['start_command'] 	= 'srcds_run -game {game} +ip {ip} +port {port} +map de_dust2';
-										break;
-									
-									case 'goldsource':
-										$sql_data['start_command'] 	= 'hlds_run -console -game {game} +ip {ip} +port {port} +map de_dust2';
-										break;
-								}
-							}
 						}
-						
-						/* Присваиваем значения пути к картам и  имя scren  */
-						$sql_data['screen_name'] = $sql_data['game'] . '_' . random_string('alnum', 6) . '_' . $sql_data['server_port'];
-						$sql_data['maps_path'] = '/' . $sql_data['game'] . '/maps';
-						
+
 						/* Чтобы ид модификации был правильный и подходил для выбранной игры */
 						$where = array('id' => $sql_data['game_type'], 'game_code' => $sql_data['game']);
 						if (!$this->game_types->get_gametypes_list($where, 1)) {
@@ -660,11 +719,10 @@ class Adm_servers extends CI_Controller {
 
 						$local_tpl_data = array();
 						
-
 						// Добавление сервера
-						if($this->dedicated_servers->add_game_server($sql_data)){
+						if ($this->dedicated_servers->add_game_server($sql_data)) {
 							$local_tpl_data['message'] = lang('adm_servers_add_server_successful');
-						}else{
+						} else {
 							$local_tpl_data['message'] = lang('adm_servers_add_server_failed');
 						}
 						
@@ -739,6 +797,8 @@ class Adm_servers extends CI_Controller {
 		$this->parser->parse('main.html', $this->tpl_data);
 		
 	}
+	
+	// -----------------------------------------------------------
 	
 	/**
 	 * Удаление
@@ -939,6 +999,8 @@ class Adm_servers extends CI_Controller {
 		$this->parser->parse('main.html', $this->tpl_data);
 		
 	}
+	
+	// -----------------------------------------------------------
 	
 	/**
 	 * Редактирование
@@ -1481,6 +1543,8 @@ class Adm_servers extends CI_Controller {
 				redirect('');
 				break;
 		}
+		
+		// -----------------------------------------------------------
 
 		/* 
 		 * Проверка заполненной формы, если все в порядке,
@@ -1541,16 +1605,11 @@ class Adm_servers extends CI_Controller {
 					 * чтобы пароль подходил
 					*/
 					
-					//print_r($this->dedicated_servers->ds_list);
-					
-					if(!empty($sql_data['ssh_host'])) {
-						$ssh_data = explode(':', $sql_data['ssh_host']);
-						
-						if(!isset($ssh_data[1])) {
-							$ssh_data[1] = 22;
-						}
-						
-						$connection = ssh2_connect($ssh_data[0], $ssh_data[1]);
+					/* 
+					 * Проверка указандых данных ssh, telnet, ftp
+					 * чтобы пароль подходил
+					*/
+					if (!empty($sql_data['ssh_host'])) {
 						
 						/* Пароль не задан, берем из базы */
 						if(empty($sql_data['ssh_password'])) {
@@ -1559,22 +1618,13 @@ class Adm_servers extends CI_Controller {
 							$ssh_password = $sql_data['ssh_password'];
 						}
 						
-						/* Если не удалось соединиться или неверные данные */
-						if (!$connection OR !ssh2_auth_password($connection, $sql_data['ssh_login'], $ssh_password)) {
+						if (FALSE == $this->_check_ssh($sql_data['ssh_host'], $sql_data['ssh_login'], $ssh_password)) {
 							$this->_show_message(lang('adm_servers_ssh_data_unavailable'), 'javascript:history.back()');
 							return FALSE;
 						}
-						
 					}
 					
 					if(!empty($sql_data['ftp_host'])) {
-						$ftp_data = explode(':', $sql_data['ftp_host']);
-						
-						if(!isset($ftp_data[1])) {
-							$ftp_data[1] = 21;
-						}
-
-						$connection = ftp_connect($ftp_data[0], $ftp_data[1]);
 						
 						/* Пароль не задан, берем из базы */
 						if(empty($sql_data['ftp_password'])) {
@@ -1583,8 +1633,8 @@ class Adm_servers extends CI_Controller {
 							$ftp_password = $sql_data['ftp_password'];
 						}
 						
-						/* Если не удалось соединиться или неверные данные */
-						if (!$connection OR !ftp_login($connection, $sql_data['ftp_login'], $ftp_password)) {
+						
+						if (FALSE == $this->_check_ftp($sql_data['ftp_host'], $sql_data['ftp_login'], $ftp_password)) {
 							$this->_show_message(lang('adm_servers_ftp_data_unavailable'), 'javascript:history.back()');
 							return FALSE;
 						}
@@ -1944,6 +1994,8 @@ class Adm_servers extends CI_Controller {
 		$this->parser->parse('main.html', $this->tpl_data);
 		
 	}
+	
+	// -----------------------------------------------------------
 
 	/**
 	 * Установка выделенного сервера
@@ -2026,8 +2078,8 @@ class Adm_servers extends CI_Controller {
 			
 			$game_data = $this->games->get_games_list(array('code' => $new_gs['game']), 1);
 			
-			$new_gs['maps_path'] = $game_data[0]['start_code'] . '/maps';
-			$new_gs['screen_name'] = $new_gs['game'] . '_' . random_string('alnum', 6) . '_' . $new_gs['server_port'];
+			/* Получение стандартных данных */
+			$new_gs = $this->_gs_default_data($new_gs);
 			
 			/* Чтобы ид модификации был правильный и подходил для выбранной игры */
 			$where = array('id' => $new_gs['game_type'], 'game_code' => $new_gs['game']);
