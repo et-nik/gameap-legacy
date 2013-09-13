@@ -4,7 +4,52 @@ class Dedicated_servers extends Servers {
 	
 	var $ds_list = FALSE;				// Список удаленных серверов
 	
+	
 	//-----------------------------------------------------------
+	
+	/**
+     * Шифровка паролей
+     * 
+     * @param array
+     * @return bool
+     *
+    */
+	function _encrypt_passwords($data) {
+		
+		$this->load->library('encrypt');
+		
+		if (isset($data['ssh_login'])) {
+			$data['ssh_login']	= $this->encrypt->encode($data['ssh_login']);
+			if ($data['ssh_password'] == '') {
+				unset($data['ssh_password']);
+			} else {
+				$data['ssh_password']	= $this->encrypt->encode($data['ssh_password']);
+			}
+		}
+
+		if (isset($data['telnet_login'])) {
+			$data['telnet_login']	= $this->encrypt->encode($data['telnet_login']);
+			if ($data['telnet_password'] == '') {
+				unset($data['telnet_password']);
+			} else {
+				$data['telnet_password']	= $this->encrypt->encode($data['telnet_password']);
+			}
+		}
+		
+		if (isset($data['ftp_login'])) {
+			$data['ftp_login']	= $this->encrypt->encode($data['ftp_login']);
+			if ($data['ftp_password'] == '') {
+				unset($data['ftp_password']);
+			} else {
+				$data['ftp_password']	= $this->encrypt->encode($data['ftp_password']);
+			}
+		}
+		
+		return $data;
+	}
+	
+	//-----------------------------------------------------------
+	
 	/**
      * Добавление выделенного сервера
      * 
@@ -14,6 +59,8 @@ class Dedicated_servers extends Servers {
     */
 	function add_dedicated_server($data)
 	{
+		$data = $this->_encrypt_passwords($data);
+		
 		if ($this->db->insert('dedicated_servers', $data)) {
 			return TRUE;
 		} else {
@@ -23,6 +70,7 @@ class Dedicated_servers extends Servers {
 	
 	
 	//-----------------------------------------------------------
+	
 	/**
      * Удаление выделенного сервера
      * 
@@ -40,6 +88,7 @@ class Dedicated_servers extends Servers {
 	}
 	
 	//-----------------------------------------------------------
+	
 	/**
      * Получение списка удаленных сервров (машин)
      * 
@@ -107,35 +156,7 @@ class Dedicated_servers extends Servers {
     */
 	function edit_dedicated_server($id, $data)
 	{
-		$this->load->library('encrypt');
-		
-		/* Зашифровываем пароли */
-		if(isset($data['ssh_login'])) {
-			$data['ssh_login']	= $this->encrypt->encode($data['ssh_login']);
-			if($data['ssh_password'] == '') {
-				unset($data['ssh_password']);
-			} else {
-				$data['ssh_password']	= $this->encrypt->encode($data['ssh_password']);
-			}
-		}
-
-		if(isset($data['telnet_login'])) {
-			$data['telnet_login']	= $this->encrypt->encode($data['telnet_login']);
-			if($data['telnet_password'] == '') {
-				unset($data['telnet_password']);
-			} else {
-				$data['telnet_password']	= $this->encrypt->encode($data['telnet_password']);
-			}
-		}
-		
-		if(isset($data['ftp_login'])) {
-			$data['ftp_login']	= $this->encrypt->encode($data['ftp_login']);
-			if($data['ftp_password'] == '') {
-				unset($data['ftp_password']);
-			} else {
-				$data['ftp_password']	= $this->encrypt->encode($data['ftp_password']);
-			}
-		}
+		$data = $this->_encrypt_passwords($data);
 		
 		$this->db->where('id', $id);
 
@@ -147,6 +168,7 @@ class Dedicated_servers extends Servers {
 	}
 	
 	//-----------------------------------------------------------
+	
 	/**
      * Получение данных выделенного сервера для шаблона
      * (вырезаны ненужные данные - пароли и пр.)
