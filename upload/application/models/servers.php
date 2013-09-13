@@ -1430,11 +1430,11 @@ class Servers extends CI_Model {
 		}
 		
 		/* Редактируем rcon в server.cfg */
-		switch ($this->servers->server_data['engine']) {
-			case 'GoldSource':
+		switch (strtolower($this->servers->server_data['engine'])) {
+			case 'goldsource':
 				$servercfg_file = 'server.cfg';
 				break;
-			case 'Source':
+			case 'source':
 				$servercfg_file = 'cfg/server.cfg';
 				break;
 			default:
@@ -1510,18 +1510,18 @@ class Servers extends CI_Model {
 		/* Отправляем новый rcon пароль в консоль сервера*/
 		if($this->servers->server_status($this->server_data['server_ip'], $this->server_data['server_port'])) {
 			
-			$this->load->model('valve_rcon');
-			
-			$rcon_connect = $this->valve_rcon->connect(
-				$this->server_data['server_ip'], 
-				$this->server_data['server_port'],
-				$this->server_data['rcon'],
-				$this->server_data['engine']
-			);
+			$this->load->driver('rcon');
 
-			$this->valve_rcon->command('rcon_password ' . $new_rcon);
+			$this->rcon->set_variables(
+									$this->server_data['server_ip'],
+									$this->server_data['server_port'],
+									$this->server_data['rcon'], 
+									$this->servers->server_data['engine']
+			);
 			
-			
+			$rcon_connect = $this->rcon->connect();
+
+			$this->rcon->command('rcon_password ' . $new_rcon);
 		}
 		
 		$this->server_data['rcon'] = $new_rcon;

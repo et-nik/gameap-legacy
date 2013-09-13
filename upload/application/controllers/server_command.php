@@ -327,17 +327,17 @@ class Server_command extends CI_Controller {
 							$this->_show_message(lang('server_command_server_down'), site_url('admin/server_control/main/' . $server_id));
 							return FALSE;
 						}
-							
-						$this->load->model('valve_rcon');
-							
-						$rcon_connect = $this->valve_rcon->connect(
-								$this->servers->server_data['server_ip'], 
-								$this->servers->server_data['server_port'],
-								$this->servers->server_data['rcon'],
-								$this->servers->server_data['engine']
-							);
-							
-							
+						
+						$this->load->driver('rcon');
+						
+						$this->rcon->set_variables(
+												$this->servers->server_data['server_ip'],
+												$this->servers->server_data['server_port'],
+												$this->servers->server_data['rcon'], 
+												$this->servers->servers->server_data['engine']
+						);
+						
+						$rcon_connect = $this->rcon->connect();
 							
 						if(@$rcon_connect) {
 							$player_id = (int)$id;
@@ -358,7 +358,7 @@ class Server_command extends CI_Controller {
 									$rcon_command = str_replace('{time}', $pl_ban_time, $rcon_command);
 									$rcon_command = str_replace('{reason}', $pl_ban_reason, $rcon_command);
 									
-									$rcon_string = $this->valve_rcon->command($rcon_command);
+									$rcon_string = $this->rcon->command($rcon_command);
 									$message = lang('server_command_ban_command_sended');
 									break;
 									
@@ -366,7 +366,7 @@ class Server_command extends CI_Controller {
 									$rcon_command = $this->servers->server_data['kick_cmd'];
 									$rcon_command = str_replace('{id}', $player_id, $rcon_command);
 									
-									$rcon_string = $this->valve_rcon->command($rcon_command);
+									$rcon_string = $this->rcon->command($rcon_command);
 									$message = lang('server_command_kick_command_sended');
 									break;
 									
@@ -375,7 +375,7 @@ class Server_command extends CI_Controller {
 									$rcon_command = str_replace('{id}', $player_id, $rcon_command);
 									$rcon_command = str_replace('{name}', $pl_newname, $rcon_command);
 									
-									$rcon_string = $this->valve_rcon->command($rcon_command);
+									$rcon_string = $this->rcon->command($rcon_command);
 									$message = lang('server_command_nickchange_command_sended');
 									break;
 									
@@ -383,7 +383,7 @@ class Server_command extends CI_Controller {
 									$rcon_command = $this->servers->server_data['sendmsg_cmd'];
 									$rcon_command = str_replace('{msg}', $msg_text, $rcon_command);
 
-									$rcon_string = $this->valve_rcon->command($rcon_command);
+									$rcon_string = $this->rcon->command($rcon_command);
 									$message = lang('server_command_msg_command_sended');
 									break;
 									
@@ -391,14 +391,14 @@ class Server_command extends CI_Controller {
 									$rcon_command = $this->servers->server_data['chmap_cmd'];
 									$rcon_command = str_replace('{map}', $map, $rcon_command);
 
-									$rcon_string = $this->valve_rcon->command($rcon_command);
+									$rcon_string = $this->rcon->command($rcon_command);
 									$message = lang('server_command_mapchange_command_sended', $map);
 									break;
 									
 								case 'restart':
 									$rcon_command = $this->servers->server_data['srestart_cmd'];
 									
-									$rcon_string = $this->valve_rcon->command($rcon_command);
+									$rcon_string = $this->rcon->command($rcon_command);
 									$message = lang('server_command_restart_cmd_sended');
 									break;
 									
@@ -407,18 +407,18 @@ class Server_command extends CI_Controller {
 									$rcon_command = str_replace('{password}', $password, $rcon_command);
 									$rcon_command = str_replace('{pass}', $password, $rcon_command);
 
-									$rcon_string = $this->valve_rcon->command($rcon_command);
+									$rcon_string = $this->rcon->command($rcon_command);
 									$message = lang('server_command_password_set');
 									break;
 									
 								case 'fast':
-									$rcon_string = $this->valve_rcon->command("$rcon_command");
-									$message = lang('Команда отправлена на сервер');
+									$rcon_string = $this->rcon->command("$rcon_command");
+									$message = lang('server_command_cmd_sended');
 									break;
 									
 								case 'rcon_command':
-									$rcon_string = $this->valve_rcon->command("$rcon_command");
-									$message = lang('Команда отправлена на сервер');
+									$rcon_string = $this->rcon->command("$rcon_command");
+									$message = lang('server_command_cmd_sended');
 									break;
 							}
 								

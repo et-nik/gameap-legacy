@@ -89,6 +89,7 @@ class Server_control extends CI_Controller {
     // Команды
     public function main($server_id = FALSE)
     {
+        $this->load->driver('rcon');
         
         $this->load->helper('date');
         
@@ -125,18 +126,19 @@ class Server_control extends CI_Controller {
 			if(!$error_desc){
 				$rcon_connect = FALSE;
 				
-				if($this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['server_port'])) {
+				if ($this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['server_port'])) {
 					$this->servers->server_data['server_status'] = 1;
 					
-					/* Если сервер включен, то подключаемся по ркону */
-					$rcon_connect = $this->valve_rcon->connect(
-														$this->servers->server_data['server_ip'], 
-														$this->servers->server_data['server_port'],
-														$this->servers->server_data['rcon'],
-														$this->servers->servers->server_data['engine']
-													);
+					$this->rcon->set_variables(
+												$this->servers->server_data['server_ip'],
+												$this->servers->server_data['server_port'],
+												$this->servers->server_data['rcon'], 
+												$this->servers->servers->server_data['engine']
+					);
 					
-				}else{
+					$rcon_connect = $this->rcon->connect();
+					
+				} else {
 					$this->servers->server_data['server_status'] = 0;
 				}
 				
@@ -144,12 +146,12 @@ class Server_control extends CI_Controller {
 				if($this->servers->server_data['server_status']) {
 
 					// Отправка команды
-					$rcon_string = $this->valve_rcon->command("status");
+					$rcon_string = $this->rcon->command("status");
 					
 					$local_tpl_data['users_list'] = FALSE;
 					
 					if($rcon_string){
-							$local_tpl_data['users_list'] = get_players($rcon_string, $this->servers->server_data['engine']);
+							$local_tpl_data['users_list'] = $this->rcon->get_players($rcon_string, $this->servers->server_data['engine']);
 					}
 					
 					if(!$local_tpl_data['users_list']){
@@ -168,7 +170,7 @@ class Server_control extends CI_Controller {
 						$local_tpl_data['maps_list'] = $this->servers->get_server_maps();
 					}else{
 						$this->tpl_data['content'] .= '<p>' . lang('server_control_no_ftp') . '</p>';
-						$local_tpl_data['maps_list'] = $this->hl_rcon->get_server_maps();
+						$local_tpl_data['maps_list'] = $this->rcon->get_maps();
 					}
 					
 					/*
