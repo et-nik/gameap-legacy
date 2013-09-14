@@ -1305,9 +1305,9 @@ class Adm_servers extends CI_Controller {
 
 				/* Прогон по алиасам */
 				
+				$empty_alias = '';
 				if ($allowable_aliases && !empty($allowable_aliases)) {
-					$empty_alias = '';
-					
+
 					/* Если параметр пуст, то выводим сообщение с предупреждением */
 					$i = 0;
 					foreach ($allowable_aliases as $alias) {
