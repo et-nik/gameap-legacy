@@ -228,7 +228,7 @@ class Query_goldsource extends CI_Driver {
 		$request = $this->A2S_PLAYER($host, $port, $challenge);
 		
 		$players['names'] = $request['Player Name'];
-		$players['kills'] = $request['Kills'];
+		$players['score'] = $request['Kills'];
 		$players['connected'] = $request['Time connected'];
 		
 		return $players;
@@ -247,8 +247,8 @@ class Query_goldsource extends CI_Driver {
 		$info['map'] 			= $request['Map'];
 		$info['game'] 			= $request['Game Description'];
 		$info['game_code'] 		= $request['Game Directory'];
-		$info['online_players'] = $request['Number of players'];
-		$info['max_players'] 	= $request['Maximum players'];
+		$info['players'] 		= $request['Number of players'];
+		$info['maxplayers'] 	= $request['Maximum players'];
 		$info['version'] 		= $request['Version'];
 		$info['password'] 		= $request['Password'];
 		
@@ -269,10 +269,31 @@ class Query_goldsource extends CI_Driver {
 	function get_rules($host, $port)
 	{
 		$challenge = $this->A2S_SERVERQUERY_GETCHALLENGE($host, $port);
-		$request = $this->A2S_RULES($host, $port, $challenge);
 		
-		$rules['rule'] = $request['Rule Name'];
-		$rules['value'] = $request['Rule Value'];
+		$st = $this->request("\x56".$this->pastelong($challenge),$host,$port);
+		
+		if (!$st) { return FALSE; }
+		
+		$st=substr($st, 4);
+		
+		if (substr($st, 0, 1) == "\x41") {
+		  $challenge = $this->cutlong(substr($st, 1));
+		  $st = $this->request("\x56".$this->pastelong($challenge),$host,$port);
+		  if (!$st) return false;
+		  $st = substr($st, 4);
+		}
+		
+		if (substr($st, 0, 1) != "\x45") return false;
+		
+		$result['Type'] = $this->cutchar($st); // Char: Should be equal to 'E'
+		$result['Num Rules'] = $this->cutshort($st); // Short: The number of rules reported in response
+		
+		for ($i = 1; $i <= $result['Num Rules']; $i++) {
+			$rule_name = $this->cutstring($st);
+			$rule_value = $this->cutstring($st);
+
+			$rules[$rule_name] = $rule_value;
+		}
 		
 		return $rules;
 	}

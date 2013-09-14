@@ -189,7 +189,7 @@ class Query_samp extends CI_Driver {
         $info['map'] = (string) fread($this->sock, $strLen);
         
 
-		$info['game'] 			= 'San Andreas Multuplayer';
+		$info['game'] 			= 'San Andreas Multiplayer';
 		$info['game_code'] 		= 'samp';
 		$info['version'] 		= '';
 		$info['os'] 			= 'Unknown';
