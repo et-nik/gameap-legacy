@@ -21,6 +21,7 @@ class Query_minecraft extends CI_Driver {
 	private $socket;
 	private $players;
 	private $info;
+	var $challenge = NULL;
 
 	public function __destruct() {
 		if (isset($this->socket)) {
@@ -30,7 +31,6 @@ class Query_minecraft extends CI_Driver {
 
 	public function connect($host, $port = 25565)
 	{
-
 		$this->socket = @fsockopen('udp://' . $host, (int)$port, $errno, $errstr, $this->timeout);
 
 		if( $errno || $this->socket === false )
@@ -41,10 +41,9 @@ class Query_minecraft extends CI_Driver {
 		stream_set_timeout($this->socket, 1);
 		stream_set_blocking($this->socket, true);
 
-		$challenge = $this->getchallenge();
-		$this->GetStatus($challenge);
+		$this->challenge = $this->getchallenge();
 		
-		//~ fclose( $this->socket );
+		return TRUE;
 	}
 	
 	private function getchallenge()
@@ -198,7 +197,12 @@ class Query_minecraft extends CI_Driver {
 	*/
 	function get_status($host, $port)
 	{
-		//return (bool)$this->getStatus($host, $port);
+		if ($this->connect($host, $port)) {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+		
 	}
 	
 	// ------------------------------------------------------------------------
@@ -208,7 +212,7 @@ class Query_minecraft extends CI_Driver {
 	*/
 	function ping($host, $port)
 	{
-		$request = $this->getStatus($host, $port);
+		$request = $this->GetStatus($host, $port);
 		return (int)$request['ping'];
 	}
 }
