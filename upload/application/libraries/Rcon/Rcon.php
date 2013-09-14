@@ -1,4 +1,16 @@
-<?php
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+/**
+ * Game AdminPanel (АдминПанель)
+ *
+ * 
+ *
+ * @package		Game AdminPanel
+ * @author		Nikita Kuznetsov (ET-NiK)
+ * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
+ * @license		http://gameap.ru/license.html
+ * @link		http://gameap.ru
+ * @filesource
+*/
 
 class Rcon extends CI_Driver_Library {
 
@@ -17,7 +29,10 @@ class Rcon extends CI_Driver_Library {
     function __construct()
     {
         $this->CI =& get_instance();
-        $this->valid_drivers = array('rcon_goldsource', 'rcon_source', 'rcon_minecraft');
+        
+        $this->CI->config->load('drivers');
+        $drivers = $this->CI->config->item('drivers');
+        $this->valid_drivers = $drivers['rcon'];
     }
     
     // ----------------------------------------------------------------

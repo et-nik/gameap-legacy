@@ -1000,20 +1000,29 @@ class Servers extends CI_Model {
      * 
      * @return bool
     */	
-	function server_status($ip = FALSE, $port = FALSE){
+	function server_status($host = FALSE, $port = FALSE, $engine = FALSE, $engine_version = FALSE)
+	{
+		$this->load->driver('query');
 		
-		if(!$ip) {
-			$ip = $this->server_data['server_ip'];
+		if (!$host) {
+			$host = $this->server_data['server_ip'];
 		}
 		
-		if(!$port) {
+		if (!$port) {
 			$port = $this->server_data['server_port'];
 		}
 		
-		/* Загрузка хелпера */
-		$this->load->helper('serverinfo');
+		if (!$engine) {
+			$engine = $this->server_data['engine'];
+		}
+		
+		if (!$engine_version) {
+			$engine_version = $this->server_data['engine_version'];
+		}
+		
+		$this->query->set_engine($engine, $engine_version);
 
-		if(A2S_INFO($ip, $port)){
+		if ($this->query->get_status($host, $port)) {
 			return TRUE;
 		}else{
 			return FALSE;

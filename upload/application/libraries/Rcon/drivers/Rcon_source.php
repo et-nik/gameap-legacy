@@ -1,4 +1,5 @@
-<?php
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+
 
 /*
 	Basic CS:S Rcon class by Freman.  (V1.00)
@@ -15,8 +16,6 @@
 	---------------------------------------------
 	
 */
-
-if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 define("SERVERDATA_EXECCOMMAND",2);
 define("SERVERDATA_AUTH",3);

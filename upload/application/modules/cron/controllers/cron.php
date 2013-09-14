@@ -11,6 +11,7 @@
  * @link		http://gameap.ru
  * @filesource
 */
+
 // ------------------------------------------------------------------------
 
 /**
@@ -47,7 +48,7 @@ class Cron extends MX_Controller {
         
         /* Скрипт можно запустить только из командной строки (через cron)*/
         if(php_sapi_name() != 'cli'){
-			exit('Access Denied');
+			show_404();
 		}
 		
 		set_time_limit(0);
@@ -57,7 +58,7 @@ class Cron extends MX_Controller {
     public function index()
     {
 		$this->load->model('servers');
-		$this->load->model('valve_rcon');
+		$this->load->driver('rcon');
 		
 		$time = time();
 		
@@ -252,15 +253,19 @@ class Cron extends MX_Controller {
 					break;
 				case 'server_rcon':
 					if($this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['server_port'])) {
-						$rcon_connect = $this->valve_rcon->connect(
+						
+						$this->rcon->set_variables(
 								$this->servers_data[$server_id]['server_ip'], 
 								$this->servers_data[$server_id]['server_port'],
 								$this->servers_data[$server_id]['rcon'],
-								$this->servers_data[$server_id]['engine']
+								$this->servers_data[$server_id]['engine'],
+								$this->servers_data[$server_id]['engine_version'],
 						);
 						
+						$rcon_connect = $this->rcon->connect();
+						
 						if($rcon_connect) {
-							$rcon_string = $this->valve_rcon->command($task_list[$i]['command']);
+							$rcon_string = $this->rcon->command($task_list[$i]['command']);
 							
 							$cron_success = TRUE;
 							$cron_stats['success'] ++;

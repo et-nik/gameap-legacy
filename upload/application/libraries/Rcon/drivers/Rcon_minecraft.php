@@ -23,7 +23,7 @@ class Rcon_minecraft extends CI_Driver {
 	*/
 	function get_players()
 	{
-		
+		return array();
 	}
 	
 	// ----------------------------------------------------------------

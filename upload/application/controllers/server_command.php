@@ -334,7 +334,8 @@ class Server_command extends CI_Controller {
 												$this->servers->server_data['server_ip'],
 												$this->servers->server_data['server_port'],
 												$this->servers->server_data['rcon'], 
-												$this->servers->servers->server_data['engine']
+												$this->servers->servers->server_data['engine'],
+												$this->servers->servers->server_data['engine_version']
 						);
 						
 						$rcon_connect = $this->rcon->connect();
