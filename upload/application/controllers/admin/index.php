@@ -69,14 +69,25 @@ class Index extends CI_Controller {
 				
 			foreach ($this->servers->servers_list as $this->server_data) {
 					$server_commands = '';
-
+					
 					$num++;
+					
+					/* Получение id игры в массиве */
+					$i = 0;
+					$count = count($this->games->games_list);
+					while($i < $count) {
+						if ($this->server_data['game'] == $this->games->games_list[$i]['code']) {
+							$game_arr_id = $i;
+							break;
+						}
+						$i++;
+					}
 					
 					$template = (!isset($this->config->config['template'])) ? 'default' : $this->config->config['template'];
 					$style = (!isset($this->config->config['style'])) ? 'default' : $this->config->config['style'];
 						
 					/* Работает ли сервер */
-					if($this->servers->server_status($this->server_data['server_ip'], $this->server_data['server_port'])) {
+					if($this->servers->server_status($this->server_data['server_ip'], $this->server_data['server_port'], $this->games->games_list[$game_arr_id]['engine'], $this->games->games_list[$game_arr_id]['engine_version'])) {
 						$server_status['string'] = '<img src="' . base_url() . '/themes/system/images/bullet_green.png" alt="' . lang('enabled') . '"/>';
 						$this->server_data['server_status'] = 1;
 					} else {

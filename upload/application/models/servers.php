@@ -1012,12 +1012,31 @@ class Servers extends CI_Model {
 			$port = $this->server_data['server_port'];
 		}
 		
+		if (!$engine or !$engine_version) {
+
+			if (!isset($this->games->games_list)) {
+				$this->load->models('servers/games');
+				$this->games->get_games_list();
+			}
+			
+			/* Получение id игры в массиве */
+			$i = 0;
+			$count = count($this->games->games_list);
+			while($i < $count) {
+				if ($this->server_data['game'] == $this->games->games_list[$i]['code']) {
+					$game_arr_id = $i;
+					break;
+				}
+				$i++;
+			}
+		}
+		
 		if (!$engine) {
-			$engine = $this->server_data['engine'];
+			$engine = $this->games->games_list[$game_arr_id]['engine'];
 		}
 		
 		if (!$engine_version) {
-			$engine_version = $this->server_data['engine_version'];
+			$engine_version = $this->games->games_list[$game_arr_id]['engine_version'];
 		}
 		
 		$this->query->set_engine($engine, $engine_version);

@@ -1,17 +1,17 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Test extends CI_Controller {
-	
+
 	//Template
 	var $tpl_data = array();
-	
+
 	var $user_data = array();
 	var $server_data = array();
-	
+
 	public function __construct()
     {
         parent::__construct();
-		
+
 		$this->load->database();
         $this->load->model('users');
         $check = $this->users->check_user();
@@ -39,13 +39,11 @@ class Test extends CI_Controller {
     */
     public function index($user_id = FALSE)
     {
-		$this->load->driver('rcon');
-		$this->rcon->set_variables('46.38.50.185', 27055, '123', 'goldsource');
-		$this->rcon->connect();
-		$this->tpl_data['content'] = $this->rcon->command('status');
+		$this->load->driver('query');
+		$this->query->set_engine('minecraft');
 		
-		echo $this->rcon->errors;
-		
+		print_r($this->query->get_players('178.33.115.194', 27033));
+
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
     
