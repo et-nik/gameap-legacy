@@ -28,6 +28,10 @@
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
+# Раскомментируйте строчку ниже, если не запускается игровой сервер
+# во многих случаях, особенно для виртуальных серверов, это помогает
+#export CPU_MHZ=2000
+
 # Directory
 DIR=$2
 
@@ -62,7 +66,7 @@ case "$1" in
 		su $USER -c "cd $DIR; screen -m -d -S $NAME ./$COMMAND -pidfile ./${PIDFILE_NAME}"
 		sleep 4
 		
-		if [ -e ${PIDFILE} ] && [ $(ps -p $(cat ${PIDFILE})|wc -l) = "2" ] ;
+		if [[ `su $USER -c "screen -ls |grep $NAME"` ]]
 			then
 			echo "Server started"
 		else
