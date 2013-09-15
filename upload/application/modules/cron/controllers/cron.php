@@ -55,9 +55,23 @@ class Cron extends MX_Controller {
 		$this->load->database();
     }
     
+    
+    function _get_server_data($server_id)
+    {
+		if(!array_key_exists($server_id, $this->servers_data)) {
+			$this->servers_data[$server_id] = $this->servers->get_server_data($server_id);
+			
+			$this->servers_data[$server_id]['app_id'] = $this->games->games_list[0]['app_id'];
+			$this->servers_data[$server_id]['app_set_config'] = $this->games->games_list[0]['app_set_config'];
+		}
+		
+		return $this->servers_data[$server_id];
+	}
+    
     public function index()
     {
 		$this->load->model('servers');
+		$this->load->model('servers/games');
 		$this->load->driver('rcon');
 		
 		$time = time();
@@ -114,9 +128,8 @@ class Cron extends MX_Controller {
 				
 				$server_id = $task_list[$i]['server_id'];
 				
-				if(!array_key_exists($server_id , $this->servers_data)) {
-					$this->servers_data[$server_id ] = $this->servers->get_server_data($server_id);
-				}
+				// Получение данных сервера
+				$this->_get_server_data($server_id);
 				
 			} else {
 				$cron_stats['skipped'] ++;
@@ -259,7 +272,7 @@ class Cron extends MX_Controller {
 								$this->servers_data[$server_id]['server_port'],
 								$this->servers_data[$server_id]['rcon'],
 								$this->servers_data[$server_id]['engine'],
-								$this->servers_data[$server_id]['engine_version'],
+								$this->servers_data[$server_id]['engine_version']
 						);
 						
 						$rcon_connect = $this->rcon->connect();
@@ -348,22 +361,15 @@ class Cron extends MX_Controller {
 		echo "== Runner ==\n";
 
 		$this->servers->get_server_list(FALSE, FALSE, array('enabled' => '1'));
+		//~ $this->games->get_game_list();
 		
 		$i = 0;
 		$count_i = count($this->servers->servers_list);
 		while($i < $count_i) {
 			$server_id = $this->servers->servers_list[$i]['id'];
 
-			if(!array_key_exists($server_id, $this->servers_data)) {
-				$this->servers_data[$server_id] = $this->servers->get_server_data($server_id);
-			}
-			
-			//print_r($this->servers_data[$server_id]);
-			//~ $cfg_files = json_decode($this->servers_data[$server_id]['config_files'], TRUE);
-			//~ 
-			//~ foreach($cfg_files as $file) {
-				//~ echo $this->servers_data[$server_id]['dir'] . $file['file'] . ' ' ;
-			//~ }
+			// Получение данных сервера
+			$this->_get_server_data($server_id);
 			
 			/*==================================================*/
 			/*     Установка сервера					        */
@@ -385,11 +391,11 @@ class Cron extends MX_Controller {
 					//steamcmd +login anonymous +force_install_dir ../czero +app_set_config 90 mod czero +app_update 90 validate +quit
 					$cmd['app'] = '';
 					
-					if($this->games->games_list[0]['app_set_config']) {
-						$cmd['app'] .= '+app_set_config ' . $this->games->games_list[0]['app_set_config'] . ' ';
+					if($this->servers_data[$server_id]['app_set_config']) {
+						$cmd['app'] .= '+app_set_config ' . $this->servers_data[$server_id]['app_set_config'] . ' ';
 					}
 					
-					$cmd['app'] .= '+app_update ' . $this->games->games_list[0]['app_id'];
+					$cmd['app'] .= '+app_update ' . $this->servers_data[$server_id]['app_id'];
 					
 					$cmd['login'] = '+login anonymous';
 					$cmd['install_dir'] = '+force_install_dir ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'];
@@ -407,8 +413,8 @@ class Cron extends MX_Controller {
 					
 					$exec_command = array_pop($this->servers->commands);
 
-					if(strpos($result, 'Success! App \'' . $this->games->games_list[0]['app_id'] . '\' fully installed.') !== FALSE
-						OR strpos($result, 'Success! App \'' . $this->games->games_list[0]['app_id'] . '\' already up to date.') !== FALSE
+					if(strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' fully installed.') !== FALSE
+						OR strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' already up to date.') !== FALSE
 					) {
 						$server_data = array('installed' => '1');
 						
@@ -498,9 +504,20 @@ class Cron extends MX_Controller {
 
 			/* В настройках указано, что сервер перезапускать не нужно */
 			if($this->servers->server_settings['SERVER_AUTOSTART']) {
+				
+				/* Получение id игры в массиве */
+				$a = 0;
+				$count = count($this->games->games_list);
+				while($a < $count) {
+					if ($this->servers->servers_list[$i] == $this->games->games_list[$a]['code']) {
+						$game_arr_id = $a;
+						break;
+					}
+					$a++;
+				}
 
 				// Проверка статуса сервера
-				$status = $this->servers->server_status($this->servers->servers_list[$i]['server_ip'], $this->servers->servers_list[$i]['server_port']);
+				$status = $this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['server_port'], $this->servers_data[$server_id]['engine'], $this->servers_data[$server_id]['engine_version']);
 
 				if(!$status) {
 					/* Смотрим данные предыдущих проверок, если сервер был в оффе, то запускаем его */
@@ -557,21 +574,24 @@ class Cron extends MX_Controller {
 			
 			if($this->servers->server_settings['SERVER_RCON_AUTOCHANGE']) {
 				
-				if($this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['server_port'])) {
-				
-					$rcon_connect = $this->valve_rcon->connect(
-						$this->servers_data[$server_id]['server_ip'], 
-						$this->servers_data[$server_id]['server_port'],
-						$this->servers_data[$server_id]['rcon'],
-						$this->servers_data[$server_id]['engine']
+				if($this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['server_port'], $this->servers_data[$server_id]['engine'], $this->servers_data[$server_id]['engine_version'])) {
+					
+					$this->rcon->set_variables(
+							$this->servers_data[$server_id]['server_ip'], 
+							$this->servers_data[$server_id]['server_port'],
+							$this->servers_data[$server_id]['rcon'],
+							$this->servers_data[$server_id]['engine'],
+							$this->servers_data[$server_id]['engine_version']
 					);
+					
+					$rcon_connect = $this->rcon->connect();
 					
 				} else {
 					$rcon_connect = FALSE;
 				}
 						
 				if($rcon_connect) {
-					$rcon_string = $this->valve_rcon->command('status');
+					$rcon_string = $this->rcon->command('status');
 					
 					$rcon_string = trim($rcon_string);
 					
