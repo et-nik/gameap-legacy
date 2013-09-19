@@ -13,7 +13,6 @@ $mimes = array(	'hqx'	=>	'application/mac-binhex40',
 				'csv'	=>	array('text/x-comma-separated-values', 'text/comma-separated-values', 'application/octet-stream', 'application/vnd.ms-excel', 'application/x-csv', 'text/x-csv', 'text/csv', 'application/csv', 'application/excel', 'application/vnd.msexcel'),
 				'bin'	=>	'application/macbinary',
 				'dms'	=>	'application/octet-stream',
-				'bsp'	=>	'application/octet-stream',
 				'spr'	=>	'application/octet-stream',
 				'lha'	=>	'application/octet-stream',
 				'lzh'	=>	'application/octet-stream',
@@ -90,7 +89,6 @@ $mimes = array(	'hqx'	=>	'application/mac-binhex40',
 				'mpeg'	=>	'video/mpeg',
 				'mpg'	=>	'video/mpeg',
 				'mpe'	=>	'video/mpeg',
-				'mdl'	=>  'application/x-simulink-mdl',
 				'qt'	=>	'video/quicktime',
 				'mov'	=>	'video/quicktime',
 				'avi'	=>	'video/x-msvideo',
@@ -101,8 +99,15 @@ $mimes = array(	'hqx'	=>	'application/mac-binhex40',
 				'word'	=>	array('application/msword', 'application/octet-stream'),
 				'xl'	=>	'application/excel',
 				'eml'	=>	'message/rfc822',
-				'amxx'  =>  'application/octet-stream',
-				'json' => array('application/json', 'text/json')
+				'json' => array('application/json', 'text/json'),
+				
+				// Games Mimes
+				'bsp'	=>	'application/octet-stream',	// Half-Life Maps
+				'mdl'	=>  array('application/octet-stream', 'application/x-simulink-mdl'), 	// Models
+				'amxx'  =>  'application/octet-stream', // AMX Plugin
+				'sma'	=> 	'text/plain', // AMX Plugin Source		
+				'smx'	=>	'application/octet-stream', // SMA Plugin
+				'sp'	=>	array('application/octet-stream', 'text/plain') // SMA Plugin Source
 			);
 
 
