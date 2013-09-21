@@ -1199,42 +1199,65 @@ class Server_command extends CI_Controller {
 				/* Подтверждение 
 				 * Чтобы избежать случаев случайного обновления
 				*/
-				if($confirm == $this->security->get_csrf_hash()){
-					if ($response = $this->servers->update($this->servers->server_data)) {
-						$message = lang('server_command_cmd_sended');
-						
-						// Сохраняем логи
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'update';
-						$log_data['user_name'] = $this->users->auth_login;
-						$log_data['server_id'] = $this->servers->server_data['id'];
-						$log_data['msg'] = 'Server update success';
-						$log_data['log_data'] = $response;
-						$this->panel_log->save_log($log_data);
+				if ($confirm == $this->security->get_csrf_hash()) {
 					
-					}else{
-						$message = lang('server_command_update_failed');
-						
-						// Сохраняем логи
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'update';
-						$log_data['user_name'] = $this->users->auth_login;
-						$log_data['server_id'] = $this->servers->server_data['id'];
-						$log_data['msg'] = 'Server update error';
-						$log_data['log_data'] = $response;
-						$this->panel_log->save_log($log_data);
-					}
+					/* Прямое обновление
+					 * устарело, теперь обновление через cron */
+					//~ if ($response = $this->servers->update($this->servers->server_data)) {
+						//~ $message = lang('server_command_cmd_sended');
+						//~ 
+						//~ // Сохраняем логи
+						//~ $log_data['type'] = 'server_command';
+						//~ $log_data['command'] = 'update';
+						//~ $log_data['user_name'] = $this->users->auth_login;
+						//~ $log_data['server_id'] = $this->servers->server_data['id'];
+						//~ $log_data['msg'] = 'Server update success';
+						//~ $log_data['log_data'] = $response;
+						//~ $this->panel_log->save_log($log_data);
+					//~ 
+					//~ } else {
+						//~ $message = lang('server_command_update_failed');
+						//~ 
+						//~ // Сохраняем логи
+						//~ $log_data['type'] = 'server_command';
+						//~ $log_data['command'] = 'update';
+						//~ $log_data['user_name'] = $this->users->auth_login;
+						//~ $log_data['server_id'] = $this->servers->server_data['id'];
+						//~ $log_data['msg'] = 'Server update error';
+						//~ $log_data['log_data'] = 'Command: ' . array_pop($this->servers->commands) . "\nResponse: \n" . $response;
+						//~ $this->panel_log->save_log($log_data);
+					//~ }
+					//~ 
 					
-					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
+					$sql_data['server_id'] = $id;
+			
+					$sql_data['name'] = 'Update server';
+					$sql_data['code'] = 'server_update';
+					$sql_data['command'] = '';
+					$sql_data['date_perform'] = time();
+					
+					// Добавляем задание
+					$this->db->insert('cron', $sql_data);
+					
+					// Сохраняем логи
+					$log_data['type'] = 'server_task';
+					$log_data['command'] = 'add_task';
+					$log_data['user_name'] = $this->users->user_login;
+					$log_data['server_id'] = $id;
+					$log_data['msg'] = 'Add new task';
+					$log_data['log_data'] = 'Name: ' . $sql_data['name'];
+					$this->panel_log->save_log($log_data);
+
+					$this->_show_message(lang('server_command_cmd_sended'), site_url('admin/server_control/main/' . $id), lang('next'));
 					return TRUE;
 					
-				}else{
+				} else {
 					/* Пользователь не подвердил намерения */
 					$confirm_tpl['message'] = lang('server_command_update_confirm');
 					$confirm_tpl['confirmed_url'] = $this->servers->server_data['id'] . '/' . $this->security->get_csrf_hash();
 					$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, TRUE);
 				}
-			}else{
+			} else {
 					$message = lang('server_command_no_update_privileges');
 					$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
 					return FALSE;
