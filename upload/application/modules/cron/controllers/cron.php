@@ -247,7 +247,7 @@ class Cron extends MX_Controller {
 						$log_data['command'] = 'update';
 						$log_data['server_id'] = $server_id;
 						$log_data['msg'] = 'Update server success';
-						$log_data['log_data'] = $response;
+						$log_data['log_data'] = 'Command: ' . array_pop($this->servers->commands) . "\nResponse: \n" . $response;
 						$this->panel_log->save_log($log_data);
 						
 					} else {
