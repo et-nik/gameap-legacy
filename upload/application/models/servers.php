@@ -536,8 +536,8 @@ class Servers extends CI_Model {
 		
 		$command = $this->command_generate($server_data, 'start');
 		
-		switch($server_data['os']){
-			case 'Windows':
+		switch(strtolower($server_data['os'])) {
+			case 'windows':
 				$result = $this->command_windows($command, $server_data);
 				break;
 			default:
@@ -565,8 +565,8 @@ class Servers extends CI_Model {
 		
 		$command = $this->command_generate($server_data, 'stop');
 		
-		switch($server_data['os']){
-			case 'Windows':
+		switch(strtolower($server_data['os'])) {
+			case 'windows':
 				$result = $this->command_windows($command, $server_data);
 				break;
 			default:
@@ -594,8 +594,8 @@ class Servers extends CI_Model {
 		
 		$command = $this->command_generate($server_data, 'restart');
 		
-		switch($server_data['os']){
-			case 'Windows':
+		switch(strtolower($server_data['os'])) {
+			case 'windows':
 				$result = $this->command_windows($command, $server_data);
 				break;
 			default:
@@ -622,12 +622,19 @@ class Servers extends CI_Model {
 		
 		$command = $this->command_generate($server_data, 'update');
 		
-		switch($server_data['os']){
-			case 'Windows':
-				$result = $this->command_windows($command, $server_data);
+		/* Определение пути до steamcmd */
+		if ($server_data['steamcmd_path']) {
+			$steamcmd_path = $server_data['steamcmd_path'];
+		} else {
+			$steamcmd_path = FALSE;
+		}
+		
+		switch(strtolower($server_data['os'])) {
+			case 'windows':
+				$result = $this->command_windows($command, $server_data, $steamcmd_path);
 				break;
 			default:
-				$result = $this->command($command, $server_data);
+				$result = $this->command($command, $server_data, $steamcmd_path);
 				break;
 		}
 		
