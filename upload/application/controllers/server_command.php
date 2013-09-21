@@ -16,6 +16,9 @@ class Server_command extends CI_Controller {
 	//Template
 	var $tpl_data = array();
 	var $user_data = array();
+	
+	var $ext_list;
+	var $errors = '';
 
 	public function __construct()
     {
@@ -25,7 +28,7 @@ class Server_command extends CI_Controller {
         $this->load->model('users');
         $this->lang->load('server_command');
         
-        if($this->users->check_user()){
+        if ($this->users->check_user()) {
 			//Base Template
 			$this->tpl_data['title'] 	= lang('server_command_title_index');
 			$this->tpl_data['heading'] 	= lang('server_command_header_index');
@@ -34,9 +37,9 @@ class Server_command extends CI_Controller {
 			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), TRUE);
 			
 			$this->load->model('servers');
-
-        
-        }else{
+			
+			$this->ext_list = get_loaded_extensions();
+        } else {
             redirect('auth');
         }
     }
@@ -48,7 +51,7 @@ class Server_command extends CI_Controller {
 	{
 		
 		if (!$message) {
-			$message = lang('error');
+			$message = ($this->errors OR lang('error'));
 		}
 		
 		if (!$link) {
@@ -65,7 +68,77 @@ class Server_command extends CI_Controller {
 		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
-    
+	
+	// -----------------------------------------------------------------------
+	
+	/**
+	 * Проверка SSH данных
+	*/
+	function _check_ssh() {
+
+		/* 
+		 * Заданы ли данные SSH у DS сервера 
+		 * 
+		 * Если сервер является удаленным, используется telnet
+		 * и заданы хост, логин и пароль то все впорядке,
+		 * иначе отправляем пользователю сообщение
+		 * 
+		*/
+		if ($this->servers->server_data['ds_id']
+		&& $this->servers->server_data['control_protocol'] == 'ssh'
+		&& (!$this->servers->server_data['ssh_host']
+			OR !$this->servers->server_data['ssh_login']
+			OR !$this->servers->server_data['ssh_password']
+			)
+		) {
+			$this->errors = lang('server_command_ssh_not_set');
+			return FALSE;	
+		}
+		
+		/*
+		 * Есть ли модуль SSH
+		 */
+		if ($this->servers->server_data['ds_id'] 
+		&& $this->servers->server_data['control_protocol'] == 'ssh'
+		&& (!in_array('ssh2', $this->ext_list))
+		) {
+			$this->errors = lang('server_command_ssh_not_module');
+			return FALSE;	
+		}
+		
+		return TRUE;
+	}
+	
+	// -----------------------------------------------------------------------
+	
+	/**
+	 * Проверка данных Telnet
+	*/
+	function _check_telnet() {
+		
+		/* 
+		 * Заданы ли данные TELNET у DS сервера 
+		 * 
+		 * Если сервер является удаленным, используется telnet
+		 * и заданы хост, логин и пароль то все впорядке,
+		 * иначе отправляем пользователю сообщение
+		 * 
+		*/
+		
+		if($this->servers->server_data['ds_id']
+		&& $this->servers->server_data['control_protocol'] == 'telnet'
+		&& (!$this->servers->server_data['telnet_host']
+			OR !$this->servers->server_data['telnet_login']
+			OR !$this->servers->server_data['telnet_password']
+			)
+		){
+			$this->errors = lang('server_command_telnet_not_set');
+			return FALSE;	
+		}
+		
+		return TRUE;
+	}
+
 	/*
 	 * 
 	 * Главная страница
@@ -76,8 +149,7 @@ class Server_command extends CI_Controller {
 	*/
 	public function index()
     {
-		
-		$this->parser->parse('main.html', $this->tpl_data);
+		redirect('admin');
 	}
 	
 	
@@ -449,7 +521,7 @@ class Server_command extends CI_Controller {
 							$message = 'Error';
 						}
 							
-						$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), 'Далее');
+						$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
 						return TRUE;
 					}
 					
@@ -457,7 +529,7 @@ class Server_command extends CI_Controller {
 				}
 					
 			} else {
-				$this->_show_message(lang('server_command_no_players_privileges'), site_url('admin'), 'Далее');
+				$this->_show_message(lang('server_command_no_players_privileges'), site_url('admin'), lang('next'));
 				return FALSE;
 			}	
 
@@ -542,7 +614,7 @@ class Server_command extends CI_Controller {
 			
 			if(strtolower($this->servers->server_data['os']) == 'windows') {
 				/* Еще одна причина не использовать Windows */
-				$this->_show_message(lang('server_command_not_available_for_windows'), site_url('admin/server_control/main/' . $id), 'Далее');
+				$this->_show_message(lang('server_command_not_available_for_windows'), site_url('admin/server_control/main/' . $id), lang('next'));
 				return FALSE;
 			}
 			
@@ -579,7 +651,7 @@ class Server_command extends CI_Controller {
 				OR !$this->servers->server_data['ssh_password']
 				)
 			){
-				$this->_show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
+				$this->_show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), lang('next'));
 				return FALSE;	
 			}
 			
@@ -590,7 +662,7 @@ class Server_command extends CI_Controller {
 			&& $this->servers->server_data['control_protocol'] == 'ssh'
 			&& (!in_array('ssh2', $ext_list))
 			){
-				$this->_show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
+				$this->_show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), lang('next'));
 				return FALSE;	
 			}
 			
@@ -611,7 +683,7 @@ class Server_command extends CI_Controller {
 				OR !$this->servers->server_data['telnet_password']
 				)
 			){
-				$this->_show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
+				$this->_show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), lang('next'));
 				return FALSE;	
 			}
 			
@@ -673,7 +745,7 @@ class Server_command extends CI_Controller {
 			}
 			
 		} else {
-			$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), 'Далее');
+			$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), lang('next'));
 			return FALSE;
 		}
 		
@@ -713,70 +785,15 @@ class Server_command extends CI_Controller {
 				&& $this->users->servers_privileges['SERVER_START']	// Право на запуск этого сервера
 			) {
 				
-				/*
-				 * Список расширений php
-				 */
-				$ext_list = get_loaded_extensions();
-				
-				
-				/* 
-				 * Заданы ли данные SSH у DS сервера 
-				 * 
-				 * Если сервер является удаленным, используется telnet
-				 * и заданы хост, логин и пароль то все впорядке,
-				 * иначе отправляем пользователю сообщение
-				 * 
-				*/
-				if ($this->servers->server_data['ds_id'] 
-				&& $this->servers->server_data['control_protocol'] == 'ssh'
-				&& (!$this->servers->server_data['ssh_host']
-					OR !$this->servers->server_data['ssh_login']
-					OR !$this->servers->server_data['ssh_password']
-					)
-				) {
-					$this->_show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
-					return FALSE;	
+				/* Проверка SSH и Telnet */
+				if (FALSE == $this->_check_ssh() OR FALSE == $this->_check_telnet()) {
+					$this->_show_message();
+					return FALSE;
 				}
-				
-				/*
-				 * Есть ли модуль SSH
-				 */
-				if ($this->servers->server_data['ds_id'] 
-				&& $this->servers->server_data['control_protocol'] == 'ssh'
-				&& (!in_array('ssh2', $ext_list))
-				) {
-					$this->_show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
-					return FALSE;	
-				}
-				
-				
-				/* 
-				 * Заданы ли данные TELNET у DS сервера 
-				 * 
-				 * Если сервер является удаленным, используется telnet
-				 * и заданы хост, логин и пароль то все впорядке,
-				 * иначе отправляем пользователю сообщение
-				 * 
-				*/
-				
-				if($this->servers->server_data['ds_id'] 
-				&& $this->servers->server_data['control_protocol'] == 'telnet'
-				&& (!$this->servers->server_data['telnet_host']
-					OR !$this->servers->server_data['telnet_login']
-					OR !$this->servers->server_data['telnet_password']
-					)
-				){
-					$this->_show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
-					return FALSE;	
-				}
-				
+
 				/* Заданы ли параметры запуска */
-				if(!$this->servers->server_data['script_start']){
-					$local_tpl_data['message'] = lang('server_command_start_not_param');	
-					$local_tpl_data['link'] = '/admin';
-					$local_tpl_data['back_link_txt'] = 'Вернуться';
-					$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
-					$this->parser->parse('main.html', $this->tpl_data);
+				if (!$this->servers->server_data['script_start']){
+					$this->_show_message(lang('server_command_start_not_param'));
 					return FALSE;
 				}
 				
@@ -850,7 +867,7 @@ class Server_command extends CI_Controller {
 						$this->panel_log->save_log($log_data);
 					}
 					
-					$this->_show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
 					return TRUE;
 					
 				} else {
@@ -861,11 +878,11 @@ class Server_command extends CI_Controller {
 				}
 				
 			}else{
-				$this->_show_message(lang('server_command_no_start_privileges'), site_url('admin/server_control/main/' . $id), 'Далее');
+				$this->_show_message(lang('server_command_no_start_privileges'), site_url('admin/server_control/main/' . $id), lang('next'));
 				return FALSE;
 			}
 		} else {
-			$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), 'Далее');
+			$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), lang('next'));
 			return FALSE;
 		}
 
@@ -907,70 +924,15 @@ class Server_command extends CI_Controller {
 					&& $this->users->servers_privileges['SERVER_STOP']	// Право на запуск этого сервера
 				) {
 					
-					/*
-					 * Список расширений php
-					 */
-					$ext_list = get_loaded_extensions();
-					
-					
-					/* 
-					 * Заданы ли данные SSH у DS сервера 
-					 * 
-					 * Если сервер является удаленным, используется telnet
-					 * и заданы хост, логин и пароль то все впорядке,
-					 * иначе отправляем пользователю сообщение
-					 * 
-					*/
-					if($this->servers->server_data['ds_id'] 
-					&& $this->servers->server_data['control_protocol'] == 'ssh'
-					&& (!$this->servers->server_data['ssh_host']
-						OR !$this->servers->server_data['ssh_login']
-						OR !$this->servers->server_data['ssh_password']
-						)
-					){
-						$this->_show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
-						return FALSE;	
+					/* Проверка SSH и Telnet */
+					if (FALSE == $this->_check_ssh() OR FALSE == $this->_check_telnet()) {
+						$this->_show_message();
+						return FALSE;
 					}
-					
-					/*
-					 * Есть ли модуль SSH
-					 */
-					if($this->servers->server_data['ds_id'] 
-					&& $this->servers->server_data['control_protocol'] == 'ssh'
-					&& (!in_array('ssh2', $ext_list))
-					){
-						$this->_show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
-						return FALSE;	
-					}
-					
-					
-					/* 
-					 * Заданы ли данные TELNET у DS сервера 
-					 * 
-					 * Если сервер является удаленным, используется telnet
-					 * и заданы хост, логин и пароль то все впорядке,
-					 * иначе отправляем пользователю сообщение
-					 * 
-					*/
-					
-					if($this->servers->server_data['ds_id'] 
-					&& $this->servers->server_data['control_protocol'] == 'telnet'
-					&& (!$this->servers->server_data['telnet_host']
-						OR !$this->servers->server_data['telnet_login']
-						OR !$this->servers->server_data['telnet_password']
-						)
-					){
-						$this->_show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
-						return FALSE;	
-					}
-					
-					/* Заданы ли параметры остановки */
-					if(!$this->servers->server_data['script_stop']){
-						$local_tpl_data['message'] = lang('server_command_stop_not_param');	
-						$local_tpl_data['link'] = '/admin';
-						$local_tpl_data['back_link_txt'] = 'Вернуться';
-						$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
-						$this->parser->parse('main.html', $this->tpl_data);
+	
+					/* Заданы ли параметры запуска */
+					if (!$this->servers->server_data['script_stop']){
+						$this->_show_message(lang('server_command_stop_not_param'));
 						return FALSE;
 					}
 					
@@ -1037,7 +999,7 @@ class Server_command extends CI_Controller {
 							$this->panel_log->save_log($log_data);
 						}
 						
-						$this->_show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
+						$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
 						return TRUE;
 						
 					}else{
@@ -1048,11 +1010,11 @@ class Server_command extends CI_Controller {
 					}
 					
 				}else{
-						$this->_show_message(lang('server_command_no_stop_privileges'), site_url('admin/server_control/main/' . $id), 'Далее');
+						$this->_show_message(lang('server_command_no_stop_privileges'), site_url('admin/server_control/main/' . $id), lang('next'));
 						return FALSE;
 				}
 			} else {
-				$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), 'Далее');
+				$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), lang('next'));
 				return FALSE;
 			}
 		}
@@ -1094,67 +1056,16 @@ class Server_command extends CI_Controller {
 				&& $this->users->servers_privileges['SERVER_RESTART']
 			) {
 				
-				/*
-				 * Список расширений php
-				 */
-				$ext_list = get_loaded_extensions();
-				
-				
-				/* 
-				 * Заданы ли данные SSH у DS сервера 
-				 * 
-				 * Если сервер является удаленным, используется telnet
-				 * и заданы хост, логин и пароль то все впорядке,
-				 * иначе отправляем пользователю сообщение
-				 * 
-				*/
-				if($this->servers->server_data['ds_id'] 
-				&& $this->servers->server_data['control_protocol'] == 'ssh'
-				&& (!$this->servers->server_data['ssh_host']
-					OR !$this->servers->server_data['ssh_login']
-					OR !$this->servers->server_data['ssh_password']
-					)
-				){
-					$this->_show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
-					return FALSE;	
+				/* Проверка SSH и Telnet */
+				if (FALSE == $this->_check_ssh() OR FALSE == $this->_check_telnet()) {
+					$this->_show_message();
+					return FALSE;
 				}
-				
-				/*
-				 * Есть ли модуль SSH
-				 */
-				if($this->servers->server_data['ds_id'] 
-				&& $this->servers->server_data['control_protocol'] == 'ssh'
-				&& (!in_array('ssh2', $ext_list))
-				){
-					$this->_show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
-					return FALSE;	
-				}
-				
-				
-				/* 
-				 * Заданы ли данные TELNET у DS сервера 
-				 * 
-				 * Если сервер является удаленным, используется telnet
-				 * и заданы хост, логин и пароль то все впорядке,
-				 * иначе отправляем пользователю сообщение
-				 * 
-				*/
-				
-				if($this->servers->server_data['ds_id'] 
-				&& $this->servers->server_data['control_protocol'] == 'telnet'
-				&& (!$this->servers->server_data['telnet_host']
-					OR !$this->servers->server_data['telnet_login']
-					OR !$this->servers->server_data['telnet_password']
-					)
-				){
-					$this->_show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
-					return FALSE;	
-				}
-				
+
 				/* Заданы ли параметры запуска */
-				if(!$this->servers->server_data['script_restart']){
-					$this->_show_message(lang('server_command_restart_not_param'), site_url('admin/server_control/main/' . $id), 'Далее');
-					return FALSE;	
+				if (!$this->servers->server_data['script_restart']){
+					$this->_show_message(lang('server_command_restart_not_param'));
+					return FALSE;
 				}
 
 				/* Подтверждение 
@@ -1222,7 +1133,7 @@ class Server_command extends CI_Controller {
 						$this->panel_log->save_log($log_data);
 					}
 					
-					$this->_show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
 					return TRUE;
 					
 				}else{
@@ -1233,14 +1144,14 @@ class Server_command extends CI_Controller {
 				}
 			}else{
 					$message = lang('server_command_no_restart_privileges');
-					$this->_show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
 					return FALSE;
 					
 					break;
 			}
 		}else{
 			$message = lang('server_command_server_not_found');
-			$this->_show_message($message, site_url('admin'), 'Далее');
+			$this->_show_message($message, site_url('admin'), lang('next'));
 			return FALSE;
 		}
 	
@@ -1271,82 +1182,25 @@ class Server_command extends CI_Controller {
 			 * Информация о сервере хранится в $this->servers->server_data
 			 * 
 			*/
-			if($this->users->servers_privileges['SERVER_UPDATE']) {
+			if ($this->users->servers_privileges['SERVER_UPDATE']) {
 				
-				/*
-				 * Список расширений php
-				 */
-				$ext_list = get_loaded_extensions();
-				
-				
-				/* 
-				 * Заданы ли данные SSH у DS сервера 
-				 * 
-				 * Если сервер является удаленным, используется telnet
-				 * и заданы хост, логин и пароль то все впорядке,
-				 * иначе отправляем пользователю сообщение
-				 * 
-				*/
-				if($this->servers->server_data['ds_id'] 
-				&& $this->servers->server_data['control_protocol'] == 'ssh'
-				&& (!$this->servers->server_data['ssh_host']
-					OR !$this->servers->server_data['ssh_login']
-					OR !$this->servers->server_data['ssh_password']
-					)
-				){
-					$this->_show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
-					return FALSE;	
-				}
-				
-				/*
-				 * Есть ли модуль SSH
-				 */
-				if($this->servers->server_data['ds_id'] 
-				&& $this->servers->server_data['control_protocol'] == 'ssh'
-				&& (!in_array('ssh2', $ext_list))
-				){
-					$this->_show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), 'Далее');
-					return FALSE;	
-				}
-				
-				
-				/* 
-				 * Заданы ли данные TELNET у DS сервера 
-				 * 
-				 * Если сервер является удаленным, используется telnet
-				 * и заданы хост, логин и пароль то все впорядке,
-				 * иначе отправляем пользователю сообщение
-				 * 
-				*/
-				
-				if($this->servers->server_data['ds_id'] 
-				&& $this->servers->server_data['control_protocol'] == 'telnet'
-				&& (!$this->servers->server_data['telnet_host']
-					OR !$this->servers->server_data['telnet_login']
-					OR !$this->servers->server_data['telnet_password']
-					)
-				){
-					$this->_show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), 'Далее');
-					return FALSE;	
-				}
-				
-				/* Заданы ли параметры обновления */
-				if(!$this->servers->server_data['script_update']){
-					$local_tpl_data['message'] = lang('server_command_update_not_param');	
-					$local_tpl_data['link'] = '/admin';
-					$local_tpl_data['back_link_txt'] = 'Вернуться';
-					$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
-					$this->parser->parse('main.html', $this->tpl_data);
+				/* Проверка SSH и Telnet */
+				if (FALSE == $this->_check_ssh() OR FALSE == $this->_check_telnet()) {
+					$this->_show_message();
 					return FALSE;
 				}
-				
-				
-				
+
+				/* Заданы ли параметры запуска */
+				if (!$this->servers->server_data['script_update']) {
+					$this->_show_message(lang('server_command_update_not_param'));
+					return FALSE;
+				}
+
 				/* Подтверждение 
 				 * Чтобы избежать случаев случайного обновления
 				*/
 				if($confirm == $this->security->get_csrf_hash()){
-					if($response = $this->servers->update($this->servers->server_data)){
+					if ($response = $this->servers->update($this->servers->server_data)) {
 						$message = lang('server_command_cmd_sended');
 						
 						// Сохраняем логи
@@ -1371,7 +1225,7 @@ class Server_command extends CI_Controller {
 						$this->panel_log->save_log($log_data);
 					}
 					
-					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), 'Далее');
+					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
 					return TRUE;
 					
 				}else{
@@ -1382,7 +1236,7 @@ class Server_command extends CI_Controller {
 				}
 			}else{
 					$message = lang('server_command_no_update_privileges');
-					$this->_show_message($message, site_url('admin/server_control/main/' . $id), 'Далее');
+					$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
 					return FALSE;
 					
 					break;

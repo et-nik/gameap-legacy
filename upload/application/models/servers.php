@@ -809,11 +809,28 @@ class Servers extends CI_Model {
 				$this->server_ds_data = $this->dedicated_servers->ds_list['0'];
 				
 				// Данные для игрового сервера из машины
-				$this->server_data['os'] = $this->server_ds_data['os'];
+				$this->server_data['os'] = strtolower($this->server_ds_data['os']);
 				
 				$this->server_data['local_server'] = 0;
 				
-				$this->server_data['control_protocol'] = $this->server_ds_data['control_protocol'];
+				switch (strtolower($this->server_ds_data['control_protocol'])) {
+					case 'ssh':
+						$this->server_data['control_protocol'] = 'ssh';
+						break;
+					
+					case 'telnet':
+						$this->server_data['control_protocol'] = 'telnet';
+						break;
+					
+					default:
+						if ($this->server_data['os'] == 'windows') {
+							$this->server_data['control_protocol'] = 'telnet';
+						} else {
+							$this->server_data['control_protocol'] = 'ssh';
+						}
+						
+						break;
+				}
 
 				$this->server_data['ssh_host'] = $this->server_ds_data['ssh_host'];
 				$this->server_data['ssh_login'] = $this->server_ds_data['ssh_login'];
@@ -854,6 +871,7 @@ class Servers extends CI_Model {
 				//$this->server_data['control_protocol'] = $this->server_ds_data['control_protocol'];
 			} else {
 				$this->server_data['os'] 			= $this->config->config['local_os'];
+				$this->server_data['control_protocol'] = 'local';
 				$this->server_data['script_path'] 	= $this->config->config['local_script_path'];
 				$this->server_data['local_path'] 	= $this->config->config['local_script_path'];
 				$this->server_data['steamcmd_path'] = $this->config->config['local_steamcmd_path'];
