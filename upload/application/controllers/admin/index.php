@@ -87,7 +87,7 @@ class Index extends CI_Controller {
 					$style = (!isset($this->config->config['style'])) ? 'default' : $this->config->config['style'];
 						
 					/* Работает ли сервер */
-					if($this->servers->server_status($this->server_data['server_ip'], $this->server_data['server_port'], $this->games->games_list[$game_arr_id]['engine'], $this->games->games_list[$game_arr_id]['engine_version'])) {
+					if($this->servers->server_status($this->server_data['server_ip'], $this->server_data['query_port'], $this->games->games_list[$game_arr_id]['engine'], $this->games->games_list[$game_arr_id]['engine_version'])) {
 						$server_status['string'] = '<img src="' . base_url() . '/themes/system/images/bullet_green.png" alt="' . lang('enabled') . '"/>';
 						$this->server_data['server_status'] = 1;
 					} else {

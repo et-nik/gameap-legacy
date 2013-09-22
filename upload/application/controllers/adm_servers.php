@@ -190,18 +190,27 @@ class Adm_servers extends CI_Controller {
 				case 'goldsource':
 					$data['start_command'] 	= 'hlds.exe -console -game {game} +ip {ip} +port {port} +map de_dust2';
 					break;
+					
+				case 'minecraft':
+					$data['start_command'] 	= "\"%ProgramFiles(x86)%\Java\jre7\bin\java.exe\" -Xmx1024M -Xms1024M -jar {dir}/craftbukkit.jar";
+					break;
 			}
 			
 		} else {
 			
 			switch (strtolower($this->games->games_list[0]['engine'])) {
 				case 'source':
-					$data['start_command'] 	= 'srcds_run -game {game} +ip {ip} +port {port} +map de_dust2';
+					$data['start_command'] 	= './srcds_run -game {game} +ip {ip} +port {port} +map de_dust2';
 					break;
 				
 				case 'goldsource':
-					$data['start_command'] 	= 'hlds_run -console -game {game} +ip {ip} +port {port} +map de_dust2';
+					$data['start_command'] 	= './hlds_run -console -game {game} +ip {ip} +port {port} +map de_dust2';
 					break;
+					
+				case 'minecraft':
+					$data['start_command'] 	= 'java -Xincgc -Xmx1G -jar {dir}/craftbukkit.jar';
+					break;	
+					
 			}
 		}
 		
@@ -483,6 +492,8 @@ class Adm_servers extends CI_Controller {
 					
 					$this->form_validation->set_rules('server_ip', lang('ip'), 'trim|max_length[64]|min_length[4]|xss_clean');
 					$this->form_validation->set_rules('server_port', lang('port'), 'trim|required|integer|max_length[6]|min_length[2]|xss_clean');
+					$this->form_validation->set_rules('query_port', lang('adm_servers_query_port'), 'trim|integer|max_length[6]|min_length[2]|xss_clean');
+					$this->form_validation->set_rules('rcon_port', lang('adm_servers_rcon_port'), 'trim|integer|max_length[6]|min_length[2]|xss_clean');
 					
 					$this->form_validation->set_rules('rcon', 'RCON password', 'trim|max_length[64]|min_length[3]|xss_clean');
 					$this->form_validation->set_rules('code',  lang('adm_servers_game_code'), 'trim|required|max_length[32]|min_length[3]|xss_clean');
@@ -672,6 +683,8 @@ class Adm_servers extends CI_Controller {
 
 						$sql_data['server_ip'] 		= $this->input->post('server_ip');
 						$sql_data['server_port'] 	= $this->input->post('server_port');
+						$sql_data['query_port'] 	= $this->input->post('query_port');
+						$sql_data['rcon_port'] 		= $this->input->post('rcon_port');
 						$sql_data['enabled'] 		= (int)(bool)$this->input->post('enabled');
 						$sql_data['installed'] 		= '1';
 						
@@ -1139,15 +1152,18 @@ class Adm_servers extends CI_Controller {
 				
 				$local_tpl_data = $servers_list[0];
 				$local_tpl_data['information'] = array();
-						
+				
 				// Для tpl
 				$local_tpl_data['screen_name'] 			= $this->servers->server_data['screen_name'];
 				$local_tpl_data['su_user'] 				= $this->servers->server_data['su_user'];
 				$local_tpl_data['server_dir'] 			= $this->servers->server_data['dir'];
 				$local_tpl_data['game_type_id']			= $this->servers->server_data['game_type'];
-				$local_tpl_data['server_start_code']		= $this->servers->server_data['start_code'];
+				$local_tpl_data['server_start_code']	= $this->servers->server_data['start_code'];
 				
 				$local_tpl_data['start_command'] 		= $this->servers->server_data['start_command'];
+				
+				$local_tpl_data['query_port'] 			= $this->servers->server_data['query_port'];
+				$local_tpl_data['rcon_port'] 			= $this->servers->server_data['rcon_port'];
 				
 				/* Получаем абсолютный путь к корневой директории с сервером и к исполняемым файлам */
 				if ($this->servers->server_data['ds_id'] === '0') {
@@ -1338,6 +1354,9 @@ class Adm_servers extends CI_Controller {
 				
 				$this->form_validation->set_rules('server_ip', lang('ip'), 'trim|max_length[64]|min_length[4]|xss_clean');
 				$this->form_validation->set_rules('server_port', lang('port'), 'trim|required|integer|max_length[6]|min_length[2]|xss_clean');
+				$this->form_validation->set_rules('query_port', lang('adm_servers_query_port'), 'trim|integer|max_length[6]|min_length[2]|xss_clean');
+				$this->form_validation->set_rules('rcon_port', lang('adm_servers_rcon_port'), 'trim|integer|max_length[6]|min_length[2]|xss_clean');
+					
 				
 				$this->form_validation->set_rules('rcon', 'RCON password', 'trim|max_length[64]|min_length[3]|xss_clean');
 				$this->form_validation->set_rules('game_type', lang('adm_servers_game_type'), 'trim|required|integer|xss_clean');
@@ -1662,8 +1681,9 @@ class Adm_servers extends CI_Controller {
 					
 					$sql_data['server_ip'] = $this->input->post('server_ip');
 					$sql_data['server_port'] = $this->input->post('server_port');
-					
-					//$sql_data['rcon'] = $this->input->post('rcon');
+					$sql_data['query_port'] 	= $this->input->post('query_port');
+					$sql_data['rcon_port'] 		= $this->input->post('rcon_port');
+
 					//$sql_data['game'] = $this->input->post('code');
 					$sql_data['dir'] = $this->input->post('dir');
 					$sql_data['game_type'] = $this->input->post('game_type');

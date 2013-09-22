@@ -265,7 +265,7 @@ class Cron extends MX_Controller {
 					}
 					break;
 				case 'server_rcon':
-					if($this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['server_port'])) {
+					if($this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['query_port'])) {
 						
 						$this->rcon->set_variables(
 								$this->servers_data[$server_id]['server_ip'], 
@@ -517,7 +517,7 @@ class Cron extends MX_Controller {
 				}
 
 				// Проверка статуса сервера
-				$status = $this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['server_port'], $this->servers_data[$server_id]['engine'], $this->servers_data[$server_id]['engine_version']);
+				$status = $this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['query_port'], $this->servers_data[$server_id]['engine'], $this->servers_data[$server_id]['engine_version']);
 
 				if(!$status) {
 					/* Смотрим данные предыдущих проверок, если сервер был в оффе, то запускаем его */

@@ -23,7 +23,26 @@ class Rcon_minecraft extends CI_Driver {
 	*/
 	function get_players()
 	{
-		return array();
+		$result = $this->command('list');
+		$result = explode("\n", $result);
+		unset($result[0]);
+		
+		$players = array();
+		foreach($result as $str) {
+			if ($str == '') {
+				continue;
+			}
+			
+			$players[] = array(
+						'user_name' => $str, 
+						'steam_id' => $str,
+						'user_id' => '',
+						'user_ip' => '',
+						'user_time' => '',
+			);
+		}
+		
+		return $players;
 	}
 	
 	// ----------------------------------------------------------------

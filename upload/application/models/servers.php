@@ -706,7 +706,7 @@ class Servers extends CI_Model {
 		 * которых является user_id
 		*/
 
-		if(!$user_id) {
+		if (!$user_id) {
 			$this->db->where($where);
 			$query = $this->db->get('servers');
 		} else {
@@ -742,11 +742,22 @@ class Servers extends CI_Model {
 				$query = $this->db->get('servers');
 			}
 			
-			if($query->num_rows > 0){
+			if ($query->num_rows > 0) {
 
-				foreach ($query->result_array() as $server_data){
+				$a = 0;
+				foreach ($query->result_array() as $server_data) {
 					
-					$server_list[] = $server_data;
+					$server_list[$a] = $server_data;
+					
+					if (!$server_data['query_port']) {
+						$server_list[$a]['query_port'] = $server_data['server_port'];
+					}
+					
+					if (!$server_data['rcon_port']) {
+						$server_list[$a]['rcon_port'] = $server_data['server_port'];
+					}
+					
+					$a++;
 				}
 				
 				$this->servers_list = $server_list;
@@ -799,6 +810,15 @@ class Servers extends CI_Model {
 			
 			/* Расшифровываем RCON пароль */
 			$this->server_data['rcon'] = $this->encrypt->decode($this->server_data['rcon']);
+			
+			/* Получаем query и rcon порты */
+			if (!$this->server_data['query_port']) {
+				$this->server_data['query_port'] = $this->server_data['server_port'];
+			}
+			
+			if (!$this->server_data['rcon_port']) {
+				$this->server_data['rcon_port'] = $this->server_data['server_port'];
+			}
 			
 			/* 
 			 * Получение информации об удаленном сервере
@@ -913,8 +933,10 @@ class Servers extends CI_Model {
 				$this->server_data['disk_size'] 	= $this->game_types->game_types_list['0']['disk_size'];
 				
 				if(strtolower($this->server_data['os']) == 'windows') {
+					$execfile_upd = 'steamcmd.exe';
 					$execfile = $this->game_types->game_types_list['0']['execfile_windows'];
 				} else {
+					$execfile_upd = './steamcmd.sh';
 					$execfile = $this->game_types->game_types_list['0']['execfile_linux'];
 					
 					/* Добавляем к линуксу ./ в случае необходимости */
@@ -928,7 +950,7 @@ class Servers extends CI_Model {
 				$this->server_data['script_stop'] 		= $execfile . ' ' . $this->game_types->game_types_list['0']['script_stop'];
 				$this->server_data['script_restart'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_restart'];
 				$this->server_data['script_status'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_status'];
-				$this->server_data['script_update'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_update'];
+				$this->server_data['script_update'] 	= $execfile_upd . ' ' . $this->game_types->game_types_list['0']['script_update'];
 				$this->server_data['script_get_console'] = $execfile . ' ' . $this->game_types->game_types_list['0']['script_get_console'];
 				
 				$this->server_data['kick_cmd'] 		= $this->game_types->game_types_list['0']['kick_cmd'];
@@ -1034,9 +1056,9 @@ class Servers extends CI_Model {
 		}
 		
 		if (!$port) {
-			$port = $this->server_data['server_port'];
+				$port = $this->server_data['query_port'];
 		}
-		
+
 		if (!$engine or !$engine_version) {
 
 			if (!isset($this->games->games_list)) {

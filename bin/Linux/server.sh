@@ -63,14 +63,15 @@ case "$1" in
 		then
 		echo "Server is already running"
     else
-		su $USER -c "cd $DIR; screen -m -d -S $NAME ./$COMMAND -pidfile ./${PIDFILE_NAME}"
+		su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
 		sleep 4
 		
 		if [[ `su $USER -c "screen -ls |grep $NAME"` ]]
 			then
 			echo "Server started"
 		else
-		   echo "Server not started"
+		   echo -e "Server not started \nStart command:"
+		   echo su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
 		fi
     fi
     ;;
@@ -92,7 +93,7 @@ case "$1" in
        
        sleep 2
 
-		su $USER -c "cd $DIR; screen -m -d -S $NAME ./$COMMAND"
+		su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
 		echo "Server restarted"
     else
        echo "Coulnd't find a running server"

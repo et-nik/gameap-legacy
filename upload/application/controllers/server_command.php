@@ -395,7 +395,7 @@ class Server_command extends CI_Controller {
 								break;
 						}
 							
-						if(!$this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['server_port'])) {
+						if(!$this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['query_port'])) {
 							$this->_show_message(lang('server_command_server_down'), site_url('admin/server_control/main/' . $server_id));
 							return FALSE;
 						}
@@ -404,7 +404,7 @@ class Server_command extends CI_Controller {
 						
 						$this->rcon->set_variables(
 												$this->servers->server_data['server_ip'],
-												$this->servers->server_data['server_port'],
+												$this->servers->server_data['rcon_port'],
 												$this->servers->server_data['rcon'], 
 												$this->servers->servers->server_data['engine'],
 												$this->servers->servers->server_data['engine_version']

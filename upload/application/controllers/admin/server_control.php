@@ -126,12 +126,12 @@ class Server_control extends CI_Controller {
 			if(!$error_desc){
 				$rcon_connect = FALSE;
 				
-				if ($this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['server_port'])) {
+				if ($this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['query_port'])) {
 					$this->servers->server_data['server_status'] = 1;
 					
 					$this->rcon->set_variables(
 												$this->servers->server_data['server_ip'],
-												$this->servers->server_data['server_port'],
+												$this->servers->server_data['rcon_port'],
 												$this->servers->server_data['rcon'], 
 												$this->servers->servers->server_data['engine']
 					);

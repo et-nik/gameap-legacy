@@ -48,9 +48,13 @@ class Rcon_source extends CI_Driver {
 		// Real response (id: -1 = failure)
 		$ret = $this->_packetread();
 		
-		if ($ret[1]['ID'] == -1) {
+		if (FALSE == $ret) {
 			return FALSE;
-		}else{
+		}
+		
+		if (@$ret[1]['ID'] == -1) {
+			return FALSE;
+		} else {
 			return TRUE;
 		}
 	}
@@ -98,7 +102,7 @@ class Rcon_source extends CI_Driver {
 			
 			if ($size["Size"] > 4096) {
 				//pad with 8 nulls
-				$packet = "\x00\x00\x00\x00\x00\x00\x00\x00".fread($this->fp,4096);
+				$packet = "\x00\x00\x00\x00\x00\x00\x00\x00".fread($this->fp, 4096);
 			} else {
 				//Read the packet back
 				$packet = fread($this->fp,$size["Size"]);
@@ -133,7 +137,7 @@ class Rcon_source extends CI_Driver {
 
 	function sendcommand($command) 
 	{
-		$command = '"'.trim(str_replace(' ', '" "', $command)).'"';
+		//~ $command = '"'.trim(str_replace(' ', '" "', $command)).'"';
 		$this->_write(SERVERDATA_EXECCOMMAND, $command,'');
 	}
 

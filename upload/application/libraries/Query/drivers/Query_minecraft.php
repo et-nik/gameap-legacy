@@ -43,7 +43,11 @@ class Query_minecraft extends CI_Driver {
 
 		$this->challenge = $this->getchallenge();
 		
-		return TRUE;
+		if ($this->challenge) {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
 	}
 	
 	private function getchallenge()
