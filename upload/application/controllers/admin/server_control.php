@@ -90,13 +90,8 @@ class Server_control extends CI_Controller {
     public function main($server_id = FALSE)
     {
         $this->load->driver('rcon');
-        
         $this->load->helper('date');
-        
-        $this->load->helper('serverinfo');
-		//$this->load->model('patterns');
-		$this->load->model('valve_rcon');
-        
+
         $error = 0;
         $error_desc = null;
 
