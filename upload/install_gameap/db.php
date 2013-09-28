@@ -575,6 +575,16 @@ $fields = array(
 							'constraint' => 5, 
 		),
 		
+		'query_port' => array(
+							'type' => 'INT',
+							'constraint' => 5,
+		),
+		
+		'rcon_port' => array(
+							'type' => 'INT',
+							'constraint' => 5, 
+		),
+		
 		'rcon' => array(
 							'type' => 'TINYTEXT',
 		),
