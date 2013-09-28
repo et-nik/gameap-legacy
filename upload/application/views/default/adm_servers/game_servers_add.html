@@ -6,7 +6,7 @@
 
 <form action="{site_url}adm_servers/add/game_servers" method="post" accept-charset="utf-8">
 	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
-	<table class="zebra" width="75%">
+	<table class="zebra" width="100%">
 		<tr>
 			<td width="40%">{lang_name}:</td>
 			<td><input type="text" name="name" /></td>
@@ -14,17 +14,17 @@
 
 		<tr>
 			<td>{lang_adm_servers_connect_data}:</td>
-			<td><input value="" type="text" name="server_ip" />:<input value="27015" size="6" type="text" name="server_port" /></td>
+			<td><input value="" type="text" name="server_ip" />:<input size="6" type="text" name="server_port" /><span id="server_port_info"></span></td>
 		</tr>
 		
 		<tr>
 			<td>{lang_adm_servers_query_port}:<br /><span class="description">[ {lang_adm_servers_query_port_desc} ]</span></td>
-				<td><input type="text" name="query_port" /></td>
+				<td><input type="text" name="query_port" /><span id="query_port_info"></span></td>
 			</tr>
 			
 			<tr>
 				<td>{lang_adm_servers_rcon_port}:<br /><span class="description">[ {lang_adm_servers_rcon_port_desc} ]</span></td>
-				<td><input type="text" name="rcon_port" /></td>
+				<td><input type="text" name="rcon_port" /><span id="rcon_port_info"></span></td>
 			</tr>
 
 		<tr>
@@ -115,6 +115,23 @@
 				document.getElementById('install_dir').innerHTML = ds_path + '/' + $("input[name='dir']").val();
 			});
 			
+			$("input[name='server_port']").change(function() {
+				if($("input[name='server_port']").val()) {
+					AjaxFormRequest('server_port_info', 'server_port_info', '{site_url}ajax/adm_servers/check_port/' + $("input[name='server_port']").val());
+				}
+			});
+			
+			$("input[name='query_port']").change(function() {
+				if($("input[name='query_port']").val()) {
+					AjaxFormRequest('query_port_info', 'query_port_info', '{site_url}ajax/adm_servers/check_port/' + $("input[name='query_port']").val());
+				}
+			});
+			
+			$("input[name='rcon_port']").change(function() {
+				if($("input[name='rcon_port']").val()) {
+					AjaxFormRequest('rcon_port_info', 'rcon_port_info', '{site_url}ajax/adm_servers/check_port/' + $("input[name='rcon_port']").val());
+				}
+			});
 		});
 
 		window.onload = AjaxFormRequest('game_type', 'game_type', '{site_url}ajax/adm_servers/get_gametypes');

@@ -63,7 +63,7 @@ class Servers extends CI_Model {
 			$this->errors = "Dir " . $path . "not executable";
 			return FALSE;
 		}
-		
+
 		return TRUE;
 		
 	}
@@ -87,6 +87,8 @@ class Servers extends CI_Model {
 			$this->errors = 'Error: ' . $file . ' file not executable';
 			return FALSE;
 		}
+		
+		
 		
 		return TRUE;
 	}
@@ -393,7 +395,7 @@ class Servers extends CI_Model {
 		
 		if ($server_data['local_server']) {
 			
-			if ($this->_check_path($path)) {
+			if (!$this->_check_path($path)) {
 				return $this->errors;
 			}
 			
@@ -406,7 +408,7 @@ class Servers extends CI_Model {
 					$script_file = $script_file[0];
 					$script_file = str_replace('./', '', $script_file);
 					
-					if ($this->_check_file($path . '/' . $script_file)) {
+					if (!$this->_check_file($path . '/' . $script_file)) {
 						$result .= $this->errors;
 					}
 					
@@ -421,7 +423,7 @@ class Servers extends CI_Model {
 				$script_file = $script_file[0];
 				$script_file = str_replace('./', '', $script_file);
 				
-				if ($this->_check_file($path . '/' . $script_file)) {
+				if (!$this->_check_file($path . '/' . $script_file)) {
 					$result .= $this->errors;
 				}
 				
@@ -496,7 +498,7 @@ class Servers extends CI_Model {
 		
 		if($server_data['local_server']) {
 			
-			if ($this->_check_path($path)) {
+			if (!$this->_check_path($path)) {
 				return $this->errors;
 			}
 			
@@ -510,7 +512,7 @@ class Servers extends CI_Model {
 					$script_file = $script_file[0];
 					$script_file = str_replace('./', '', $script_file);
 					
-					if ($this->_check_file($path . '/' . $script_file)) {
+					if (!$this->_check_file($path . '/' . $script_file)) {
 						$result .= $this->errors;
 					}
 
@@ -527,7 +529,7 @@ class Servers extends CI_Model {
 				$script_file = $script_file[0];
 				$script_file = str_replace('./', '', $script_file);
 				
-				if ($this->_check_file($path . '/' . $script_file)) {
+				if (!$this->_check_file($path . '/' . $script_file)) {
 					return $this->errors;
 				}
 
@@ -573,6 +575,7 @@ class Servers extends CI_Model {
 			case 'windows':
 				$result = $this->command_windows($command, $server_data);
 				break;
+				
 			default:
 				$result = $this->command($command, $server_data);
 				break;
@@ -1535,8 +1538,6 @@ class Servers extends CI_Model {
     */
     function change_rcon($new_rcon, $server_data = FALSE) 
     {
-		$this->load->helper('serverinfo');
-		
 		if($server_data) {
 			$this->server_data = $server_data;
 		}
@@ -1628,7 +1629,8 @@ class Servers extends CI_Model {
 									$this->server_data['server_ip'],
 									$this->server_data['server_port'],
 									$this->server_data['rcon'], 
-									$this->servers->server_data['engine']
+									$this->servers->server_data['engine'],
+									$this->servers->server_data['engine_version']
 			);
 			
 			$rcon_connect = $this->rcon->connect();

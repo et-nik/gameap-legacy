@@ -26,13 +26,14 @@ class Rcon_minecraft extends CI_Driver {
 		$result = $this->command('list');
 		$result = explode("\n", $result);
 		$players = explode(",", $result[1]);
+		$rplayers = array();
 
 		foreach($players as $str) {
 			if ($str == '') {
 				continue;
 			}
 			
-			$players[] = array(
+			$rplayers[] = array(
 						'user_name' => $str, 
 						'steam_id' => $str,
 						'user_id' => '',
@@ -41,7 +42,7 @@ class Rcon_minecraft extends CI_Driver {
 			);
 		}
 		
-		return $players;
+		return $rplayers;
 	}
 	
 	// ----------------------------------------------------------------

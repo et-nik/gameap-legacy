@@ -24,7 +24,7 @@
 
 		<tr>
 			<td>{lang_port}:</td>
-			<td><input value="27015" size="6" type="text" name="server_port" /></td>
+			<td><input value="27015" size="6" type="text" name="server_port" /><span id="server_port_info"></span></td>
 		</tr>
 
 		<tr>
@@ -89,6 +89,12 @@
 			
 			$("input[name='dir']").keyup(function() {
 				document.getElementById('install_dir').innerHTML = ds_path + '/' + $("input[name='dir']").val();
+			});
+			
+			$("input[name='server_port']").change(function() {
+				if($("input[name='server_port']").val()) {
+					AjaxFormRequest('server_port_info', 'server_port_info', '{site_url}ajax/adm_servers/check_port/' + $("input[name='server_port']").val());
+				}
 			});
 			
 		});

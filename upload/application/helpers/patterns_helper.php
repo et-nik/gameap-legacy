@@ -54,7 +54,8 @@ function get_matches($pattern, $string)
 	$string_expl = explode("\n", $string);
 
 	$mreturn = array();
-	$b = -1;
+	$a = 0;
+	$b = 0;
 	
 	while ($a < count($string_expl))
 	{
@@ -67,8 +68,8 @@ function get_matches($pattern, $string)
 		
 		if($preg_match)
 		{
-			$b++;
 			$mreturn[$b] = $matches;
+			$b++;
 		}
 		
 		$a++;

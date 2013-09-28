@@ -128,7 +128,8 @@ class Server_control extends CI_Controller {
 												$this->servers->server_data['server_ip'],
 												$this->servers->server_data['rcon_port'],
 												$this->servers->server_data['rcon'], 
-												$this->servers->servers->server_data['engine']
+												$this->servers->servers->server_data['engine'],
+												$this->servers->servers->server_data['engine_version']
 					);
 					
 					$rcon_connect = $this->rcon->connect();
@@ -285,18 +286,23 @@ class Server_control extends CI_Controller {
 							case 'server_start':
 								$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_start');
 								break;
+								
 							case 'server_stop':
 								$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_stop');
 								break;
+								
 							case 'server_restart':
 								$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_restart');
 								break;
+								
 							case 'server_update':
 								$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_update');
 								break;
+								
 							case 'server_rcon':
 								$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_rcon_send');
 								break;
+								
 							default:
 								continue;
 								break;

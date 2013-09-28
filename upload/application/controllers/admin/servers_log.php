@@ -74,6 +74,10 @@ class Servers_log extends CI_Controller {
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
+    function check_directory()
+    {
+	}
+    
     /**
      * Главная страница
      * 

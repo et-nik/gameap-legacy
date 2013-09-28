@@ -222,27 +222,13 @@ class Dedicated_servers extends Servers {
 	*/
 	function check_ports($ds_id, $ports)
 	{
-		$this->db->or_where('ds_id', $ds_id);
+		$this->db->where('ds_id', $ds_id);
 		
-		if (is_array($ports)) {
-			foreach($ports as $port) {
-				if (!is_int($port) OR !$port) {
-					continue;
-				}
-				
-				$this->db->or_where('server_port', $port);
-				$this->db->or_where('query_port', $port);
-				$this->db->or_where('rcon_port', $port);
-			}
-		} else {
-			$this->db->or_where('server_port', $port);
-			$this->db->or_where('query_port', $port);
-			$this->db->or_where('rcon_port', $port);
-		}
+		$this->db->where_in('server_port', $ports);
+		$this->db->or_where_in('query_port', $ports);
+		$this->db->or_where_in('rcon_port', $ports);
 		
 		$query = $this->db->get('servers');
-		
-		print_r($query);
 		
 		if($query->num_rows > 0) {
 			return FALSE;

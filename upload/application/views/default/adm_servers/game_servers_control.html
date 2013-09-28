@@ -58,7 +58,7 @@
 	<br />
 	
 <form action="{site_url}adm_servers/edit/game_servers/{server_id}" method="post" accept-charset="utf-8">
-<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />	
+	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />	
 
     <ul class="tabs">
         <li><a href="#base_parameters">{lang_base_parameters}</a></li>
@@ -95,16 +95,16 @@
 
 				<tr>
 					<td>{lang_adm_servers_connect_data}:</td>
-					<td><input type="text" name="server_ip" value="{server_ip}" />:<input type="text" name="server_port" value="{server_port}" size="6" /></td>
+					<td><input type="text" name="server_ip" value="{server_ip}" />:<input type="text" name="server_port" value="{server_port}" size="6" /><span id="server_port_info"></span></td>
 				</tr>
 				
 				<tr>
-					<td>{lang_adm_servers_query_port}:<br /><span class="description">[ {lang_adm_servers_query_port_desc} ]</span></td>
+					<td>{lang_adm_servers_query_port}:<span id="query_port_info"></span><br /><span class="description">[ {lang_adm_servers_query_port_desc} ]</span></td>
 					<td><input type="text" name="query_port" value="{query_port}" /></td>
 				</tr>
 				
 				<tr>
-					<td>{lang_adm_servers_rcon_port}:<br /><span class="description">[ {lang_adm_servers_rcon_port_desc} ]</span></td>
+					<td>{lang_adm_servers_rcon_port}:<span id="rcon_port_info"></span><br /><span class="description">[ {lang_adm_servers_rcon_port_desc} ]</span></td>
 					<td><input type="text" name="rcon_port" value="{rcon_port}" /></td>
 				</tr>
 
@@ -124,7 +124,7 @@
 				</tr>
 				</table>
         </div>
-        
+
         <div id="start_parameters" class="tab_content">
 			<table class="zebra" width="100%">
 				<tr>

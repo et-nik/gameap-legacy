@@ -704,6 +704,12 @@ class Adm_servers extends CI_Controller {
 							$this->dedicated_servers->get_ds_list($where);
 						}
 						
+						/* Не занят ли порт на выделенном сервере*/
+						//~ if (!$this->dedicated_servers->check_ports($sql_data['ds_id'], array($sql_data['server_port'], $sql_data['rcon_port'], $sql_data['query_port']))) {
+							//~ $this->_show_message(lang('adm_servers_port_exists'));
+							//~ return FALSE;
+						//~ }
+						
 						if ($sql_data['ds_id'] && !$this->dedicated_servers->ds_list) {
 							$this->_show_message(lang('adm_servers_selected_ds_unavailable'));
 							return FALSE;
@@ -2079,6 +2085,12 @@ class Adm_servers extends CI_Controller {
 			$new_gs['dir'] 			= $this->input->post('dir');
 			$new_gs['enabled']		= '1';
 			$new_gs['installed']	= '0';
+			
+			/* Не занят ли порт на выделенном сервере*/
+			//~ if (!$this->dedicated_servers->check_ports($sql_data['ds_id'], array($sql_data['server_port'], $sql_data['rcon_port'], $sql_data['query_port']))) {
+				//~ $this->_show_message(lang('adm_servers_port_exists'));
+				//~ return FALSE;
+			//~ }
 			
 			if(!$new_gs['server_ip'] && $new_gs['ds_id']) {
 				$i = 0;
