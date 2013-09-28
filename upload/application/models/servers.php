@@ -42,6 +42,54 @@ class Servers extends CI_Model {
 		
 		return $string;
 	}
+	
+	//-----------------------------------------------------------
+    
+    /*
+     * Проверяет директорию на необходимые права
+     * 
+     * 
+    */
+	function _check_path($path) {
+		
+		if (!is_dir($path)) {
+			/* Это не директория */
+			$this->errors = "Dir " . $path . " not found";
+			return FALSE;
+		}
+		
+		if (!is_executable($path)) {
+			/* Нет прав на выполнение */
+			$this->errors = "Dir " . $path . "not executable";
+			return FALSE;
+		}
+		
+		return TRUE;
+		
+	}
+	
+	//-----------------------------------------------------------
+    
+    /*
+     * Проверяет файл на необходимые права
+     * 
+     * @param str - путь к локальному файлу
+     * @return bool
+     * 
+    */
+	function _check_file($file) {
+		if (!file_exists($file)) {
+			$this->errors = 'Error: ' . $file . ' file not found';
+			return FALSE;
+		}
+		
+		if (!is_executable($file)) {
+			$this->errors = 'Error: ' . $file . ' file not executable';
+			return FALSE;
+		}
+		
+		return TRUE;
+	}
     
     //-----------------------------------------------------------
     
@@ -115,18 +163,7 @@ class Servers extends CI_Model {
 
 		return $command;
 	}
-	
-	//-----------------------------------------------------------
-    
-    /*
-     * Определяет относительный или абсолютный путь
-     * 
-     * 
-    */
-	public function path_detect($path){
-		
-	}
-	
+
 	//-----------------------------------------------------------
     
     /*
@@ -355,6 +392,11 @@ class Servers extends CI_Model {
 		}
 		
 		if ($server_data['local_server']) {
+			
+			if ($this->_check_path($path)) {
+				return $this->errors;
+			}
+			
 			if(is_array($command)) {
 				$result = '';
 				
@@ -364,9 +406,8 @@ class Servers extends CI_Model {
 					$script_file = $script_file[0];
 					$script_file = str_replace('./', '', $script_file);
 					
-					if (!file_exists($path . '/' . $script_file)) {
-						$result .= 'Error: ' . $path . '/' . $script_file . ' file not found';
-						continue;
+					if ($this->_check_file($path . '/' . $script_file)) {
+						$result .= $this->errors;
 					}
 					
 					if($result) { $result .= "\n---\n"; }
@@ -380,9 +421,8 @@ class Servers extends CI_Model {
 				$script_file = $script_file[0];
 				$script_file = str_replace('./', '', $script_file);
 				
-				if (!file_exists($path . '/' . $script_file)) {
-					$result = 'Error: ' . $path . '/' . $script_file . ' file not found';
-					return $result;
+				if ($this->_check_file($path . '/' . $script_file)) {
+					$result .= $this->errors;
 				}
 				
 				$result = exec($cd . ' && ' . $command);
@@ -442,7 +482,7 @@ class Servers extends CI_Model {
 		if(!$path) {
 			$path = $server_data['script_path'];
 		}
-		
+
 		/* Добавляем команду в зависимости от ОС */
 		switch(strtolower($server_data['os'])) {
 			case 'windows':
@@ -455,9 +495,14 @@ class Servers extends CI_Model {
 		}
 		
 		if($server_data['local_server']) {
+			
+			if ($this->_check_path($path)) {
+				return $this->errors;
+			}
+			
 			if(is_array($command)) {
 				$result = '';
-				
+
 				foreach($command as $cmd_arr) {
 					
 					/* Проверка существования исполняемого файла и прав на выполнение */
@@ -465,16 +510,10 @@ class Servers extends CI_Model {
 					$script_file = $script_file[0];
 					$script_file = str_replace('./', '', $script_file);
 					
-					if (!file_exists($path . '/' . $script_file)) {
-						$result .= 'Error: ' . $path . '/' . $script_file . ' file not found';
-						continue;
+					if ($this->_check_file($path . '/' . $script_file)) {
+						$result .= $this->errors;
 					}
-					
-					if (!is_executable($path . '/' . $script_file)) {
-						$result .= 'Error: ' . $path . '/' . $script_file . ' file not executable';
-						continue;
-					}
-					
+
 					if($result) { $result .= "\n---\n"; }
 					$cmd_arr = $this->add_sudo($cmd_arr, $server_data['os']);
 					
@@ -488,16 +527,10 @@ class Servers extends CI_Model {
 				$script_file = $script_file[0];
 				$script_file = str_replace('./', '', $script_file);
 				
-				if (!file_exists($path . '/' . $script_file)) {
-					$result = 'Error: ' . $path . '/' . $script_file . ' file not found';
-					return $result;
+				if ($this->_check_file($path . '/' . $script_file)) {
+					return $this->errors;
 				}
-				
-				if (!is_executable($path . '/' . $script_file)) {
-					$result = 'Error: ' . $path . '/' . $script_file . ' file not executable';
-					return $result;
-				}
-				
+
 				$command = $this->add_sudo($command, $server_data['os']);
 				
 				$result = exec($cd . ' && ' . $command);
