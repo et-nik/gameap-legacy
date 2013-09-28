@@ -714,9 +714,13 @@ class Servers extends CI_Model {
     */
     function delete_game_server($id)
     {
-		if($this->db->delete('servers', array('id' => $id))){
+		if ($this->db->delete('servers', array('id' => $id))) {
+			
+			$this->db->delete('servers_privileges', array('server_id' => $id));
+			$this->db->delete('logs', array('server_id' => $id));
+			
 			return TRUE;
-		}else{
+		} else {
 			return FALSE;
 		}
 	}
