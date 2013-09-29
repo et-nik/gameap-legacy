@@ -222,7 +222,9 @@ class Servers extends CI_Model {
 	private function telnet_command($command, $server_data, $path = FALSE)
     {
 		// Загрузка необходимой модели
-		$this->load->model('telnet');
+		//~ $this->load->model('telnet');
+		$this->load->library('telnet');
+		
 		
 		/* -------------------
 		 * 	Определяем путь 
@@ -253,203 +255,21 @@ class Servers extends CI_Model {
 			$telnet_port = $telnet_data['1'];
 		}
 		
-		$this->telnet->connect($telnet_ip, $telnet_port);
-		
-		/*
-		 * Все что ниже работает исключительно на магии, лучше не трогать.
-		*/
-		$this->telnet->read_till("ogin: ");
-		$this->telnet->write( $server_data['telnet_login'] . "\r\n");
-		$this->telnet->read_till("word: ");
-		$this->telnet->write( $server_data['telnet_password'] . "\r\n");
-		$this->telnet->read_till(":> ");
-		
-		$this->telnet->write("\r\n");
-		$this->telnet->read_till(":> ");
-		
+		$this->telnet->connect($telnet_ip, $telnet_port)->auth($server_data['telnet_login'], $server_data['telnet_password']);
+
 		if(is_array($command)) {
 			foreach($command as $cmd_arr) {
-				$this->telnet->write($cd . ' && ' . $cmd_arr  . "\r\n");
+				//~ $this->telnet->write($cd . ' && ' . $cmd_arr  . "\r\n");
+				$this->telnet->command($cd . ' && ' . $cmd_arr  . "\r\n");
 				$this->commands[] = $cd . ' && ' . $cmd_arr  . "\r\n";
 			}
 		} else {
-			$this->telnet->write($cd . ' && ' . $command  . "\r\n");
+			//~ $this->telnet->write($cd . ' && ' . $command  . "\r\n");
+			$this->telnet->command($cd . ' && ' . $command  . "\r\n");
 			$this->commands[] = $cd . ' && ' . $command  . "\r\n";
 		}
 
-		$return = $this->telnet->read_till(":> ");
-		$this->telnet->close();
-		
-		/*
-		 * Здесь лучше написать
-		 * return хрен знает;
-		 * =)
-		*/
-		return $return;
-	
-	}
-	
-	
-	
-	
-	//-----------------------------------------------------------
-	
-	/* 
-	 * Отправка команды на сервер через ssh
-	 * 
-	 * @param string - команда на сервер
-	 * @param array - массив с данными сервера
-	*/
-	private function ssh_command($command, $server_data, $path = FALSE)
-    {
-		/* -------------------
-		 * 	Определяем путь 
-		 * -------------------
-		*/
-		if(!$path) {
-			$path = $server_data['ssh_path'];
-		}
-		
-		/* Добавляем команду в зависимости от ОС */
-		switch(strtolower($server_data['os'])) {
-			case 'windows':
-					$cd = "cd /D " . $path;
-				break;
-				
-			default:
-					$cd = "cd " . $path;
-				break;
-		}
-		
-		$ssh_data = explode(':', $server_data['ssh_host']);
-		
-		$ssh_ip = $ssh_data['0'];
-		
-		if(!isset($ssh_data['1'])){
-			$ssh_port = 22;
-		}else{
-			$ssh_port = $ssh_data['1'];
-		}
-
-		// Соединение с сервером
-		$connection = ssh2_connect($ssh_ip, $ssh_port);
-		$stream = array();
-		
-		if (ssh2_auth_password($connection, $server_data['ssh_login'], $server_data['ssh_password'])) {
-
-			if(is_array($command)) {
-				foreach($command as $cmd_arr) {
-					$stream[] = ssh2_exec($connection, $cd . ' && ' . $cmd_arr);
-					$this->commands[] = $cd . ' && ' . $cmd_arr;
-					
-				}
-				
-			} else {
-					$stream[] = ssh2_exec($connection, $cd . ' && ' . $command);
-					$this->commands[] = $cd . ' && ' . $command;
-			}
-			
-			$data = "";
-			
-			foreach($stream as $st) {
-				if($data) { $data .= "\n---\n"; }
-				
-				stream_set_blocking($st, true);
-				$data .= stream_get_contents($st);	
-			}
-
-			return $data;
-			
-		} else {
-			// Ошибка аутентификации
-			//$this->commands[] = 'SSH auth error';
-			return FALSE;
-		}
-	}
-	
-	//-----------------------------------------------------------
-	
-	/*
-	 * Функция отправляет команду на сервер
-	*/
-	function command_windows($command, $server_data, $path = FALSE)
-    {
-		/* -------------------
-		 * 	Определяем путь 
-		 * -------------------
-		*/
-		if(!$path) {
-			$path = $server_data['script_path'];
-		}
-		
-		/* Добавляем команду в зависимости от ОС */
-		switch(strtolower($server_data['os'])) {
-			case 'windows':
-					$cd = "cd /D " . $path;
-				break;
-				
-			default:
-					$cd = "cd " . $path;
-				break;
-		}
-		
-		if ($server_data['local_server']) {
-			
-			if (!$this->_check_path($path)) {
-				return $this->errors;
-			}
-			
-			if(is_array($command)) {
-				$result = '';
-				
-				foreach($command as $cmd_arr) {
-					/* Проверка существования исполняемого файла */
-					$script_file = explode(' ', $cmd_arr);
-					$script_file = $script_file[0];
-					$script_file = str_replace('./', '', $script_file);
-					
-					if (!$this->_check_file($path . '/' . $script_file)) {
-						$result .= $this->errors;
-					}
-					
-					if($result) { $result .= "\n---\n"; }
-					
-					$result .= exec($cd . ' && ' . $cmd_arr);
-					$this->commands[] = $cd .  ' && ' . $cmd_arr;
-				}
-			} else {
-				/* Проверка существования исполняемого файла */
-				$script_file = explode(' ', $command);
-				$script_file = $script_file[0];
-				$script_file = str_replace('./', '', $script_file);
-				
-				if (!$this->_check_file($path . '/' . $script_file)) {
-					$result .= $this->errors;
-				}
-				
-				$result = exec($cd . ' && ' . $command);
-				$this->commands[] = $cd . ' && ' . $command;
-			}
-		} else {
-			if (strtolower($server_data['control_protocol']) == 'telnet') { 
-				$result = $this->telnet_command($command, $server_data, $path);
-			} else {
-				$result = $this->ssh_command($command, $server_data, $path);
-			}
-		}
-		
-		//$result = $this->ssh_command($command, $server_data);
-		//echo 'Команда: '  . "<strong>cd " . $server_data['ssh_path'] . $command . '' . '</strong><br />Ответ сервера:<code>';
-		//print_r($result);
-		//echo '</code>';
-		
-		if($result){
-			return $result;
-		}else{
-			return FALSE;
-		}
-		
-		return FALSE;
+		return $this->telnet->get_string();
 	}
 	
 	//-----------------------------------------------------------
@@ -472,11 +292,8 @@ class Servers extends CI_Model {
 		 * для отправки команды через ssh
 		 * 
 		*/
-		
-		if(strtolower($server_data['os']) == 'windows') {
-			return $this->command_windows($command, $server_data);
-		}
-		
+
+
 		/* -------------------
 		 * 	Определяем путь 
 		 * -------------------
@@ -539,14 +356,82 @@ class Servers extends CI_Model {
 				$this->commands[] = $cd . ' && ' . $command;
 			}
 		} else {
+			/* Удаленная машина */
+			
 			if (strtolower($server_data['control_protocol']) == 'telnet') { 
-				$result = $this->telnet_command($command, $server_data, $path);
+				
+				/* Загрузка необходимой библиотеки */
+				$this->load->library('telnet');
+				
+				//~ $result = $this->telnet_command($command, $server_data, $path);
+				
+				/* Получение данных для соединения */
+				$telnet_data = explode(':', $server_data['telnet_host']);
+				$telnet_ip = $telnet_data['0'];
+				
+				if(!isset($telnet_data['1'])){
+					$telnet_port = 23; // Стандартный порт telnet
+				}else{
+					$telnet_port = $telnet_data['1'];
+				}
+				
+				$this->telnet->connect($telnet_ip, $telnet_port);
+				$this->telnet->auth($server_data['telnet_login'], $server_data['telnet_password']);
+
+				if(is_array($command)) {
+					foreach($command as $cmd_arr) {
+						//~ $this->telnet->write($cd . ' && ' . $cmd_arr  . "\r\n");
+						$this->telnet->command($cd . ' && ' . $cmd_arr  . "\r\n");
+						$this->commands[] = $cd . ' && ' . $cmd_arr  . "\r\n";
+					}
+				} else {
+					//~ $this->telnet->write($cd . ' && ' . $command  . "\r\n");
+					$this->telnet->command($cd . ' && ' . $command  . "\r\n");
+					$this->commands[] = $cd . ' && ' . $command  . "\r\n";
+				}
+
+				$result = $this->telnet->get_string();
+				
 			} else {
-				$result = $this->ssh_command($command, $server_data, $path);
+				
+				/* Загрузка необходимой библиотеки */
+				$this->load->library('ssh');
+				
+				$result = '';
+				
+				$ssh_data = explode(':', $server_data['ssh_host']);
+		
+				$ssh_ip = $ssh_data['0'];
+				
+				if(!isset($ssh_data['1'])){
+					$ssh_port = 22;
+				}else{
+					$ssh_port = $ssh_data['1'];
+				}
+				
+				$this->ssh->connect($ssh_ip, $ssh_port);
+				
+				if ($this->ssh->auth($server_data['ssh_login'], $server_data['ssh_password'])) {
+					if(is_array($command)) {
+						foreach($command as $cmd_arr) {
+							//~ $stream[] = ssh2_exec($connection, $cd . ' && ' . $cmd_arr);
+							$this->ssh->command($cd . ' && ' . $cmd_arr);
+							$result .= $this->commands[] = $cd . ' && ' . $cmd_arr;
+							$result = "\n/------------------------/\n\n";
+							
+						}
+						
+					} else {
+							//~ $stream[] = ssh2_exec($connection, $cd . ' && ' . $command);
+							$result = $this->ssh->command($cd . ' && ' . $command);
+							$this->commands[] = $cd . ' && ' . $command;
+					}
+					
+				}
 			}
 		}
 		
-		if($result){
+		if ($result) {
 			return $result;
 		}else{
 			return FALSE;
@@ -570,16 +455,7 @@ class Servers extends CI_Model {
 		}
 		
 		$command = $this->command_generate($server_data, 'start');
-		
-		switch(strtolower($server_data['os'])) {
-			case 'windows':
-				$result = $this->command_windows($command, $server_data);
-				break;
-				
-			default:
-				$result = $this->command($command, $server_data);
-				break;
-		}
+		$result = $this->command($command, $server_data);
 
 		return $result;
 	}
@@ -600,15 +476,7 @@ class Servers extends CI_Model {
 		}
 		
 		$command = $this->command_generate($server_data, 'stop');
-		
-		switch(strtolower($server_data['os'])) {
-			case 'windows':
-				$result = $this->command_windows($command, $server_data);
-				break;
-			default:
-				$result = $this->command($command, $server_data);
-				break;
-		}
+		$result = $this->command($command, $server_data);
 		
 		return $result;
 	}
@@ -629,15 +497,7 @@ class Servers extends CI_Model {
 		}
 		
 		$command = $this->command_generate($server_data, 'restart');
-		
-		switch(strtolower($server_data['os'])) {
-			case 'windows':
-				$result = $this->command_windows($command, $server_data);
-				break;
-			default:
-				$result = $this->command($command, $server_data);
-				break;
-		}
+		$result = $this->command($command, $server_data);
 		
 		return $result;
 	}
@@ -665,14 +525,7 @@ class Servers extends CI_Model {
 			$steamcmd_path = FALSE;
 		}
 		
-		switch(strtolower($server_data['os'])) {
-			case 'windows':
-				$result = $this->command_windows($command, $server_data, $steamcmd_path);
-				break;
-			default:
-				$result = $this->command($command, $server_data, $steamcmd_path);
-				break;
-		}
+		$result = $this->command($command, $server_data, $steamcmd_path);
 		
 		return $result;
 	}
