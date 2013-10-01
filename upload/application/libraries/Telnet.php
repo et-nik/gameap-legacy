@@ -27,31 +27,31 @@
 */
  
 class Telnet {
-	
+
 	/* (c) thies@thieso.net */
-	
+
 	var $_connection = FALSE;
 	var $errors = '';
-	
+
 	// ----------------------------------------------------------------
-	
+
 	/**
 	 * Соединение с Telnet
 	*/
 	function connect($ip, $port = 23)
 	{
 		$this->_connection = fsockopen($ip, $port);
-		socket_set_timeout($this->_connection,2,0);
+		socket_set_timeout($this->_connection,10,0);
 
 		if (!$this->_connection) {
 			return FALSE;
 		}
-		
+
 		return $this->_connection;
 	}
-	
+
 	// ----------------------------------------------------------------
-	
+
 	/**
 	 * Авторизация
 	*/
@@ -62,25 +62,30 @@ class Telnet {
 		$this->_read_till("word: ");
 		$this->_write( $password . "\r\n");
 		$this->_read_till(":> ");
-		
+
 		$this->_write("\r\n");
 		$this->_read_till(":> ");
 	}
-	
+
 	function command($command)
 	{
-		$this->_write($command);
-		return TRUE;
-		//~ return $this->get_string();
+		if(!$this->_connection) { return FALSE;}
+		
+		$this->_write($command . "\n\r");
+
+		$result = explode("\n", $this->_read_till(":> "));
+		
+		$last_element = count($result)-1;
+		unset($result[0]);
+		if (strpos($result[$last_element], '>') !== FALSE) {
+			unset($result[$last_element]);
+		}
+
+		return trim(implode("\n", $result));
 	}
-	
-	function get_string()
-	{
-		return $this->_read_till(":> ");
-	}
-	
+
 	// ----------------------------------------------------------------
-	
+
 	/**
 	 * Отключение
 	*/
@@ -92,13 +97,15 @@ class Telnet {
         
         $this->_connection = NULL;
 	}
-	
+
 	function __destruct() 
 	{
 		$this->disconnect();
 	}
-	
+
 	function _write($buffer) {
+		if(!$this->_connection) { return FALSE;}
+		
 		$buffer = str_replace(chr(255),chr(255).chr(255),$buffer);
         fwrite($this->_connection,$buffer);
     }
@@ -106,6 +113,7 @@ class Telnet {
 
 	function _getc() 
 	{
+		if(!$this->_connection) { return FALSE;}
 		return fgetc($this->_connection);
 	}
 
@@ -113,7 +121,7 @@ class Telnet {
 	function _read_till($what) 
 	{
 		$buf = '';
-		
+
 		while (1) {
 			$IAC = chr(255);
 
@@ -138,7 +146,6 @@ class Telnet {
 			if ($c == "\021") {
 				continue;
 			}
-
 
 			if ($c != $IAC) {
 				$buf .= $c;
@@ -167,7 +174,7 @@ class Telnet {
 			} else {
 				// echo "where are we? c=".ord($c)."\n";
 			}
-			
+
 		}
 
 	}
