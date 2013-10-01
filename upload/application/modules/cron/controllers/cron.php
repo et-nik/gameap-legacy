@@ -51,11 +51,23 @@ class Cron extends MX_Controller {
 			show_404();
 		}
 		
+		$this->load->model('servers');
+		$this->load->model('servers/dedicated_servers');
+		$this->load->model('servers/games');
+		$this->load->driver('rcon');
+		$this->load->library('ssh');
+		$this->load->library('telnet');
+		
 		set_time_limit(0);
 		$this->load->database();
     }
     
+    // ----------------------------------------------------------------
     
+    /**
+     * Получает информацию о сервере информации о котором 
+     * еще нет в массиве $this->server_data
+    */
     function _get_server_data($server_id)
     {
 		if(!array_key_exists($server_id, $this->servers_data)) {
@@ -67,13 +79,198 @@ class Cron extends MX_Controller {
 		
 		return $this->servers_data[$server_id];
 	}
+	
+	// ----------------------------------------------------------------
     
+    /**
+     * Обрабатывает полученные данные статистики
+    */
+	function _stats_processing($ds)
+	{
+		// Определение протокола управления
+		switch (strtolower($ds['control_protocol'])) {
+			case 'ssh':
+				$control_protocol = 'ssh';
+				break;
+			
+			case 'telnet':
+				$control_protocol = 'telnet';
+				break;
+			
+			case 'local':
+				$control_protocol = 'local';
+				break;
+			
+			default:
+				if ($ds['os'] == 'windows') {
+					$control_protocol = 'telnet';
+				} else {
+					$control_protocol = 'ssh';
+				}
+				break;
+				
+		}
+
+		/* 
+		 * Для Windows будут следующие команды:
+		 * 		Загруженность процессора:	wmic cpu get LoadPercentage
+		 * 		Получение свободной памяти: wmic os get FreePhysicalMemory
+		 * 		Получение всей памяти:		wmic os get TotalVisibleMemorySize 
+		 * 
+		 * Для Linux команды будут следующими:
+		 * 									vmstats
+		*/
+		if (strtolower($ds['os']) == 'windows') {
+			
+			if ($control_protocol == 'telnet') {
+				$telnet_data = explode(':', $ds['telnet_host']);
+				
+				$telnet_ip = $telnet_data['0'];
+				$telnet_port = 23;
+				
+				if (isset($telnet_data['1'])) {
+					$telnet_port = $telnet_data['1'];
+				}
+				
+				$this->telnet->connect($telnet_ip, $telnet_port);
+				$this->telnet->auth($ds['telnet_login'], $ds['telnet_password']);
+
+				$stats_string['cpu_load'] = $this->telnet->command('wmic cpu get LoadPercentage');
+				$stats_string['free_memory'] = $this->telnet->command('wmic os get FreePhysicalMemory');
+				$stats_string['total_memory'] = $this->telnet->command('wmic os get TotalVisibleMemorySize');
+			} elseif ($control_protocol == 'local') {
+				$stats_string['cpu_load'] = shell_exec('wmic cpu get LoadPercentage');
+				$stats_string['free_memory'] = shell_exec('wmic os get FreePhysicalMemory');
+				$stats_string['total_memory'] = shell_exec('wmic os get TotalVisibleMemorySize');
+			} else {
+				$ssh_data = explode(':', $ds['ssh_host']);
+			
+				$ssh_ip = $ssh_data['0'];
+				$ssh_port = 22;
+				
+				if (isset($ssh_data['1'])) {
+					$ssh_port = $ssh_data['1'];
+				}
+				
+				$this->ssh->connect($ssh_ip, $ssh_port);
+				$this->ssh->auth($ds['ssh_login'], $ds['ssh_password']);
+				
+				$stats_string['cpu_load'] = $this->ssh->command('wmic cpu get LoadPercentage');
+				$stats_string['free_memory'] = $this->ssh->command('wmic os get FreePhysicalMemory');
+				$stats_string['total_memory'] = $this->ssh->command('wmic os get TotalVisibleMemorySize');
+			}
+			
+			/* Обработака загруженности процессора */
+			
+			/* 
+			 * Пример значения $stats['cpu_load_string']:
+				LoadPercentage  
+				16              
+				0 
+				
+			 * LoadPercentage - ненужная намс строка, ее убираем
+			 * 16 - загруженность первого ядра (%)
+			 * 0 - загруженность второго ядра (%)
+			 * 
+			 * Загруженность процессора = суммарная загруженность ядер / количество ядер
+			 * В данном случае загруженность процессора = 8%
+			*/
+			
+			$explode = explode("\n", $stats_string['cpu_load']);
+			unset($explode[0]);
+
+			$a = 0; 		// Количество строк (количество ядер процессора + 1)
+			$value = 0; 	// Сумма значений в строках (суммарная загруженность каждого ядра)
+
+			foreach($explode as &$arr) {
+				$arr = trim($arr);
+				$arr = (int)$arr;
+				$value = $value + $arr;
+				$a ++;
+			}
+			
+			$stats['cpu_usage'] = (int)round($value/$a);
+			
+			/* Свободно памяти */
+			$explode = explode("\n", $stats_string['free_memory']);
+			unset($explode[0]);
+			$free_memory = (int)trim($explode[1]);
+			
+			/* Всего памяти */
+			$explode = explode("\n", $stats_string['total_memory']);
+			unset($explode[0]);
+			$total_memory = (int)trim($explode[1]);
+			
+			$usage_memory = $total_memory - $free_memory;
+			$stats['memory_usage'] = (int)round(($usage_memory/$total_memory) * 100);
+			
+			if($stats['cpu_usage'] > 100) {$stats['cpu_usage'] = 100;}
+			if($stats['memory_usage'] > 100) {$stats['memory_usage'] = 100;}
+			
+			return $stats;
+
+		} else {
+			if ($control_protocol == 'telnet') {
+				$telnet_data = explode(':', $ds['telnet_host']);
+				
+				$telnet_ip = $telnet_data['0'];
+				$telnet_port = 23;
+				
+				if (isset($telnet_data['1'])) {
+					$telnet_port = $telnet_data['1'];
+				}
+				
+				$this->telnet->connect($telnet_ip, $telnet_port);
+				$this->telnet->auth($ds['telnet_login'], $ds['telnet_password']);
+				
+				$stats_string['cpu_load'] = $this->telnet->command('vmstat');
+				$stats_string['memory_usage'] = $this->telnet->command('free');
+			} elseif ($control_protocol == 'local') {
+				$stats_string['cpu_load'] = shell_exec('vmstat');
+				$stats_string['memory_usage'] = shell_exec('free');
+			} else {
+				$ssh_data = explode(':', $ds['ssh_host']);
+			
+				$ssh_ip = $ssh_data['0'];
+				$ssh_port = 22;
+				
+				if (isset($ssh_data['1'])) {
+					$ssh_port = $ssh_data['1'];
+				}
+				
+				$this->ssh->connect($ssh_ip, $ssh_port);
+				$this->ssh->auth($ds['ssh_login'], $ds['ssh_password']);
+				
+				$stats_string['cpu_load'] = $this->ssh->command('vmstat');
+				$stats_string['memory_usage'] = $this->ssh->command('free');
+			}
+
+			/* Использование процессора */
+			$stats_explode = preg_replace('| +|', ' ', array_pop(explode("\n", trim($stats_string['cpu_load']))));
+			$stats_explode = explode(' ', trim($stats_explode));
+			$stats['cpu_usage'] = (int)$stats_explode[11] + $stats_explode[12];
+			
+			/* Использование памяти */
+			$stats_explode = preg_replace('| +|', ' ', $stats_string['memory_usage']);
+			$stats_explode = explode("\n", trim($stats_explode));
+			$stats_explode = explode(' ', $stats_explode[1]);
+			$stats['memory_usage'] = (int)round(($stats_explode[2]/$stats_explode[1])*100);
+			
+			if($stats['cpu_usage'] > 100) {$stats['cpu_usage'] = 100;}
+			if($stats['memory_usage'] > 100) {$stats['memory_usage'] = 100;}
+			
+			return $stats;
+		}
+	}
+	
+    
+    // ----------------------------------------------------------------
+    
+    /**
+     * Функция, выполняющаяся при запуске cron
+    */
     public function index()
     {
-		$this->load->model('servers');
-		$this->load->model('servers/games');
-		$this->load->driver('rcon');
-		
 		$time = time();
 		
 		$cron_stats = array(
@@ -98,7 +295,7 @@ class Cron extends MX_Controller {
 		/*     Выполняем задания                            */
 		/*==================================================*/
 		
-		echo "== Task manager ==\n";
+		$this->output->append_output("== Task manager ==\n");
 		
 		$i = 0;
 		$a = 0;
@@ -153,7 +350,7 @@ class Cron extends MX_Controller {
 						$cron_success = TRUE;
 						$cron_stats['success'] ++;
 						
-						echo 'Task: server #' . $server_id . '  start success' . "\n";
+						$this->output->append_output('Task: server #' . $server_id . '  start success' . "\n");
 						
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
@@ -166,7 +363,7 @@ class Cron extends MX_Controller {
 					}else{
 						
 						$cron_stats['failed'] ++;
-						echo 'Task: server #' . $server_id . '  start failed' . "\n";
+						$this->output->append_output('Task: server #' . $server_id . '  start failed' . "\n");
 						
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
@@ -182,7 +379,7 @@ class Cron extends MX_Controller {
 						$cron_success = TRUE;
 						$cron_stats['success'] ++;
 						
-						echo 'Task: server #' . $server_id . '  stop success' . "\n";
+						$this->output->append_output('Task: server #' . $server_id . '  stop success' . "\n");
 						
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
@@ -195,7 +392,7 @@ class Cron extends MX_Controller {
 					}else{
 						$cron_stats['failed'] ++;
 						
-						echo 'Task: server #' . $server_id . '  stop failed' . "\n";
+						$this->output->append_output('Task: server #' . $server_id . '  stop failed' . "\n");
 
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
@@ -211,7 +408,7 @@ class Cron extends MX_Controller {
 						$cron_success = TRUE;
 						$cron_stats['success'] ++;
 						
-						echo 'Task: server #' . $server_id . '  restart success' . "\n";
+						$this->output->append_output('Task: server #' . $server_id . '  restart success' . "\n");
 						
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
@@ -224,7 +421,7 @@ class Cron extends MX_Controller {
 					}else{
 						$cron_stats['failed'] ++;
 						
-						echo 'Task: server #' . $server_id . '  restart failed' . "\n";
+						$this->output->append_output('Task: server #' . $server_id . '  restart failed' . "\n");
 						
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
@@ -240,7 +437,7 @@ class Cron extends MX_Controller {
 						$cron_success = TRUE;
 						$cron_stats['success'] ++;
 						
-						echo 'Task: server #' . $server_id . '  update success' . "\n";
+						$this->output->append_output('Task: server #' . $server_id . '  update success' . "\n");
 						
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
@@ -253,7 +450,7 @@ class Cron extends MX_Controller {
 					} else {
 						$cron_stats['failed'] ++;
 						
-						echo 'Task: server #' . $server_id . '  update failed' . "\n";
+						$this->output->append_output('Task: server #' . $server_id . '  update failed' . "\n");
 						
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
@@ -283,7 +480,7 @@ class Cron extends MX_Controller {
 							$cron_success = TRUE;
 							$cron_stats['success'] ++;
 							
-							echo 'Task: server #' . $server_id . '  rcon send success' . "\n";
+							$this->output->append_output('Task: server #' . $server_id . '  rcon send success' . "\n");
 							
 							// Сохраняем логи
 							$log_data['type'] = 'server_rcon';
@@ -295,7 +492,7 @@ class Cron extends MX_Controller {
 						} else {
 							$cron_stats['failed'] ++;
 							
-							echo 'Task: server #' . $server_id . '  rcon send failed' . "\n";
+							$this->output->append_output('Task: server #' . $server_id . '  rcon send failed' . "\n");
 							
 							// Сохраняем логи
 							$log_data['type'] = 'server_rcon';
@@ -308,7 +505,7 @@ class Cron extends MX_Controller {
 					} else {
 						$cron_stats['failed'] ++;
 						
-						echo 'Task: server #' . $server_id . '  rcon send failed' . "\n";
+						$this->output->append_output('Task: server #' . $server_id . '  rcon send failed' . "\n");
 							
 						// Сохраняем логи
 						$log_data['type'] = 'server_rcon';
@@ -350,7 +547,7 @@ class Cron extends MX_Controller {
 		}
 		
 		// Отображаем статистику заданий
-		echo "Success: $cron_stats[success] Failed: $cron_stats[failed] Skipped: $cron_stats[skipped]\n";
+		$this->output->append_output("Success: $cron_stats[success] Failed: $cron_stats[failed] Skipped: $cron_stats[skipped]\n");
 		
 		
 		/*==================================================*/
@@ -358,7 +555,7 @@ class Cron extends MX_Controller {
 		/*    Пробегаем по каждому серверу			        */
 		/*==================================================*/
 		
-		echo "== Runner ==\n";
+		$this->output->append_output("== Runner ==\n");
 
 		$this->servers->get_server_list(FALSE, FALSE, array('enabled' => '1'));
 		//~ $this->games->get_game_list();
@@ -379,7 +576,7 @@ class Cron extends MX_Controller {
 				OR $this->servers_data[$server_id]['installed'] == '3'
 			) {
 				// Сервер не установлен
-				echo "Server #" . $server_id . " not installed\n";
+				$this->output->append_output("Server #" . $server_id . " not installed\n");
 				
 				/*
 				 * Полю installed устанавливаем значение 2, что сервер начал устанавливаться
@@ -454,26 +651,26 @@ class Cron extends MX_Controller {
 						$server_data['rcon'] = $this->encrypt->encode($new_rcon);
 						
 						$log_data['msg'] = 'Update server success';
-						echo "Install server success\n";
+						$this->output->append_output("Install server success\n");
 					} elseif(strpos($result, 'Failed to request AppInfo update') !== FALSE) {
 						/* Сервер не установлен до конца */
 						$server_data = array('installed' => '0');
 						
 						$log_data['msg'] = 'Update server failed';
-						echo "Install server failure\n";
+						$this->output->append_output("Install server failure\n");
 					} elseif(strpos($result, 'Error! App \'' . $this->games->games_list[0]['app_id'] . '\' state is') !== FALSE) {
 						/* Сервер не установлен до конца */
 						$server_data = array('installed' => '0');
 						
 						$log_data['msg'] = 'Error. App state after update job';
-						echo "Install server failure\n";
+						$this->output->append_output("Install server failure\n");
 					} else {
 						/* Неизвестная ошибка */
 						$server_data = array('installed' => '1');
 						
 						$log_data['msg'] = 'Unknown error';
 						$command = array_pop($this->servers->commands);
-						echo "Install server failure\n";
+						$this->output->append_output("Install server failure\n");
 					}
 					
 					$this->servers->edit_game_server($server_id, $server_data);
@@ -488,7 +685,7 @@ class Cron extends MX_Controller {
 					/*
 					 * Для игры не задан или не существует парамера app_update для SteamCMD
 					*/
-					echo "Server #" . $server_id . " install failed. App_id not specified\n";
+					$this->output->append_output("Server #" . $server_id . " install failed. App_id not specified\n");
 				}
 
 				$i ++;
@@ -646,7 +843,57 @@ class Cron extends MX_Controller {
 			$i ++;
 		}
 		
-		echo "Cron end\n";
+		/*==================================================*/
+		/*    	СТАТИСТИКА ВЫДЕЛЕННОГО СЕРВЕРА  			*/
+		/*==================================================*/
+		
+		$this->output->append_output("== DS Stats ==\n");
+		$this->dedicated_servers->get_ds_list();
+		
+		foreach($this->dedicated_servers->ds_list as $ds) {
+			
+			$stats = $this->_stats_processing($ds);
+			
+			if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
+				$this->output->append_output('Stats server #' . $ds['id'] . ' successful' . "\n");
+			} else {
+				$this->output->append_output('Stats server #' . $ds['id'] . ' failed'. "\n");
+				continue;
+			}
+			
+			/* 
+			 * Обновляем статистику
+			 * Добавляем новое значение в существующий массив
+			 * date - дата проверки (unix time)
+			 * cpu_usage - использование cpu (%)
+			 * memory_usage - использование памяти (%)
+			*/
+			
+			$stats_array = json_decode($ds['stats'], TRUE);
+			
+			$stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
+			$data['stats'] = json_encode($stats_array);
+			$this->dedicated_servers->edit_dedicated_server($ds['id'], $data);
+		}
+		
+		// Статистика для локального сервера
+		$ds = array('os' => $this->config->config['os'], 'control_protocol' => 'local'); 
+		$stats = $this->_stats_processing($ds);
+		
+		if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
+
+			$stats_array = json_decode(@file_get_contents(APPPATH . 'cache/local_server_stats.json', TRUE));
+			$stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
+			$data['stats'] = json_encode($stats_array);
+			file_put_contents(APPPATH . 'cache/local_server_stats.json', $data['stats']);
+			
+			$this->output->append_output('Local server stats successful' . "\n");
+			
+		} else {
+			$this->output->append_output('Local server stats failed'. "\n");
+		}
+
+		$this->output->append_output("Cron end\n");
 
 	}
 

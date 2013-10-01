@@ -85,9 +85,9 @@ class Ssh {
 	*/
 	function disconnect()
 	{
-		//~ if ($this->_connection) {
-			//~ ssh2_exec($this->_connection, "exit");
-		//~ }
+		if ($this->_connection) {
+			ssh2_exec($this->_connection, "exit");
+		}
 	}
 	
 	// ----------------------------------------------------------------
@@ -97,6 +97,6 @@ class Ssh {
 	*/
 	function __destruct()
 	{
-		//~ $this->disconnect();
+		$this->disconnect();
 	}
 }

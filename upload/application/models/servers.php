@@ -357,7 +357,7 @@ class Servers extends CI_Model {
 			}
 		} else {
 			/* Удаленная машина */
-			
+
 			if (strtolower($server_data['control_protocol']) == 'telnet') { 
 				
 				/* Загрузка необходимой библиотеки */
@@ -377,20 +377,21 @@ class Servers extends CI_Model {
 				
 				$this->telnet->connect($telnet_ip, $telnet_port);
 				$this->telnet->auth($server_data['telnet_login'], $server_data['telnet_password']);
+				
+				$result = '';
 
 				if(is_array($command)) {
 					foreach($command as $cmd_arr) {
 						//~ $this->telnet->write($cd . ' && ' . $cmd_arr  . "\r\n");
-						$this->telnet->command($cd . ' && ' . $cmd_arr  . "\r\n");
+						$result .= $this->telnet->command($cd . ' && ' . $cmd_arr  . "\r\n");
+						$result .= "\n/------------------------/\n\n";
 						$this->commands[] = $cd . ' && ' . $cmd_arr  . "\r\n";
 					}
 				} else {
 					//~ $this->telnet->write($cd . ' && ' . $command  . "\r\n");
-					$this->telnet->command($cd . ' && ' . $command  . "\r\n");
+					$result = $this->telnet->command($cd . ' && ' . $command  . "\r\n");
 					$this->commands[] = $cd . ' && ' . $command  . "\r\n";
 				}
-
-				$result = $this->telnet->get_string();
 				
 			} else {
 				
@@ -415,8 +416,8 @@ class Servers extends CI_Model {
 					if(is_array($command)) {
 						foreach($command as $cmd_arr) {
 							//~ $stream[] = ssh2_exec($connection, $cd . ' && ' . $cmd_arr);
-							$this->ssh->command($cd . ' && ' . $cmd_arr);
-							$result .= $this->commands[] = $cd . ' && ' . $cmd_arr;
+							$result .= $this->ssh->command($cd . ' && ' . $cmd_arr);
+							$this->commands[] = $cd . ' && ' . $cmd_arr;
 							$result = "\n/------------------------/\n\n";
 							
 						}

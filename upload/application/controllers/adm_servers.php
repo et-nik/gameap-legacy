@@ -44,6 +44,7 @@ class Adm_servers extends CI_Controller {
         $this->lang->load('main');
         
         $this->load->model('servers');
+        $this->load->model('servers/dedicated_servers');
 		$this->load->model('servers/games');
 		$this->load->model('servers/game_types');
 		
@@ -128,7 +129,7 @@ class Adm_servers extends CI_Controller {
 		}
 	}
 	
-	// -----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Проверка FTP
@@ -153,7 +154,7 @@ class Adm_servers extends CI_Controller {
 		}
 	}
 	
-	// -----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Данные по умолчанию для игрового сервера
@@ -221,7 +222,29 @@ class Adm_servers extends CI_Controller {
 		return $data;
 	}
 	
-	// -----------------------------------------------------------
+	// -----------------------------------------------------------------
+	
+	/**
+	 * 
+	 * Обработка статистики
+	*/
+	function _stats_processing($stats) {
+		foreach($stats as $arr) {
+					
+			/* Показываем только за последние сутки */
+			if((time() - $arr['date']) > 86400) {
+				continue;
+			}
+			
+			$data['data']['axis']['categories'][] = preg_replace('/(\d+)\-(\d+)\-(\d+) (\d+)\:(\d+)/i', '$4:$5', unix_to_human($arr['date'], FALSE, 'eu'));
+			$data['cpu_graph_data']['data'][] = $arr['cpu_usage'];
+			$data['memory_graph_data']['data'][] = $arr['memory_usage'];
+		}
+		
+		return $data;
+	}
+	
+	// -----------------------------------------------------------------
     
     //Главная
     public function index()
@@ -230,7 +253,7 @@ class Adm_servers extends CI_Controller {
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 	
-	// -----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Просмотр списка
@@ -387,7 +410,7 @@ class Adm_servers extends CI_Controller {
 		
 	}
 	
-	// -----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Добавление
@@ -817,7 +840,7 @@ class Adm_servers extends CI_Controller {
 		
 	}
 	
-	// -----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Удаление
@@ -1568,9 +1591,6 @@ class Adm_servers extends CI_Controller {
 				redirect('');
 				break;
 		}
-		
-		// -----------------------------------------------------------
-
 		/* 
 		 * Проверка заполненной формы, если все в порядке,
 		 * то добавляем данные в базу.
@@ -2021,7 +2041,7 @@ class Adm_servers extends CI_Controller {
 		
 	}
 	
-	// -----------------------------------------------------------
+	// -----------------------------------------------------------------
 
 	/**
 	 * Установка выделенного сервера
@@ -2270,6 +2290,8 @@ class Adm_servers extends CI_Controller {
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 	
+	// -----------------------------------------------------------------
+	
 	/**
 	 * Переустановка игрового сервера
 	 * 
@@ -2341,6 +2363,8 @@ class Adm_servers extends CI_Controller {
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 	
+	// -----------------------------------------------------------------
+	
 	/**
 	 * Создание дубликата игровой модификации
 	 * 
@@ -2397,6 +2421,85 @@ class Adm_servers extends CI_Controller {
 			return TRUE;
 		}
 		
+		$this->parser->parse('main.html', $this->tpl_data);
+	}
+	
+	// -----------------------------------------------------------------
+	
+	/**
+	 * Статистика выделенных серверов
+	 * 
+	 * 
+	*/
+	function ds_stats()
+	{
+		$this->load->library('highcharts');
+		$this->load->helper('date');
+		
+		$local_tpl_data = array();
+		
+		$this->dedicated_servers->get_ds_list();
+		
+		$i = 0;
+		foreach($this->dedicated_servers->ds_list as $ds) {
+			
+			if($stats = json_decode($ds['stats'], TRUE)) {
+
+				$stats = $this->_stats_processing($stats);
+
+				$this->highcharts->set_serie($stats['cpu_graph_data'], 'CPU');
+				$this->highcharts->set_serie($stats['memory_graph_data'], 'RAM');
+				
+				$this->highcharts->push_xAxis($stats['data']['axis']);
+				$this->highcharts->set_type('spline');
+				$this->highcharts->set_dimensions('', 200);
+				$this->highcharts->set_title('CPU');
+				
+				$this->highcharts->push_xAxis($stats['data']['axis']);
+				$this->highcharts->set_type('spline');
+				$this->highcharts->set_dimensions('', 200);
+				$this->highcharts->set_title('CPU');
+				
+				$credits->href = 'http://www.gameap.ru';
+				$credits->text = "GameAP";
+				$this->highcharts->set_credits($credits);
+				
+				$local_tpl_data['ds_stats'][$i]['graph'] = $this->highcharts->render();
+				$local_tpl_data['ds_stats'][$i]['ds_name'] = $ds['name'];
+				
+				$i++;
+			
+			}
+			
+		}
+		
+		// Для локального сервера
+		if($stats = json_decode(@file_get_contents(APPPATH . 'cache/local_server_stats.json'), TRUE)) {
+			$stats = $this->_stats_processing($stats);
+
+			$this->highcharts->set_serie($stats['cpu_graph_data'], 'CPU');
+			$this->highcharts->set_serie($stats['memory_graph_data'], 'RAM');
+			
+			$this->highcharts->push_xAxis($stats['data']['axis']);
+			$this->highcharts->set_type('spline');
+			$this->highcharts->set_dimensions('', 200);
+			$this->highcharts->set_title('CPU');
+			
+			$this->highcharts->push_xAxis($stats['data']['axis']);
+			$this->highcharts->set_type('spline');
+			$this->highcharts->set_dimensions('', 200);
+			$this->highcharts->set_title('CPU');
+			
+			$credits->href = 'http://www.gameap.ru';
+			$credits->text = "GameAP";
+			$this->highcharts->set_credits($credits);
+			
+			$local_tpl_data['ds_stats'][$i]['graph'] = $this->highcharts->render();
+			$local_tpl_data['ds_stats'][$i]['ds_name'] = 'Local';
+		}
+		
+
+		$this->tpl_data['content'] = $this->parser->parse('adm_servers/dedicated_servers_stats.html', $local_tpl_data, TRUE);
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 
