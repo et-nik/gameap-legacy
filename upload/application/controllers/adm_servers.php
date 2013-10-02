@@ -2341,6 +2341,7 @@ class Adm_servers extends CI_Controller {
 		$this->load->helper('date');
 		
 		$local_tpl_data = array();
+		$local_tpl_data['ds_stats'] = array();
 		
 		$this->dedicated_servers->get_ds_list();
 		

@@ -251,7 +251,7 @@ class Cron extends MX_Controller {
 			/* Использование процессора */
 			$stats_explode = preg_replace('| +|', ' ', array_pop(explode("\n", trim($stats_string['cpu_load']))));
 			$stats_explode = explode(' ', trim($stats_explode));
-			$stats['cpu_usage'] = (int)$stats_explode[11] + $stats_explode[12];
+			$stats['cpu_usage'] = (int)$stats_explode[12] + $stats_explode[13];
 
 			/* Использование памяти */
 			$stats_explode = preg_replace('| +|', ' ', $stats_string['memory_usage']);
@@ -1182,35 +1182,37 @@ class Cron extends MX_Controller {
 
 		$cron_result .= "== DS Stats ==\n";
 		$this->dedicated_servers->get_ds_list();
+		
+		if (!empty($this->dedicated_servers->ds_list)) {
+			foreach($this->dedicated_servers->ds_list as $ds) {
+				
+				if (!$ds['ssh_host'] && !$ds['telnet_host']) {
+					continue;
+				}
+				
+				$stats = $this->_stats_processing($ds);
 
-		foreach($this->dedicated_servers->ds_list as $ds) {
-			
-			if (!$ds['ssh_host'] && !$ds['telnet_host']) {
-				continue;
+				if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
+					$cron_result .= 'Stats server #' . $ds['id'] . ' successful' . "\n";
+				} else {
+					$cron_result .= 'Stats server #' . $ds['id'] . ' failed'. "\n";
+					continue;
+				}
+
+				/* 
+				 * Обновляем статистику
+				 * Добавляем новое значение в существующий массив
+				 * date - дата проверки (unix time)
+				 * cpu_usage - использование cpu (%)
+				 * memory_usage - использование памяти (%)
+				*/
+
+				$stats_array = json_decode($ds['stats'], TRUE);
+
+				$stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
+				$data['stats'] = json_encode($stats_array);
+				$this->dedicated_servers->edit_dedicated_server($ds['id'], $data);
 			}
-			
-			$stats = $this->_stats_processing($ds);
-
-			if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
-				$cron_result .= 'Stats server #' . $ds['id'] . ' successful' . "\n";
-			} else {
-				$cron_result .= 'Stats server #' . $ds['id'] . ' failed'. "\n";
-				continue;
-			}
-
-			/* 
-			 * Обновляем статистику
-			 * Добавляем новое значение в существующий массив
-			 * date - дата проверки (unix time)
-			 * cpu_usage - использование cpu (%)
-			 * memory_usage - использование памяти (%)
-			*/
-
-			$stats_array = json_decode($ds['stats'], TRUE);
-
-			$stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
-			$data['stats'] = json_encode($stats_array);
-			$this->dedicated_servers->edit_dedicated_server($ds['id'], $data);
 		}
 
 		// Статистика для локального сервера
