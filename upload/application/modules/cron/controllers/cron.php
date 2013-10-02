@@ -690,7 +690,7 @@ class Cron extends MX_Controller {
 							case 'windows':
 
 								$this->servers->command(
-														'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->games->games_list[0]['local_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' | del /F ' . basename($this->games->games_list[0]['local_repository']), 
+														'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->games->games_list[0]['local_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($this->games->games_list[0]['local_repository']), 
 														$this->servers_data[$server_id], 
 														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 								);
@@ -698,7 +698,7 @@ class Cron extends MX_Controller {
 								if ($this->game_types->game_types_list[0]['local_repository']) {
 
 									$this->servers->command(
-															'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->game_types->game_types_list[0]['local_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' | del /F ' . basename($this->game_types->game_types_list[0]['local_repository']), 
+															'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->game_types->game_types_list[0]['local_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($this->game_types->game_types_list[0]['local_repository']), 
 															$this->servers_data[$server_id], 
 															$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 									);
@@ -759,7 +759,7 @@ class Cron extends MX_Controller {
 							);
 
 							$this->servers->command(
-													'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->games->games_list[0]['remote_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' | del /F ' . basename($this->games->games_list[0]['remote_repository']),
+													'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->games->games_list[0]['remote_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($this->games->games_list[0]['remote_repository']),
 													$this->servers_data[$server_id], 
 													$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 							);
@@ -902,7 +902,7 @@ class Cron extends MX_Controller {
 								ftp_close($connection);
 
 								$this->servers->command(
-														'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->game_types->game_types_list[0]['local_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' | del /F ' . basename($this->game_types->game_types_list[0]['local_repository']), 
+														'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->game_types->game_types_list[0]['local_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($this->game_types->game_types_list[0]['local_repository']), 
 														$this->servers_data[$server_id], 
 														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 								);
@@ -917,7 +917,7 @@ class Cron extends MX_Controller {
 								);
 
 								$this->servers->command(
-														'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->game_types->game_types_list[0]['remote_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' | del /F ' . basename($this->game_types->game_types_list[0]['remote_repository']), 
+														'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->game_types->game_types_list[0]['remote_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($this->game_types->game_types_list[0]['remote_repository']), 
 														$this->servers_data[$server_id], 
 														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 								);
@@ -985,7 +985,7 @@ class Cron extends MX_Controller {
 				if ($server_installed == TRUE) {
 					/* Устанавливаем 777 права на директории, в которые загружается контент (карты, модели и пр.)
 					* и 666 на конфиг файлы, которые можно редактировать через админпанель */
-					if($this->servers_data[$server_id]['os'] != 'Windows') {
+					if(strtolower($this->servers_data[$server_id]['os']) != 'windows') {
 						$config_files 	= json_decode($this->servers_data[$server_id]['config_files'], TRUE);
 						$content_dirs 	= json_decode($this->servers_data[$server_id]['content_dirs'], TRUE);
 						$log_dirs 		= json_decode($this->servers_data[$server_id]['log_dirs'], TRUE);

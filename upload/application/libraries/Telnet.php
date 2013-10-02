@@ -30,8 +30,12 @@ class Telnet {
 
 	/* (c) thies@thieso.net */
 
-	var $_connection = FALSE;
+	var $_connection 	= FALSE;
+	var $_auth			= FALSE;
 	var $errors = '';
+	
+	private $ip;
+	private $port;
 
 	// ----------------------------------------------------------------
 
@@ -40,13 +44,22 @@ class Telnet {
 	*/
 	function connect($ip, $port = 23)
 	{
-		$this->_connection = fsockopen($ip, $port);
-		socket_set_timeout($this->_connection,10,0);
+		if ($this->ip && $this->ip == $ip && $this->_connection) {
+			/* Уже соединен с этим сервером */
+			return TRUE;
+		}
+		
+		$this->ip = $ip;
+		$this->port = $port;
+		
+		$this->_connection = fsockopen($this->ip, $this->port);
+		socket_set_timeout($this->_connection, 5);
 
 		if (!$this->_connection) {
 			return FALSE;
 		}
-
+		
+		$this->auth = FALSE;
 		return $this->_connection;
 	}
 
@@ -57,6 +70,10 @@ class Telnet {
 	*/
 	function auth($login, $password)
 	{
+		if ($this->auth == TRUE) {
+			return NULL;
+		}
+		
 		$this->_read_till("ogin: ");
 		$this->_write( $login . "\r\n");
 		$this->_read_till("word: ");
@@ -65,6 +82,8 @@ class Telnet {
 
 		$this->_write("\r\n");
 		$this->_read_till(":> ");
+		
+		$this->auth = TRUE;
 	}
 
 	function command($command)
