@@ -137,3 +137,10 @@ $lang['servers_privileges_task_manage']		= 'Allow manage server tasks';
 $lang['servers_privileges_upload_contents']	= 'Allow upload server files';
 $lang['servers_privileges_change_config']	= 'Allow edit server files';
 $lang['servers_privileges_log_view']		= 'Allow logs view';
+
+/* -- 0.8 -- */
+
+/* Menu */
+$lang['menu_servers_logs']						= 'Server logs';
+$lang['menu_panel_logs']						= 'GameAP logs';
+

@@ -182,3 +182,19 @@ $lang['adm_servers_srestart_cmd']					= 'Soft restart command';
 
 $lang['adm_servers_aliases_for_command']			= 'Startup command aliases';
 $lang['adm_servers_aliases_edit']					= 'Edit aliases';
+
+// 0.8
+$lang['adm_servers_query_port']						= 'Query port';
+$lang['adm_servers_query_port_desc']				= 'Port for querying server. Leave it blank for use default server port.';
+$lang['adm_servers_rcon_port']						= 'RCON port';
+$lang['adm_servers_rcon_port_desc']					= 'Port for sending RCON commands. Leave it blank for use default server port.';
+$lang['adm_servers_port_exists']					= 'Following port are already in use';
+$lang['adm_servers_ds_stats']						= 'Server load stats';
+$lang['adm_servers_install_server_parameters']		= 'Server installation options';
+$lang['adm_servers_repository_parameters']			= 'Repositories';
+$lang['adm_servers_local_repository']				= 'Local repositry';
+$lang['adm_servers_local_repository_gdesc']			= 'Path to game server archive on localhost. Its used for server installation.';
+$lang['adm_servers_local_repository_gtdesc']		= 'Path to game server mod archive on localhost. This archive will be extracted to server directory folder after basic files of this server are installed.';
+$lang['adm_servers_remote_repository']				= 'Remote repositry';
+$lang['adm_servers_remote_repository_gdesc']		= 'Path to game server archive on remote host. Its will be downloaded and extracted into server installation directory. Always specify transfer protocol (http://, https://, ftp:// and etc.).';
+$lang['adm_servers_remote_repository_gtdesc']		= 'Path to game server mod archive on remote host. Its will be downloaded and extracted into server directory after basic files installation completes. Always specify transfer protocol (http://, https://, ftp:// and etc.).';
