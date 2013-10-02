@@ -231,11 +231,12 @@ class Adm_servers extends CI_Controller {
 	function _stats_processing($stats) {
 		foreach($stats as $arr) {
 					
-			/* Показываем только за последние сутки */
-			if((time() - $arr['date']) > 86400) {
+			/* Показываем только за последние 3 часа */
+			if((time() - $arr['date']) > 10800) {
 				continue;
 			}
 			
+			// Оставляем от даты лишь время
 			$data['data']['axis']['categories'][] = preg_replace('/(\d+)\-(\d+)\-(\d+) (\d+)\:(\d+)/i', '$4:$5', unix_to_human($arr['date'], FALSE, 'eu'));
 			$data['cpu_graph_data']['data'][] = $arr['cpu_usage'];
 			$data['memory_graph_data']['data'][] = $arr['memory_usage'];
@@ -2453,12 +2454,7 @@ class Adm_servers extends CI_Controller {
 				$this->highcharts->push_xAxis($stats['data']['axis']);
 				$this->highcharts->set_type('spline');
 				$this->highcharts->set_dimensions('', 200);
-				$this->highcharts->set_title('CPU');
-				
-				$this->highcharts->push_xAxis($stats['data']['axis']);
-				$this->highcharts->set_type('spline');
-				$this->highcharts->set_dimensions('', 200);
-				$this->highcharts->set_title('CPU');
+				$this->highcharts->set_title($ds['name'] . ' stats');
 				
 				$credits->href = 'http://www.gameap.ru';
 				$credits->text = "GameAP";
@@ -2483,12 +2479,7 @@ class Adm_servers extends CI_Controller {
 			$this->highcharts->push_xAxis($stats['data']['axis']);
 			$this->highcharts->set_type('spline');
 			$this->highcharts->set_dimensions('', 200);
-			$this->highcharts->set_title('CPU');
-			
-			$this->highcharts->push_xAxis($stats['data']['axis']);
-			$this->highcharts->set_type('spline');
-			$this->highcharts->set_dimensions('', 200);
-			$this->highcharts->set_title('CPU');
+			$this->highcharts->set_title('Local server stats');
 			
 			$credits->href = 'http://www.gameap.ru';
 			$credits->text = "GameAP";
