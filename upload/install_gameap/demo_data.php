@@ -171,6 +171,17 @@ $data = array(
 $this->games->add_game($data);
 
 $data = array(
+		'code' => "minecraft",
+		'start_code' => "minecraft",
+		'name' => "Minecraft",
+		'engine' => "minecraft",
+		'engine_version' => "162",
+		'app_id' => "",
+		'app_set_config' => "",
+);
+$this->games->add_game($data);
+
+$data = array(
 		'code' => "ricochet",
 		'start_code' => "ricochet",
 		'name' => "Ricochet",

@@ -170,6 +170,11 @@ $fields = array(
 							'type' => 'TINYTEXT',
 		),
 		
+		'stats' => array(
+							 'type' => 'TEXT',
+							 'default' => '',
+		),
+		
 		'steamcmd_path' => array(
 							'type' => 'TINYTEXT',
 		),
@@ -266,6 +271,16 @@ $fields = array(
 							'constraint' => 64,
 							'default' => '',
 		),
+		
+		'remote_repository' => array(
+							'type' => 'TEXT',
+							'default' => '',
+		),
+				  
+		'local_repository' => array(
+							'type' => 'TEXT',
+							'default' => '',
+		),
 );
 
 $this->dbforge->add_key('code', TRUE);
@@ -315,6 +330,16 @@ $fields = array(
 		'disk_size' => array(
 							'type' => 'INT',
 							'constraint' => 16, 
+		),
+		
+		'remote_repository' => array(
+							'type' => 'TEXT',
+							'default' => '',
+		),
+				  
+		'local_repository' => array(
+							'type' => 'TEXT',
+							'default' => '',
 		),
 		
 		'execfile_windows' => array(
