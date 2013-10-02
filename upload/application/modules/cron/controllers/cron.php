@@ -39,7 +39,7 @@
  * 
 */
 class Cron extends MX_Controller {
-	
+
 	var $servers_data = array();
 
 	public function __construct()
@@ -50,7 +50,7 @@ class Cron extends MX_Controller {
         if(php_sapi_name() != 'cli'){
 			show_404();
 		}
-		
+
 		$this->load->model('servers');
 		$this->load->model('servers/dedicated_servers');
 		$this->load->model('servers/games');
@@ -58,7 +58,7 @@ class Cron extends MX_Controller {
 		$this->load->driver('rcon');
 		$this->load->library('ssh');
 		$this->load->library('telnet');
-		
+
 		set_time_limit(0);
 		$this->load->database();
     }
@@ -73,14 +73,14 @@ class Cron extends MX_Controller {
     {
 		if(!array_key_exists($server_id, $this->servers_data)) {
 			$this->servers_data[$server_id] = $this->servers->get_server_data($server_id);
-			
+
 			$this->servers_data[$server_id]['app_id'] = $this->games->games_list[0]['app_id'];
 			$this->servers_data[$server_id]['app_set_config'] = $this->games->games_list[0]['app_set_config'];
 		}
-		
+
 		return $this->servers_data[$server_id];
 	}
-	
+
 	// ----------------------------------------------------------------
     
     /**
@@ -93,15 +93,15 @@ class Cron extends MX_Controller {
 			case 'ssh':
 				$control_protocol = 'ssh';
 				break;
-			
+
 			case 'telnet':
 				$control_protocol = 'telnet';
 				break;
-			
+
 			case 'local':
 				$control_protocol = 'local';
 				break;
-			
+
 			default:
 				if ($ds['os'] == 'windows') {
 					$control_protocol = 'telnet';
@@ -109,7 +109,7 @@ class Cron extends MX_Controller {
 					$control_protocol = 'ssh';
 				}
 				break;
-				
+
 		}
 
 		/* 
@@ -122,17 +122,17 @@ class Cron extends MX_Controller {
 		 * 									vmstats
 		*/
 		if (strtolower($ds['os']) == 'windows') {
-			
+
 			if ($control_protocol == 'telnet') {
 				$telnet_data = explode(':', $ds['telnet_host']);
-				
+
 				$telnet_ip = $telnet_data['0'];
 				$telnet_port = 23;
-				
+
 				if (isset($telnet_data['1'])) {
 					$telnet_port = $telnet_data['1'];
 				}
-				
+
 				$this->telnet->connect($telnet_ip, $telnet_port);
 				$this->telnet->auth($ds['telnet_login'], $ds['telnet_password']);
 
@@ -145,24 +145,24 @@ class Cron extends MX_Controller {
 				$stats_string['total_memory'] = shell_exec('wmic os get TotalVisibleMemorySize');
 			} else {
 				$ssh_data = explode(':', $ds['ssh_host']);
-			
+
 				$ssh_ip = $ssh_data['0'];
 				$ssh_port = 22;
-				
+
 				if (isset($ssh_data['1'])) {
 					$ssh_port = $ssh_data['1'];
 				}
-				
+
 				$this->ssh->connect($ssh_ip, $ssh_port);
 				$this->ssh->auth($ds['ssh_login'], $ds['ssh_password']);
-				
+
 				$stats_string['cpu_load'] = $this->ssh->command('wmic cpu get LoadPercentage');
 				$stats_string['free_memory'] = $this->ssh->command('wmic os get FreePhysicalMemory');
 				$stats_string['total_memory'] = $this->ssh->command('wmic os get TotalVisibleMemorySize');
 			}
-			
+
 			/* Обработака загруженности процессора */
-			
+
 			/* 
 			 * Пример значения $stats['cpu_load_string']:
 				LoadPercentage  
@@ -176,54 +176,56 @@ class Cron extends MX_Controller {
 			 * Загруженность процессора = суммарная загруженность ядер / количество ядер
 			 * В данном случае загруженность процессора = 8%
 			*/
-			
+
 			$explode = explode("\n", $stats_string['cpu_load']);
 			unset($explode[0]);
 
 			$a = 0; 		// Количество строк (количество ядер процессора + 1)
 			$value = 0; 	// Сумма значений в строках (суммарная загруженность каждого ядра)
-
 			foreach($explode as &$arr) {
+				if (trim($arr) == '') { continue;}
+				
 				$arr = trim($arr);
 				$arr = (int)$arr;
 				$value = $value + $arr;
 				$a ++;
+				
 			}
-			
+
 			$stats['cpu_usage'] = (int)round($value/$a);
-			
+
 			/* Свободно памяти */
 			$explode = explode("\n", $stats_string['free_memory']);
 			unset($explode[0]);
 			$free_memory = (int)trim($explode[1]);
-			
+
 			/* Всего памяти */
 			$explode = explode("\n", $stats_string['total_memory']);
 			unset($explode[0]);
 			$total_memory = (int)trim($explode[1]);
-			
+
 			$usage_memory = $total_memory - $free_memory;
 			$stats['memory_usage'] = (int)round(($usage_memory/$total_memory) * 100);
-			
+
 			if($stats['cpu_usage'] > 100) {$stats['cpu_usage'] = 100;}
 			if($stats['memory_usage'] > 100) {$stats['memory_usage'] = 100;}
-			
+
 			return $stats;
 
 		} else {
 			if ($control_protocol == 'telnet') {
 				$telnet_data = explode(':', $ds['telnet_host']);
-				
+
 				$telnet_ip = $telnet_data['0'];
 				$telnet_port = 23;
-				
+
 				if (isset($telnet_data['1'])) {
 					$telnet_port = $telnet_data['1'];
 				}
-				
+
 				$this->telnet->connect($telnet_ip, $telnet_port);
 				$this->telnet->auth($ds['telnet_login'], $ds['telnet_password']);
-				
+
 				$stats_string['cpu_load'] = $this->telnet->command('vmstat');
 				$stats_string['memory_usage'] = $this->telnet->command('free');
 			} elseif ($control_protocol == 'local') {
@@ -231,17 +233,17 @@ class Cron extends MX_Controller {
 				$stats_string['memory_usage'] = shell_exec('free');
 			} else {
 				$ssh_data = explode(':', $ds['ssh_host']);
-			
+
 				$ssh_ip = $ssh_data['0'];
 				$ssh_port = 22;
-				
+
 				if (isset($ssh_data['1'])) {
 					$ssh_port = $ssh_data['1'];
 				}
-				
+
 				$this->ssh->connect($ssh_ip, $ssh_port);
 				$this->ssh->auth($ds['ssh_login'], $ds['ssh_password']);
-				
+
 				$stats_string['cpu_load'] = $this->ssh->command('vmstat');
 				$stats_string['memory_usage'] = $this->ssh->command('free');
 			}
@@ -250,20 +252,20 @@ class Cron extends MX_Controller {
 			$stats_explode = preg_replace('| +|', ' ', array_pop(explode("\n", trim($stats_string['cpu_load']))));
 			$stats_explode = explode(' ', trim($stats_explode));
 			$stats['cpu_usage'] = (int)$stats_explode[11] + $stats_explode[12];
-			
+
 			/* Использование памяти */
 			$stats_explode = preg_replace('| +|', ' ', $stats_string['memory_usage']);
 			$stats_explode = explode("\n", trim($stats_explode));
 			$stats_explode = explode(' ', $stats_explode[1]);
 			$stats['memory_usage'] = (int)round(($stats_explode[2]/$stats_explode[1])*100);
-			
+
 			if($stats['cpu_usage'] > 100) {$stats['cpu_usage'] = 100;}
 			if($stats['memory_usage'] > 100) {$stats['memory_usage'] = 100;}
-			
+
 			return $stats;
 		}
 	}
-	
+
     
     // ----------------------------------------------------------------
     
@@ -279,9 +281,9 @@ class Cron extends MX_Controller {
 			'failed' => 0,
 			'skipped' => 0,
 		);
-		
+
 		$log_data['user_name'] = 'System (cron)';
-		
+
 		/* Получение заданий из базы данных 
 		 * Задания ограничиваются последним часом, если по какой либо 
 		 * причине задания двухчасовой давносте не были выполнены они не 
@@ -289,28 +291,28 @@ class Cron extends MX_Controller {
 		 * */
 		$where = array('date_perform >' => $time - 3600, 'date_perform <' => $time);
 		$query = $this->db->get_where('cron', $where);
-		
+
 		$task_list = $query->result_array();
-		
+
 		/*==================================================*/
 		/*     Выполняем задания                            */
 		/*==================================================*/
-		
+
 		$cron_result .= "== Task manager ==\n";
-		
+
 		$i = 0;
 		$a = 0;
 		$count_i = count($task_list);
 		while($i < $count_i) {
-			
+
 			// Если достигнут предел выполняемых задания, то оставляем оставшиеся на потом
 			if($i >= 100) {
 				$cron_stats['skipped'] += $count_i - $i;
 				break;
 			}
-			
+
 			$cron_success = FALSE;
-			
+
 			/* Проверяем дату, чтобы выполнить то что нужно
 			 * Возможно задание уже было выполнено ранее*/
 			if($task_list[$i]['date_performed'] > $task_list[$i]['date_perform']){
@@ -318,23 +320,23 @@ class Cron extends MX_Controller {
 				$i ++;
 				continue;
 			}
-			
+
 			/*
 			 * Получение данных сервера
 			*/
 			if(isset($task_list[$i]['server_id'])) {
-				
+
 				$server_id = $task_list[$i]['server_id'];
-				
+
 				// Получение данных сервера
 				$this->_get_server_data($server_id);
-				
+
 			} else {
 				$cron_stats['skipped'] ++;
 				$i ++;
 				continue;
 			}
-			
+
 			/* 
 			 * Отправляем данны о том, что задание начало выполняться 
 			 * чтобы исключить повторное выполнение при следующем запуске cron скрипта, 
@@ -342,17 +344,17 @@ class Cron extends MX_Controller {
 			*/
 			$this->db->where('id', $task_list[$i]['id']);
 			$this->db->update('cron', array('started' => '1')); 
-			
+
 			// Выполняем задание
 			switch($task_list[$i]['code']) {
 				case 'server_start':
-				
+
 					if($response = $this->servers->start($this->servers_data[$server_id])){
 						$cron_success = TRUE;
 						$cron_stats['success'] ++;
-						
+
 						$cron_result .= 'Task: server #' . $server_id . '  start success' . "\n";
-						
+
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
 						$log_data['command'] = 'start';
@@ -360,12 +362,12 @@ class Cron extends MX_Controller {
 						$log_data['msg'] = 'Start server success';
 						$log_data['log_data'] = $response;
 						$this->panel_log->save_log($log_data);
-						
+
 					}else{
-						
+
 						$cron_stats['failed'] ++;
 						$cron_result .= 'Task: server #' . $server_id . '  start failed' . "\n";
-						
+
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
 						$log_data['command'] = 'start';
@@ -379,9 +381,9 @@ class Cron extends MX_Controller {
 					if($response = $this->servers->stop($this->servers_data[$server_id])){
 						$cron_success = TRUE;
 						$cron_stats['success'] ++;
-						
+
 						$cron_result .= 'Task: server #' . $server_id . '  stop success' . "\n";
-						
+
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
 						$log_data['command'] = 'stop';
@@ -389,10 +391,10 @@ class Cron extends MX_Controller {
 						$log_data['msg'] = 'Stop server success';
 						$log_data['log_data'] = $response;
 						$this->panel_log->save_log($log_data);
-						
+
 					}else{
 						$cron_stats['failed'] ++;
-						
+
 						$cron_result .= 'Task: server #' . $server_id . '  stop failed' . "\n";
 
 						// Сохраняем логи
@@ -408,9 +410,9 @@ class Cron extends MX_Controller {
 					if($response = $this->servers->restart($this->servers_data[$server_id])){
 						$cron_success = TRUE;
 						$cron_stats['success'] ++;
-						
+
 						$cron_result .= 'Task: server #' . $server_id . '  restart success' . "\n";
-						
+
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
 						$log_data['command'] = 'restart';
@@ -418,12 +420,12 @@ class Cron extends MX_Controller {
 						$log_data['msg'] = 'Restart server success';
 						$log_data['log_data'] = $response;
 						$this->panel_log->save_log($log_data);
-						
+
 					}else{
 						$cron_stats['failed'] ++;
-						
+
 						$cron_result .= 'Task: server #' . $server_id . '  restart failed' . "\n";
-						
+
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
 						$log_data['command'] = 'restart';
@@ -437,9 +439,9 @@ class Cron extends MX_Controller {
 					if($response = $this->servers->update($this->servers_data[$server_id])) {
 						$cron_success = TRUE;
 						$cron_stats['success'] ++;
-						
+
 						$cron_result .= 'Task: server #' . $server_id . '  update success' . "\n";
-						
+
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
 						$log_data['command'] = 'update';
@@ -447,12 +449,12 @@ class Cron extends MX_Controller {
 						$log_data['msg'] = 'Update server success';
 						$log_data['log_data'] = 'Command: ' . array_pop($this->servers->commands) . "\nResponse: \n" . $response;
 						$this->panel_log->save_log($log_data);
-						
+
 					} else {
 						$cron_stats['failed'] ++;
-						
+
 						$cron_result .= 'Task: server #' . $server_id . '  update failed' . "\n";
-						
+
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
 						$log_data['command'] = 'update';
@@ -464,7 +466,7 @@ class Cron extends MX_Controller {
 					break;
 				case 'server_rcon':
 					if($this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['query_port'])) {
-						
+
 						$this->rcon->set_variables(
 								$this->servers_data[$server_id]['server_ip'], 
 								$this->servers_data[$server_id]['server_port'],
@@ -472,17 +474,17 @@ class Cron extends MX_Controller {
 								$this->servers_data[$server_id]['engine'],
 								$this->servers_data[$server_id]['engine_version']
 						);
-						
+
 						$rcon_connect = $this->rcon->connect();
-						
+
 						if($rcon_connect) {
 							$rcon_string = $this->rcon->command($task_list[$i]['command']);
-							
+
 							$cron_success = TRUE;
 							$cron_stats['success'] ++;
-							
+
 							$cron_result .= 'Task: server #' . $server_id . '  rcon send success' . "\n";
-							
+
 							// Сохраняем логи
 							$log_data['type'] = 'server_rcon';
 							$log_data['command'] = $task_list[$i]['command'];
@@ -492,9 +494,9 @@ class Cron extends MX_Controller {
 							$this->panel_log->save_log($log_data);
 						} else {
 							$cron_stats['failed'] ++;
-							
+
 							$cron_result .= 'Task: server #' . $server_id . '  rcon send failed' . "\n";
-							
+
 							// Сохраняем логи
 							$log_data['type'] = 'server_rcon';
 							$log_data['command'] = $task_list[$i]['command'];
@@ -505,9 +507,9 @@ class Cron extends MX_Controller {
 						}
 					} else {
 						$cron_stats['failed'] ++;
-						
+
 						$cron_result .= 'Task: server #' . $server_id . '  rcon send failed' . "\n";
-							
+
 						// Сохраняем логи
 						$log_data['type'] = 'server_rcon';
 						$log_data['command'] = $task_list[$i]['command'];
@@ -516,51 +518,51 @@ class Cron extends MX_Controller {
 						$log_data['log_data'] = '';
 						$this->panel_log->save_log($log_data);
 					}
-					
+
 					break;
 				default:
 					$i ++;
 					continue;
 					break;
-				
+
 			}
-			
+
 			/* Задание было успешно выполнено */
 			if($cron_success) {
 				$sql_data[$a]['id'] = $task_list[$i]['id'];
 				$sql_data[$a]['started'] = '0';
-				
+
 				// Устанавливаем дату выполнения
 				$sql_data[$a]['date_performed'] = $time;
-				
+
 				// Устанавливаем дату следующего выполнения
 				$sql_data[$a]['date_perform'] = $task_list[$i]['date_perform'] + $task_list[$i]['time_add'];
 			}
-			
+
 			$i ++;
 			$a ++;
 
 		}
-		
+
 		// Обновляем данные
 		if(!empty($sql_data)) {
 			$this->db->update_batch('cron', $sql_data, 'id');
 		}
-		
+
 		// Отображаем статистику заданий
 		$cron_result .= "Success: $cron_stats[success] Failed: $cron_stats[failed] Skipped: $cron_stats[skipped]\n";
-		
-		
+
+
 		/*==================================================*/
 		/*    				БЕГУН					        */
 		/*    Пробегаем по каждому серверу			        */
 		/*==================================================*/
-		
+
 		$cron_result .= "== Runner ==\n";
 
 		$this->servers->get_server_list(FALSE, FALSE, array('enabled' => '1'));
 		//~ $this->games->get_game_list();
-		
+
 		$i = 0;
 		$count_i = count($this->servers->servers_list);
 		while($i < $count_i) {
@@ -568,27 +570,27 @@ class Cron extends MX_Controller {
 
 			// Получение данных сервера
 			$this->_get_server_data($server_id);
-			
+
 			/*==================================================*/
 			/*     Установка сервера					        */
 			/*==================================================*/
-			
+
 			if($this->servers_data[$server_id]['installed'] == '0'
 				OR $this->servers_data[$server_id]['installed'] == '3'
 			) {
 				// Сервер не установлен
 				$cron_result .= "Server #" . $server_id . " not installed\n";
 				$server_installed = FALSE;
-				
+
 				/* Получение данных об игровой модификации */
 				$this->game_types->get_gametypes_list(array('id' => $this->servers_data[$server_id]['dir']));
-				
+
 				/*
 				 * Полю installed устанавливаем значение 2, что сервер начал устанавливаться
 				*/
-				
+
 				$this->servers->edit_game_server($server_id, array('installed' => '2'));
-				
+
 				/* Выбор типа установки сервера (из локального репозитория, с удаленного репозитория, через steamcmd */
 				if ($this->games->games_list[0]['local_repository']) {
 					$type_install = 'local_repository';
@@ -597,7 +599,7 @@ class Cron extends MX_Controller {
 				} elseif ($this->games->games_list[0]['app_id']) {
 					$type_install = 'steamcmd';
 				} else {
-					
+
 					/* 
 					 * Не удалость выбрать тип установки 
 					 * отсутствуют данные локального репозитория, удаленного репозитория и steamcmd
@@ -605,10 +607,10 @@ class Cron extends MX_Controller {
 					$cron_result .= "Server #" . $server_id . " install failed. App_id and Repository data not specified\n";
 					$type_install = FALSE;
 				}
-				
+
 				/* Установка из локального репозитория */
 				if ($type_install == 'local_repository') {
-					
+
 					/* Существует ли файл */
 					if(file_exists($this->games->games_list[0]['local_repository'])) {
 						if(!is_readable($this->games->games_list[0]['local_repository'])) {
@@ -623,10 +625,10 @@ class Cron extends MX_Controller {
 								*/
 							}
 						}
-						
+
 					} else {
 						/* Файл отсутствует */
-						
+
 						// Меняем тип установки на следующий
 						if ($this->games->games_list[0]['remote_repository']) {
 							$type_install = 'remote_repository';
@@ -638,31 +640,29 @@ class Cron extends MX_Controller {
 							*/
 						}
 					}
-					
+
 					if ($type_install == 'local_repository') {
 						/* Если тип установки не изменился в процессе проверки */
-						
+
 						// Создание директории
 						switch(strtolower($this->servers_data[$server_id]['os'])) {
 							case 'windows':
 								$this->servers->command('mkdir ' . $this->servers_data[$server_id]['dir'], $this->servers_data[$server_id]);
 								break;
-								
+
 							default:
 								$this->servers->command('mkdir -p ' . $this->servers_data[$server_id]['dir'], $this->servers_data[$server_id]);
 								$this->servers->command('chmod 777 ' . $this->servers_data[$server_id]['dir'], $this->servers_data[$server_id]);
 								break;
 						}
-						
-						
+
+
 						$connection = ftp_connect($this->servers_data[$server_id]['ftp_host']);
-						
-						if($connection && ftp_login($connection, $this->servers_data[$server_id]['ftp_login'], $this->servers_data[$server_id]['ftp_passwd'])) {
-							
-						}
-						
+
+						ftp_login($connection, $this->servers_data[$server_id]['ftp_login'], $this->servers_data[$server_id]['ftp_passwd']);
+
 						//~ ftp_pasv($connection, TRUE);
-						
+
 						ftp_put(
 								$connection, 
 								$this->servers_data[$server_id]['ftp_path'] . '/' . $this->servers_data[$server_id]['dir'] . '/' . basename($this->games->games_list[0]['local_repository']), 
@@ -670,7 +670,7 @@ class Cron extends MX_Controller {
 								FTP_BINARY
 						);
 
-						
+
 						// Загрузка игровой модификации
 						if ($this->game_types->game_types_list[0]['local_repository'] 
 							&& is_readable($this->game_types->game_types_list[0]['local_repository'])) 
@@ -682,39 +682,39 @@ class Cron extends MX_Controller {
 									FTP_BINARY
 							);
 						}
-						
+
 						ftp_close($connection);
-						
+
 						// Распаковка архива
 						switch(strtolower($this->servers_data[$server_id]['os'])) {
 							case 'windows':
-							
+
 								$this->servers->command(
 														'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->games->games_list[0]['local_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' | del /F ' . basename($this->games->games_list[0]['local_repository']), 
 														$this->servers_data[$server_id], 
 														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 								);
-								
+
 								if ($this->game_types->game_types_list[0]['local_repository']) {
-									
+
 									$this->servers->command(
 															'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->game_types->game_types_list[0]['local_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' | del /F ' . basename($this->game_types->game_types_list[0]['local_repository']), 
 															$this->servers_data[$server_id], 
 															$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 									);
-								
+
 								}
-								
+
 								break;
-								
+
 							default:
-							
+
 								$this->servers->command(
 														'unzip ' . basename($this->games->games_list[0]['local_repository']) . ' && rm ' . basename($this->games->games_list[0]['local_repository']), 
 														$this->servers_data[$server_id], 
 														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 								);
-								
+
 								if ($this->game_types->game_types_list[0]['local_repository']) {
 									$this->servers->command(
 															'unzip ' . basename($this->game_types->game_types_list[0]['local_repository']) . ' && rm ' . basename($this->game_types->game_types_list[0]['local_repository']), 
@@ -722,18 +722,18 @@ class Cron extends MX_Controller {
 															$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 									);
 								}
-								
+
 								break;
 						}
-						
+
 					}
-					
+
 					$server_installed = TRUE;
-					
+
 					$server_data = array('installed' => '1');
 					$this->servers->edit_game_server($server_id, $server_data);
 				} 
-				
+
 				/* Установка с удаленного репозитория */
 				if ($type_install == 'remote_repository') {	
 
@@ -742,38 +742,180 @@ class Cron extends MX_Controller {
 						case 'windows':
 							$this->servers->command('mkdir ' . $this->servers_data[$server_id]['dir'], $this->servers_data[$server_id]);
 							break;
-							
+
 						default:
 							$this->servers->command('mkdir -p ' . $this->servers_data[$server_id]['dir'], $this->servers_data[$server_id]);
 							break;
 					}
-					
+
 					switch(strtolower($this->servers_data[$server_id]['os'])) {
 						case 'windows':
-							
+
 							/* Загрузка файла на сервер */
 							$this->servers->command(
 													'wget ' . $this->games->games_list[0]['remote_repository'], 
 													$this->servers_data[$server_id],
 													$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 							);
-						
+
 							$this->servers->command(
 													'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->games->games_list[0]['remote_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' | del /F ' . basename($this->games->games_list[0]['remote_repository']),
 													$this->servers_data[$server_id], 
 													$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 							);
-							
+
 							/* Загрузка файлов игровой модификации */
 							if ($this->game_types->game_types_list[0]['remote_repository']) {
-								
+
 								/* Загрузка файла на сервер */
 								$this->servers->command(
 														'wget ' . $this->game_types->game_types_list[0]['remote_repository'], 
 														$this->servers_data[$server_id],
 														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 								);
+
+								$this->servers->command(
+														'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->game_types->game_types_list[0]['remote_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' | del /F ' . basename($this->game_types->game_types_list[0]['remote_repository']), 
+														$this->servers_data[$server_id], 
+														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+								);
+							}
+
+							break;
+
+						default:
+
+							/* Загрузка файла на сервер */
+							$this->servers->command(
+													'wget ' . $this->games->games_list[0]['remote_repository'], 
+													$this->servers_data[$server_id],
+													$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+							);
+
+							$this->servers->command(
+													'unzip ' . basename($this->games->games_list[0]['remote_repository']) . ' && rm ' . basename($this->games->games_list[0]['remote_repository']), 
+													$this->servers_data[$server_id], 
+													$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+							);
+
+							if ($this->game_types->game_types_list[0]['remote_repository']) {
+
+								/* Загрузка файла на сервер */
+								$this->servers->command(
+														'wget ' . $this->game_types->game_types_list[0]['remote_repository'], 
+														$this->servers_data[$server_id],
+														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+								);
+
+								$this->servers->command(
+														'unzip ' . basename($this->game_types->game_types_list[0]['remote_repository']) . ' && rm ' . basename($this->game_types->game_types_list[0]['remote_repository']), 
+														$this->servers_data[$server_id], 
+														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+								);
+
+							}
+
+							break;
+					}
+
+					$server_installed = TRUE;
+
+					$server_data = array('installed' => '1');
+					$this->servers->edit_game_server($server_id, $server_data);
+				} 
+
+				/* Установка через SteamCMD */
+				if ($type_install == 'steamcmd') {
+
+
+					//steamcmd +login anonymous +force_install_dir ../czero +app_set_config 90 mod czero +app_update 90 validate +quit
+					$cmd['app'] = '';
+
+					if($this->servers_data[$server_id]['app_set_config']) {
+						$cmd['app'] .= '+app_set_config ' . $this->servers_data[$server_id]['app_set_config'] . ' ';
+					}
+
+					$cmd['app'] .= '+app_update ' . $this->servers_data[$server_id]['app_id'];
+
+					$cmd['login'] = '+login anonymous';
+					$cmd['install_dir'] = '+force_install_dir ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'];
+
+					switch(strtolower($this->servers_data[$server_id]['os'])) {
+						case 'windows':
+							$command = 'steamcmd.exe ' . $cmd['login'] . ' ' . $cmd['install_dir'] . ' ' . $cmd['app'] . ' validate +quit';
+							break;
+
+						default:
+							$command = './steamcmd.sh ' . $cmd['login'] . ' ' . $cmd['install_dir'] . ' ' . $cmd['app'] . ' validate +quit';
+							break;
+					}
+
+					$result = $this->servers->command($command, $this->servers_data[$server_id], $this->servers_data[$server_id]['steamcmd_path']);
+
+					$exec_command = array_pop($this->servers->commands);
+
+					if(strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' fully installed.') !== FALSE
+						OR strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' already up to date.') !== FALSE
+					) {
+						$server_data = array('installed' => '1');
+						$server_installed = TRUE;
+
+						$log_data['msg'] = 'Update server success';
+						$cron_result .= "Install server success\n";
+					} elseif(strpos($result, 'Failed to request AppInfo update') !== FALSE) {
+						/* Сервер не установлен до конца */
+						$server_data = array('installed' => '0');
+
+						$log_data['msg'] = 'Update server failed';
+						$cron_result .= "Install server failure\n";
+					} elseif(strpos($result, 'Error! App \'' . $this->games->games_list[0]['app_id'] . '\' state is') !== FALSE) {
+						/* Сервер не установлен до конца */
+						$server_data = array('installed' => '0');
+
+						$log_data['msg'] = 'Error. App state after update job';
+						$cron_result .= "Install server failure\n";
+					} else {
+						/* Неизвестная ошибка */
+						$server_data = array('installed' => '1');
+
+						$log_data['msg'] = 'Unknown error';
+						$command = array_pop($this->servers->commands);
+						$cron_result .= "Install server failure\n";
+					}
+					
+					// Загрузка игровой модификации
+					switch(strtolower($this->servers_data[$server_id]['os'])) {
+						case 'windows':
+							
+							if ($this->game_types->game_types_list[0]['local_repository']) {
 								
+								$connection = ftp_connect($this->servers_data[$server_id]['ftp_host']);
+								ftp_login($connection, $this->servers_data[$server_id]['ftp_login'], $this->servers_data[$server_id]['ftp_passwd']);
+								
+								ftp_put(
+										$connection, 
+										$this->servers_data[$server_id]['ftp_path'] . '/' . $this->servers_data[$server_id]['dir'] . '/' . basename($this->game_types->game_types_list[0]['local_repository']), 
+										$this->game_types->game_types_list[0]['local_repository'], 
+										FTP_BINARY
+								);
+								
+								ftp_close($connection);
+
+								$this->servers->command(
+														'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->game_types->game_types_list[0]['local_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' | del /F ' . basename($this->game_types->game_types_list[0]['local_repository']), 
+														$this->servers_data[$server_id], 
+														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+								);
+								
+							} elseif ($this->game_types->game_types_list[0]['remote_repository']) {
+
+								/* Загрузка файла на сервер */
+								$this->servers->command(
+														'wget ' . $this->game_types->game_types_list[0]['remote_repository'], 
+														$this->servers_data[$server_id],
+														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+								);
+
 								$this->servers->command(
 														'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->game_types->game_types_list[0]['remote_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' | del /F ' . basename($this->game_types->game_types_list[0]['remote_repository']), 
 														$this->servers_data[$server_id], 
@@ -782,31 +924,38 @@ class Cron extends MX_Controller {
 							}
 							
 							break;
-							
+						
 						default:
-							
-							/* Загрузка файла на сервер */
-							$this->servers->command(
-													'wget ' . $this->games->games_list[0]['remote_repository'], 
-													$this->servers_data[$server_id],
-													$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-							);
-							
-							$this->servers->command(
-													'unzip ' . basename($this->games->games_list[0]['remote_repository']) . ' && rm ' . basename($this->games->games_list[0]['remote_repository']), 
-													$this->servers_data[$server_id], 
-													$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-							);
-							
-							if ($this->game_types->game_types_list[0]['remote_repository']) {
+							if ($this->game_types->game_types_list[0]['local_repository'] 
+								&& is_readable($this->game_types->game_types_list[0]['local_repository'])) 
+							{
+								$connection = ftp_connect($this->servers_data[$server_id]['ftp_host']);
+								ftp_login($connection, $this->servers_data[$server_id]['ftp_login'], $this->servers_data[$server_id]['ftp_passwd']);
+
+								ftp_put(
+										$connection, 
+										$this->servers_data[$server_id]['ftp_path'] . '/' . $this->servers_data[$server_id]['dir'] . '/' . basename($this->game_types->game_types_list[0]['local_repository']), 
+										$this->game_types->game_types_list[0]['local_repository'], 
+										FTP_BINARY
+								);
 								
+								ftp_close($connection);
+								
+								$this->servers->command(
+														'unzip ' . basename($this->game_types->game_types_list[0]['remote_repository']) . ' && rm ' . basename($this->game_types->game_types_list[0]['remote_repository']), 
+														$this->servers_data[$server_id], 
+														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+								);
+								
+							} elseif ($this->game_types->game_types_list[0]['remote_repository']) {
+
 								/* Загрузка файла на сервер */
 								$this->servers->command(
 														'wget ' . $this->game_types->game_types_list[0]['remote_repository'], 
 														$this->servers_data[$server_id],
 														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 								);
-								
+
 								$this->servers->command(
 														'unzip ' . basename($this->game_types->game_types_list[0]['remote_repository']) . ' && rm ' . basename($this->game_types->game_types_list[0]['remote_repository']), 
 														$this->servers_data[$server_id], 
@@ -814,85 +963,21 @@ class Cron extends MX_Controller {
 								);
 
 							}
-							
 							break;
 					}
+						
+						
 
-					$server_installed = TRUE;
-					
-					$server_data = array('installed' => '1');
 					$this->servers->edit_game_server($server_id, $server_data);
-				} 
-				
-				/* Установка через SteamCMD */
-				if ($type_install == 'steamcmd') {
-					
-					
-					//steamcmd +login anonymous +force_install_dir ../czero +app_set_config 90 mod czero +app_update 90 validate +quit
-					$cmd['app'] = '';
-					
-					if($this->servers_data[$server_id]['app_set_config']) {
-						$cmd['app'] .= '+app_set_config ' . $this->servers_data[$server_id]['app_set_config'] . ' ';
-					}
-					
-					$cmd['app'] .= '+app_update ' . $this->servers_data[$server_id]['app_id'];
-					
-					$cmd['login'] = '+login anonymous';
-					$cmd['install_dir'] = '+force_install_dir ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'];
-					
-					switch(strtolower($this->servers_data[$server_id]['os'])) {
-						case 'windows':
-							$command = 'steamcmd.exe ' . $cmd['login'] . ' ' . $cmd['install_dir'] . ' ' . $cmd['app'] . ' validate +quit';
-							break;
-							
-						default:
-							$command = './steamcmd.sh ' . $cmd['login'] . ' ' . $cmd['install_dir'] . ' ' . $cmd['app'] . ' validate +quit';
-							break;
-					}
-					
-					$result = $this->servers->command($command, $this->servers_data[$server_id], $this->servers_data[$server_id]['steamcmd_path']);
-					
-					$exec_command = array_pop($this->servers->commands);
 
-					if(strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' fully installed.') !== FALSE
-						OR strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' already up to date.') !== FALSE
-					) {
-						$server_data = array('installed' => '1');
-						$server_installed = TRUE;
-						
-						$log_data['msg'] = 'Update server success';
-						$cron_result .= "Install server success\n";
-					} elseif(strpos($result, 'Failed to request AppInfo update') !== FALSE) {
-						/* Сервер не установлен до конца */
-						$server_data = array('installed' => '0');
-						
-						$log_data['msg'] = 'Update server failed';
-						$cron_result .= "Install server failure\n";
-					} elseif(strpos($result, 'Error! App \'' . $this->games->games_list[0]['app_id'] . '\' state is') !== FALSE) {
-						/* Сервер не установлен до конца */
-						$server_data = array('installed' => '0');
-						
-						$log_data['msg'] = 'Error. App state after update job';
-						$cron_result .= "Install server failure\n";
-					} else {
-						/* Неизвестная ошибка */
-						$server_data = array('installed' => '1');
-						
-						$log_data['msg'] = 'Unknown error';
-						$command = array_pop($this->servers->commands);
-						$cron_result .= "Install server failure\n";
-					}
-					
-					$this->servers->edit_game_server($server_id, $server_data);
-					
 					$log_data['type'] = 'server_command';
 					$log_data['command'] = 'install';
 					$log_data['server_id'] = $server_id;
 					$log_data['log_data'] = $result . "Command: ". $exec_command;
 					$this->panel_log->save_log($log_data);
-					
+
 				}
-				
+
 				/* 
 				 * Завершение установки.
 				 * Установка прав на директории, задание ркон пароля
@@ -906,17 +991,17 @@ class Cron extends MX_Controller {
 						$log_dirs 		= json_decode($this->servers_data[$server_id]['log_dirs'], TRUE);
 						$command = array();
 						$log = '';
-						
+
 						foreach($config_files as $file) {
 							$command[] = 'chmod 666 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $file['file'];
 							$log .= 'chmod 666 ' . './' . $this->servers_data[$server_id]['dir'] . '/' .  $file['file'] . "\n";
 						}
-						
+
 						foreach($content_dirs as $dir) {
 							$command[] = 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir']. '/' .  $dir['path'];
 							$log .= 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/'. $dir['path'] . "\n";
 						}
-						
+
 						foreach($log_dirs as $dir) {
 							$command[] = 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'];
 							$log .= 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . "\n";
@@ -924,32 +1009,32 @@ class Cron extends MX_Controller {
 
 						$log .= "\n---\nCHMOD\n" . $log . "\n" .  $this->servers->command($command, $this->servers_data[$server_id]);
 					}
-					
-					
+
+
 					/* Устанавливаем серверу rcon пароль */
 					$this->load->helper('safety');
 					$new_rcon = generate_code(8);
 					$this->servers->change_rcon($new_rcon, $this->servers_data[$server_id]);
 					$server_data['rcon'] = $this->encrypt->encode($new_rcon);
-					
+
 				} else {
 					$cron_result .= "";
 				}
 
 				$i ++;
 				continue;
-				
+
 			}
-			
+
 			$this->servers->get_server_settings($server_id);
-			
+
 			/*==================================================*/
 			/*     Перезапуск сервера в случае падения          */
 			/*==================================================*/
 
 			/* В настройках указано, что сервер перезапускать не нужно */
 			if($this->servers->server_settings['SERVER_AUTOSTART']) {
-				
+
 				/* Получение id игры в массиве */
 				$a = 0;
 				$count = count($this->games->games_list);
@@ -966,33 +1051,33 @@ class Cron extends MX_Controller {
 
 				if(!$status) {
 					/* Смотрим данные предыдущих проверок, если сервер был в оффе, то запускаем его */
-					
+
 					/* Получение данных проверки крона из логов */
 					$where = array('date >=' => $time - 780,  'type' => 'cron_check', 'command' => 'server_status', 'server_id' => $server_id, 'log_data' => 'Server is down');
 					$logs = $this->panel_log->get_log($where); // Логи сервера в админпанели
-					
+
 					$response = FALSE;
 
 					if(count($logs) >= 1) {
 						/* При последней проверке сервер был оффлайн, запускаем его*/
 						$response = $this->servers->start($this->servers_data[$server_id]);
-						
+
 						$log_data['command'] = 'start';
 						$log_data['msg'] = 'Start server success';
-						
+
 						if(strpos($response, 'Server is already running') !== FALSE) {
 							/* Сервер запущен, видимо завис */
 							$response = $this->servers->restart($this->servers_data[$server_id]);
 							$log_data['command'] = 'restart';
-							
+
 							if(strpos($response, 'Server restarted') !== FALSE) {
 								$log_data['msg'] = 'Restart server success';	
 							}
-							
+
 						}
 					}
-					
-					
+
+
 					if($response) {
 						// Записываем лог запуска
 						$log_data['type'] = 'server_command';
@@ -1000,27 +1085,27 @@ class Cron extends MX_Controller {
 						$log_data['log_data'] = $response;
 						$this->panel_log->save_log($log_data);
 					}
-					
-					
+
+
 					// Записываем лог проверки
 					$log_data['type'] = 'cron_check';
 					$log_data['command'] = 'server_status';
 					$log_data['server_id'] = $server_id;
 					$log_data['log_data'] = 'Server is down';
 					$this->panel_log->save_log($log_data);
-					
-					
+
+
 				}
 			}
-			
+
 			/*==================================================*/
 			/*     Смена rcon пароля					         */
 			/*==================================================*/
-			
+
 			if($this->servers->server_settings['SERVER_RCON_AUTOCHANGE']) {
-				
+
 				if($this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['server_port'], $this->servers_data[$server_id]['engine'], $this->servers_data[$server_id]['engine_version'])) {
-					
+
 					$this->rcon->set_variables(
 							$this->servers_data[$server_id]['server_ip'], 
 							$this->servers_data[$server_id]['server_port'],
@@ -1028,31 +1113,31 @@ class Cron extends MX_Controller {
 							$this->servers_data[$server_id]['engine'],
 							$this->servers_data[$server_id]['engine_version']
 					);
-					
+
 					$rcon_connect = $this->rcon->connect();
-					
+
 				} else {
 					$rcon_connect = FALSE;
 				}
-						
+
 				if($rcon_connect) {
 					$rcon_string = $this->rcon->command('status');
-					
+
 					$rcon_string = trim($rcon_string);
-					
+
 					if(strpos($rcon_string, 'Bad rcon_password.') !== FALSE) {
 
 						$this->load->helper('safety');
-						
+
 						$new_rcon = generate_code(8);
-						
+
 						$this->servers->server_data = $this->servers_data[$server_id];
 						$this->servers->change_rcon($new_rcon);
-						
+
 						// Меняем пароль в базе
 						$sql_data['rcon'] = $this->encrypt->encode($new_rcon);
 						$this->servers->edit_game_server($server_id, $sql_data);
-						
+
 						// Сохраняем логи
 						$log_data['type'] = 'server_rcon';
 						$log_data['command'] = 'rcon_password';
@@ -1060,11 +1145,11 @@ class Cron extends MX_Controller {
 						$log_data['msg'] = 'Change rcon password';
 						$log_data['log_data'] = 'Rcon command: rcon_password ' . $new_rcon . "\n";
 						$this->panel_log->save_log($log_data);
-						
-						
+
+
 						// Перезагружаем сервер
 						$response = $this->servers->restart($this->servers_data[$server_id]);
-						
+
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
 						$log_data['command'] = 'restart';
@@ -1072,43 +1157,47 @@ class Cron extends MX_Controller {
 						$log_data['msg'] = 'Restart server success';
 						$log_data['log_data'] = $response;
 						$this->panel_log->save_log($log_data);
-						
+
 						$cron_stats['success'] ++;	
 					} else {
 						$cron_stats['skipped'] ++;
 					}
-					
-					
+
+
 				} else {
 					// Не удалось соединиться с сервером, либо он выключен
 					$cron_stats['failed'] ++;
 				}
-				
+
 			} else {
 				$cron_stats['skipped'] ++;
 			}
 
 			$i ++;
 		}
-		
+
 		/*==================================================*/
 		/*    	СТАТИСТИКА ВЫДЕЛЕННОГО СЕРВЕРА  			*/
 		/*==================================================*/
-		
+
 		$cron_result .= "== DS Stats ==\n";
 		$this->dedicated_servers->get_ds_list();
-		
+
 		foreach($this->dedicated_servers->ds_list as $ds) {
 			
-			$stats = $this->_stats_processing($ds);
+			if (!$ds['ssh_host'] && !$ds['telnet_host']) {
+				continue;
+			}
 			
+			$stats = $this->_stats_processing($ds);
+
 			if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
 				$cron_result .= 'Stats server #' . $ds['id'] . ' successful' . "\n";
 			} else {
 				$cron_result .= 'Stats server #' . $ds['id'] . ' failed'. "\n";
 				continue;
 			}
-			
+
 			/* 
 			 * Обновляем статистику
 			 * Добавляем новое значение в существующий массив
@@ -1116,34 +1205,34 @@ class Cron extends MX_Controller {
 			 * cpu_usage - использование cpu (%)
 			 * memory_usage - использование памяти (%)
 			*/
-			
+
 			$stats_array = json_decode($ds['stats'], TRUE);
-			
+
 			$stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
 			$data['stats'] = json_encode($stats_array);
 			$this->dedicated_servers->edit_dedicated_server($ds['id'], $data);
 		}
-		
+
 		// Статистика для локального сервера
 		$ds = array('os' => $this->config->config['local_os'], 'control_protocol' => 'local'); 
 		$stats = $this->_stats_processing($ds);
-		
+
 		if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
 
 			$stats_array = json_decode(@file_get_contents(APPPATH . 'cache/local_server_stats.json', TRUE));
 			$stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
 			$data['stats'] = json_encode($stats_array);
 			file_put_contents(APPPATH . 'cache/local_server_stats.json', $data['stats']);
-			
+
 			$cron_result .= 'Local server stats successful' . "\n";
-			
+
 		} else {
 			$cron_result .= 'Local server stats failed'. "\n";
 		}
 
 		$cron_result .= "Cron end\n";
 		$this->output->append_output($cron_result);
-		
+
 		$log_data['type'] = 'cron';
 		$log_data['command'] = 'cron work';
 		$log_data['msg'] = 'Cron end working';
