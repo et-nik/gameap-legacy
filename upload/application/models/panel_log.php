@@ -61,15 +61,15 @@ class Panel_log extends CI_Model {
      * 
      *
     */
-	function get_log($where, $limit = 10)
+	function get_log($where = array(), $limit = 10, $offset = FALSE)
 	{
 		
 		$this->db->order_by('date', 'desc'); 
 		
 		if(is_array($where)){
-			$query = $this->db->get_where('logs', $where, $limit);
+			$query = $this->db->get_where('logs', $where, $limit, $offset);
 		}else{
-			$query = $this->db->get('logs');
+			$query = $this->db->get('logs', $limit, $offset);
 		}
 
 		if($query->num_rows > 0){
@@ -80,6 +80,15 @@ class Panel_log extends CI_Model {
 		}else{
 			return NULL;
 		}
+	}
+	
+	//-----------------------------------------------------------
+	
+	/**
+     * Получает количество логов в базе
+    */
+	function get_count_all_log() {
+		return $this->db->count_all('logs');
 	}
 	
 }

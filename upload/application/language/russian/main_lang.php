@@ -137,3 +137,9 @@ $lang['servers_privileges_task_manage']		= 'Управление задания�
 $lang['servers_privileges_upload_contents']	= 'Загрузка файлов на сервер';
 $lang['servers_privileges_change_config']	= 'Изменение конфигурационных файлов';
 $lang['servers_privileges_log_view']		= 'Просмотр файлов логов';
+
+/* -- 0.8 -- */
+
+/* Menu */
+$lang['menu_servers_logs']						= 'Серверные логи';
+$lang['menu_panel_logs']						= 'Логи GameAP';

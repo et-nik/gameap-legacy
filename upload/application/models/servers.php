@@ -1339,9 +1339,11 @@ class Servers extends CI_Model {
 			
 			if (!ftp_put($connection, $remote_file, $file, FTP_BINARY)) {
 				$this->errors = 'Ошибка записи файла';
+				ftp_close($connection);
 				return FALSE;
 			} else {
 				@ftp_chmod($connection, $mode, $remote_file);
+				ftp_close($connection);
 				return TRUE;
 			}
 		
@@ -1349,7 +1351,6 @@ class Servers extends CI_Model {
 			$this->errors = 'Ошибка авторизации FTP';
 			return FALSE;
 		}
-		
 	}
 	
 	// ----------------------------------------------------------------

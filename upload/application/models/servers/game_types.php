@@ -116,8 +116,11 @@ class Game_types extends CI_Model {
 				
 				if($script_param = TRUE) {
 					
-					$tpl_data[$num]['execfile_linux'] 	= $game_types['execfile_linux'];
-					$tpl_data[$num]['execfile_windows'] = $game_types['execfile_windows'];
+					$tpl_data[$num]['execfile_linux'] 		= $game_types['execfile_linux'];
+					$tpl_data[$num]['execfile_windows'] 	= $game_types['execfile_windows'];
+					
+					$tpl_data[$num]['local_repository']		= $game_types['local_repository'];
+					$tpl_data[$num]['remote_repository']	= $game_types['remote_repository'];
 					
 					// Заменяем двойные кавычки на html символы
 					$tpl_data[$num]['script_start'] 	= str_replace('"', '&quot;', $game_types['script_start'] );

@@ -116,8 +116,11 @@ class Games extends CI_Model {
 				$tpl_data[$num]['game_engine'] 			= $games['engine'];
 				$tpl_data[$num]['game_engine_version'] 	= $games['engine_version'];
 				
-				$tpl_data[$num]['app_id']			= $games['app_id'];
-				$tpl_data[$num]['app_set_config']	= $games['app_set_config'];
+				$tpl_data[$num]['app_id']				= $games['app_id'];
+				$tpl_data[$num]['app_set_config']		= $games['app_set_config'];
+				
+				$tpl_data[$num]['local_repository']		= $games['local_repository'];
+				$tpl_data[$num]['remote_repository']	= $games['remote_repository'];
 				
 			}
 			

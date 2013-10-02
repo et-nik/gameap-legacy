@@ -552,14 +552,17 @@ class Adm_servers extends CI_Controller {
 					
 					$tpl_file_add = 'adm_servers/games_add.html';
 					
-					$this->form_validation->set_rules('code', 'код', 'trim|required|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('start_code', 'старт код', 'trim|required|max_length[32]|min_length[2]|xss_clean');
-					$this->form_validation->set_rules('name', 'название игры', 'trim|required|max_length[32]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('engine', 'движок', 'trim|required|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('engine_version', 'версия движка', 'trim|numeric|max_length[11]|xss_clean');
+					$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[32]|min_length[3]|xss_clean');
+					$this->form_validation->set_rules('code', lang('adm_servers_game_code'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
+					$this->form_validation->set_rules('start_code', lang('adm_servers_game_start_code'), 'trim|required|max_length[32]|min_length[2]|xss_clean');
+					$this->form_validation->set_rules('engine', lang('adm_servers_engine'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
+					$this->form_validation->set_rules('engine_version', lang('adm_servers_engine_version'), 'trim|numeric|max_length[11]|xss_clean');
 					
 					$this->form_validation->set_rules('app_id', 'app_id', 'trim|integer|max_length[32]|xss_clean');
 					$this->form_validation->set_rules('app_set_config', 'app_set_config', 'trim|max_length[32]|xss_clean');
+					
+					$this->form_validation->set_rules('local_repository', lang('adm_servers_local_repository'), 'trim|xss_clean');
+					$this->form_validation->set_rules('remote_repository', lang('adm_servers_remote_repository'), 'trim|xss_clean');
 
 					break;
 				
@@ -788,6 +791,9 @@ class Adm_servers extends CI_Controller {
 						
 						$sql_data['app_id'] 		= $this->input->post('app_id');
 						$sql_data['app_set_config'] = $this->input->post('app_set_config');
+						
+						$sql_data['local_repository'] 	= $this->input->post('local_repository');
+						$sql_data['remote_repository'] 	= $this->input->post('remote_repository');
 						
 						/* Убираем кавычки из app_set_config */
 						$sql_data['app_set_config'] = str_replace('\'', '', $sql_data['app_set_config']);
@@ -1420,15 +1426,18 @@ class Adm_servers extends CI_Controller {
 				$local_tpl_data = $tpl_list[0];
 					
 				/* Правила для проверки формы */
-				$this->form_validation->set_rules('name', 'название', 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('code', 'код игры', 'trim|required|max_length[32]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('start_code', 'старт код', 'trim|required|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('code', lang('adm_servers_game_code'), 'trim|required|max_length[32]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('start_code', lang('adm_servers_game_start_code'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
 					
-				$this->form_validation->set_rules('engine', 'движок', 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('engine_version', 'версия движка', 'trim|required|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('engine', lang('adm_servers_engine'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('engine_version', lang('adm_servers_engine_version'), 'trim|required|max_length[64]|xss_clean');
 				
 				$this->form_validation->set_rules('app_id', 'app_id', 'trim|integer|max_length[32]|xss_clean');
 				$this->form_validation->set_rules('app_set_config', 'app_set_config', 'trim|max_length[32]|xss_clean');
+				
+				$this->form_validation->set_rules('local_repository', lang('adm_servers_local_repository'), 'trim|xss_clean');
+				$this->form_validation->set_rules('remote_repository', lang('adm_servers_remote_repository'), 'trim|xss_clean');
 			
 				break;
 				
@@ -1542,18 +1551,18 @@ class Adm_servers extends CI_Controller {
 				*/
 				
 				$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('game_code', 'код игры', 'trim|required|max_length[32]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('game_code', lang('adm_servers_game_code'), 'trim|required|max_length[32]|min_length[3]|xss_clean');
 				
 				/* Параметры запуска */
-				$this->form_validation->set_rules('execfile_linux', 'исполняемый файл linux', 'trim|max_length[32]|xss_clean');
-				$this->form_validation->set_rules('execfile_windows', 'исполняемый файл windows', 'trim|max_length[32]|xss_clean');
+				$this->form_validation->set_rules('execfile_linux', lang('adm_servers_linux_execute'), 'trim|max_length[32]|xss_clean');
+				$this->form_validation->set_rules('execfile_windows', lang('adm_servers_windows_execute'), 'trim|max_length[32]|xss_clean');
 				
-				$this->form_validation->set_rules('script_start', 'команда запуска', 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_stop', 'команда остановки', 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_restart', 'команда перезагрузки', 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_status', 'команда проверки статуса', 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_update', 'команда обновления', 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_get_console', 'команда получения консоли', 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('script_start', lang('adm_servers_command_start'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('script_stop', lang('adm_servers_command_stop'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('script_restart', lang('adm_servers_command_restart'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('script_status', lang('adm_servers_command_status'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('script_update', lang('adm_servers_command_update'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('script_get_console', lang('adm_servers_command_get_console'), 'trim|max_length[256]|xss_clean');
 				
 				/* Сведения о cfg файлах */
 				$this->form_validation->set_rules('cfg_desc[]', 'описание конф. файла', 'trim|max_length[64]|xss_clean');
@@ -1586,6 +1595,10 @@ class Adm_servers extends CI_Controller {
 				$this->form_validation->set_rules('chmap_cmd', 		lang('adm_servers_chmap_cmd'), 'trim|max_length[64]|xss_clean');
 				$this->form_validation->set_rules('sendmsg_cmd', 	lang('adm_servers_sendmsg_cmd'), 'trim|max_length[64]|xss_clean');
 				$this->form_validation->set_rules('passwd_cmd', 	lang('adm_servers_passwd_cmd'), 'trim|max_length[64]|xss_clean');
+				
+				/* Репозитории */
+				$this->form_validation->set_rules('local_repository', lang('adm_servers_local_repository'), 'trim|xss_clean');
+				$this->form_validation->set_rules('remote_repository', lang('adm_servers_remote_repository'), 'trim|xss_clean');
 				
 				break;
 			default:
@@ -1761,6 +1774,9 @@ class Adm_servers extends CI_Controller {
 					$sql_data['app_id'] 		= $this->input->post('app_id');
 					$sql_data['app_set_config'] = $this->input->post('app_set_config');
 					
+					$sql_data['local_repository'] 	= $this->input->post('local_repository');
+					$sql_data['remote_repository'] 	= $this->input->post('remote_repository');
+					
 					/* Убираем кавычки из app_set_config */
 					$sql_data['app_set_config'] = str_replace('\'', '', $sql_data['app_set_config']);
 					$sql_data['app_set_config'] = str_replace('"', '', $sql_data['app_set_config']);
@@ -1803,6 +1819,9 @@ class Adm_servers extends CI_Controller {
 					$sql_data['chmap_cmd'] 			= $this->input->post('chmap_cmd');
 					$sql_data['sendmsg_cmd'] 		= $this->input->post('sendmsg_cmd');
 					$sql_data['passwd_cmd'] 		= $this->input->post('passwd_cmd');
+					
+					$sql_data['local_repository'] 	= $this->input->post('local_repository');
+					$sql_data['remote_repository'] 	= $this->input->post('remote_repository');
 					
 					/*
 					 * ----------------------------
@@ -2141,58 +2160,13 @@ class Adm_servers extends CI_Controller {
 				return FALSE;
 			}
 			
-			/* Закоментированный код для установки без помощи 
-			 * cron модуля */
-			 
-			/*
-			 * 
-			if($new_gs['ds_id']) {
-				$new_gs['os'] = $this->dedicated_servers->ds_list[$new_gs['ds_id']]['os'];
-				
-				// Данные для игрового сервера из машины
-				$new_gs['os'] = $this->server_ds_data['os'];
-				
-				$new_gs['local_server'] = 0;
-				
-				$new_gs['control_protocol'] = $this->dedicated_servers->ds_list[$new_gs['ds_id']]['control_protocol'];
 
-				$new_gs['ssh_host'] 	= $this->dedicated_servers->ds_list[$new_gs['ds_id']]['ssh_host'];
-				$new_gs['ssh_login'] 	= $this->dedicated_servers->ds_list[$new_gs['ds_id']]['ssh_login'];
-				$new_gs['ssh_password'] = $this->dedicated_servers->ds_list[$new_gs['ds_id']]['ssh_password'];
-				$new_gs['ssh_passwd'] 	= $this->dedicated_servers->ds_list[$new_gs['ds_id']]['ssh_password'];
-				$new_gs['ssh_path'] 	= $this->dedicated_servers->ds_list[$new_gs['ds_id']]['ssh_path'];
-				
-				$new_gs['telnet_host'] 		= $this->dedicated_servers->ds_list[$new_gs['ds_id']]['telnet_host'];
-				$new_gs['telnet_login'] 	= $this->dedicated_servers->ds_list[$new_gs['ds_id']]['telnet_login'];
-				$new_gs['telnet_password'] 	= $this->dedicated_servers->ds_list[$new_gs['ds_id']]['telnet_password'];
-				$new_gs['telnet_path'] 		= $this->dedicated_servers->ds_list[$new_gs['ds_id']]['telnet_path'];
-				
-			} else {
-				// Устанавливаем на локальном сервере
-				$new_gs['os'] 			= $this->config->config['local_os'];
-				$new_gs['script_path'] 	= $this->config->config['local_script_path'];
-				$new_gs['local_path'] 	= $this->config->config['local_script_path'];
-				$new_gs['local_server'] = 1;
-			}
-			*/
-			
 			if ($this->games->get_games_list(array('code'=> $new_gs['game']), 1)) {
 
-				if($this->games->games_list[0]['app_id']) {
-					/* Закоментированный код для установки без помощи 
-					* cron модуля */
-					
-					//steamcmd +login anonymous +force_install_dir ../czero +app_set_config 90 mod czero +app_update 90 validate +quit
-					//$cmd['app'] = '';
-					
-					//($this->games->games_list[0]['app_set_config']) {
-					//	$cmd['app'] .= '+app_set_config "' . $this->games->games_list[0]['app_set_config'] . '" ';
-					//}
-					
-					//$cmd['app'] .= '+app_update ' . $this->games->games_list[0]['app_id'];
-				} else {
+				if(!$this->games->games_list[0]['app_id'] && !$this->games->games_list[0]['local_repository'] && !$this->games->games_list[0]['remote_repository']) {
 					/*
-					 * Для игры не задан или не существует парамера app_update для SteamCMD
+					 * Для игры не задан или не существует парамера app_update для SteamCMD,
+					 * нет ссылок на локальный и удаленные репозитории
 					*/
 					$this->_show_message(lang('adm_servers_no_steamcmd_data'));
 					return FALSE;
@@ -2205,56 +2179,6 @@ class Adm_servers extends CI_Controller {
 				return FALSE;
 			}
 			
-			//~ /* 
-			 //~ * Заданы ли данные SSH у DS сервера 
-			 //~ * 
-			 //~ * Если сервер является удаленным, используется telnet
-			 //~ * и заданы хост, логин и пароль то все впорядке,
-			 //~ * иначе отправляем пользователю сообщение
-			 //~ * 
-			//~ */
-			//~ if($this->servers->server_data['ds_id'] 
-			//~ && $this->servers->server_data['control_protocol'] == 'ssh'
-			//~ && (!$this->servers->server_data['ssh_host']
-				//~ OR !$this->servers->server_data['ssh_login']
-				//~ OR !$this->servers->server_data['ssh_password']
-				//~ )
-			//~ ){
-				//~ $this->_show_message(lang('server_command_ssh_not_set'));
-				//~ return FALSE;	
-			//~ }
-			//~ 
-			//~ /*
-			 //~ * Есть ли модуль SSH
-			 //~ */
-			//~ if($this->servers->server_data['ds_id'] 
-			//~ && $this->servers->server_data['control_protocol'] == 'ssh'
-			//~ && (!in_array('ssh2', $ext_list))
-			//~ ){
-				//~ $this->_show_message(lang('server_command_ssh_not_module'));
-				//~ return FALSE;	
-			//~ }
-			//~ 
-			//~ 
-			//~ /* 
-			 //~ * Заданы ли данные TELNET у DS сервера 
-			 //~ * 
-			 //~ * Если сервер является удаленным, используется telnet
-			 //~ * и заданы хост, логин и пароль то все впорядке,
-			 //~ * иначе отправляем пользователю сообщение
-			 //~ * 
-			//~ */
-			//~ 
-			//~ if($this->servers->server_data['ds_id'] 
-			//~ && $this->servers->server_data['control_protocol'] == 'telnet'
-			//~ && (!$this->servers->server_data['telnet_host']
-				//~ OR !$this->servers->server_data['telnet_login']
-				//~ OR !$this->servers->server_data['telnet_password']
-				//~ )
-			//~ ){
-				//~ $this->_show_message(lang('server_command_telnet_not_set'));
-				//~ return FALSE;	
-			//~ }
 			
 			// Добавление сервера
 			if($this->servers->add_game_server($new_gs)) {
@@ -2264,28 +2188,7 @@ class Adm_servers extends CI_Controller {
 				$this->_show_message(lang('adm_servers_add_game_failed'));
 				return FALSE;
 			}
-			
-			/* Закоментированный код для установки без помощи 
-			 * cron модуля */
-			/*
-			$cmd['login'] = '+login anonymous';
-			$cmd['install_dir'] = '+force_install_dir ' . $new_gs['dir'];
-			
-			switch($new_gs['os']){
-			case 'Windows':
-				$command = '&& ./steamcmd.exe ' . $cmd['login'] . ' ' . $cmd['install_dir'] . ' ' . $cmd['app'] . ' validate +quit';
-				$result = $this->servers->command_windows($command, $new_gs);
-				break;
-			default:
-				$command = '&& ./steamcmd.sh ' . $cmd['login'] . ' ' . $cmd['install_dir'] . ' ' . $cmd['app'] . ' validate +quit';
-				$result = $this->servers->command($command, $new_gs);
-				break;
-			}
-			* 
-			*/
-			
-			
-			//echo $result . "\n";
+
 		}
 		
 		$this->parser->parse('main.html', $this->tpl_data);

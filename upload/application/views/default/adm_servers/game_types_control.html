@@ -30,6 +30,7 @@
 	<li><a href="#aliases" onclick="return false;">{lang_adm_servers_aliases}</a></li>
 	<li><a href="#start_parameters" onclick="return false;">{lang_adm_servers_start_parameters}</a></li>
 	<li><a href="#rcon_control_parameters" onclick="return false;">{lang_adm_servers_rcon_commands}</a></li>
+	<li><a href="#repositories" onclick="return false;">{lang_adm_servers_repository_parameters}</a></li>
 </ul>
 
 <div id="config_files" class="tab_content">
@@ -255,6 +256,28 @@
 				<td><input style="width: 50%" type="text" name="passwd_cmd" value="{passwd_cmd}" /></td>
 			</tr>
 
+		</table>
+	</div>
+	
+	<div id="repositories" class="tab_content">
+		<table class="zebra" width="100%">
+			
+			<tbody>
+				<tr>
+					<td colspan='2'><p class="hr">{lang_adm_servers_repository_parameters}</p></td>
+				</tr>
+			</tbody>
+			
+			<tr>
+				<td>{lang_adm_servers_local_repository}:<br /><span class="description">[ {lang_adm_servers_local_repository_gtdesc} ] </span></td>
+				<td><input size="50" type="text" name="local_repository" value="{local_repository}" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_remote_repository}:<br /><span class="description">[ {lang_adm_servers_remote_repository_gtdesc} ] </span></td>
+				<td><input size="50" type="text" name="remote_repository" value="{remote_repository}" /></td>
+			</tr>
+			
 		</table>
 	</div>
 
