@@ -57,12 +57,6 @@ class Servers extends CI_Model {
 			$this->errors = "Dir " . $path . " not found";
 			return FALSE;
 		}
-		
-		if (!is_executable($path)) {
-			/* Нет прав на выполнение */
-			$this->errors = "Dir " . $path . "not executable";
-			return FALSE;
-		}
 
 		return TRUE;
 		

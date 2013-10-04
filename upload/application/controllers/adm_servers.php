@@ -926,7 +926,7 @@ class Adm_servers extends CI_Controller {
 							switch($this->servers->server_data['os']) {
 							case 'Windows':
 								$command = 'rmdir /S ' . $this->servers->server_data['dir'];
-								$result = $this->servers->command_windows($command, $this->servers->server_data);
+								$result = $this->servers->command($command, $this->servers->server_data);
 								break;
 							default:
 								// Linux
