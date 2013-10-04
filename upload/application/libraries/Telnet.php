@@ -53,7 +53,7 @@ class Telnet {
 		$this->port = $port;
 		
 		$this->_connection = fsockopen($this->ip, $this->port);
-		socket_set_timeout($this->_connection, 5);
+		socket_set_timeout($this->_connection, 7);
 
 		if (!$this->_connection) {
 			return FALSE;

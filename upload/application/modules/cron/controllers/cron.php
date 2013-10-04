@@ -80,6 +80,229 @@ class Cron extends MX_Controller {
 
 		return $this->servers_data[$server_id];
 	}
+	
+	// ----------------------------------------------------------------
+    
+    /**
+     * Создает директорию на выделенном сервере
+     * 
+     * @param string
+     * @param integer
+     * @param bool
+     * @param string
+     * @return bool
+    */
+	function _mkdir($server_id)
+	{
+		$commands = array();
+		
+		switch(strtolower($this->servers_data[$server_id]['os'])) {
+			case 'windows':
+				$commands[] = 'mkdir ' . $this->servers_data[$server_id]['dir'];
+				break;
+
+			default:
+				$commands[] = 'mkdir -p ' . $this->servers_data[$server_id]['dir'];
+				$commands[] = 'chmod 777 ' . $this->servers_data[$server_id]['dir'];
+				
+				break;
+		}
+			
+		if ($this->servers->command($commands, $this->servers_data[$server_id])) {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+	
+	// ----------------------------------------------------------------
+    
+    /**
+     * Загружает файлы на удаленный сервер
+     * 
+     * @param string
+     * @param integer
+     * @param bool
+     * @param string
+     * @return bool
+    */
+	function _wget_files($server_id, $link, $rep_type = 'local')
+	{
+		$commands = array();
+
+		if ($rep_type == 'local') {
+			
+			/* Загружаем данные на сервер по FTP */
+			if ($this->servers_data[$server_id]['control_protocol'] != 'local') {
+				$connection = @ftp_connect($this->servers_data[$server_id]['ftp_host']);
+				
+				if (!$connection) {
+					return FALSE;
+				}
+				
+				if (!ftp_login($connection, $this->servers_data[$server_id]['ftp_login'], $this->servers_data[$server_id]['ftp_passwd'])) {
+					return FALSE;
+				}
+				
+				/* Загружаем файл на удаленный сервер */
+				$ftp_put_result = ftp_put(
+					$connection, 
+					$this->servers_data[$server_id]['ftp_path'] . '/' . $this->servers_data[$server_id]['dir'] . '/' . basename($link), 
+					$link, 
+					FTP_BINARY
+				);
+				
+				if (!$ftp_put_result) {
+					ftp_close($connection);
+					return FALSE;
+				}
+				
+				ftp_close($connection);
+				
+			} else {
+				/* Установка на локальный сервер */
+				$commands = array();
+				$commands[] = 'cp ' . $link . ' ' . $this->config->config['local_script_path'] . '/' .$this->servers_data[$server_id]['dir'];
+			}
+			
+			$this->servers->command($commands, $this->servers_data[$server_id], $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']);
+			
+			return TRUE;
+
+		} elseif ($rep_type == 'remote') {
+			
+			switch (strtolower($this->servers_data[$server_id]['os'])) {
+				case 'windows':
+					$command = 'wget ' . $link;
+					break;
+
+				default:
+					$command = 'wget ' . $link;
+					break;
+			}
+			
+			$result = $this->servers->command(
+									$command,
+									$this->servers_data[$server_id], 
+									$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+			);
+			
+			//~ if ($result) {
+				//~ return TRUE;
+			//~ }
+			return TRUE;
+
+		} else {
+			return FALSE;
+		}
+
+	}
+	
+	// ----------------------------------------------------------------
+    
+    /**
+     * Распаковка архивов на выделенном сервере
+     * 
+     * @param integer
+     * @param string
+     * @return bool
+    */
+	function _unpack_files($server_id, $pack_file)
+	{
+		switch (strtolower($this->servers_data[$server_id]['os'])) {
+			case 'windows':
+				$commands[] = '"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($pack_file) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($pack_file);
+				break;
+
+			default:
+				$commands[] = 'unzip ' . basename($pack_file) . ' && rm ' . basename($pack_file);
+				break;
+		}
+
+		$result = $this->servers->command(
+									$commands,
+									$this->servers_data[$server_id], 
+									$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+		);
+			
+		if ($result) {
+			return TRUE;
+		}
+	}
+
+	// ----------------------------------------------------------------
+    
+    /**
+     * Установка игрового сервера с помощью SteamCMD
+    */
+	function _install_from_steamcmd($server_id)
+	{
+		/* Установка через SteamCMD */
+
+		//steamcmd +login anonymous +force_install_dir ../czero +app_set_config 90 mod czero +app_update 90 validate +quit
+		$cmd['app'] = '';
+
+		if($this->servers_data[$server_id]['app_set_config']) {
+			$cmd['app'] .= '+app_set_config ' . $this->servers_data[$server_id]['app_set_config'] . ' ';
+		}
+
+		$cmd['app'] .= '+app_update ' . $this->servers_data[$server_id]['app_id'];
+
+		$cmd['login'] = '+login anonymous';
+		$cmd['install_dir'] = '+force_install_dir ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'];
+
+		switch(strtolower($this->servers_data[$server_id]['os'])) {
+			case 'windows':
+				$command = 'steamcmd.exe ' . $cmd['login'] . ' ' . $cmd['install_dir'] . ' ' . $cmd['app'] . ' validate +quit';
+				break;
+
+			default:
+				$command = './steamcmd.sh ' . $cmd['login'] . ' ' . $cmd['install_dir'] . ' ' . $cmd['app'] . ' validate +quit';
+				break;
+		}
+
+		$result = $this->servers->command($command, $this->servers_data[$server_id], $this->servers_data[$server_id]['steamcmd_path']);
+
+		$exec_command = array_pop($this->servers->commands);
+
+		if(strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' fully installed.') !== FALSE
+			OR strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' already up to date.') !== FALSE
+		) {
+			$server_data = array('installed' => '1');
+			$server_installed = TRUE;
+
+			$log_data['msg'] = 'Update server success';
+			$cron_result .= "Install server success\n";
+			
+			return TRUE;
+			
+		} elseif(strpos($result, 'Failed to request AppInfo update') !== FALSE) {
+			/* Сервер не установлен до конца */
+			$server_data = array('installed' => '0');
+
+			$log_data['msg'] = 'Update server failed';
+			$cron_result .= "Install server failure\n";
+			
+			return FALSE;
+		} elseif(strpos($result, 'Error! App \'' . $this->games->games_list[0]['app_id'] . '\' state is') !== FALSE) {
+			/* Сервер не установлен до конца */
+			$server_data = array('installed' => '0');
+
+			$log_data['msg'] = 'Error. App state after update job';
+			$cron_result .= "Install server failure\n";
+			
+			return FALSE;
+		} else {
+			/* Неизвестная ошибка */
+			$server_data = array('installed' => '1');
+
+			$log_data['msg'] = 'Unknown error';
+			$command = array_pop($this->servers->commands);
+			$cron_result .= "Install server failure\n";
+			
+			return FALSE;
+		}
+	}
 
 	// ----------------------------------------------------------------
     
@@ -575,7 +798,7 @@ class Cron extends MX_Controller {
 			/*     Установка сервера					        */
 			/*==================================================*/
 
-			if($this->servers_data[$server_id]['installed'] == '0'
+			if ($this->servers_data[$server_id]['installed'] == '0'
 				OR $this->servers_data[$server_id]['installed'] == '3'
 			) {
 				// Сервер не установлен
@@ -590,392 +813,35 @@ class Cron extends MX_Controller {
 				*/
 
 				$this->servers->edit_game_server($server_id, array('installed' => '2'));
-
-				/* Выбор типа установки сервера (из локального репозитория, с удаленного репозитория, через steamcmd */
+				
+				$this->_mkdir($server_id);
+				
 				if ($this->games->games_list[0]['local_repository']) {
-					$type_install = 'local_repository';
+					/* Установка из локального репозитория */
+					if ($this->_wget_files($server_id, $this->games->games_list[0]['local_repository'], 'local')) {
+						$this->_unpack_files($server_id, $this->games->games_list[0]['local_repository']);
+						$server_installed = TRUE;
+					}
+					
 				} elseif ($this->games->games_list[0]['remote_repository']) {
-					$type_install = 'remote_repository';
+					/* Установка из удаленного репозитория */
+					if ($this->_wget_files($server_id, $this->games->games_list[0]['remote_repository'], 'remote')) {
+						$this->_unpack_files($server_id, $this->games->games_list[0]['remote_repository']);
+						$server_installed = TRUE;
+					}
 				} elseif ($this->games->games_list[0]['app_id']) {
-					$type_install = 'steamcmd';
+					/* Установка через SteamCMD */
+					if ($this->install_from_steamcmd($server_id)) {
+						$server_installed = TRUE;
+					}
+					
 				} else {
-
 					/* 
 					 * Не удалость выбрать тип установки 
 					 * отсутствуют данные локального репозитория, удаленного репозитория и steamcmd
 					 */
 					$cron_result .= "Server #" . $server_id . " install failed. App_id and Repository data not specified\n";
-					$type_install = FALSE;
-				}
-
-				/* Установка из локального репозитория */
-				if ($type_install == 'local_repository') {
-
-					/* Существует ли файл */
-					if(file_exists($this->games->games_list[0]['local_repository'])) {
-						if(!is_readable($this->games->games_list[0]['local_repository'])) {
-							// Меняем тип установки на следующий
-							if ($this->games->games_list[0]['remote_repository']) {
-								$type_install = 'remote_repository';
-							} elseif ($this->games->games_list[0]['app_id']) {
-								$type_install = 'steamcmd';
-							} else {
-								/* Ошибка установки с локального репозитория
-								 * не удалось определить подходящий тип
-								*/
-							}
-						}
-
-					} else {
-						/* Файл отсутствует */
-
-						// Меняем тип установки на следующий
-						if ($this->games->games_list[0]['remote_repository']) {
-							$type_install = 'remote_repository';
-						} elseif ($this->games->games_list[0]['app_id']) {
-							$type_install = 'steamcmd';
-						} else {
-							/* Ошибка установки с локального репозитория
-							 * не удалось определить подходящий тип
-							*/
-						}
-					}
-
-					if ($type_install == 'local_repository') {
-						/* Если тип установки не изменился в процессе проверки */
-
-						// Создание директории
-						switch(strtolower($this->servers_data[$server_id]['os'])) {
-							case 'windows':
-								$this->servers->command('mkdir ' . $this->servers_data[$server_id]['dir'], $this->servers_data[$server_id]);
-								break;
-
-							default:
-								$this->servers->command('mkdir -p ' . $this->servers_data[$server_id]['dir'], $this->servers_data[$server_id]);
-								$this->servers->command('chmod 777 ' . $this->servers_data[$server_id]['dir'], $this->servers_data[$server_id]);
-								break;
-						}
-
-
-						$connection = ftp_connect($this->servers_data[$server_id]['ftp_host']);
-
-						ftp_login($connection, $this->servers_data[$server_id]['ftp_login'], $this->servers_data[$server_id]['ftp_passwd']);
-
-						//~ ftp_pasv($connection, TRUE);
-
-						ftp_put(
-								$connection, 
-								$this->servers_data[$server_id]['ftp_path'] . '/' . $this->servers_data[$server_id]['dir'] . '/' . basename($this->games->games_list[0]['local_repository']), 
-								$this->games->games_list[0]['local_repository'], 
-								FTP_BINARY
-						);
-
-
-						// Загрузка игровой модификации
-						if ($this->game_types->game_types_list[0]['local_repository'] 
-							&& is_readable($this->game_types->game_types_list[0]['local_repository'])) 
-						{
-							ftp_put(
-									$connection, 
-									$this->servers_data[$server_id]['ftp_path'] . '/' . $this->servers_data[$server_id]['dir'] . '/' . basename($this->game_types->game_types_list[0]['local_repository']), 
-									$this->game_types->game_types_list[0]['local_repository'], 
-									FTP_BINARY
-							);
-						}
-
-						ftp_close($connection);
-
-						// Распаковка архива
-						switch(strtolower($this->servers_data[$server_id]['os'])) {
-							case 'windows':
-
-								$this->servers->command(
-														'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->games->games_list[0]['local_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($this->games->games_list[0]['local_repository']), 
-														$this->servers_data[$server_id], 
-														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-								);
-
-								if ($this->game_types->game_types_list[0]['local_repository']) {
-
-									$this->servers->command(
-															'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->game_types->game_types_list[0]['local_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($this->game_types->game_types_list[0]['local_repository']), 
-															$this->servers_data[$server_id], 
-															$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-									);
-
-								}
-
-								break;
-
-							default:
-
-								$this->servers->command(
-														'unzip ' . basename($this->games->games_list[0]['local_repository']) . ' && rm ' . basename($this->games->games_list[0]['local_repository']), 
-														$this->servers_data[$server_id], 
-														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-								);
-
-								if ($this->game_types->game_types_list[0]['local_repository']) {
-									$this->servers->command(
-															'unzip ' . basename($this->game_types->game_types_list[0]['local_repository']) . ' && rm ' . basename($this->game_types->game_types_list[0]['local_repository']), 
-															$this->servers_data[$server_id], 
-															$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-									);
-								}
-
-								break;
-						}
-
-					}
-
-					$server_installed = TRUE;
-
-					$server_data = array('installed' => '1');
-					$this->servers->edit_game_server($server_id, $server_data);
-				} 
-
-				/* Установка с удаленного репозитория */
-				if ($type_install == 'remote_repository') {	
-
-					// Создание директории
-					switch(strtolower($this->servers_data[$server_id]['os'])) {
-						case 'windows':
-							$this->servers->command('mkdir ' . $this->servers_data[$server_id]['dir'], $this->servers_data[$server_id]);
-							break;
-
-						default:
-							$this->servers->command('mkdir -p ' . $this->servers_data[$server_id]['dir'], $this->servers_data[$server_id]);
-							break;
-					}
-
-					switch(strtolower($this->servers_data[$server_id]['os'])) {
-						case 'windows':
-
-							/* Загрузка файла на сервер */
-							$this->servers->command(
-													'wget ' . $this->games->games_list[0]['remote_repository'], 
-													$this->servers_data[$server_id],
-													$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-							);
-
-							$this->servers->command(
-													'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->games->games_list[0]['remote_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($this->games->games_list[0]['remote_repository']),
-													$this->servers_data[$server_id], 
-													$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-							);
-
-							/* Загрузка файлов игровой модификации */
-							if ($this->game_types->game_types_list[0]['remote_repository']) {
-
-								/* Загрузка файла на сервер */
-								$this->servers->command(
-														'wget ' . $this->game_types->game_types_list[0]['remote_repository'], 
-														$this->servers_data[$server_id],
-														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-								);
-
-								$this->servers->command(
-														'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->game_types->game_types_list[0]['remote_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' | del /F ' . basename($this->game_types->game_types_list[0]['remote_repository']), 
-														$this->servers_data[$server_id], 
-														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-								);
-							}
-
-							break;
-
-						default:
-
-							/* Загрузка файла на сервер */
-							$this->servers->command(
-													'wget ' . $this->games->games_list[0]['remote_repository'], 
-													$this->servers_data[$server_id],
-													$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-							);
-
-							$this->servers->command(
-													'unzip ' . basename($this->games->games_list[0]['remote_repository']) . ' && rm ' . basename($this->games->games_list[0]['remote_repository']), 
-													$this->servers_data[$server_id], 
-													$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-							);
-
-							if ($this->game_types->game_types_list[0]['remote_repository']) {
-
-								/* Загрузка файла на сервер */
-								$this->servers->command(
-														'wget ' . $this->game_types->game_types_list[0]['remote_repository'], 
-														$this->servers_data[$server_id],
-														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-								);
-
-								$this->servers->command(
-														'unzip ' . basename($this->game_types->game_types_list[0]['remote_repository']) . ' && rm ' . basename($this->game_types->game_types_list[0]['remote_repository']), 
-														$this->servers_data[$server_id], 
-														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-								);
-
-							}
-
-							break;
-					}
-
-					$server_installed = TRUE;
-
-					$server_data = array('installed' => '1');
-					$this->servers->edit_game_server($server_id, $server_data);
-				} 
-
-				/* Установка через SteamCMD */
-				if ($type_install == 'steamcmd') {
-
-
-					//steamcmd +login anonymous +force_install_dir ../czero +app_set_config 90 mod czero +app_update 90 validate +quit
-					$cmd['app'] = '';
-
-					if($this->servers_data[$server_id]['app_set_config']) {
-						$cmd['app'] .= '+app_set_config ' . $this->servers_data[$server_id]['app_set_config'] . ' ';
-					}
-
-					$cmd['app'] .= '+app_update ' . $this->servers_data[$server_id]['app_id'];
-
-					$cmd['login'] = '+login anonymous';
-					$cmd['install_dir'] = '+force_install_dir ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'];
-
-					switch(strtolower($this->servers_data[$server_id]['os'])) {
-						case 'windows':
-							$command = 'steamcmd.exe ' . $cmd['login'] . ' ' . $cmd['install_dir'] . ' ' . $cmd['app'] . ' validate +quit';
-							break;
-
-						default:
-							$command = './steamcmd.sh ' . $cmd['login'] . ' ' . $cmd['install_dir'] . ' ' . $cmd['app'] . ' validate +quit';
-							break;
-					}
-
-					$result = $this->servers->command($command, $this->servers_data[$server_id], $this->servers_data[$server_id]['steamcmd_path']);
-
-					$exec_command = array_pop($this->servers->commands);
-
-					if(strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' fully installed.') !== FALSE
-						OR strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' already up to date.') !== FALSE
-					) {
-						$server_data = array('installed' => '1');
-						$server_installed = TRUE;
-
-						$log_data['msg'] = 'Update server success';
-						$cron_result .= "Install server success\n";
-					} elseif(strpos($result, 'Failed to request AppInfo update') !== FALSE) {
-						/* Сервер не установлен до конца */
-						$server_data = array('installed' => '0');
-
-						$log_data['msg'] = 'Update server failed';
-						$cron_result .= "Install server failure\n";
-					} elseif(strpos($result, 'Error! App \'' . $this->games->games_list[0]['app_id'] . '\' state is') !== FALSE) {
-						/* Сервер не установлен до конца */
-						$server_data = array('installed' => '0');
-
-						$log_data['msg'] = 'Error. App state after update job';
-						$cron_result .= "Install server failure\n";
-					} else {
-						/* Неизвестная ошибка */
-						$server_data = array('installed' => '1');
-
-						$log_data['msg'] = 'Unknown error';
-						$command = array_pop($this->servers->commands);
-						$cron_result .= "Install server failure\n";
-					}
-					
-					// Загрузка игровой модификации
-					switch(strtolower($this->servers_data[$server_id]['os'])) {
-						case 'windows':
-							
-							if ($this->game_types->game_types_list[0]['local_repository']) {
-								
-								$connection = ftp_connect($this->servers_data[$server_id]['ftp_host']);
-								ftp_login($connection, $this->servers_data[$server_id]['ftp_login'], $this->servers_data[$server_id]['ftp_passwd']);
-								
-								ftp_put(
-										$connection, 
-										$this->servers_data[$server_id]['ftp_path'] . '/' . $this->servers_data[$server_id]['dir'] . '/' . basename($this->game_types->game_types_list[0]['local_repository']), 
-										$this->game_types->game_types_list[0]['local_repository'], 
-										FTP_BINARY
-								);
-								
-								ftp_close($connection);
-
-								$this->servers->command(
-														'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->game_types->game_types_list[0]['local_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($this->game_types->game_types_list[0]['local_repository']), 
-														$this->servers_data[$server_id], 
-														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-								);
-								
-							} elseif ($this->game_types->game_types_list[0]['remote_repository']) {
-
-								/* Загрузка файла на сервер */
-								$this->servers->command(
-														'wget ' . $this->game_types->game_types_list[0]['remote_repository'], 
-														$this->servers_data[$server_id],
-														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-								);
-
-								$this->servers->command(
-														'"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($this->game_types->game_types_list[0]['remote_repository']) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($this->game_types->game_types_list[0]['remote_repository']), 
-														$this->servers_data[$server_id], 
-														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-								);
-							}
-							
-							break;
-						
-						default:
-							if ($this->game_types->game_types_list[0]['local_repository'] 
-								&& is_readable($this->game_types->game_types_list[0]['local_repository'])) 
-							{
-								$connection = ftp_connect($this->servers_data[$server_id]['ftp_host']);
-								ftp_login($connection, $this->servers_data[$server_id]['ftp_login'], $this->servers_data[$server_id]['ftp_passwd']);
-
-								ftp_put(
-										$connection, 
-										$this->servers_data[$server_id]['ftp_path'] . '/' . $this->servers_data[$server_id]['dir'] . '/' . basename($this->game_types->game_types_list[0]['local_repository']), 
-										$this->game_types->game_types_list[0]['local_repository'], 
-										FTP_BINARY
-								);
-								
-								ftp_close($connection);
-								
-								$this->servers->command(
-														'unzip ' . basename($this->game_types->game_types_list[0]['remote_repository']) . ' && rm ' . basename($this->game_types->game_types_list[0]['remote_repository']), 
-														$this->servers_data[$server_id], 
-														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-								);
-								
-							} elseif ($this->game_types->game_types_list[0]['remote_repository']) {
-
-								/* Загрузка файла на сервер */
-								$this->servers->command(
-														'wget ' . $this->game_types->game_types_list[0]['remote_repository'], 
-														$this->servers_data[$server_id],
-														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-								);
-
-								$this->servers->command(
-														'unzip ' . basename($this->game_types->game_types_list[0]['remote_repository']) . ' && rm ' . basename($this->game_types->game_types_list[0]['remote_repository']), 
-														$this->servers_data[$server_id], 
-														$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-								);
-
-							}
-							break;
-					}
-						
-						
-
-					$this->servers->edit_game_server($server_id, $server_data);
-
-					$log_data['type'] = 'server_command';
-					$log_data['command'] = 'install';
-					$log_data['server_id'] = $server_id;
-					$log_data['log_data'] = $result . "Command: ". $exec_command;
-					$this->panel_log->save_log($log_data);
-
+					$server_installed = FALSE;
 				}
 
 				/* 
@@ -983,6 +849,17 @@ class Cron extends MX_Controller {
 				 * Установка прав на директории, задание ркон пароля
 				*/
 				if ($server_installed == TRUE) {
+					/* Загружаем дополнительный файлы игровой модификации */
+					if ($this->game_types->game_types_list[0]['local_repository']) {
+						if ($this->_wget_files($server_id, $this->game_types->game_types_list[0]['local_repository'], 'local')) {
+							$this->_unpack_files($server_id, $this->game_types->game_types_list[0]['local_repository']);
+						}
+					} elseif ($this->game_types->game_types_list[0]['remote_repository']) {
+						if ($this->_wget_files($server_id, $this->game_types->game_types_list[0]['remote_repository'], 'remote')) {
+							$this->_unpack_files($server_id, $this->game_types->game_types_list[0]['remote_repository']);
+						}
+					}
+					
 					/* Устанавливаем 777 права на директории, в которые загружается контент (карты, модели и пр.)
 					* и 666 на конфиг файлы, которые можно редактировать через админпанель */
 					if(strtolower($this->servers_data[$server_id]['os']) != 'windows') {
@@ -1016,9 +893,30 @@ class Cron extends MX_Controller {
 					$new_rcon = generate_code(8);
 					$this->servers->change_rcon($new_rcon, $this->servers_data[$server_id]);
 					$server_data['rcon'] = $this->encrypt->encode($new_rcon);
+					
+					$server_data = array('installed' => '1');
+					$this->servers->edit_game_server($server_id, $server_data);
+
+					$log_data['type'] = 'server_command';
+					$log_data['command'] = 'install';
+					$log_data['server_id'] = $server_id;
+					$log_data['msg'] = 'Server install successful';
+					$log_data['log_data'] = 'Commands: ' . var_export($this->servers->commands, TRUE);
+					$this->panel_log->save_log($log_data);
 
 				} else {
-					$cron_result .= "";
+					
+					$server_data = array('installed' => '0');
+					$this->servers->edit_game_server($server_id, $server_data);
+
+					$log_data['type'] = 'server_command';
+					$log_data['command'] = 'install';
+					$log_data['server_id'] = $server_id;
+					$log_data['msg'] = 'Server install failed';
+					$log_data['log_data'] = 'Commands: ' . var_export($this->servers->commands, TRUE);
+					$this->panel_log->save_log($log_data);
+					
+					$cron_result .= 'Server install #' . $server_id . ' failed';
 				}
 
 				$i ++;
