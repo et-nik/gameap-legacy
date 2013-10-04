@@ -346,7 +346,12 @@ class Servers extends CI_Model {
 				$script_file = $script_file[0];
 				$script_file = str_replace('./', '', $script_file);
 				
-				if (!$this->_check_file($path . '/' . $script_file)) {
+				/* 
+				 * Проверяем, существует ли файл
+				 * Проверяется файлы .sh, если это команда, например wget, то 
+				 * проверки не будет 
+				*/
+				if (strpos($command, '.sh') !== FALSE && !$this->_check_file($path . '/' . $script_file)) {
 					return $this->errors;
 				}
 
