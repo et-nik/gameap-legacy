@@ -120,7 +120,8 @@ class Rcon_goldsource extends CI_Driver {
 		if ($result = $this->command('status')) {
 			$return = array();
 			
-			$pattern = '!#([\s]*)(\d*)([\s]*)"(.*?)"(\s*)(\d*)(\s*)([a-zA-Z0-9\_\:]*)(\s*)([0-9\-]*)(\s*)([0-9\:]*)(\s*)(\d*)(\s*)(\d*)(\s*)(.*):(\d*)!si';
+			// # 7 "seeking chiters" 818 HLTV hltv:0/128 delay:0 1:17:53 178.124.124.119:44892
+			$pattern = '!#([\s]*)(\d*)([\s]*)"(.*?)"(\s*)(\d*)(\s*)([a-zA-Z0-9\_\:]*)(\s*)(hltv\:0\/128 delay\:0|[a-z\-\:0-9]*)(\s*)([0-9\:]*)(\s*)(\s*|\d*)(\s*)(\s*|\d*)(\s*)([0-9\.]*):(\d*)!si';
 			$matches = get_matches($pattern, $result);
 			
 			$count = count($matches);
