@@ -34,7 +34,10 @@
 
 3. Укажите абсолютный путь до исполняемых файлов в АдминПанели.
 
-4. Для автоматической установки серверов необходимо наличие утилиты SteamCMD (http://wiki.hldm.org/index.php/SteamCMD), 
+4. Для установки игровых серверов из репозиториев необходимо наличие архиватора unzip (для Linux) и 7-zip (для Windows), для Windows также 
+требуется утилита wget, скачайте ее по адресу http://users.ugent.be/~bpuype/wget/ и загрузите файл wget.exe в Windows/system32 папку
+
+Для установки и обновления игровых серверов с официальных серверов Valve требуется SteamCMD (http://wiki.hldm.org/index.php/SteamCMD), 
 в директории с исполняемыми файлами АдминПанели (server.sh или server.exe).
 Ссылки для загрузки SteamCMD:
 Linux: 		http://media.steampowered.com/client/steamcmd_linux.tar.gz
