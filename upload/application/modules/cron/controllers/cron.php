@@ -831,7 +831,7 @@ class Cron extends MX_Controller {
 					}
 				} elseif ($this->games->games_list[0]['app_id']) {
 					/* Установка через SteamCMD */
-					if ($this->install_from_steamcmd($server_id)) {
+					if ($this->_install_from_steamcmd($server_id)) {
 						$server_installed = TRUE;
 					}
 					
