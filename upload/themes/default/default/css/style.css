@@ -358,7 +358,7 @@ button {
 	font-size:13px;
 	font-weight:bold;
 	height:25px;
-	line-height:36px;
+	line-height:normal;
 	width:120px;
 }
 
