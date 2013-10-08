@@ -86,7 +86,7 @@ function server_status()
 		
 	//chdir($dir);
 		
-	system("netstat -ano | findstr " . $port .">" . $dir . '\\pid.txt');
+	system("netstat -ano -p udp | findstr " . $port .">" . $dir . '\\pid.txt');
 	$file = file($dir . '\\pid.txt');
 
 	//UDP    0.0.0.0:27015          *:*                                    1508
