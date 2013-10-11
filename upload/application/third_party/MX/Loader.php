@@ -2,6 +2,7 @@
 
 /**
  * Modular Extensions - HMVC
+ * Modify by ET-NiK
  *
  * Adapted from the CodeIgniter Core Classes
  * @link	http://codeigniter.com
@@ -81,6 +82,14 @@ class MX_Loader extends CI_Loader
 			{
 				array_unshift($this->_ci_model_paths, $module_path);
 			}
+		}
+		
+		/* Modify by ET-NiK
+		 * Добавление в массив с library путями путь к модулю.
+		 * Чтобы загружались драйверы из директории с модулем
+		 */
+		if (isset($module_path) && !in_array($module_path, $this->_ci_library_paths)) {
+			$this->_ci_library_paths[] = $module_path;
 		}
 	}	
 	
@@ -259,6 +268,16 @@ class MX_Loader extends CI_Loader
 
 	/** Load a module view **/
 	public function view($view, $vars = array(), $return = FALSE) {
+		
+		/* ET-NiK modify
+		 * Без кода ниже, при вызове модуля из контролера находящегося
+		 * в application/controllers $this->_module будет равен ''
+		 * что недопустимо при загрузке шаблонов
+		 */
+		 
+		/* set the module name */
+		$this->_module = CI::$APP->router->fetch_module();
+		
 		list($path, $_view) = Modules::find($view, $this->_module, 'views/');
 		
 		if ($path != FALSE) {

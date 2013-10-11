@@ -38,6 +38,7 @@ require dirname(__FILE__).'/Modules.php';
 class MX_Router extends CI_Router
 {
 	protected $module;
+	var $i;
 	
 	public function fetch_module() {
 		return $this->module;
@@ -57,7 +58,7 @@ class MX_Router extends CI_Router
 		}
 		
 		/* no controller found */
-		show_404();
+		show_404(implode('/', $segments));
 	}
 	
 	/** Locate the controller **/

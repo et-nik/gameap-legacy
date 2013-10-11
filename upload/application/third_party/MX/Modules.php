@@ -54,7 +54,6 @@ class Modules
 	* Output from module is buffered and returned.
 	**/
 	public static function run($module) {
-		
 		$method = 'index';
 		
 		if(($pos = strrpos($module, '/')) != FALSE) {
