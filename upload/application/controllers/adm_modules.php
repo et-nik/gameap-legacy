@@ -56,6 +56,7 @@ class Adm_modules extends CI_Controller {
 			$this->tpl_data['content'] 	= '';
 			
 			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, TRUE);
+			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), TRUE);
 		} else {
 			redirect('auth/in');
 		}
