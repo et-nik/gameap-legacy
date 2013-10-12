@@ -185,11 +185,11 @@ class Adm_servers extends CI_Controller {
 			
 			switch (strtolower($this->games->games_list[0]['engine'])) {
 				case 'source':
-					$data['start_command'] 	= 'srcds.exe -console -game {game} +ip {ip} +port {port} +map de_dust2';
+					$data['start_command'] 	= 'srcds.exe -console -game {game} +ip {ip} +port {port} +map de_dust2 +maxplayers 32';
 					break;
 				
 				case 'goldsource':
-					$data['start_command'] 	= 'hlds.exe -console -game {game} +ip {ip} +port {port} +map de_dust2';
+					$data['start_command'] 	= 'hlds.exe -console -game {game} +ip {ip} +port {port} +map de_dust2 +maxplayers 32';
 					break;
 					
 				case 'minecraft':
@@ -201,11 +201,11 @@ class Adm_servers extends CI_Controller {
 			
 			switch (strtolower($this->games->games_list[0]['engine'])) {
 				case 'source':
-					$data['start_command'] 	= './srcds_run -game {game} +ip {ip} +port {port} +map de_dust2';
+					$data['start_command'] 	= './srcds_run -game {game} +ip {ip} +port {port} +map de_dust2 +maxplayers 32';
 					break;
 				
 				case 'goldsource':
-					$data['start_command'] 	= './hlds_run -console -game {game} +ip {ip} +port {port} +map de_dust2';
+					$data['start_command'] 	= './hlds_run -console -game {game} +ip {ip} +port {port} +map de_dust2 +maxplayers 32';
 					break;
 					
 				case 'minecraft':
@@ -215,9 +215,9 @@ class Adm_servers extends CI_Controller {
 			}
 		}
 		
-		/* Присваиваем значения пути к картам и имя scren  */
+		/* Присваиваем значения пути к картам и имя screen  */
 		$data['screen_name'] = $data['game'] . '_' . random_string('alnum', 6) . '_' . $data['server_port'];
-		$data['maps_path'] = '/' . $this->games->games_list[0]['start_code'] . '/maps';
+		$data['maps_path'] = $this->games->games_list[0]['start_code'] . '/maps';
 		
 		return $data;
 	}
@@ -766,7 +766,7 @@ class Adm_servers extends CI_Controller {
 						$local_tpl_data = array();
 						
 						// Добавление сервера
-						if ($this->dedicated_servers->add_game_server($sql_data)) {
+						if ($this->servers->add_game_server($sql_data)) {
 							$local_tpl_data['message'] = lang('adm_servers_add_server_successful');
 						} else {
 							$local_tpl_data['message'] = lang('adm_servers_add_server_failed');
@@ -875,8 +875,6 @@ class Adm_servers extends CI_Controller {
 			$local_tpl_data = array();
 			$error_msg = FALSE;
 			
-			$id = $id;
-
 			if ($confirm == $this->security->get_csrf_hash()) {
 							
 				/* Пользователь подтвердил удаление */

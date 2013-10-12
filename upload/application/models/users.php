@@ -81,6 +81,7 @@ class Users extends CI_Model {
         parent::__construct();
         
         $this->load->helper('safety');
+        $this->load->library('encrypt');
     }
 
 
@@ -103,10 +104,11 @@ class Users extends CI_Model {
             return FALSE;
         }
 
-        if($query->num_rows > 0){
+        if ($query->num_rows > 0) {
 			
 			$this->auth_id = $user_id;
 			$this->auth_login = $this->auth_data['login'];
+			$this->auth_data['balance'] = (int)$this->encrypt->decode($this->auth_data['balance']);
 			
 			/* Костыль */
 			$this->user_id = $user_id;
@@ -120,7 +122,7 @@ class Users extends CI_Model {
 					 * key в привилегиях меньше 3х знаков
 					 * используется для обозначения категории
 					*/
-					if(strlen($key) > 3) {
+					if (strlen($key) > 3) {
 						$this->auth_privileges[$key] = 0;
 					}
 				}
@@ -131,7 +133,7 @@ class Users extends CI_Model {
 			/*--------*/
 		
             return TRUE;
-        }else{
+        } else {
             return FALSE;
         }
     }
@@ -142,7 +144,7 @@ class Users extends CI_Model {
     */
     function user_auth($user_login = '', $user_password = '')
     {
-        if(!$user_login || !$user_password){
+        if(!$user_login OR !$user_password){
             return FALSE;
         }
         
@@ -151,7 +153,7 @@ class Users extends CI_Model {
         
         $query = $this->db->get_where('users', array('login' => $user_login), 1);
         
-        if($query->num_rows > 0){
+        if ($query->num_rows > 0) {
             
             $this->user_data = $query->row_array();
             $user_data = $this->user_data;
@@ -159,7 +161,7 @@ class Users extends CI_Model {
             $this->load->model('password');
             $password_md5 = $this->password->encryption($user_password, $this->user_data);
             
-        }else{
+        } else {
             return FALSE;
         }
         
@@ -169,16 +171,11 @@ class Users extends CI_Model {
             $this->auth_id 		= $user_data['id'];
             $this->auth_login 	= $user_data['login'];
             $this->auth_data 	= $user_data;
-            
-            //$this->user_id 			= $user_data['id'];
-            //$this->user_login 		= $user_data['login'];
-            //$this->user_password 		= $password_md5;
-            
-            //$this->user_data 			= $user_data;
+            $this->auth_data['balance'] = (int)$this->encrypt->decode($user_data['balance']);
             
             
             return $this->auth_id;
-        }else{
+        } else {
             return FALSE;
         }  
     }
@@ -209,9 +206,11 @@ class Users extends CI_Model {
         $query = $this->db->get_where('users', $where, 1);
         $user_data = $query->row_array();
         
-        if(!$user_data) {
+        if (!$user_data) {
 			return FALSE;
 		}
+		
+		$user_data['balance'] = (int)$this->encrypt->decode($user_data['balance']);
 
         if(!$no_get_privileges) {
 			
@@ -236,7 +235,7 @@ class Users extends CI_Model {
             $user_privileges = array();
         }
         
-        if($to_this){
+        if ($to_this) {
 			/* Сохранять значения в $this->****  */
             //$this->user_id = $user_data['id'];
             //$this->user_login = $user_data['login'];
@@ -320,12 +319,11 @@ class Users extends CI_Model {
     function tpl_userdata($id = FALSE, $user_data = FALSE)
     {
         $this->load->helper('date');
-        $this->load->library('encrypt');
         
-        if(!$id) {
+        if (!$id) {
             $user_data = $this->auth_data;
         } else {
-			if(!$user_data){
+			if (!$user_data) {
 				$user_data = $this->get_user_data($id, FALSE, TRUE);
 			}
         }
@@ -335,8 +333,7 @@ class Users extends CI_Model {
         $tpl_data['user_name'] 			= $user_data['name'];
         $tpl_data['user_email'] 		= $user_data['email'];
         $tpl_data['user_email'] 		= $user_data['email'];
-        
-        $tpl_data['balance'] 			= (int)$this->encrypt->decode($user_data['balance']);
+        $tpl_data['balance'] 			= $user_data['balance'];
    
         $tpl_data['user_reg_date'] = unix_to_human($user_data['reg_date'], TRUE, 'eu');
         $tpl_data['user_last_auth'] = unix_to_human($user_data['last_auth'], TRUE, 'eu');

@@ -26,7 +26,7 @@ class Servers extends CI_Model {
     
     var $server_settings 	= array();
     var $commands			= array(); // Команды, которые отправлялись на сервер
-    var $errors 			= FALSE; 	// Строка с ошибкой (если имеются)
+    var $errors 			= ''; 	// Строка с ошибкой (если имеются)
 
     function __construct()
     {
@@ -203,67 +203,6 @@ class Servers extends CI_Model {
 		}
 		
 		return $command;
-	}
-	
-	//-----------------------------------------------------------
-	
-	/* 
-	 * Отправка команды на сервер через telnet
-	 * 
-	 * @param string - команда на сервер
-	 * @param array - массив с данными сервера
-	*/
-	private function telnet_command($command, $server_data, $path = FALSE)
-    {
-		// Загрузка необходимой модели
-		//~ $this->load->model('telnet');
-		$this->load->library('telnet');
-		
-		
-		/* -------------------
-		 * 	Определяем путь 
-		 * -------------------
-		*/
-		if(!$path) {
-			$cd = $server_data['telnet_path'];
-		}
-		
-		/* Добавляем команду в зависимости от ОС */
-		switch(strtolower($server_data['os'])) {
-			case 'windows':
-					$cd = "cd /D " . $path;
-				break;
-				
-			default:
-					$cd = "cd " . $path;
-				break;
-		}
-		
-		/* Получение данных для соединения */
-		$telnet_data = explode(':', $server_data['telnet_host']);
-		$telnet_ip = $telnet_data['0'];
-		
-		if(!isset($telnet_data['1'])){
-			$telnet_port = 23; // Стандартный порт telnet
-		}else{
-			$telnet_port = $telnet_data['1'];
-		}
-		
-		$this->telnet->connect($telnet_ip, $telnet_port)->auth($server_data['telnet_login'], $server_data['telnet_password']);
-
-		if(is_array($command)) {
-			foreach($command as $cmd_arr) {
-				//~ $this->telnet->write($cd . ' && ' . $cmd_arr  . "\r\n");
-				$this->telnet->command($cd . ' && ' . $cmd_arr  . "\r\n");
-				$this->commands[] = $cd . ' && ' . $cmd_arr  . "\r\n";
-			}
-		} else {
-			//~ $this->telnet->write($cd . ' && ' . $command  . "\r\n");
-			$this->telnet->command($cd . ' && ' . $command  . "\r\n");
-			$this->commands[] = $cd . ' && ' . $command  . "\r\n";
-		}
-
-		return $this->telnet->get_string();
 	}
 	
 	//-----------------------------------------------------------
@@ -538,9 +477,15 @@ class Servers extends CI_Model {
     */
     function add_game_server($data)
     {
-		if($this->db->insert('servers', $data)){
+		$this->load->helper('string');
+		$this->load->model('games');
+		
+		/* Присваиваем имя scren  */
+		$data['screen_name'] = (!isset($data['screen_name'])) ? $data['game'] . '_' . random_string('alnum', 6) . '_' . $data['server_port'] : $data['screen_name'];
+		
+		if ($this->db->insert('servers', $data)) {
 			return TRUE;
-		}else{
+		} else {
 			return FALSE;
 		}
 	}
@@ -580,6 +525,21 @@ class Servers extends CI_Model {
 			return FALSE;
 		}
 	}
+	
+	//-----------------------------------------------------------
+	
+	/**
+     * Получение списка серверов
+     * 
+     * @param int - id пользователя для которого получаем серверы
+     * @param str - привилегия пользователя
+     * @param array - where для запроса sql
+     *
+    */
+	function get_server_list($user_id = FALSE, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1', ))
+	{
+		return $this->get_servers_list($user_id, $privilege_name, $where);
+	}
 
 	//-----------------------------------------------------------
 	
@@ -591,7 +551,7 @@ class Servers extends CI_Model {
      * @param array - where для запроса sql
      *
     */
-    function get_server_list($user_id = FALSE, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1', ))
+    function get_servers_list($user_id = FALSE, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1', ))
     {
 		/* 
 		 * Если user_id не задан, то получаем все серверы

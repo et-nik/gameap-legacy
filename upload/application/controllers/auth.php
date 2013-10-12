@@ -118,7 +118,7 @@ class Auth extends CI_Controller {
         
         $check = $this->users->check_user();
 			
-		if($check){
+		if ($check) {
 			/* Перенаправляем пользователя в нужное место, 
 			 * если заданы нужные куки location_page 
 			*/
