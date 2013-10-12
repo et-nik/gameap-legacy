@@ -360,7 +360,7 @@ class Auth extends CI_Controller {
 			$data = array(
 				'captcha_time'	=> time(),
 				'ip_address'	=> $this->input->ip_address(),
-				'word'	 		=> $captcha['word']
+				'word'	 		=> $cap['word']
 			);
 			
 			$query = $this->db->insert('captcha', $data);
