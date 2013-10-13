@@ -29,10 +29,15 @@ class Panel_log extends CI_Model {
      * 
      *
     */
-	function save_log($data = FALSE)
+	function save_log($data = false)
     {
 		if(!isset($data['type'])){
-			return FALSE;
+			return false;
+		}
+		
+		/* Если подробные данные являются массивом */
+		if (isset($data['log_data'])) {
+			$data['log_data'] = (is_array($data['log_data'])) ? json_encode($data['log_data']) : $data['log_data'];
 		}
 		
 		$data['date'] = time();
@@ -43,10 +48,10 @@ class Panel_log extends CI_Model {
 			$data['ip'] = 'localhost';
 		}
 		
-		if($this->db->insert('logs', $data)){
-			return TRUE;
-		}else{
-			return FALSE;
+		if ($this->db->insert('logs', $data)) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 	
@@ -61,7 +66,7 @@ class Panel_log extends CI_Model {
      * 
      *
     */
-	function get_log($where = array(), $limit = 10, $offset = FALSE)
+	function get_log($where = array(), $limit = 10, $offset = false)
 	{
 		
 		$this->db->order_by('date', 'desc'); 

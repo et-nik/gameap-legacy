@@ -14,17 +14,17 @@
 class Users extends CI_Model {
 	
 	/* Данные авторизованного пользователя */
-	var $auth_id 		= FALSE;
-	var $auth_login 	= FALSE;
+	var $auth_id 		= false;
+	var $auth_login 	= false;
     
     var $auth_privileges 			= array();	// Базовые привилегии
     var $auth_servers_privileges 	= array();	// Привилегии на отдельные серверы
     var $auth_data 					= array();	// Данные пользователя
     
-    /* Данные авторизованного пользователя */
-    var $user_id 		= FALSE;
-    var $user_login		= FALSE;
-    var $user_password	= FALSE;
+    /* Данные пользователя */
+    var $user_id 		= false;
+    var $user_login		= false;
+    var $user_password	= false;
     
     var $tpl_data;							// Данные для шаблона
     
@@ -94,14 +94,14 @@ class Users extends CI_Model {
     */
     function check_user()
     {
-        $user_id = safesql($this->input->cookie('user_id', TRUE));
-        $user_hash = safesql($this->input->cookie('hash', TRUE));
+        $user_id = safesql($this->input->cookie('user_id', true));
+        $user_hash = safesql($this->input->cookie('hash', true));
         
         if($user_id && $user_hash) {
             $query = $this->db->get_where('users', array('id' => $user_id, 'hash' => $user_hash), 1);
             $this->auth_data = $query->row_array();
         } else {
-            return FALSE;
+            return false;
         }
 
         if ($query->num_rows > 0) {
@@ -116,7 +116,7 @@ class Users extends CI_Model {
 			/*--------*/
 			
 			/* Получение базовых привилегий */
-            if(!$this->auth_privileges = json_decode($this->auth_data['privileges'], TRUE)) {
+            if(!$this->auth_privileges = json_decode($this->auth_data['privileges'], true)) {
 				foreach($this->all_user_privileges as $key => $value) {
 					/* 
 					 * key в привилегиях меньше 3х знаков
@@ -132,9 +132,9 @@ class Users extends CI_Model {
 			$this->user_privileges = $this->auth_privileges;
 			/*--------*/
 		
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
     }
     
@@ -145,7 +145,7 @@ class Users extends CI_Model {
     function user_auth($user_login = '', $user_password = '')
     {
         if(!$user_login OR !$user_password){
-            return FALSE;
+            return false;
         }
         
         $user_login = safesql($user_login);
@@ -162,7 +162,7 @@ class Users extends CI_Model {
             $password_md5 = $this->password->encryption($user_password, $this->user_data);
             
         } else {
-            return FALSE;
+            return false;
         }
         
         // Проверка пароля
@@ -176,7 +176,7 @@ class Users extends CI_Model {
             
             return $this->auth_id;
         } else {
-            return FALSE;
+            return false;
         }  
     }
     
@@ -188,13 +188,13 @@ class Users extends CI_Model {
      * 
      * @param int       - id пользователя
      * @param bool      - записать данные в $this->user_data
-     * @param bool      - если TRUE то данные привиление не будут получены
+     * @param bool      - если true то данные привиление не будут получены
      * @return array
     */
-    function get_user_data($user_id = FALSE, $to_this = FALSE, $no_get_privileges = FALSE){
+    function get_user_data($user_id = false, $to_this = false, $no_get_privileges = false){
         
         if(!$user_id){
-            return FALSE;
+            return false;
         }
         
         if(is_array($user_id)) {
@@ -207,14 +207,14 @@ class Users extends CI_Model {
         $user_data = $query->row_array();
         
         if (!$user_data) {
-			return FALSE;
+			return false;
 		}
 		
 		$user_data['balance'] = (int)$this->encrypt->decode($user_data['balance']);
 
         if(!$no_get_privileges) {
 			
-			if(!$user_privileges = json_decode($user_data['privileges'], TRUE)) {
+			if(!$user_privileges = json_decode($user_data['privileges'], true)) {
 				foreach($this->all_user_privileges as $key => $value) {
 					
 					/* 
@@ -258,18 +258,18 @@ class Users extends CI_Model {
     function add_user($user_data)
     {
         if($this->db->insert('users', $user_data)){
-			return TRUE;
+			return true;
 		}else{
-			return FALSE;
+			return false;
 		}
     }
     
     function delete_user($id)
     {
 		if($this->db->delete('users', array('id' => $id))){
-			return TRUE;
+			return true;
 		}else{
-			return FALSE;
+			return false;
 		}
 	}
     
@@ -282,14 +282,14 @@ class Users extends CI_Model {
      * @param string - id пользователя, либо массив с where
      * @return bool
     */
-    function update_user($user_data, $user_id = FALSE)
+    function update_user($user_data, $user_id = false)
     {
         if(!$user_id){
             $user_id = $this->auth_id;
         }
         
         if(!$user_id OR !$user_data){
-            return FALSE;
+            return false;
         }
         
         if(!is_array($user_id)) {
@@ -302,9 +302,9 @@ class Users extends CI_Model {
         
         
         if(!$query){
-            return FALSE;
+            return false;
         }else{
-            return TRUE;
+            return true;
         }
     }
     
@@ -316,7 +316,7 @@ class Users extends CI_Model {
      * 
      * @return array
     */
-    function tpl_userdata($id = FALSE, $user_data = FALSE)
+    function tpl_userdata($id = false, $user_data = false)
     {
         $this->load->helper('date');
         
@@ -324,7 +324,7 @@ class Users extends CI_Model {
             $user_data = $this->auth_data;
         } else {
 			if (!$user_data) {
-				$user_data = $this->get_user_data($id, FALSE, TRUE);
+				$user_data = $this->get_user_data($id, false, true);
 			}
         }
         
@@ -335,8 +335,8 @@ class Users extends CI_Model {
         $tpl_data['user_email'] 		= $user_data['email'];
         $tpl_data['balance'] 			= $user_data['balance'];
    
-        $tpl_data['user_reg_date'] = unix_to_human($user_data['reg_date'], TRUE, 'eu');
-        $tpl_data['user_last_auth'] = unix_to_human($user_data['last_auth'], TRUE, 'eu');
+        $tpl_data['user_reg_date'] = unix_to_human($user_data['reg_date'], true, 'eu');
+        $tpl_data['user_last_auth'] = unix_to_human($user_data['last_auth'], true, 'eu');
         
         return $tpl_data;
     }
@@ -348,7 +348,7 @@ class Users extends CI_Model {
      * 
      * @return array
     */
-    function get_server_privileges($server_id = FALSE, $user_id = FALSE, $no_insert_this = FALSE)
+    function get_server_privileges($server_id = false, $user_id = false, $no_insert_this = false)
     {
         
         if(!$user_id){
@@ -356,7 +356,7 @@ class Users extends CI_Model {
         }
         
         if(!is_numeric($user_id)){
-            return FALSE;
+            return false;
         }
 
         if(!$server_id){
@@ -403,10 +403,10 @@ class Users extends CI_Model {
      * 
      * @return string
     */
-    function set_server_privileges($privilege_name, $rule, $server_id, $user_id = FALSE)
+    function set_server_privileges($privilege_name, $rule, $server_id, $user_id = false)
     {
         if(!$user_id){
-            $user_id = $this->user_data['id'];
+            $user_id = $this->auth_id;
         }else{
             $user_id  = (int)$user_id;
         }
@@ -431,17 +431,17 @@ class Users extends CI_Model {
         if($query->num_rows > 0){
            /* Если привилегия уже есть в базе данных, то обновляем */
            if($this->db->update('servers_privileges', $data)){
-                return TRUE;
+                return true;
             }else{
-                return FALSE;
+                return false;
             }
             
         }else{
 			/* Привилегии нет в базе данных, создаем новую строку */
 			if($this->db->insert('servers_privileges', $data)){
-                return TRUE;
+                return true;
             }else{
-                return FALSE;
+                return false;
             }
 		}
 
@@ -468,9 +468,10 @@ class Users extends CI_Model {
             $num++;
             
             $list[$num] = $users;
-            $list[$num]['user_id'] = $users['id'];
-            $list[$num]['user_reg_date'] = unix_to_human($users['reg_date'], TRUE, 'eu');
-            $list[$num]['user_last_auth'] = unix_to_human($users['last_auth'], TRUE, 'eu');
+            $list[$num]['user_id'] 			= $users['id'];
+            $list[$num]['user_reg_date'] 	= unix_to_human($users['reg_date'], true, 'eu');
+            $list[$num]['user_last_auth'] 	= unix_to_human($users['last_auth'], true, 'eu');
+            $list[$num]['user_balance'] 	= $users['balance'];
         }
         
         return $list;
@@ -486,7 +487,7 @@ class Users extends CI_Model {
      * @return array
      *
     */
-    function get_users_list($where = FALSE, $limit = FALSE)
+    function get_users_list($where = false, $limit = false)
     {
 		/*
 		 * В массиве $where храняться данные для выборки.
@@ -505,6 +506,12 @@ class Users extends CI_Model {
 		if($query->num_rows > 0){
 			
 			$this->users_list = $query->result_array();
+			
+			/* Расшифровка баланса */
+			foreach($this->users_list as &$user) {
+				$user['balance'] = (int)$this->encrypt->decode($user['balance']);
+			}
+			
 			return $this->users_list;
 			
 		}else{
@@ -519,24 +526,32 @@ class Users extends CI_Model {
      * 
      * @return bool
     */  
-    function user_live($string, $type='ID'){
+    function user_live($string, $type='id'){
+		
+		$type = strtolower($type);
         
         switch($type){
-            case('ID'):
-                $query = $this->db->get_where('users', array('id' => $string));
-            break;
-            case('LOGIN'):
-                $query = $this->db->get_where('users', array('login' => $string));
-            break;
-            case('EMAIL'):
-                $query = $this->db->get_where('users', array('email' => $string));
-            break;
+            case('id'):
+				$this->db->where('id', $string);
+				break;
+            
+            case('login'):
+				$this->db->where('login', $string);
+				break;
+				
+            case('email'):
+               $this->db->where('email', $string);
+				break;
+			
+			default:
+				return false;
+				break;
         }
-        
-        if($query->num_rows > 0){
-            return TRUE;
-        }else{
-            return FALSE;
+
+        if ($this->db->count_all_results('users') > 0) {
+            return true;
+        } else {
+            return false;
         }
         
     }
@@ -551,7 +566,7 @@ class Users extends CI_Model {
      * @param string - имя привилегии
      * 
     */  
-    function check_privilege($user_id = FALSE, $server_id = FALSE, $privilege = FALSE){
+    function check_privilege($user_id = false, $server_id = false, $privilege = false){
         
         if(!$user_id){
             $user_id = $this->user_data['id'];
@@ -614,7 +629,7 @@ class Users extends CI_Model {
 		
 		if (empty($admin_list)) {
 			// Админов нет
-			return FALSE;
+			return false;
 		}
 		
 		foreach($admin_list as $admin_data) {
@@ -629,10 +644,10 @@ class Users extends CI_Model {
 		$this->email->message($message);
 							
 		if($this->email->send()) {
-			return TRUE;
+			return true;
 		} else {
 			//echo $this->email->print_debugger();
-			return FALSE;
+			return false;
 		}
     }
 }
