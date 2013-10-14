@@ -65,13 +65,12 @@ case "$1" in
     else
 		su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
 		sleep 4
-		
+
 		if [[ `su $USER -c "screen -ls |grep $NAME"` ]]
 			then
 			echo "Server started"
 		else
-		   echo -e "Server not started \nStart command:"
-		   echo su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
+		   echo -e "Server not started \rStart command:" su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
 		fi
     fi
     ;;
