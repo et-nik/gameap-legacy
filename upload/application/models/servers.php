@@ -55,10 +55,10 @@ class Servers extends CI_Model {
 		if (!is_dir($path)) {
 			/* Это не директория */
 			$this->errors = "Dir " . $path . " not found";
-			return FALSE;
+			return false;
 		}
 
-		return TRUE;
+		return true;
 		
 	}
 	
@@ -74,17 +74,17 @@ class Servers extends CI_Model {
 	function _check_file($file) {
 		if (!file_exists($file)) {
 			$this->errors = 'Error: ' . $file . ' file not found';
-			return FALSE;
+			return false;
 		}
 		
 		if (!is_executable($file)) {
 			$this->errors = 'Error: ' . $file . ' file not executable';
-			return FALSE;
+			return false;
 		}
 		
 		
 		
-		return TRUE;
+		return true;
 	}
     
     //-----------------------------------------------------------
@@ -115,7 +115,7 @@ class Servers extends CI_Model {
 				$command = $server_data['script_get_console'];
 				break;
 			default:
-				return FALSE;
+				return false;
 		}
 		
 		/*-------------------*/
@@ -144,9 +144,9 @@ class Servers extends CI_Model {
 		/*-------------------*/
 		
 		/* Допустимые алиасы */
-		$allowable_aliases = json_decode($server_data['aliases_list'], TRUE);
+		$allowable_aliases = json_decode($server_data['aliases_list'], true);
 		/* Значения алиасов на сервере */
-		$server_aliases = json_decode($server_data['aliases'], TRUE);
+		$server_aliases = json_decode($server_data['aliases'], true);
 		
 		/* Прогон по алиасам */
 		if($allowable_aliases && !empty($allowable_aliases)){
@@ -209,7 +209,7 @@ class Servers extends CI_Model {
 	/*
 	 * Функция отправляет команду на сервер
 	*/
-	function command($command, $server_data, $path = FALSE)
+	function command($command, $server_data, $path = false)
     {
 
 		/*
@@ -287,7 +287,7 @@ class Servers extends CI_Model {
 				 * Проверяется файлы .sh, если это команда, например wget, то 
 				 * проверки не будет 
 				*/
-				if (strpos($command, '.sh') !== FALSE && !$this->_check_file($path . '/' . $script_file)) {
+				if (strpos($command, '.sh') !== false && !$this->_check_file($path . '/' . $script_file)) {
 					return $this->errors;
 				}
 
@@ -376,10 +376,10 @@ class Servers extends CI_Model {
 		if ($result) {
 			return $result;
 		}else{
-			return FALSE;
+			return false;
 		}
 		
-		return FALSE;
+		return false;
 	}
     
     
@@ -393,7 +393,7 @@ class Servers extends CI_Model {
     {
 		if(!is_array($server_data)) {
 			// был передан id, получаем данные сервера
-			$server_data = $this->get_server_data($server_data, FALSE, TRUE, TRUE);
+			$server_data = $this->get_server_data($server_data, false, true, true);
 		}
 		
 		$command = $this->command_generate($server_data, 'start');
@@ -414,7 +414,7 @@ class Servers extends CI_Model {
     {
 		if(!is_array($server_data)) {
 			// был передан id, получаем данные сервера
-			$server_data = $this->get_server_data($server_data, FALSE, TRUE, TRUE);
+			$server_data = $this->get_server_data($server_data, false, true, true);
 		}
 		
 		$command = $this->command_generate($server_data, 'stop');
@@ -435,7 +435,7 @@ class Servers extends CI_Model {
     {
 		if(!is_array($server_data)) {
 			// был передан id, получаем данные сервера
-			$server_data = $this->get_server_data($server_data, FALSE, TRUE, TRUE);
+			$server_data = $this->get_server_data($server_data, false, true, true);
 		}
 		
 		$command = $this->command_generate($server_data, 'restart');
@@ -455,7 +455,7 @@ class Servers extends CI_Model {
     {
 		if(!is_array($server_data)) {
 			// был передан id, получаем данные сервера
-			$server_data = $this->get_server_data($server_data, FALSE, TRUE, TRUE);
+			$server_data = $this->get_server_data($server_data, false, true, true);
 		}
 		
 		$command = $this->command_generate($server_data, 'update');
@@ -464,7 +464,7 @@ class Servers extends CI_Model {
 		if ($server_data['steamcmd_path']) {
 			$steamcmd_path = $server_data['steamcmd_path'];
 		} else {
-			$steamcmd_path = FALSE;
+			$steamcmd_path = false;
 		}
 		
 		$result = $this->command($command, $server_data, $steamcmd_path);
@@ -487,9 +487,9 @@ class Servers extends CI_Model {
 		$data['screen_name'] = (!isset($data['screen_name'])) ? $data['game'] . '_' . random_string('alnum', 6) . '_' . $data['server_port'] : $data['screen_name'];
 		
 		if ($this->db->insert('servers', $data)) {
-			return TRUE;
+			return true;
 		} else {
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -503,10 +503,14 @@ class Servers extends CI_Model {
     {
 		$this->db->where('id', $id);
 		
+		if (isset($data['rcon']) {
+			$data['rcon'] = $this->encrypt->encode($data['rcon']);
+		}
+		
 		if($this->db->update('servers', $data)){
-			return TRUE;
+			return true;
 		}else{
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -523,9 +527,9 @@ class Servers extends CI_Model {
 			$this->db->delete('servers_privileges', array('server_id' => $id));
 			$this->db->delete('logs', array('server_id' => $id));
 			
-			return TRUE;
+			return true;
 		} else {
-			return FALSE;
+			return false;
 		}
 	}
 	
@@ -539,7 +543,7 @@ class Servers extends CI_Model {
      * @param array - where для запроса sql
      *
     */
-	function get_server_list($user_id = FALSE, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1', ))
+	function get_server_list($user_id = false, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1', ))
 	{
 		return $this->get_servers_list($user_id, $privilege_name, $where);
 	}
@@ -554,7 +558,7 @@ class Servers extends CI_Model {
      * @param array - where для запроса sql
      *
     */
-    function get_servers_list($user_id = FALSE, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1', ))
+    function get_servers_list($user_id = false, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1', ))
     {
 		/* 
 		 * Если user_id не задан, то получаем все серверы
@@ -638,14 +642,14 @@ class Servers extends CI_Model {
      * Получение данных сервера
      * 
      * @param int - id сервера
-     * @param bool - если TRUE, то данные выделенного сервера получены не будут
-     * @param bool - если TRUE, то данные игры получены не будут
-     * @param bool - если TRUE, то данные типа игры получены не будут
+     * @param bool - если true, то данные выделенного сервера получены не будут
+     * @param bool - если true, то данные игры получены не будут
+     * @param bool - если true, то данные типа игры получены не будут
      * 
      * @return array
      *
     */
-    function get_server_data($server_id, $no_get_ds = FALSE, $no_get_game = FALSE, $no_get_gt = FALSE)
+    function get_server_data($server_id, $no_get_ds = false, $no_get_game = false, $no_get_gt = false)
     {
 		// Загрузка необходимых моделей
 		$this->load->model('servers/dedicated_servers');
@@ -796,7 +800,7 @@ class Servers extends CI_Model {
 					$execfile = $this->game_types->game_types_list['0']['execfile_linux'];
 					
 					/* Добавляем к линуксу ./ в случае необходимости */
-					if (stripos($execfile, './') === FALSE) {
+					if (stripos($execfile, './') === false) {
 						$execfile = './' . $execfile;
 					}
 					
@@ -825,7 +829,7 @@ class Servers extends CI_Model {
 
 			
 		} else {
-			return FALSE;
+			return false;
 		}
 
 		return $this->server_data;
@@ -872,9 +876,9 @@ class Servers extends CI_Model {
 	function server_live($server_id){
 		
 		if($this->db->count_all_results('servers', array('id' => $server_id)) > 0){
-			return TRUE;
+			return true;
 		}else{
-			return FALSE;
+			return false;
 		}
 		
 	}
@@ -889,9 +893,9 @@ class Servers extends CI_Model {
 	function ds_server_live($server_id){
 		
 		if($this->db->count_all_results('dedicated_servers', array('id' => $server_id)) > 0){
-			return TRUE;
+			return true;
 		}else{
-			return FALSE;
+			return false;
 		}
 		
 	}
@@ -903,7 +907,7 @@ class Servers extends CI_Model {
      * 
      * @return bool
     */	
-	function server_status($host = FALSE, $port = FALSE, $engine = FALSE, $engine_version = FALSE)
+	function server_status($host = false, $port = false, $engine = false, $engine_version = false)
 	{
 		$this->load->driver('query');
 		
@@ -945,9 +949,9 @@ class Servers extends CI_Model {
 		$this->query->set_engine($engine, $engine_version);
 
 		if ($this->query->get_status($host, $port)) {
-			return TRUE;
+			return true;
 		}else{
-			return FALSE;
+			return false;
 		}
 		
 	}
@@ -961,7 +965,7 @@ class Servers extends CI_Model {
      * 
      *
     */
-    function get_game_servers_list($where = FALSE, $limit = 10000)
+    function get_game_servers_list($where = false, $limit = 10000)
     {
 		if(is_array($where)){
 			$query = $this->db->get_where('servers', $where, $limit);
@@ -992,7 +996,7 @@ class Servers extends CI_Model {
      * @return array - возвращает список файлов с полным путем к файлу
      * 
     */
-	function get_local_files($server_data, $dir, $file_time = FALSE, $file_size = FALSE)
+	function get_local_files($server_data, $dir, $file_time = false, $file_size = false)
 	{
 		if($dir) {
 			$files_list = glob($dir);
@@ -1021,7 +1025,7 @@ class Servers extends CI_Model {
 			
 			return $files;
 		}else{
-			return FALSE;
+			return false;
 		}
 	}
 	
@@ -1039,7 +1043,7 @@ class Servers extends CI_Model {
      * @return array - возвращает список файлов с полным путем к файлу
      * 
     */
-	function get_remote_files($server_data, $dir, $file_time = FALSE, $file_size = FALSE)
+	function get_remote_files($server_data, $dir, $file_time = false, $file_size = false)
 	{
 		
 		$connection = ftp_connect($server_data['ftp_host']);
@@ -1067,13 +1071,13 @@ class Servers extends CI_Model {
 					}
 				}
 			}else{
-				return FALSE;
+				return false;
 			}
 			
 			return $files;
 
 		}else{
-			return FALSE;
+			return false;
 		}
 
 	}
@@ -1091,7 +1095,7 @@ class Servers extends CI_Model {
 		$time = time();
 
 		/* Получаем список карт из базы (своеобразный кеш)*/
-		$maps_cache = json_decode($this->server_data['maps_list'], TRUE);
+		$maps_cache = json_decode($this->server_data['maps_list'], true);
 		
 		/* Если списку не более суток */
 		if($maps_cache && $maps_cache['time'] > $time - 86400){
@@ -1107,7 +1111,7 @@ class Servers extends CI_Model {
 		}else{
 			// Сервер удаленный
 			$dir = set_realpath($this->server_data['ftp_path'] . '/' . $this->server_data['dir'] . '/' . $this->server_data['maps_path']);
-			$files_list = $this->get_remote_files($this->server_data, $dir . "*.bsp", TRUE);
+			$files_list = $this->get_remote_files($this->server_data, $dir . "*.bsp", true);
 		}
 		
 		/* Сортировка массива с файлами по возрастанию
@@ -1187,12 +1191,12 @@ class Servers extends CI_Model {
 				$file_contents = file_get_contents($file);
 			} else {
 				$this->errors = 'Отсутствуют права на чтение файла';
-				return FALSE;
+				return false;
 			}
 			
 		} else {
 			$this->errors = 'Файл не найден';
-			return FALSE;
+			return false;
 		}
 		
 		return $file_contents;
@@ -1223,7 +1227,7 @@ class Servers extends CI_Model {
 			// Производим скачивание файла
 			if (@!ftp_fget($connection, $handle, $file, FTP_ASCII, 0)) {
 				$this->errors = 'Файл не найден';
-				return FALSE;
+				return false;
 			}
 
 			$file_contents = file_get_contents($temp_file);
@@ -1233,7 +1237,7 @@ class Servers extends CI_Model {
 			
 			return $file_contents;
 		} else {
-			return FALSE;
+			return false;
 		}
 	}
 	
@@ -1247,10 +1251,10 @@ class Servers extends CI_Model {
      * @param str
      * @return str
     */
-	function write_local_file($file, $data = FALSE) {
+	function write_local_file($file, $data = false) {
 		
 		if(!$data) {
-			return FALSE;
+			return false;
 		}
 		
 		if(file_exists($file)) {
@@ -1258,20 +1262,20 @@ class Servers extends CI_Model {
 			if(is_writable($file)) {
 				
 				if(file_put_contents($file, $data)) {
-					return TRUE;
+					return true;
 				}else{
 					$this->errors = 'Неизвестная ошибка';
-					return FALSE;
+					return false;
 				}
 				
 			} else {
 				$this->errors = 'Отсутствуют права на запись файла';
-				return FALSE;
+				return false;
 			}
 
 		} else {
 			$this->errors = 'Файл не найден';
-			return FALSE;
+			return false;
 		}
 
 	}
@@ -1294,7 +1298,7 @@ class Servers extends CI_Model {
 		
 		if(!$connection) {
 			$this->errors = 'Ошибка соединения с ftp сервером';
-			return FALSE;
+			return false;
 		}
 		
 		if(ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])) {
@@ -1302,16 +1306,16 @@ class Servers extends CI_Model {
 			if (!ftp_put($connection, $remote_file, $file, FTP_BINARY)) {
 				$this->errors = 'Ошибка записи файла';
 				ftp_close($connection);
-				return FALSE;
+				return false;
 			} else {
 				@ftp_chmod($connection, $mode, $remote_file);
 				ftp_close($connection);
-				return TRUE;
+				return true;
 			}
 		
 		} else {
 			$this->errors = 'Ошибка авторизации FTP';
-			return FALSE;
+			return false;
 		}
 	}
 	
@@ -1331,15 +1335,15 @@ class Servers extends CI_Model {
 		// Определяем временный файл
 		$temp_file = tempnam(sys_get_temp_dir(), basename($file));
 
-		if (file_put_contents($temp_file, $data) === FALSE) {
+		if (file_put_contents($temp_file, $data) === false) {
 			$this->errors = 'Ошибка записи временного файла';
-			return FALSE;
+			return false;
 		}
 		
 		if($this->upload_remote_file($temp_file, $file)){
-			return TRUE;
+			return true;
 		}else{
-			return FALSE;
+			return false;
 		}
 	}
 	
@@ -1348,12 +1352,13 @@ class Servers extends CI_Model {
     /**
      * Смена rcon пароля серверу
      * 
-     * @param str - новый RCON пароль
-     * @pararm arr -
+     * @param string	$new_rcon новый RCON пароль
+     * @pararm array	$server_data данные сервера
+     * @param bool		$update_db обновлять данные БД
      * 
      * @return bool
     */
-    function change_rcon($new_rcon, $server_data = FALSE) 
+    function change_rcon($new_rcon, $server_data = false, $update_db = false) 
     {
 		if($server_data) {
 			$this->server_data = $server_data;
@@ -1368,7 +1373,7 @@ class Servers extends CI_Model {
 				$servercfg_file = 'cfg/server.cfg';
 				break;
 			default:
-				return FALSE;
+				return false;
 				break;
 		}
 		
@@ -1389,12 +1394,12 @@ class Servers extends CI_Model {
 		
 		/* Ошибка чтения, либо файл не найден */
 		if(!$file_contents) {
-			return FALSE;
+			return false;
 		}
 		
 		$file_strings = explode("\n", $file_contents);
 		
-		$string_found = FALSE;
+		$string_found = false;
 		$new_cfg_data = '';
 		$i = 0;
 		$count_i = count($file_strings);
@@ -1404,7 +1409,7 @@ class Servers extends CI_Model {
 			/* Найдены совпадения, поэтому меняем ркон */
 			if(!empty($matches)){
 				$file_strings[$i] = 'rcon_password "' . $new_rcon . '"';
-				$string_found = TRUE; // Строка rcon_password найдена
+				$string_found = true; // Строка rcon_password найдена
 			}
 			
 			/* Записываем данные в переменную, которую потом запишем как новый конфиг */
@@ -1455,9 +1460,12 @@ class Servers extends CI_Model {
 			$this->rcon->command('rcon_password ' . $new_rcon);
 		}
 		
-		$this->server_data['rcon'] = $new_rcon;
+		if ($update_db) {
+			$sql_data = array('rcon' = $new_rcon);
+			$this->edit_game_server($this->server_data['id'], $sql_data);
+		}
 		
-		return TRUE;
+		return true;
 
 	}
 	
@@ -1472,7 +1480,7 @@ class Servers extends CI_Model {
      * 
      * @return array
     */
-    function get_server_settings($server_id, $user_id = FALSE)
+    function get_server_settings($server_id, $user_id = false)
     {
 		if(!$user_id) {
             $where = array('server_id' => $server_id);
@@ -1507,7 +1515,7 @@ class Servers extends CI_Model {
      * 
      * @return bool
     */
-    function set_server_settings($sett_id, $value, $server_id, $user_id = FALSE)
+    function set_server_settings($sett_id, $value, $server_id, $user_id = false)
     {
         $where = array('sett_id' => $sett_id,
 						'server_id' => $server_id);
@@ -1534,17 +1542,17 @@ class Servers extends CI_Model {
         if($query->num_rows > 0){
            /* Если привилегия уже есть в базе данных, то обновляем */
            if($this->db->update('settings', $data)){
-                return TRUE;
+                return true;
             }else{
-                return FALSE;
+                return false;
             }
             
         }else{
 			/* Привилегии нет в базе данных, создаем новую строку */
 			if($this->db->insert('settings', $data)){
-                return TRUE;
+                return true;
             }else{
-                return FALSE;
+                return false;
             }
 		}
 

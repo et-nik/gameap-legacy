@@ -1,50 +1,61 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Test extends CI_Controller {
-
-	//Template
-	var $tpl_data = array();
-
-	var $user_data = array();
-	var $server_data = array();
-
+	
 	public function __construct()
     {
         parent::__construct();
-
+		
 		$this->load->database();
         $this->load->model('users');
-        $check = $this->users->check_user();
+        $this->lang->load('adm_servers');
+        $this->lang->load('server_control');
+        $this->lang->load('main');
         
-        if($check){
+        $this->load->model('servers');
+        $this->load->model('servers/dedicated_servers');
+		$this->load->model('servers/games');
+		$this->load->model('servers/game_types');
+		
+		$this->load->helper('string');
+		$this->load->helper('form');
+
+		$games_list = $this->games->get_games_list();
+		$game_types_list = $this->game_types->get_gametypes_list();
+
+        if ($this->users->check_user()) {
+			
 			//Base Template
-			$this->tpl_data['title'] = 'Настройки :: АдминПанель';
-			$this->tpl_data['heading'] = 'Настройки';
-			$this->tpl_data['content'] = '';
+			$this->tpl_data['title'] 	= lang('adm_servers_title_index');
+			$this->tpl_data['heading'] 	= lang('adm_servers_heading_index');
+			$this->tpl_data['content'] 	= '';
+			
+			/* Есть ли у пользователя права */
+			if(!$this->users->auth_privileges['srv_global']) {
+				redirect('admin');
+			}
+			
+			$this->load->model('servers');
+			$this->load->library('form_validation');
+			$this->load->helper('form');
+			
 			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, TRUE);
 			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), TRUE);
+			
+			
         
-        }else{
-            header("Location: /auth");
-			exit;
+        } else {
+			redirect('auth');
         }
     }
     
-    
-    // ----------------------------------------------------------------
-
-    /**
-     * Редактирование пользователя
-     * 
-    */
-    public function index($user_id = FALSE)
+    function index()
     {
-		$this->load->driver('query');
-		$this->query->set_engine('minecraft');
+		$this->servers->get_server_data(17);
 		
-		print_r($this->query->get_players('178.33.115.194', 27033));
-
-		$this->parser->parse('main.html', $this->tpl_data);
+		print_r($this->servers->command("./add_ftp_user.sh test 123 /home/test", $this->servers->server_data));
+		//~ print_r($this->servers->command('echo "Текст" >> /etc/proftpd/ftpd.passwd', $this->servers->server_data));
+		print_r($this->servers->commands);
 	}
-    
+
 }
