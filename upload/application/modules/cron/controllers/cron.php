@@ -163,7 +163,16 @@ class Cron extends MX_Controller {
 			} else {
 				/* Установка на локальный сервер */
 				$commands = array();
-				$commands[] = 'cp ' . $link . ' ' . $this->config->config['local_script_path'] . '/' .$this->servers_data[$server_id]['dir'];
+				
+				switch (strtolower($this->servers_data[$server_id]['os'])) {
+					case 'windows':
+						$commands[] = 'copy ' . $link . ' ' . $this->config->config['local_script_path'] . '/' .$this->servers_data[$server_id]['dir'];
+						break;
+
+					default:
+						$commands[] = 'cp ' . $link . ' ' . $this->config->config['local_script_path'] . '/' .$this->servers_data[$server_id]['dir'];
+						break;
+				} 
 			}
 			
 			$this->servers->command($commands, $this->servers_data[$server_id], $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']);
