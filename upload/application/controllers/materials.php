@@ -10,12 +10,12 @@ class Materials extends MX_Controller {
 		modules::run('commercial/materials_comm/index');
 	}
 	
-	function view($param = FALSE)
+	function view($param = false)
 	{
 		modules::run('commercial/materials_comm/view', $param);
 	}
 	
-	function category($param = FALSE)
+	function category($param = false)
 	{
 		modules::run('commercial/materials_comm/category', $param);
 	}

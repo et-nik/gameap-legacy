@@ -36,8 +36,8 @@ class Index extends CI_Controller {
 			$this->tpl_data['title'] 	= lang('ap_title');
 			$this->tpl_data['heading'] 	= lang('ap_header');
 			$this->tpl_data['content'] = '';
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, TRUE);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), TRUE);
+			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
+			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
 			
 		
 		} else {
@@ -150,7 +150,7 @@ class Index extends CI_Controller {
 			$local_tpl_data['games_list'] = clean_games_list($local_tpl_data['games_list']);
 				
 			if($num){
-				$this->tpl_data['content'] .= $this->parser->parse('servers/servers_list.html', $local_tpl_data, TRUE);
+				$this->tpl_data['content'] .= $this->parser->parse('servers/servers_list.html', $local_tpl_data, true);
 			}
 		}
 			

@@ -43,8 +43,8 @@ class Servers_log extends CI_Controller {
 			$this->tpl_data['title'] 		= lang('servers_log_title_index');
 			$this->tpl_data['heading'] 		= lang('servers_log_header_index');
 			$this->tpl_data['content'] 		= '';
-			$this->tpl_data['menu'] 		= $this->parser->parse('menu.html', $this->tpl_data, TRUE);
-			$this->tpl_data['profile'] 		= $this->parser->parse('profile.html', $this->users->tpl_userdata(), TRUE);
+			$this->tpl_data['menu'] 		= $this->parser->parse('menu.html', $this->tpl_data, true);
+			$this->tpl_data['profile'] 		= $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
         
         }else{
             redirect('auth');
@@ -52,7 +52,7 @@ class Servers_log extends CI_Controller {
     }
     
     // Отображение информационного сообщения
-    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = false, $link = false, $link_text = false)
     {
         
         if (!$message) {
@@ -70,7 +70,7 @@ class Servers_log extends CI_Controller {
         $local_tpl_data['message'] = $message;
         $local_tpl_data['link'] = $link;
         $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
@@ -95,7 +95,7 @@ class Servers_log extends CI_Controller {
 			$local_tpl_data['servers_list'] = $this->servers->tpl_data();
 			$local_tpl_data['url'] = site_url('/admin/servers_log/list_logs');
 				
-			$this->tpl_data['content'] .= $this->parser->parse('servers/select_server.html', $local_tpl_data, TRUE);
+			$this->tpl_data['content'] .= $this->parser->parse('servers/select_server.html', $local_tpl_data, true);
 		}
 		
 		$this->parser->parse('main.html', $this->tpl_data);
@@ -107,10 +107,10 @@ class Servers_log extends CI_Controller {
      * Просмотр файлов логов
      * 
     */
-	public function list_logs($server_id = FALSE, $id_dir = FALSE)
+	public function list_logs($server_id = false, $id_dir = false)
     {
 		if($this->users->user_id){
-			$this->tpl_data['content'] .= $this->parser->parse('servers/servers_log.html', $this->tpl_data, TRUE);
+			$this->tpl_data['content'] .= $this->parser->parse('servers/servers_log.html', $this->tpl_data, true);
 			
 			$this->load->model('servers');
 			
@@ -119,10 +119,10 @@ class Servers_log extends CI_Controller {
 				
 				$this->servers->get_server_list($this->users->user_id);
 				$local_tpl_data['servers_list'] = $this->servers->tpl_data();
-				$this->tpl_data['content'] .= $this->parser->parse('servers/log_select_server.html', $local_tpl_data, TRUE);
+				$this->tpl_data['content'] .= $this->parser->parse('servers/log_select_server.html', $local_tpl_data, true);
 				
                 $this->parser->parse('main.html', $this->tpl_data);
-				return FALSE;
+				return false;
 			}
 			
 			$this->servers->get_server_data($server_id);
@@ -130,7 +130,7 @@ class Servers_log extends CI_Controller {
 			/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
 			if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']){
 				$this->_show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_log'));
-				return FALSE;
+				return false;
 			}
 			
 			/* Проверка привилегий на сервер */
@@ -138,14 +138,14 @@ class Servers_log extends CI_Controller {
 			
 			if(!$this->users->servers_privileges['LOGS_VIEW']){
 				$this->_show_message(lang('servers_log_no_privileges'), site_url('admin/servers_log'));
-				return FALSE;
+				return false;
 			}
 			
 			/* Если не задан id директории то отображаем список с директориями 
 			 * $id_dir может быть равно 0, это id лог директории */
-			if($id_dir === FALSE){
+			if($id_dir === false){
 				
-				$ldir_list = json_decode($this->servers->server_data['log_dirs'], TRUE);
+				$ldir_list = json_decode($this->servers->server_data['log_dirs'], true);
 				
 				if($ldir_list) {
 					$i = -1;
@@ -160,9 +160,9 @@ class Servers_log extends CI_Controller {
 				
 				$local_tpl_data['server_id'] = $server_id;
 				
-				$this->tpl_data['content'] .= $this->parser->parse('servers/select_log.html', $local_tpl_data, TRUE);
+				$this->tpl_data['content'] .= $this->parser->parse('servers/select_log.html', $local_tpl_data, true);
 				$this->parser->parse('main.html', $this->tpl_data);
-				return FALSE;
+				return false;
 			}
 			
 			$this->load->model('servers/logs');
@@ -181,11 +181,11 @@ class Servers_log extends CI_Controller {
 			}
 			
 			/* Получаем данные из json */
-			$ldir_list = json_decode($this->servers->server_data['log_dirs'], TRUE);
+			$ldir_list = json_decode($this->servers->server_data['log_dirs'], true);
 			
 			if(!array_key_exists($id_dir, $ldir_list)){
 				$this->_show_message(lang('servers_log_dir_unavailable'), site_url('admin/servers_log'));
-				return FALSE;
+				return false;
 			}
 			
 			$local_tpl_data['id_dir'] = $id_dir;		
@@ -217,7 +217,7 @@ class Servers_log extends CI_Controller {
 					$log_data['log_data'] = $this->logs->errors;
 					$this->panel_log->save_log($log_data);
 
-					return FALSE;
+					return false;
 				}
 				
 				$i ++;
@@ -230,7 +230,7 @@ class Servers_log extends CI_Controller {
 			$local_tpl_data['file_name'] = $file_name;
 			$local_tpl_data['log_limit'] = $log_limit;
 					
-			$this->tpl_data['content'] .= $this->parser->parse('servers/log_list.html', $local_tpl_data, TRUE);
+			$this->tpl_data['content'] .= $this->parser->parse('servers/log_list.html', $local_tpl_data, true);
 			//$this->servers->server_data
 		}
 		
@@ -243,10 +243,10 @@ class Servers_log extends CI_Controller {
      * Просмотр файлов логов
      * 
     */
-	public function view($server_id = FALSE, $id_dir = FALSE, $file_log = FALSE)
+	public function view($server_id = false, $id_dir = false, $file_log = false)
     {
 		if($this->users->user_id){
-			$this->tpl_data['content'] .= $this->parser->parse('servers/servers_log.html', $this->tpl_data, TRUE);
+			$this->tpl_data['content'] .= $this->parser->parse('servers/servers_log.html', $this->tpl_data, true);
 			
 			$this->load->model('servers');
 			
@@ -255,17 +255,17 @@ class Servers_log extends CI_Controller {
 				$local_tpl_data['servers_list'] = $this->servers->tpl_data();
 				$local_tpl_data['param'] = $param;
 				
-				$this->tpl_data['content'] .= $this->parser->parse('servers/log_select_server.html', $local_tpl_data, TRUE);
+				$this->tpl_data['content'] .= $this->parser->parse('servers/log_select_server.html', $local_tpl_data, true);
 				
                 $this->parser->parse('main.html', $this->tpl_data);
-				return FALSE;
+				return false;
 			}
 			
 			/*
 			if(!in_array($param, $this->allow_param)){
 				$this->tpl_data['content'] .= '<p>Неправильный параметр view</p>';
 				$this->parser->parse('main.html', $this->tpl_data);
-				return FALSE;
+				return false;
 			}
 			*/
 			
@@ -274,7 +274,7 @@ class Servers_log extends CI_Controller {
 			/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
 			if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']){
 				$this->_show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_log'));
-				return FALSE;
+				return false;
 			}
 			
 			/* Проверка привилегий на сервер */
@@ -282,17 +282,17 @@ class Servers_log extends CI_Controller {
 			
 			if(!$this->users->servers_privileges['LOGS_VIEW']){
 				$this->_show_message(lang('servers_log_no_privileges'), site_url('admin/servers_log'));
-				return FALSE;
+				return false;
 			}
 			
 			$this->load->model('servers/logs');
 			
 			/* Получаем данные из json */
-			$ldir_list = json_decode($this->servers->server_data['log_dirs'], TRUE);
+			$ldir_list = json_decode($this->servers->server_data['log_dirs'], true);
 			
 			if (!array_key_exists($id_dir, $ldir_list)) {
 				$this->_show_message(lang('servers_log_dir_unavailable'), site_url('admin/servers_log'));
-				return FALSE;
+				return false;
 			}
 			
 			$local_tpl_data['id_dir'] = $id_dir;		
@@ -304,7 +304,7 @@ class Servers_log extends CI_Controller {
 			$file_ext = end(explode(".", $file_log));
 			if(!in_array($file_ext, $allowed_types)){
 				$this->_show_message(lang('servers_log_file_type_unavailable'), site_url('admin/servers_log'));
-				return FALSE;
+				return false;
 			}
 			
 			
@@ -322,7 +322,7 @@ class Servers_log extends CI_Controller {
 				$log_data['log_data'] = 'File: ' . $file_log . ' Dir: ' . $dir . "\n";
 				$this->panel_log->save_log($log_data);
 				
-				return FALSE;
+				return false;
 			}
 			
 			$local_tpl_data['log_contents'] = $log_content;
@@ -333,7 +333,7 @@ class Servers_log extends CI_Controller {
 			$local_tpl_data['server_id'] = $server_id;
 			//$local_tpl_data['param'] = $param;
 					
-			$this->tpl_data['content'] .= $this->parser->parse('servers/view_log.html', $local_tpl_data, TRUE);
+			$this->tpl_data['content'] .= $this->parser->parse('servers/view_log.html', $local_tpl_data, true);
 			//$this->servers->server_data
 		}
 		
@@ -350,7 +350,7 @@ class Servers_log extends CI_Controller {
 	public function filter()
     {
 		if($this->users->user_id){
-			$this->tpl_data['content'] .= $this->parser->parse('servers/servers_log.html', $this->tpl_data, TRUE);
+			$this->tpl_data['content'] .= $this->parser->parse('servers/servers_log.html', $this->tpl_data, true);
 		}
 		
 		$this->parser->parse('main.html', $this->tpl_data);

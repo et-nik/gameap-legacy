@@ -33,9 +33,9 @@ class Rcon_source extends CI_Driver {
 		if ($this->fp) {
 			$this->_set_timeout($this->fp, 1, 500);
 			$this->auth();
-			return TRUE;
+			return true;
 		} else {
-			return FALSE;
+			return false;
 		}
 	
     }
@@ -48,14 +48,14 @@ class Rcon_source extends CI_Driver {
 		// Real response (id: -1 = failure)
 		$ret = $this->_packetread();
 		
-		if (FALSE == $ret) {
-			return FALSE;
+		if (false == $ret) {
+			return false;
 		}
 		
 		if (@$ret[1]['ID'] == -1) {
-			return FALSE;
+			return false;
 		} else {
-			return TRUE;
+			return true;
 		}
 	}
 

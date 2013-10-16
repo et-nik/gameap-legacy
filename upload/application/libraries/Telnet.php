@@ -30,8 +30,8 @@ class Telnet {
 
 	/* (c) thies@thieso.net */
 
-	var $_connection 	= FALSE;
-	var $_auth			= FALSE;
+	var $_connection 	= false;
+	var $_auth			= false;
 	var $errors = '';
 	
 	private $ip;
@@ -46,7 +46,7 @@ class Telnet {
 	{
 		if ($this->ip && $this->ip == $ip && $this->_connection) {
 			/* Уже соединен с этим сервером */
-			return TRUE;
+			return true;
 		}
 		
 		$this->ip = $ip;
@@ -56,10 +56,10 @@ class Telnet {
 		socket_set_timeout($this->_connection, 7);
 
 		if (!$this->_connection) {
-			return FALSE;
+			return false;
 		}
 		
-		$this->auth = FALSE;
+		$this->auth = false;
 		return $this->_connection;
 	}
 
@@ -70,7 +70,7 @@ class Telnet {
 	*/
 	function auth($login, $password)
 	{
-		if ($this->auth == TRUE) {
+		if ($this->auth == true) {
 			return NULL;
 		}
 		
@@ -83,12 +83,12 @@ class Telnet {
 		$this->_write("\r\n");
 		$this->_read_till(":> ");
 		
-		$this->auth = TRUE;
+		$this->auth = true;
 	}
 
 	function command($command)
 	{
-		if(!$this->_connection) { return FALSE;}
+		if(!$this->_connection) { return false;}
 		
 		$this->_write($command . "\n\r");
 
@@ -96,7 +96,7 @@ class Telnet {
 		
 		$last_element = count($result)-1;
 		unset($result[0]);
-		if (strpos($result[$last_element], '>') !== FALSE) {
+		if (strpos($result[$last_element], '>') !== false) {
 			unset($result[$last_element]);
 		}
 
@@ -123,7 +123,7 @@ class Telnet {
 	}
 
 	function _write($buffer) {
-		if(!$this->_connection) { return FALSE;}
+		if(!$this->_connection) { return false;}
 		
 		$buffer = str_replace(chr(255),chr(255).chr(255),$buffer);
         fwrite($this->_connection,$buffer);
@@ -132,7 +132,7 @@ class Telnet {
 
 	function _getc() 
 	{
-		if(!$this->_connection) { return FALSE;}
+		if(!$this->_connection) { return false;}
 		return fgetc($this->_connection);
 	}
 

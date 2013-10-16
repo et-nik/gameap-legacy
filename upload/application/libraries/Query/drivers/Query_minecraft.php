@@ -35,7 +35,7 @@ class Query_minecraft extends CI_Driver {
 
 		if( $errno || $this->socket === false )
 		{
-			return FALSE;
+			return false;
 		}
 
 		stream_set_timeout($this->socket, 1);
@@ -44,9 +44,9 @@ class Query_minecraft extends CI_Driver {
 		$this->challenge = $this->getchallenge();
 		
 		if ($this->challenge) {
-			return TRUE;
+			return true;
 		} else {
-			return FALSE;
+			return false;
 		}
 	}
 	
@@ -54,8 +54,8 @@ class Query_minecraft extends CI_Driver {
 	{
 		$data = $this->WriteData(0x09);
 
-		if ($data === FALSE) {
-			return FALSE;
+		if ($data === false) {
+			return false;
 		}
 
 		return pack('N', $data);
@@ -67,17 +67,17 @@ class Query_minecraft extends CI_Driver {
 		$length  = strlen($command);
 
 		if ($length !== fwrite($this->socket, $command, $length)) {
-			return FALSE;
+			return false;
 		}
 
 		$data = fread($this->socket, 2048);
 
 		if ($data === false) {
-			return FALSE;
+			return false;
 		}
 
 		if (strlen( $data ) < 5 || $data[ 0 ] != $command[ 2 ]) {
-			return FALSE;
+			return false;
 		}
 
 		return substr($data, 5);
@@ -88,7 +88,7 @@ class Query_minecraft extends CI_Driver {
 		$data = $this->WriteData(0x00, $challenge . pack( 'c*', 0x00, 0x00, 0x00, 0x00 ) );
 
 		if( !$data ){
-			return FALSE;
+			return false;
 		}
 
 		$last = '';
@@ -98,7 +98,7 @@ class Query_minecraft extends CI_Driver {
 		$data    = explode( "\x00\x00\x01player_\x00\x00", $data );
 
 		if (count($data) !== 2) {
-			return FALSE;
+			return false;
 		}
 
 		$players = substr( $data[ 1 ], 0, -2 );
@@ -202,9 +202,9 @@ class Query_minecraft extends CI_Driver {
 	function get_status($host, $port)
 	{
 		if ($this->connect($host, $port)) {
-			return TRUE;
+			return true;
 		} else {
-			return FALSE;
+			return false;
 		}
 		
 	}

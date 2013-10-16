@@ -38,7 +38,7 @@ class Auth extends CI_Controller {
     }
     
     // Отображение информационного сообщения
-    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = false, $link = false, $link_text = false)
     {
         
         if (!$message) {
@@ -56,7 +56,7 @@ class Auth extends CI_Controller {
         $local_tpl_data['message'] = $message;
         $local_tpl_data['link'] = $link;
         $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
@@ -71,10 +71,10 @@ class Auth extends CI_Controller {
 			$query = $this->db->get_where('captcha', array('word' => $word, 'ip_address' => $this->input->ip_address(), 'captcha_time >' => $expiration), 1);
 			
 			if($query->num_rows > 0) {
-				return TRUE;
+				return true;
 			}
 			
-			return FALSE;
+			return false;
 	}
 	
 	public function index()
@@ -102,7 +102,7 @@ class Auth extends CI_Controller {
      * 
      *
     */
-    public function in($code = FALSE)
+    public function in($code = false)
     {
         /* Загрузка модели проверки пользователей */
         //$this->load->model('check_user');
@@ -122,7 +122,7 @@ class Auth extends CI_Controller {
 			/* Перенаправляем пользователя в нужное место, 
 			 * если заданы нужные куки location_page 
 			*/
-			if($location_page = $this->input->cookie('location_page', TRUE)){
+			if($location_page = $this->input->cookie('location_page', true)){
 				// Уничтожаем куки
 				$cookie = array(
 						'name'   => 'location_page',
@@ -142,24 +142,24 @@ class Auth extends CI_Controller {
         $this->form_validation->set_rules('user_password', 'Password', 'trim|required|md5');
 
         /* Проверка формы */
-		if ($this->form_validation->run() == FALSE){
+		if ($this->form_validation->run() == false){
 			//$this->tpl_data['content'] .= $this->parser->parse('login.html', $this->tpl_data);
 
         } else {
 
-			$user_data['login'] = $this->input->post('user_login', TRUE);
-			$user_data['password'] = $this->input->post('user_password', TRUE);
+			$user_data['login'] = $this->input->post('user_login', true);
+			$user_data['password'] = $this->input->post('user_password', true);
 			
 			/* Защита от брутфорса по одному ip */
 			if(count($this->panel_log->get_log(array('date >' => time() - 300, 'ip' => $_SERVER['REMOTE_ADDR'], 'msg' => 'Authorization Failed'))) > 5 ) {
 				$this->_show_message(lang('auth_repeat_enter_wrong_password'));
-				return FALSE;
+				return false;
 			}
 			
 			/* Защита от брутфорса для определенного пользователя */
 			if(count($this->panel_log->get_log(array('date >' => time() - 300, 'user_name' => $user_data['login'], 'msg' => 'Authorization Failed'))) > 5 ) {
 				if($this->users->user_live($user_data['login'], 'LOGIN')) {
-					$code_is_true = FALSE;
+					$code_is_true = false;
 
 					/* Проверка правильности кода */
 					if($code) {
@@ -169,9 +169,9 @@ class Auth extends CI_Controller {
 						if(!empty($user_list)) {
 							// Код верный, ничего не предпринимаем, не блокируем и разрешаем
 							// пользователю авторизоваться, т.к. он подтвердил всё
-							$code_is_true = TRUE;
+							$code_is_true = true;
 						} else {
-							$code_is_true = FALSE;
+							$code_is_true = false;
 						}
 					}
 					
@@ -209,10 +209,10 @@ class Auth extends CI_Controller {
 							$log_data['type'] = 'auth';
 							$log_data['user_name'] = $user_data['login'];
 							$this->panel_log->save_log($log_data);
-							return FALSE;
+							return false;
 						} else {
 							$this->_show_message(lang('auth_bruteforce_email_send'));
-							return FALSE;
+							return false;
 						}
 						// Код неверный
 					}
@@ -258,7 +258,7 @@ class Auth extends CI_Controller {
 				
 				/* Перенаправляем пользователя в нужное место, 
 				 * если заданы нужные куки location_page */
-				if($location_page = $this->input->cookie('location_page', TRUE)){
+				if($location_page = $this->input->cookie('location_page', true)){
 					// Уничтожаем куки
 					$cookie = array(
 							'name'   => 'location_page',
@@ -277,11 +277,11 @@ class Auth extends CI_Controller {
 				$this->tpl_data['content'] .= '<a href=' . site_url('admin') . '>' . lang('auth_goto_server_control') . '</a>';
 			} else {
 				$this->tpl_data['content'] = '<p>' . lang('auth_authorization_failed') . '</p>';
-				//$this->tpl_data['content'] .= $this->parser->parse('login.html', $this->tpl_data, TRUE);
+				//$this->tpl_data['content'] .= $this->parser->parse('login.html', $this->tpl_data, true);
 				
 				// Сохраняем логи
 				$log_data['type'] = 'auth';
-				$log_data['user_name'] = $this->input->post('user_login', TRUE);
+				$log_data['user_name'] = $this->input->post('user_login', true);
 				$log_data['msg'] = 'Authorization Failed';
 				$this->panel_log->save_log($log_data);
 			}
@@ -314,7 +314,7 @@ class Auth extends CI_Controller {
 		$local_tpl_data['message'] 			= lang('auth_quit_success');
 		$local_tpl_data['link'] 			= site_url();
 		$local_tpl_data['back_link_txt'] 	= lang('auth_goto_main');
-		$this->tpl_data['content'] 			= $this->parser->parse('info.html', $local_tpl_data, TRUE);
+		$this->tpl_data['content'] 			= $this->parser->parse('info.html', $local_tpl_data, true);
 
         $this->parser->parse('main.html', $this->tpl_data);
 	}
@@ -327,7 +327,7 @@ class Auth extends CI_Controller {
         
         if(!$this->config->config['register_users']) {
 			$this->_show_message(lang('auth_registration_closed'), site_url());
-			return FALSE;
+			return false;
 		}
 
         $this->form_validation->set_rules('login', 'логин', 'trim|required|is_unique[users.login]|max_length[32]|xss_clean');
@@ -338,7 +338,7 @@ class Auth extends CI_Controller {
 		$this->form_validation->set_rules('image', 'капча', 'trim|required|max_length[12]|xss_clean');
         
         /* Проверка формы */
-		if ($this->form_validation->run() == FALSE) {
+		if ($this->form_validation->run() == false) {
 			
 			// Слово для капчи
 			$cap['word'] = rand(1000, 9999);
@@ -380,10 +380,10 @@ class Auth extends CI_Controller {
 				$this->panel_log->save_log($log_data);
 				
 				$this->_show_message(lang('auth_captcha_enter_wrong'), site_url('auth/register'));
-				return FALSE;
+				return false;
 			}
 			
-			$user_data['email'] = $this->input->post('email', TRUE);
+			$user_data['email'] = $this->input->post('email', true);
 			$user_data['reg_date'] = time();
 			 
             $user_data['login'] = $this->input->post('login');
@@ -394,14 +394,14 @@ class Auth extends CI_Controller {
 			);
 			
 			$user_data['privileges'] = json_encode(array(
-													'srv_global' 			=> FALSE,
-													'srv_start' 			=> TRUE,
-													'srv_stop' 				=> TRUE,
-													'srv_restart' 			=> TRUE,
-													'usr_create' 			=> FALSE,
-													'usr_edit' 				=> FALSE,
-													'usr_edit_privileges' 	=> FALSE,
-													'usr_delete' 			=> FALSE,
+													'srv_global' 			=> false,
+													'srv_start' 			=> true,
+													'srv_stop' 				=> true,
+													'srv_restart' 			=> true,
+													'usr_create' 			=> false,
+													'usr_edit' 				=> false,
+													'usr_edit_privileges' 	=> false,
+													'usr_delete' 			=> false,
 			));
 			
 			$this->users->add_user($user_data);
@@ -413,12 +413,12 @@ class Auth extends CI_Controller {
 			$this->panel_log->save_log($log_data);
 			
 			$this->_show_message(lang('auth_registration_successful'));
-			return TRUE;
+			return true;
 			
 		}
 	}
 	
-	function recovery_password($code = FALSE)
+	function recovery_password($code = false)
 	{
 		$this->tpl_data['heading'] 	= lang('auth_title_recovery_password');
         $this->tpl_data['title'] 	= lang('auth_heading_recovery_password');
@@ -484,7 +484,7 @@ class Auth extends CI_Controller {
 					/* Пригодится для дебага */
 					//echo $this->email->print_debugger();
 			
-					return TRUE;
+					return true;
 					
 				} else {
 					/* Восстанавливаем старый пароль */
@@ -499,7 +499,7 @@ class Auth extends CI_Controller {
 					$log_data['user_name'] = $user_list[0]['login'];
 					$log_data['log_data'] = $this->email->print_debugger();
 					$this->panel_log->save_log($log_data);
-					return FALSE;
+					return false;
 				}
 			}
 		}
@@ -511,7 +511,7 @@ class Auth extends CI_Controller {
         $this->form_validation->set_rules('login', 'логин', 'trim|max_length[12]|xss_clean');
 		$this->form_validation->set_rules('email', 'email адрес', 'trim|max_length[64]|min_length[0]|valid_email|xss_clean');
         
-		if ($this->form_validation->run() == FALSE){
+		if ($this->form_validation->run() == false){
 			$this->parser->parse('recovery_password.html', $this->tpl_data);
 		}else{
 			
@@ -520,7 +520,7 @@ class Auth extends CI_Controller {
 			
 			if(!$login && !$email){
 				$this->_show_message(lang('auth_enter_login_or_email'), 'javascript:history.back()');
-				return FALSE;
+				return false;
 			}
 
 			if($email){
@@ -534,7 +534,7 @@ class Auth extends CI_Controller {
 			/* Существует ли пользователь */
 			if(empty($user_list)){
 				$this->_show_message(lang('auth_user_not_found'), 'javascript:history.back()');
-				return FALSE;
+				return false;
 			}
 				
 			// Получаем код восстановления

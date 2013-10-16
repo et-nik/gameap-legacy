@@ -33,8 +33,8 @@ class Servers_files extends CI_Controller {
 			$this->tpl_data['title'] 		= lang('server_files_title_index');
 			$this->tpl_data['heading']		= lang('server_files_header_index');
 			$this->tpl_data['content'] 		= '';
-			$this->tpl_data['menu'] 		= $this->parser->parse('menu.html', $this->tpl_data, TRUE);
-			$this->tpl_data['profile'] 		= $this->parser->parse('profile.html', $this->users->tpl_userdata(), TRUE);
+			$this->tpl_data['menu'] 		= $this->parser->parse('menu.html', $this->tpl_data, true);
+			$this->tpl_data['profile'] 		= $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
         
         }else{
             redirect('auth');
@@ -42,7 +42,7 @@ class Servers_files extends CI_Controller {
     }
     
     // Отображение информационного сообщения
-    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = false, $link = false, $link_text = false)
     {
         
         if (!$message) {
@@ -60,7 +60,7 @@ class Servers_files extends CI_Controller {
         $local_tpl_data['message'] = $message;
         $local_tpl_data['link'] = $link;
         $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
@@ -81,7 +81,7 @@ class Servers_files extends CI_Controller {
 		$local_tpl_data['servers_list'] = $this->servers->tpl_data();
 		$local_tpl_data['url'] 			= site_url('admin/servers_files/server');
 			
-		$this->tpl_data['content'] .= $this->parser->parse('servers/select_server.html', $local_tpl_data, TRUE);
+		$this->tpl_data['content'] .= $this->parser->parse('servers/select_server.html', $local_tpl_data, true);
 			
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
@@ -94,7 +94,7 @@ class Servers_files extends CI_Controller {
      * @param int
      * 
     */
-	public function server($server_id = FALSE)
+	public function server($server_id = false)
     {
 		if($this->users->auth_id){
 			
@@ -120,7 +120,7 @@ class Servers_files extends CI_Controller {
 			&& !$this->users->servers_privileges['CHANGE_CONFIG']
 			){
 				$this->_show_message(lang('server_files_no_privileges'), site_url('admin/servers_files'));
-				return FALSE;
+				return false;
 			}
 			
 			/* Получение данных сервера */
@@ -129,7 +129,7 @@ class Servers_files extends CI_Controller {
 			/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
 			if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']){
 				$this->_show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_files'));
-				return FALSE;
+				return false;
 			}
 			
 			/* Получение данных сервера для шаблона */
@@ -150,7 +150,7 @@ class Servers_files extends CI_Controller {
 			 * 
 			*/
 			if($this->users->servers_privileges['CHANGE_CONFIG']) {
-				$cfg_files = json_decode($this->servers->server_data['config_files'], TRUE);
+				$cfg_files = json_decode($this->servers->server_data['config_files'], true);
 				
 				if($cfg_files) {
 					$i = -1;
@@ -164,13 +164,13 @@ class Servers_files extends CI_Controller {
 					$local_tpl_data['cfg_files'] = array();
 				}
 
-				$this->tpl_data['content'] .= $this->parser->parse('servers/servers_files_cfg.html', $local_tpl_data, TRUE);
+				$this->tpl_data['content'] .= $this->parser->parse('servers/servers_files_cfg.html', $local_tpl_data, true);
 			}
 
 			if($this->users->servers_privileges['UPLOAD_CONTENTS']){
 				/* Чтобы шоткод отображался нормально*/
 
-				$content_dirs = json_decode($this->servers->server_data['content_dirs'], TRUE);
+				$content_dirs = json_decode($this->servers->server_data['content_dirs'], true);
 				
 				if($content_dirs) {
 					$i = -1;
@@ -184,7 +184,7 @@ class Servers_files extends CI_Controller {
 					$local_tpl_data['content_dirs'] = array();
 				}
 				
-				$this->tpl_data['content'] .= $this->parser->parse('servers/servers_files_content_dirs.html', $local_tpl_data, TRUE);
+				$this->tpl_data['content'] .= $this->parser->parse('servers/servers_files_content_dirs.html', $local_tpl_data, true);
 			}
 			
 			
@@ -205,7 +205,7 @@ class Servers_files extends CI_Controller {
      * @param int
      * 
     */
-	public function edit_config($server_id = FALSE, $cfg_id = FALSE)
+	public function edit_config($server_id = false, $cfg_id = false)
     {
 		if($this->users->user_id){
 			
@@ -232,18 +232,18 @@ class Servers_files extends CI_Controller {
 			/* Проверка привилегий на правку конфигов */
 			if (!$this->users->servers_privileges['CHANGE_CONFIG']) {
 				$this->_show_message(lang('server_files_no_cfg_privileges'));
-				return FALSE;
+				return false;
 			}
 			
 			/* Получение данных сервера */
 			$this->servers->get_server_data($server_id);
 			
-			$s_cfg_files = json_decode($this->servers->server_data['config_files'], TRUE);
+			$s_cfg_files = json_decode($this->servers->server_data['config_files'], true);
 			
 			/* Проверяем, правильно ли указан ID конфигурационного файла */
 			if (!array_key_exists($cfg_id, $s_cfg_files)) {
 				$this->_show_message(lang('server_files_cfg_not_found'));
-				return FALSE;
+				return false;
 			}
 			
 			/*
@@ -285,7 +285,7 @@ class Servers_files extends CI_Controller {
 					$file_contents = $this->servers->read_remote_file($file);
 				}
 				
-				if($file_contents === FALSE) {
+				if($file_contents === false) {
 					$adm_message = '';
 					
 					// Отображаем админу дополнительную информацию
@@ -304,7 +304,7 @@ class Servers_files extends CI_Controller {
 					$log_data['log_data'] = 'File: ' . $file . "\n";
 					$this->panel_log->save_log($log_data);
 					
-					return FALSE;
+					return false;
 				}
 				
 				// $file_contents = iconv('windows-1251', 'UTF-8', $file_contents);
@@ -315,7 +315,7 @@ class Servers_files extends CI_Controller {
 				$local_tpl_data['cfg_id']				= (int)$cfg_id;
 				$local_tpl_data['server_id'] 			= $server_id;
 				
-				$this->tpl_data['content'] .= $this->parser->parse('servers/edit_file.html', $local_tpl_data, TRUE);
+				$this->tpl_data['content'] .= $this->parser->parse('servers/edit_file.html', $local_tpl_data, true);
 				
             } else {
 				/*
@@ -323,7 +323,7 @@ class Servers_files extends CI_Controller {
 				 * сохраняем содержимое конфига на сервере
 				*/
 				
-				$cfg_data = $this->input->post('file_contents', TRUE);
+				$cfg_data = $this->input->post('file_contents', true);
 				
 				/* Определение, является сервер локальным или удаленным */
 				if(!$this->servers->server_data['ds_id']){
@@ -352,7 +352,7 @@ class Servers_files extends CI_Controller {
 					$log_data['log_data'] = 'File: ' . $file . ' Error: ' . $this->servers->errors . "\n";
 					$this->panel_log->save_log($log_data);
 					
-					return FALSE;
+					return false;
 				}
 				
 				$this->_show_message(lang('server_files_data_writed'), site_url('admin/servers_files/server/' . $server_id), lang('next'));
@@ -367,7 +367,7 @@ class Servers_files extends CI_Controller {
 				$log_data['log_data'] = 'Config file: ' . $s_cfg_files[$cfg_id]['file'] . "\n";
 				$this->panel_log->save_log($log_data);
 				
-				return TRUE;
+				return true;
 			}
 
 		}
@@ -384,7 +384,7 @@ class Servers_files extends CI_Controller {
      * @param int
      * 
     */
-	public function upload($server_id = FALSE, $dir_id = FALSE)
+	public function upload($server_id = false, $dir_id = false)
     {
 		if($this->users->user_id){
 			
@@ -410,7 +410,7 @@ class Servers_files extends CI_Controller {
 			/* Проверка привилегий на правку конфигов */
 			if (!$this->users->servers_privileges['UPLOAD_CONTENTS']) {
 				$this->_show_message(lang('server_files_no_cfg_privileges'));
-				return FALSE;
+				return false;
 			}
 			
 			/* Получение данных сервера */
@@ -419,15 +419,15 @@ class Servers_files extends CI_Controller {
 			/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
 			if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']){
 				$this->_show_message(lang('server_files_ftp_not_set'));
-				return FALSE;
+				return false;
 			}
 			
-			$s_content_dirs = json_decode($this->servers->server_data['content_dirs'], TRUE);
+			$s_content_dirs = json_decode($this->servers->server_data['content_dirs'], true);
 			
 			/* Проверяем, правильно ли указан ID контент директории */
 			if(!array_key_exists($dir_id, $s_content_dirs)){
 				$this->_show_message(lang('server_files_content_dir_not_found'));
-				return FALSE;
+				return false;
 			}
 			
 			$tmp_dir = set_realpath(sys_get_temp_dir());
@@ -440,7 +440,7 @@ class Servers_files extends CI_Controller {
 			}
 			
 			$upload_config['upload_path'] = $dir;
-			$upload_config['overwrite'] = TRUE;
+			$upload_config['overwrite'] = true;
 			$upload_config['max_filename'] = 64;
 			$upload_config['allowed_types'] = $s_content_dirs[$dir_id]['allowed_types'];
 			
@@ -476,7 +476,7 @@ class Servers_files extends CI_Controller {
 						$log_data['log_data'] = 'Directory: ' . $this->servers->server_data['ftp_path'] . '/' . $this->servers->server_data['dir'] . '/' . $s_content_dirs[$dir_id]['path'] . ' File name: ' . $file_data['orig_name'] . "\n";
 						$this->panel_log->save_log($log_data);
 						
-						return FALSE;
+						return false;
 					} else {
 						/* Удаление временного файла */
 						unlink($file_data['full_path']);
@@ -497,7 +497,7 @@ class Servers_files extends CI_Controller {
 						$log_data['log_data'] = 'Directory: ' . $s_content_dirs[$dir_id]['path'] . ' File name: ' . $file_data['orig_name'] . "\n";
 						$this->panel_log->save_log($log_data);
 						
-						return TRUE;
+						return true;
 					}
 					
 				} else {
@@ -515,7 +515,7 @@ class Servers_files extends CI_Controller {
 					$log_data['log_data'] = 'Directory: ' . $s_content_dirs[$dir_id]['path'] . ' File name: ' . $file_data['orig_name'] . "\n";
 					$this->panel_log->save_log($log_data);
 					
-					return TRUE;
+					return true;
 					
 				}
 				
@@ -533,7 +533,7 @@ class Servers_files extends CI_Controller {
      * @param int
      * 
     */
-	public function upload_zip($server_id = FALSE)
+	public function upload_zip($server_id = false)
     {
 		if($this->users->user_id){
 			

@@ -26,8 +26,8 @@ class Settings extends CI_Controller {
 			$this->tpl_data['title'] 		= lang('settings_title_index');
 			$this->tpl_data['heading'] 		= lang('settings_heading_index');
 			$this->tpl_data['content'] 		= '';
-			$this->tpl_data['menu'] 		= $this->parser->parse('menu.html', $this->tpl_data, TRUE);
-			$this->tpl_data['profile'] 		= $this->parser->parse('profile.html', $this->users->tpl_userdata(), TRUE);
+			$this->tpl_data['menu'] 		= $this->parser->parse('menu.html', $this->tpl_data, true);
+			$this->tpl_data['profile'] 		= $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
         
         }else{
             redirect('auth');
@@ -35,7 +35,7 @@ class Settings extends CI_Controller {
     }
     
     // Отображение информационного сообщения
-    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = false, $link = false, $link_text = false)
     {
         
         if (!$message) {
@@ -53,7 +53,7 @@ class Settings extends CI_Controller {
         $local_tpl_data['message'] = $message;
         $local_tpl_data['link'] = $link;
         $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
@@ -76,12 +76,12 @@ class Settings extends CI_Controller {
     /**
      * Настройки сервера
     */
-    public function server($server_id = FALSE)
+    public function server($server_id = false)
     {
 
 		if(!$server_id) {
 			$this->_show_message('Сервер не найден');
-			return FALSE;
+			return false;
 		}
 		
 		$server_id = (int)$server_id;
@@ -92,13 +92,13 @@ class Settings extends CI_Controller {
 		
 		if(!$this->servers->server_data) {
 			$this->_show_message(lang('settings_server_not_found'));
-			return FALSE;
+			return false;
 		}
 		
 		/* Пользователь должен быть админом либо иметь привилегии настройки */			
 		if(!$this->users->auth_data['is_admin'] && !$this->users->servers_privileges['SERVER_SETTINGS']) {
 			$this->_show_message(lang('settings_not_privileges_for_server'));
-			return FALSE;
+			return false;
 		}
 		
 		$server_settings = $this->servers->get_server_settings($server_id);
@@ -115,10 +115,10 @@ class Settings extends CI_Controller {
 			}
 			
 			/* Допустимые алиасы */
-			$allowable_aliases = json_decode($this->servers->server_data['aliases_list'], TRUE);
+			$allowable_aliases = json_decode($this->servers->server_data['aliases_list'], true);
 			
 			/* Значения алиасов на сервере */
-			$server_aliases = json_decode($this->servers->server_data['aliases'], TRUE);
+			$server_aliases = json_decode($this->servers->server_data['aliases'], true);
 			
 			/* Отображение алиасов */
 			if($allowable_aliases && !empty($allowable_aliases)) {
@@ -154,7 +154,7 @@ class Settings extends CI_Controller {
 			
 			$local_tpl_data['server_id'] = $server_id;
 
-			$this->tpl_data['content'] .= $this->parser->parse('settings/server.html', $local_tpl_data, TRUE);
+			$this->tpl_data['content'] .= $this->parser->parse('settings/server.html', $local_tpl_data, true);
 		} else {
 			/* Сохранение настроек */
 			
@@ -163,17 +163,17 @@ class Settings extends CI_Controller {
 
             foreach ($this->servers->all_settings as $sett_id => $value) {
 
-				$value = (bool)$this->input->post($sett_id, TRUE);
+				$value = (bool)$this->input->post($sett_id, true);
 				$this->servers->set_server_settings($sett_id, $value, $server_id);
 				
 				$log_data['log_data'] .= $sett_id . ' : ' . (int)$value . "\n";
             }
             
             /* Допустимые алиасы */
-			$allowable_aliases = json_decode($this->servers->server_data['aliases_list'], TRUE);
+			$allowable_aliases = json_decode($this->servers->server_data['aliases_list'], true);
 			
 			/* Значения алиасов на сервере */
-			$server_aliases = json_decode($this->servers->server_data['aliases'], TRUE);
+			$server_aliases = json_decode($this->servers->server_data['aliases'], true);
 			
 			/* Прогон по алиасам */
 			if($allowable_aliases && !empty($allowable_aliases)) {
@@ -185,7 +185,7 @@ class Settings extends CI_Controller {
 					}
 					
 					/* Для безопасности запрещаем пробелы, табы и кавычки */
-					$alias_arr = explode(' ', $this->input->post('alias_' . $alias['alias'], TRUE));
+					$alias_arr = explode(' ', $this->input->post('alias_' . $alias['alias'], true));
 					$server_aliases[$alias['alias']] = $alias_arr[0];
 					$server_aliases[$alias['alias']] = str_replace('\'', '', $server_aliases[$alias['alias']]);
 					$server_aliases[$alias['alias']] = str_replace('"', '', $server_aliases[$alias['alias']]);
@@ -208,7 +208,7 @@ class Settings extends CI_Controller {
 			$this->panel_log->save_log($log_data);
             
             $this->_show_message(lang('settings_saved'), site_url('admin/server_control/main/' . $server_id), lang('next'));
-            return TRUE;
+            return true;
             
 		}
 		

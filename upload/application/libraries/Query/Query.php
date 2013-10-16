@@ -21,7 +21,7 @@ class Query extends CI_Driver_Library {
     
     public $engine = 'goldsource';
     public $engine_version = 1;
-    var $errors = FALSE;
+    var $errors = false;
     
     function __construct()
     {
@@ -43,9 +43,9 @@ class Query extends CI_Driver_Library {
 	/**
 	 * Получение списка игроков на сервере
 	*/
-	function get_players($host, $port, $engine = FALSE)
+	function get_players($host, $port, $engine = false)
 	{
-		if ($engine == FALSE) {
+		if ($engine == false) {
 			$engine = $this->engine;
 		}
 		
@@ -57,9 +57,9 @@ class Query extends CI_Driver_Library {
 	/**
 	 * Получение информации о сервере
 	*/
-	function get_info($host, $port, $engine = FALSE)
+	function get_info($host, $port, $engine = false)
 	{
-		if ($engine == FALSE) {
+		if ($engine == false) {
 			$engine = $this->engine;
 		}
 		
@@ -71,9 +71,9 @@ class Query extends CI_Driver_Library {
 	/**
 	 * Получение переменных сервера
 	*/
-	function get_rules($host, $port, $engine = FALSE)
+	function get_rules($host, $port, $engine = false)
 	{
-		if ($engine == FALSE) {
+		if ($engine == false) {
 			$engine = $this->engine;
 		}
 		
@@ -85,9 +85,9 @@ class Query extends CI_Driver_Library {
 	/**
 	 * Статус сервера
 	*/
-	function get_status($host, $port, $engine = FALSE)
+	function get_status($host, $port, $engine = false)
 	{
-		if ($engine == FALSE) {
+		if ($engine == false) {
 			$engine = $this->engine;
 		}
 		
@@ -99,9 +99,9 @@ class Query extends CI_Driver_Library {
 	/**
 	 * Пинг сервера
 	*/
-	function ping($host, $port, $engine = FALSE)
+	function ping($host, $port, $engine = false)
 	{
-		if ($engine == FALSE) {
+		if ($engine == false) {
 			$engine = $this->engine;
 		}
 		

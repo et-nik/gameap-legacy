@@ -46,7 +46,7 @@ class Adm_modules extends CI_Controller {
         if ($this->users->check_user()) {
 			
 			/* Есть ли у пользователя права */
-			if (FALSE == $this->users->auth_data['is_admin']) {
+			if (false == $this->users->auth_data['is_admin']) {
 				show_404();
 			}
 			
@@ -55,8 +55,8 @@ class Adm_modules extends CI_Controller {
 			$this->tpl_data['heading'] 	= '';
 			$this->tpl_data['content'] 	= '';
 			
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, TRUE);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), TRUE);
+			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
+			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
 		} else {
 			redirect('auth/in');
 		}
@@ -65,7 +65,7 @@ class Adm_modules extends CI_Controller {
 	// ---------------------------------------------------------------------
 	
 	// Отображение информационного сообщения
-    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = false, $link = false, $link_text = false)
     {
         
         if (!$message) {
@@ -83,7 +83,7 @@ class Adm_modules extends CI_Controller {
         $local_tpl_data['message'] = $message;
         $local_tpl_data['link'] = $link;
         $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
 	
@@ -145,9 +145,9 @@ class Adm_modules extends CI_Controller {
 					
 				}
 			}
-			return TRUE;
+			return true;
 		} else {
-			return FALSE;
+			return false;
 		}
 		
 	}
@@ -158,7 +158,7 @@ class Adm_modules extends CI_Controller {
 	{
 		$local_tpl_data['modules_list'] = ($this->gameap_modules->modules_data) ? $this->gameap_modules->modules_data : array();
 		
-		$this->tpl_data['content'] = $this->parser->parse('adm_modules/modules_list.html', $local_tpl_data, TRUE);
+		$this->tpl_data['content'] = $this->parser->parse('adm_modules/modules_list.html', $local_tpl_data, true);
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 	
@@ -169,11 +169,11 @@ class Adm_modules extends CI_Controller {
 		
 		if (!$this->gameap_modules->modules_data) {
 			$this->_show_message('Module not found');
-			return FALSE;
+			return false;
 		}
 		
 		$local_tpl_data = array();
-		$module_found = FALSE;
+		$module_found = false;
 		
 		/*
 		 * Т.к список модулей уже получен, то 
@@ -182,7 +182,7 @@ class Adm_modules extends CI_Controller {
 		 */
 		foreach($this->gameap_modules->modules_data as $module) {
 			if ($module_id == $module['short_name']) {
-				$module_found = TRUE;
+				$module_found = true;
 				
 				$local_tpl_data['module_name'] 			= $module['name'];
 				$local_tpl_data['module_description'] 	= $module['description'];
@@ -199,10 +199,10 @@ class Adm_modules extends CI_Controller {
 		
 		if (!$module_found) {
 			$this->_show_message('Module not found');
-			return FALSE;
+			return false;
 		}
 
-		$this->tpl_data['content'] = $this->parser->parse('adm_modules/module_info.html', $local_tpl_data, TRUE);
+		$this->tpl_data['content'] = $this->parser->parse('adm_modules/module_info.html', $local_tpl_data, true);
 		
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
@@ -221,10 +221,10 @@ class Adm_modules extends CI_Controller {
 	{
 		if ($this->_update_list()) {
 			$this->_show_message('Modules list updated', site_url('adm_modules'));
-			return TRUE;
+			return true;
 		} else {
 			$this->_show_message('Modules list update failure');
-			return FALSE;
+			return false;
 		}
 	}
 

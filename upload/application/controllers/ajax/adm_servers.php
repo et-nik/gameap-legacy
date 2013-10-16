@@ -41,7 +41,7 @@ class Adm_servers extends CI_Controller {
 			/* Есть ли у пользователя права */
 			if(!$this->users->auth_privileges['srv_global']) {
 				header("HTTP/1.0 404 Not Found");
-				return FALSE;
+				return false;
 			}
         
 			$this->load->library('form_validation');
@@ -63,25 +63,25 @@ class Adm_servers extends CI_Controller {
     {
 		$this->form_validation->set_rules('code', 'код игры', 'trim|xss_clean');
 
-		if($this->form_validation->run() == FALSE){
+		if($this->form_validation->run() == false){
 			header("HTTP/1.0 404 Not Found");
-			return FALSE;
+			return false;
 		}
 		
-		$default = FALSE;
+		$default = false;
 		$game_code = $this->input->post('code');
 
 		if($game_code) {
 			$where = array('game_code' => $game_code);
 		} else {
-			$where = FALSE;
+			$where = false;
 		}
 		
 		$gametypes_list = $this->game_types->get_gametypes_list($where);
 		
 		if(!$gametypes_list) {
 			$this->output->append_output(lang('adm_servers_no_game_types_for_selected_game'));
-			return FALSE;
+			return false;
 		}
 
 		foreach($gametypes_list as $list) {
@@ -101,9 +101,9 @@ class Adm_servers extends CI_Controller {
 	{
 		$this->form_validation->set_rules('ds_id', 'id физ сервера', 'trim|integer|xss_clean');
 		
-		if($this->form_validation->run() == FALSE){
+		if($this->form_validation->run() == false){
 			header("HTTP/1.0 404 Not Found");
-			return FALSE;
+			return false;
 		}
 		
 		$ds_id = (int)$this->input->post('ds_id');

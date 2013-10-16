@@ -43,8 +43,8 @@ class Adminpanel extends CI_Controller {
 			$this->tpl_data['heading'] 	= lang('ap_heading_index');
 			$this->tpl_data['content']	= '';
 			
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, TRUE);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), TRUE);
+			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
+			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
         
         } else {
 			redirect('auth');
@@ -52,7 +52,7 @@ class Adminpanel extends CI_Controller {
     }
     
     // Отображение информационного сообщения
-    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = false, $link = false, $link_text = false)
     {
         
         if (!$message) {
@@ -70,7 +70,7 @@ class Adminpanel extends CI_Controller {
         $local_tpl_data['message'] = $message;
         $local_tpl_data['link'] = $link;
         $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
 	
@@ -98,7 +98,7 @@ class Adminpanel extends CI_Controller {
 	 * 
 	 * @param str - обновление (auto|manial|back), если строка отсутствует, то отображаются сведения о версии
 	*/
-	function update($type = FALSE, $confirm = FALSE)
+	function update($type = false, $confirm = false)
 	{
 		/* Есть ли у пользователя права */
 		if(!$this->users->auth_data['is_admin']) {
@@ -142,13 +142,13 @@ class Adminpanel extends CI_Controller {
 			if (!isset($available_version) OR !isset($download_url)) {
 				/* Не удалось получить версию */
 				$this->_show_message('<p align="center">' . lang('ap_error_check_version') . '</p>');
-				return FALSE;
+				return false;
 			}
 			
 		} else {
 			/* Не удалось получить версию */
 			$this->_show_message('<p align="center">' . lang('ap_error_check_version') . '</p>');
-			return FALSE;
+			return false;
 		}
 
 		switch($type) {
@@ -166,14 +166,14 @@ class Adminpanel extends CI_Controller {
 						show_error($this->migration->error_string());
 					} else {
 						$this->_show_message('Update successful', site_url('adminpanel/update'), lang('next'));
-						return TRUE;
+						return true;
 					}
 					
 				} else {
 					/* Пользователь не подвердил намерения */
 					$confirm_tpl['message'] = 'Загрузите последнюю версию по адресу <a href="'. $download_url . '">' . $download_url . '</a>, распакуйте архив в каталог с панелью и нажмите "Да"';
 					$confirm_tpl['confirmed_url'] = site_url('adminpanel/update/manual/' . $this->security->get_csrf_hash());
-					$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, TRUE);
+					$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
 				}
 				
 				break;
@@ -193,7 +193,7 @@ class Adminpanel extends CI_Controller {
 					//~ /* Пользователь не подвердил намерения */
 					//~ $confirm_tpl['message'] = 'Откатить к выбранной версии?';
 					//~ $confirm_tpl['confirmed_url'] = site_url('adminpanel/update/manual/' $this->security->get_csrf_hash());
-					//~ $this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, TRUE);
+					//~ $this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
 				//~ }
 				
 				break;
@@ -234,11 +234,11 @@ class Adminpanel extends CI_Controller {
 		$this->form_validation->set_rules('description', 'описание', 'trim|required|min_length[3]|xss_clean');
 		$this->form_validation->set_rules('actions', 'действия', 'trim|min_length[3]|xss_clean');
 		
-		if ($this->form_validation->run() == FALSE) {
-			$this->tpl_data['content'] = $this->parser->parse('adminpanel/send_error.html', $local_tpl_data, TRUE);
+		if ($this->form_validation->run() == false) {
+			$this->tpl_data['content'] = $this->parser->parse('adminpanel/send_error.html', $local_tpl_data, true);
 		} else {
 			$upload_config['upload_path'] = sys_get_temp_dir();
-			$upload_config['overwrite'] = TRUE;
+			$upload_config['overwrite'] = true;
 			$upload_config['max_filename'] = 64;
 			$upload_config['max_size']	= '2048';
 			$upload_config['allowed_types'] = 'gif|jpg|png|zip|rar|7z';
@@ -255,7 +255,7 @@ class Adminpanel extends CI_Controller {
 									"\nЛогин пользователя: " . $this->users->auth_data['login'] .
 									"\nEmail пользователя: " . $this->users->auth_data['email'] .
 									"\nДомен: " . site_url() .
-									"\nОписание ошибки: " . $this->input->post('description', TRUE) . 
+									"\nОписание ошибки: " . $this->input->post('description', true) . 
 									"\nДействия: " . $this->input->post('actions')
 								);
 								
@@ -267,11 +267,11 @@ class Adminpanel extends CI_Controller {
 								
 			if($this->email->send()) {
 				$this->_show_message(lang('ap_error_msg_sended'), site_url('/admin'), lang('next'));
-				return TRUE;
+				return true;
 			} else {
 				$this->_show_message(lang('ap_error_send_mail'));
 				//echo $this->email->print_debugger();
-				return FALSE;
+				return false;
 			}
 
 		}

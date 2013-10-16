@@ -33,8 +33,8 @@ class Server_command extends CI_Controller {
 			$this->tpl_data['title'] 	= lang('server_command_title_index');
 			$this->tpl_data['heading'] 	= lang('server_command_header_index');
 			$this->tpl_data['content'] = '';
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, TRUE);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), TRUE);
+			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
+			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
 			
 			$this->load->model('servers');
 			
@@ -47,7 +47,7 @@ class Server_command extends CI_Controller {
     // -----------------------------------
     
 	// Отображение информационного сообщения
-	function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+	function _show_message($message = false, $link = false, $link_text = false)
 	{
 		
 		if (!$message) {
@@ -65,7 +65,7 @@ class Server_command extends CI_Controller {
 		$local_tpl_data['message'] = $message;
 		$local_tpl_data['link'] = $link;
 		$local_tpl_data['back_link_txt'] = $link_text;
-		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
+		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 	
@@ -92,7 +92,7 @@ class Server_command extends CI_Controller {
 			)
 		) {
 			$this->errors = lang('server_command_ssh_not_set');
-			return FALSE;	
+			return false;	
 		}
 		
 		/*
@@ -103,10 +103,10 @@ class Server_command extends CI_Controller {
 		&& (!in_array('ssh2', $this->ext_list))
 		) {
 			$this->errors = lang('server_command_ssh_not_module');
-			return FALSE;	
+			return false;	
 		}
 		
-		return TRUE;
+		return true;
 	}
 	
 	// -----------------------------------------------------------------------
@@ -133,10 +133,10 @@ class Server_command extends CI_Controller {
 			)
 		){
 			$this->errors = lang('server_command_telnet_not_set');
-			return FALSE;	
+			return false;	
 		}
 		
-		return TRUE;
+		return true;
 	}
 
 	/*
@@ -153,7 +153,7 @@ class Server_command extends CI_Controller {
 	}
 	
 	
-	function rcon($command = FALSE, $server_id = FALSE, $id = FALSE, $confirm = FALSE)
+	function rcon($command = false, $server_id = false, $id = false, $confirm = false)
 	{
 		if(!$this->check_errors($server_id)){
 			$this->servers->get_server_data($server_id);
@@ -166,7 +166,7 @@ class Server_command extends CI_Controller {
 			$command = strtolower($command);
 				
 			$template_file = null;
-			$no_submit_name = FALSE;
+			$no_submit_name = false;
 				
 			// Получение прав на сервер
 			$this->users->get_server_privileges($this->servers->server_data['id']);
@@ -226,7 +226,7 @@ class Server_command extends CI_Controller {
 					$isset = (bool)$this->servers->server_data['srestart_cmd'];
 
 					$submit_name = 'submit_restart';
-					$no_submit_name = TRUE;
+					$no_submit_name = true;
 					break;
 					
 				case 'set_password':
@@ -239,14 +239,14 @@ class Server_command extends CI_Controller {
 				case 'fast':
 					/* Fast RCON */
 					$privileges = (bool)$this->users->servers_privileges['FAST_RCON'];
-					$isset = TRUE;
+					$isset = true;
 					//$submit_name = 'submit_set_password';
-					$no_submit_name = TRUE;
+					$no_submit_name = true;
 					break;
 					
 				case 'rcon_command':
 					$privileges = (bool)($this->users->servers_privileges['RCON_SEND']);
-					$isset = TRUE;
+					$isset = true;
 					
 					$submit_name = 'submit_rcon';
 					//$template_file = 'player_changename.html';
@@ -258,25 +258,25 @@ class Server_command extends CI_Controller {
 				
 				if (!$isset) {
 					$this->_show_message(lang('server_control_command_not_set'));
-					return FALSE;
+					return false;
 				}
 			
 				if(!$no_submit_name && !$this->input->post($submit_name)) {
 						
 					if($template_file){
-						$this->tpl_data['content'] .= $this->parser->parse($template_file, $this->tpl_data, TRUE);
+						$this->tpl_data['content'] .= $this->parser->parse($template_file, $this->tpl_data, true);
 					}
 						
 				} else {
 						
 					$this->load->library('form_validation');
 						
-					$no_form_vallidation = FALSE;
+					$no_form_vallidation = false;
 						
 					/* Правила проверки для форм
 					 * 
 					 * если формы нет, то нужно задать переменной
-					 * $no_form_vallidation значение TRUE
+					 * $no_form_vallidation значение true
 					*/
 					switch($command) {
 						case 'pl_ban':
@@ -286,7 +286,7 @@ class Server_command extends CI_Controller {
 							break;
 							
 						case 'pl_kick':
-							$no_form_vallidation = TRUE;
+							$no_form_vallidation = true;
 							break;
 							
 						case 'pl_changename':
@@ -302,7 +302,7 @@ class Server_command extends CI_Controller {
 							break;
 							
 						case 'restart':
-							$no_form_vallidation = TRUE;
+							$no_form_vallidation = true;
 							break;
 							
 						case 'set_password':
@@ -310,7 +310,7 @@ class Server_command extends CI_Controller {
 							break;
 							
 						case 'fast':
-							$no_form_vallidation = TRUE;
+							$no_form_vallidation = true;
 							break;
 							
 						case 'rcon_command';
@@ -323,19 +323,19 @@ class Server_command extends CI_Controller {
 					} else {
 						
 						if($confirm == $this->security->get_csrf_hash()) {
-							$form_validate = TRUE;
+							$form_validate = true;
 						} elseif($id == $this->security->get_csrf_hash()) {
 							/* В некоторых случаях $id можно использовать как $confirm */
-							$form_validate = TRUE;
+							$form_validate = true;
 						} else {
-							$form_validate = FALSE;
+							$form_validate = false;
 						}
 					}
 						
 					// Проверяем заполненные поля
 					if (!$form_validate) {
 						$this->_show_message(lang('server_command_form_unavailable'), site_url('admin/server_control/main/' . $server_id));
-						return FALSE;
+						return false;
 					} else {
 							
 						$this->load->helper('translit');
@@ -343,8 +343,8 @@ class Server_command extends CI_Controller {
 						/* Получение данных полей */
 						switch($command) {
 							case 'pl_ban':
-								$pl_ban_reason = translit($this->input->post('reason', TRUE));
-								$pl_ban_time = $this->input->post('time', TRUE) * $this->input->post('time_multiply', TRUE);
+								$pl_ban_reason = translit($this->input->post('reason', true));
+								$pl_ban_time = $this->input->post('time', true) * $this->input->post('time_multiply', true);
 								break;
 								
 							case 'pl_kick':
@@ -352,15 +352,15 @@ class Server_command extends CI_Controller {
 								break;
 								
 							case 'pl_changename':
-								$pl_newname = translit($this->input->post('new_name', TRUE));
+								$pl_newname = translit($this->input->post('new_name', true));
 								break;
 								
 							case 'send_msg';
-								$msg_text = translit($this->input->post('msg_text', TRUE));
+								$msg_text = translit($this->input->post('msg_text', true));
 								break;
 								
 							case 'changemap';
-								$map = translit($this->input->post('map', TRUE));
+								$map = translit($this->input->post('map', true));
 								break;
 								
 							case 'restart';
@@ -368,16 +368,16 @@ class Server_command extends CI_Controller {
 								break;
 								
 							case 'set_password':
-								$password = translit($this->input->post('password', TRUE));
+								$password = translit($this->input->post('password', true));
 								break;
 								
 							case 'fast':
-								$fast_rcon = json_decode($this->servers->server_data['fast_rcon'], TRUE);
+								$fast_rcon = json_decode($this->servers->server_data['fast_rcon'], true);
 									
 								// Существует ли команда
 								if(!$fast_rcon OR !array_key_exists($id, $fast_rcon)){
 									$this->_show_message(lang('server_command_rcon_command_not_found'), site_url('admin/server_control/main/' . $server_id));
-									return FALSE;
+									return false;
 								}
 									
 								$rcon_command = $fast_rcon[$id]['rcon_command'];
@@ -385,11 +385,11 @@ class Server_command extends CI_Controller {
 								break;
 								
 							case 'rcon_command';
-								$rcon_command = translit($this->input->post('rcon_command', TRUE));
+								$rcon_command = translit($this->input->post('rcon_command', true));
 									
 								if(!$this->check_rcon_command($rcon_command)) {
 									$this->_show_message(lang('server_command_rcon_command_access_denied'), site_url('admin/server_control/main/' . $server_id));
-									return FALSE;
+									return false;
 								}
 									
 								break;
@@ -397,7 +397,7 @@ class Server_command extends CI_Controller {
 							
 						if(!$this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['query_port'])) {
 							$this->_show_message(lang('server_command_server_down'), site_url('admin/server_control/main/' . $server_id));
-							return FALSE;
+							return false;
 						}
 						
 						$this->load->driver('rcon');
@@ -522,7 +522,7 @@ class Server_command extends CI_Controller {
 						}
 							
 						$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
-						return TRUE;
+						return true;
 					}
 					
 						
@@ -530,7 +530,7 @@ class Server_command extends CI_Controller {
 					
 			} else {
 				$this->_show_message(lang('server_command_no_players_privileges'), site_url('admin'), lang('next'));
-				return FALSE;
+				return false;
 			}	
 
 		}
@@ -546,7 +546,7 @@ class Server_command extends CI_Controller {
 	*/
 	private function check_errors($id)
 	{
-		$error_desc = FALSE;
+		$error_desc = false;
 		
 		if(!$id){
 			$error_desc .= 'не указан параметр server_command <br />';
@@ -573,12 +573,12 @@ class Server_command extends CI_Controller {
 
 		/* Пользователь, у которого нет прав на смену ркон пароля не имеет права отправлять rcon_password */
 		if(!$this->users->servers_privileges['CHANGE_RCON'] && in_array('rcon_password', $rcon_command)) {
-			return FALSE;
+			return false;
 		}
 		
 		/* Пользователь, у которого нет прав на выставление пароля на сервер */
 		if(!$this->users->servers_privileges['SERVER_SET_PASSWORD'] && in_array('sv_password', $rcon_command)) {
-			return FALSE;
+			return false;
 		}
 		
 		switch ($rcon_command['0']) {
@@ -594,7 +594,7 @@ class Server_command extends CI_Controller {
 		}
 	
 		
-		return TRUE;
+		return true;
 	}
 	
 	
@@ -615,7 +615,7 @@ class Server_command extends CI_Controller {
 			if(strtolower($this->servers->server_data['os']) == 'windows') {
 				/* Еще одна причина не использовать Windows */
 				$this->_show_message(lang('server_command_not_available_for_windows'), site_url('admin/server_control/main/' . $id), lang('next'));
-				return FALSE;
+				return false;
 			}
 			
 			// Получение прав на сервер
@@ -623,12 +623,12 @@ class Server_command extends CI_Controller {
 			
 			if(!$this->users->servers_privileges['CONSOLE_VIEW']) {
 				$this->_show_message(lang('server_command_no_console_privileges'), site_url('admin/server_control/main/' . $id));
-				return FALSE;
+				return false;
 			}
 			
 			if(!$this->servers->server_status()) {
 				$this->_show_message(lang('server_command_server_down'), site_url('admin/server_control/main/' . $id));
-				return FALSE;
+				return false;
 			}
 			
 			/*
@@ -652,7 +652,7 @@ class Server_command extends CI_Controller {
 				)
 			){
 				$this->_show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), lang('next'));
-				return FALSE;	
+				return false;	
 			}
 			
 			/*
@@ -663,7 +663,7 @@ class Server_command extends CI_Controller {
 			&& (!in_array('ssh2', $ext_list))
 			){
 				$this->_show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), lang('next'));
-				return FALSE;	
+				return false;	
 			}
 			
 			
@@ -684,12 +684,12 @@ class Server_command extends CI_Controller {
 				)
 			){
 				$this->_show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), lang('next'));
-				return FALSE;	
+				return false;	
 			}
 			
 			if(!$this->servers->server_data['script_get_console']) {
 				$this->_show_message(lang('server_command_console_not_param'), site_url('admin/server_control/main/' . $id));
-				return FALSE;
+				return false;
 			}
 			
 			/* Директория в которой располагается сервер */
@@ -722,13 +722,13 @@ class Server_command extends CI_Controller {
 					
 					$this->_show_message($message . $adm_message);
 					
-					return FALSE;
+					return false;
 				} else {
 					$file_contents = str_replace("\n", "<br>", $file_contents);
 					$file_contents = '<p>' . lang('server_command_console') . ':</p><p align="left"><code>' . $file_contents . '</code></p>';
 					
 					$this->_show_message($file_contents, site_url('admin/server_control/main/' . $id));
-					return TRUE;
+					return true;
 					//$this->tpl_data['content'] = '<code>' . $file_contents. '</code>';
 				}
 				
@@ -741,12 +741,12 @@ class Server_command extends CI_Controller {
 				}
 				
 				$this->_show_message($message, site_url('admin/server_control/main/' . $id));
-				return FALSE;
+				return false;
 			}
 			
 		} else {
 			$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), lang('next'));
-			return FALSE;
+			return false;
 		}
 		
 		$this->parser->parse('main.html', $this->tpl_data);
@@ -757,7 +757,7 @@ class Server_command extends CI_Controller {
 	 * Запуск сервера
 	 * 
 	*/
-	public function start($id, $confirm = FALSE)
+	public function start($id, $confirm = false)
     {
 		if(!$this->check_errors($id)){
 			$this->servers->get_server_data($id);
@@ -786,15 +786,15 @@ class Server_command extends CI_Controller {
 			) {
 				
 				/* Проверка SSH и Telnet */
-				if (FALSE == $this->_check_ssh() OR FALSE == $this->_check_telnet()) {
+				if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
 					$this->_show_message();
-					return FALSE;
+					return false;
 				}
 
 				/* Заданы ли параметры запуска */
 				if (!$this->servers->server_data['script_start']){
 					$this->_show_message(lang('server_command_start_not_param'));
-					return FALSE;
+					return false;
 				}
 				
 				
@@ -806,25 +806,25 @@ class Server_command extends CI_Controller {
 						/* 
 						 * В некоторых случаях (так обычно и бывает)
 						 * strpos($response, 'blablabla') может возвращать 0, 
-						 * а нам нужен именно FALSE
+						 * а нам нужен именно false
 						 */
-						if (strpos($response, 'Server is already running') !== FALSE) {
+						if (strpos($response, 'Server is already running') !== false) {
 							/* Сервер запущен ранее */
 							$message = lang('server_command_server_is_already_running', base_url() . 'server_command/restart/' . $id, base_url() . 'server_command/stop/' . $id);
 							$log_data['msg'] = 'Server is already running';		
-						} elseif($this->servers->server_status() OR strpos($response, 'Server started') !== FALSE) {
+						} elseif($this->servers->server_status() OR strpos($response, 'Server started') !== false) {
 							/* Сервер успешно запущен */
 							$message = lang('server_command_started');
 							$log_data['msg'] = 'Start server success';
-						} elseif(strpos($response, 'file not found') !== FALSE) {
+						} elseif(strpos($response, 'file not found') !== false) {
 							/* Не найден исполняемый файл */
 							$message = lang('server_command_start_file_not_found');
 							$log_data['msg'] = 'Executable file not found';
-						} elseif(strpos($response, 'file not executable') !== FALSE) {
+						} elseif(strpos($response, 'file not executable') !== false) {
 							/* Нет прав на запуск файла */
 							$message = lang('server_command_start_file_not_executable');
 							$log_data['msg'] = 'File not executable';
-						} elseif(strpos($response, 'Server not started') !== FALSE) {
+						} elseif(strpos($response, 'Server not started') !== false) {
 							$message = lang('server_command_start_failed');
 							
 							if($this->users->auth_data['is_admin']) {
@@ -868,22 +868,22 @@ class Server_command extends CI_Controller {
 					}
 					
 					$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
-					return TRUE;
+					return true;
 					
 				} else {
 					/* Пользователь не подвердил намерения */
 					$confirm_tpl['message'] = lang('server_command_start_confirm');
 					$confirm_tpl['confirmed_url'] = site_url('server_command/start/' . $this->servers->server_data['id'] . '/' . $this->security->get_csrf_hash());
-					$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, TRUE);
+					$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
 				}
 				
 			}else{
 				$this->_show_message(lang('server_command_no_start_privileges'), site_url('admin/server_control/main/' . $id), lang('next'));
-				return FALSE;
+				return false;
 			}
 		} else {
 			$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), lang('next'));
-			return FALSE;
+			return false;
 		}
 
 		$this->parser->parse('main.html', $this->tpl_data);
@@ -894,7 +894,7 @@ class Server_command extends CI_Controller {
 	 * Остановка сервера
 	 * 
 	*/
-	public function stop($id, $confirm = FALSE)
+	public function stop($id, $confirm = false)
     {
 		// Проверка, авторизован ли юзверь
 		if($this->users->auth_id){
@@ -925,15 +925,15 @@ class Server_command extends CI_Controller {
 				) {
 					
 					/* Проверка SSH и Telnet */
-					if (FALSE == $this->_check_ssh() OR FALSE == $this->_check_telnet()) {
+					if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
 						$this->_show_message();
-						return FALSE;
+						return false;
 					}
 	
 					/* Заданы ли параметры запуска */
 					if (!$this->servers->server_data['script_stop']){
 						$this->_show_message(lang('server_command_stop_not_param'));
-						return FALSE;
+						return false;
 					}
 					
 					/* Подтверждение 
@@ -945,23 +945,23 @@ class Server_command extends CI_Controller {
 							/* 
 							 * В некоторых случаях (так обычно и бывает)
 							 * strpos($response, 'blablabla') может возвращать 0, 
-							 * а нам нужен именно FALSE
+							 * а нам нужен именно false
 							 */
-							if(strpos($response, 'Coulnd\'t find a running server') !== FALSE) {
+							if(strpos($response, 'Coulnd\'t find a running server') !== false) {
 								$message = lang('server_command_running_server_not_found');
 								$log_data['msg'] = 'Coulnd\'t find a running server';
-							} elseif(strpos($response, 'Server stopped') !== FALSE) {
+							} elseif(strpos($response, 'Server stopped') !== false) {
 								$message = lang('server_command_stopped');
 								$log_data['msg'] = 'Stop server success';
-							} elseif(strpos($response, 'file not found') !== FALSE) {
+							} elseif(strpos($response, 'file not found') !== false) {
 								/* Не найден исполняемый файл */
 								$message = lang('server_command_start_file_not_found');
 								$log_data['msg'] = 'Executable file not found';
-							} elseif(strpos($response, 'file not executable') !== FALSE) {
+							} elseif(strpos($response, 'file not executable') !== false) {
 								/* Нет прав на запуск файла */
 								$message = lang('server_command_start_file_not_executable');
 								$log_data['msg'] = 'File not executable';
-							} elseif(strpos($response, 'Server not stopped') !== FALSE) {
+							} elseif(strpos($response, 'Server not stopped') !== false) {
 								$message = lang('server_command_stop_failed');
 								
 								if($this->users->auth_data['is_admin']) {
@@ -1000,22 +1000,22 @@ class Server_command extends CI_Controller {
 						}
 						
 						$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
-						return TRUE;
+						return true;
 						
 					}else{
 						/* Пользователь не подвердил намерения */
 						$confirm_tpl['message'] = lang('server_command_stop_confirm');
 						$confirm_tpl['confirmed_url'] = $this->servers->server_data['id'] . '/' . $this->security->get_csrf_hash();
-						$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, TRUE);
+						$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
 					}
 					
 				}else{
 						$this->_show_message(lang('server_command_no_stop_privileges'), site_url('admin/server_control/main/' . $id), lang('next'));
-						return FALSE;
+						return false;
 				}
 			} else {
 				$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), lang('next'));
-				return FALSE;
+				return false;
 			}
 		}
 		
@@ -1029,7 +1029,7 @@ class Server_command extends CI_Controller {
 	 * Перезагрузка сервера
 	 * 
 	*/
-	public function restart($id, $confirm = FALSE)
+	public function restart($id, $confirm = false)
     {
 		if(!$this->check_errors($id)){
 			$this->servers->get_server_data($id);
@@ -1057,15 +1057,15 @@ class Server_command extends CI_Controller {
 			) {
 				
 				/* Проверка SSH и Telnet */
-				if (FALSE == $this->_check_ssh() OR FALSE == $this->_check_telnet()) {
+				if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
 					$this->_show_message();
-					return FALSE;
+					return false;
 				}
 
 				/* Заданы ли параметры запуска */
 				if (!$this->servers->server_data['script_restart']){
 					$this->_show_message(lang('server_command_restart_not_param'));
-					return FALSE;
+					return false;
 				}
 
 				/* Подтверждение 
@@ -1077,23 +1077,23 @@ class Server_command extends CI_Controller {
 						/* 
 						 * В некоторых случаях (так обычно и бывает)
 						 * strpos($response, 'blablabla') может возвращать 0, 
-						 * а нам нужен именно FALSE
+						 * а нам нужен именно false
 						 */
-						if(strpos($response, 'Coulnd\'t find a running server') !== FALSE) {
+						if(strpos($response, 'Coulnd\'t find a running server') !== false) {
 							$message = lang('server_command_restart_running_server_not_found');
 							$log_data['msg'] = 'Coulnd\'t find a running server';
-						} elseif(strpos($response, 'Server restarted') !== FALSE) {
+						} elseif(strpos($response, 'Server restarted') !== false) {
 							$message = lang('server_command_restarted');
 							$log_data['msg'] = 'Server restarted';
-						} elseif(strpos($response, 'file not found') !== FALSE) {
+						} elseif(strpos($response, 'file not found') !== false) {
 							/* Не найден исполняемый файл */
 							$message = lang('server_command_start_file_not_found');
 							$log_data['msg'] = 'Executable file not found';
-						} elseif(strpos($response, 'file not executable') !== FALSE) {
+						} elseif(strpos($response, 'file not executable') !== false) {
 							/* Нет прав на запуск файла */
 							$message = lang('server_command_start_file_not_executable');
 							$log_data['msg'] = 'File not executable';
-						} elseif(strpos($response, 'Server not restarted') !== FALSE) {
+						} elseif(strpos($response, 'Server not restarted') !== false) {
 							$message = lang('server_command_restart_failed');
 							
 							if($this->users->auth_data['is_admin']) {
@@ -1134,25 +1134,25 @@ class Server_command extends CI_Controller {
 					}
 					
 					$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
-					return TRUE;
+					return true;
 					
 				}else{
 					/* Пользователь не подвердил намерения */
 					$confirm_tpl['message'] = lang('server_command_restart_confirm');
 					$confirm_tpl['confirmed_url'] = $this->servers->server_data['id'] . '/' . $this->security->get_csrf_hash();
-					$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, TRUE);
+					$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
 				}
 			}else{
 					$message = lang('server_command_no_restart_privileges');
 					$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
-					return FALSE;
+					return false;
 					
 					break;
 			}
 		}else{
 			$message = lang('server_command_server_not_found');
 			$this->_show_message($message, site_url('admin'), lang('next'));
-			return FALSE;
+			return false;
 		}
 	
 		$this->parser->parse('main.html', $this->tpl_data);
@@ -1164,7 +1164,7 @@ class Server_command extends CI_Controller {
 	 * Обновление сервера
 	 * 
 	*/
-	public function update($id, $confirm = FALSE)
+	public function update($id, $confirm = false)
     {
 		if(!$this->check_errors($id)){
 			$this->servers->get_server_data($id);
@@ -1185,15 +1185,15 @@ class Server_command extends CI_Controller {
 			if ($this->users->servers_privileges['SERVER_UPDATE']) {
 				
 				/* Проверка SSH и Telnet */
-				if (FALSE == $this->_check_ssh() OR FALSE == $this->_check_telnet()) {
+				if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
 					$this->_show_message();
-					return FALSE;
+					return false;
 				}
 
 				/* Заданы ли параметры запуска */
 				if (!$this->servers->server_data['script_update']) {
 					$this->_show_message(lang('server_command_update_not_param'));
-					return FALSE;
+					return false;
 				}
 
 				/* Подтверждение 
@@ -1249,18 +1249,18 @@ class Server_command extends CI_Controller {
 					$this->panel_log->save_log($log_data);
 
 					$this->_show_message(lang('server_command_cmd_sended'), site_url('admin/server_control/main/' . $id), lang('next'));
-					return TRUE;
+					return true;
 					
 				} else {
 					/* Пользователь не подвердил намерения */
 					$confirm_tpl['message'] = lang('server_command_update_confirm');
 					$confirm_tpl['confirmed_url'] = $this->servers->server_data['id'] . '/' . $this->security->get_csrf_hash();
-					$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, TRUE);
+					$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
 				}
 			} else {
 					$message = lang('server_command_no_update_privileges');
 					$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
-					return FALSE;
+					return false;
 					
 					break;
 			}
@@ -1268,7 +1268,7 @@ class Server_command extends CI_Controller {
 			$message = lang('server_command_server_not_found');
 			
 			$this->_show_message($message, site_url('admin'));
-			return FALSE;
+			return false;
 		}
 		
 		$this->parser->parse('main.html', $this->tpl_data);

@@ -21,8 +21,8 @@ class Template extends CI_Controller {
 			$this->tpl_data['title'] = 'Настройки :: АдминПанель';
 			$this->tpl_data['heading'] = 'Настройки';
 			$this->tpl_data['content'] = '';
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, TRUE);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), TRUE);
+			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
+			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
         
         }else{
             header("Location: /auth");
@@ -37,7 +37,7 @@ class Template extends CI_Controller {
      * Редактирование пользователя
      * 
     */
-    public function index($user_id = FALSE)
+    public function index($user_id = false)
     {
 		
 		$this->tpl_data['content'] = 'Функция в разработке';

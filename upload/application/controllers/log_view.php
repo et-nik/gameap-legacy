@@ -30,8 +30,8 @@ class Log_view extends CI_Controller {
 			$this->tpl_data['title'] = lang('log_view_title_index');
 			$this->tpl_data['heading'] = lang('log_view_heading_index');
 			$this->tpl_data['content'] = '';
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, TRUE);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), TRUE);
+			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
+			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
 			
         }else{
             redirect('auth');
@@ -41,7 +41,7 @@ class Log_view extends CI_Controller {
     // -----------------------------------------------------------------
     
     // Отображение информационного сообщения
-	function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+	function _show_message($message = false, $link = false, $link_text = false)
 	{
 		
 		if (!$message) {
@@ -59,7 +59,7 @@ class Log_view extends CI_Controller {
 		$local_tpl_data['message'] = $message;
 		$local_tpl_data['link'] = $link;
 		$local_tpl_data['back_link_txt'] = $link_text;
-		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
+		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 	
@@ -86,15 +86,15 @@ class Log_view extends CI_Controller {
 	/**
 	 * Выводит список логов
 	*/
-	function _list_log($limit = 100, $offset = FALSE)
+	function _list_log($limit = 100, $offset = false)
 	{
-		$panel_logs = $this->panel_log->get_log(FALSE, $limit, $offset); // Логи сервера в админпанели
+		$panel_logs = $this->panel_log->get_log(false, $limit, $offset); // Логи сервера в админпанели
 		
 		if (is_array($panel_logs)) {
 			$i = 0;
 			foreach($panel_logs as $log) {
 				$logs[$i]['log_id'] = 			$log['id'];
-				$logs[$i]['log_date'] = 		unix_to_human($log['date'], TRUE, 'eu');
+				$logs[$i]['log_date'] = 		unix_to_human($log['date'], true, 'eu');
 				$logs[$i]['log_server_id'] = 	$log['server_id'];
 				$logs[$i]['log_user_name'] = 	$log['user_name'];
 				$logs[$i]['log_command'] = 		$log['command'];
@@ -116,7 +116,7 @@ class Log_view extends CI_Controller {
 	function index($offset = 0) 
 	{
 		/* Доступ только для админа */
-		if (FALSE == $this->users->auth_data['is_admin']) {
+		if (false == $this->users->auth_data['is_admin']) {
 			show_404();
 		}
 		
@@ -133,7 +133,7 @@ class Log_view extends CI_Controller {
 		/* Список логов */
 		$local_tpl_data['log_list'] = $this->_list_log(100, $offset);
 
-		$this->tpl_data['content'] .= $this->parser->parse('log_list.html', $local_tpl_data, TRUE);
+		$this->tpl_data['content'] .= $this->parser->parse('log_list.html', $local_tpl_data, true);
 		
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
@@ -141,14 +141,14 @@ class Log_view extends CI_Controller {
     // -----------------------------------------------------------------
     
     
-    function view($id = FALSE)
+    function view($id = false)
     {
 		$this->load->model('servers');
 		
 		/* Проверочки */
 		if(!$id) {
 			$this->_show_message(lang('log_view_id_param_not_specified'));
-			return FALSE;
+			return false;
 		}
 				
 		// Получаем содержимое лога
@@ -165,13 +165,13 @@ class Log_view extends CI_Controller {
 			/* Лог должен быть найден и относиться к серверу */
 			if(!$log_list OR !$log_list[0]['server_id']) {
 				$this->_show_message(lang('log_view_record_not_found'));
-				return FALSE;
+				return false;
 			}
 
 			/* Если сервер, указанный в логе не найден */
 			//~ if(!$this->servers->server_data) {
 				//~ $this->_show_message(lang('log_view_record_not_found'));
-				//~ return FALSE;
+				//~ return false;
 			//~ }
 			
 			/* Получаем права на сервер */
@@ -180,13 +180,13 @@ class Log_view extends CI_Controller {
 			/* У пользователя на этот сервер должны быть права */
 			if(!$this->users->servers_privileges['VIEW']) {
 				$this->_show_message(lang('log_view_record_not_found'));
-				return FALSE;
+				return false;
 			}
 			
 			/* Если пользователю нельзя видеть rcon пароль */
 			if(!$this->users->servers_privileges['CHANGE_RCON'] && strtolower($log_list[0]['command']) == 'rcon_password') {
 				$this->_show_message(lang('log_view_log_access_denied'), '/admin/server_control/main/' . $log_list[0]['server_id']);
-				return FALSE;
+				return false;
 			}
 		}
 		
@@ -196,7 +196,7 @@ class Log_view extends CI_Controller {
 		if ($log_list[0]['server_id']) { $this->servers->get_server_data($log_list[0]['server_id']);}
 		
 		$local_tpl_data['log_id'] = $log_list[0]['id'];
-		$local_tpl_data['log_date'] = unix_to_human($log_list[0]['date'], TRUE, 'eu');
+		$local_tpl_data['log_date'] = unix_to_human($log_list[0]['date'], true, 'eu');
 		$local_tpl_data['log_type'] = $log_list[0]['type'];
 		$local_tpl_data['log_command'] = $log_list[0]['command'];
 		$local_tpl_data['log_user'] = $log_list[0]['user_name'];
@@ -206,7 +206,7 @@ class Log_view extends CI_Controller {
 		$local_tpl_data['log_msg'] = $log_list[0]['msg'];
 		$local_tpl_data['log_data'] = $log_list[0]['log_data'];
 		
-		$this->tpl_data['content'] .= $this->parser->parse('log_info.html', $local_tpl_data, TRUE);
+		$this->tpl_data['content'] .= $this->parser->parse('log_info.html', $local_tpl_data, true);
 		
 		$this->parser->parse('main.html', $this->tpl_data);
 	}

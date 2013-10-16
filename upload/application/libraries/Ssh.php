@@ -24,7 +24,7 @@
 */
  
 class Ssh {
-	var $_connection = FALSE;
+	var $_connection = false;
 	var $errors = '';
 	
 	// ----------------------------------------------------------------
@@ -37,7 +37,7 @@ class Ssh {
 		$this->_connection = ssh2_connect($ip, $port);
 		
 		if (!$this->_connection) {
-			return FALSE;
+			return false;
 		}
 		
 		return $this->_connection;
@@ -46,16 +46,16 @@ class Ssh {
 	function auth($login, $password)
 	{
 		if (!$this->_connection) {
-			return FALSE;
+			return false;
 		}
 		
 		if (!ssh2_auth_password($this->_connection, $login, $password)) {
-			$this->_connection = FALSE;
+			$this->_connection = false;
 			$this->errors = 'Authorization failed';
-			return FALSE;
+			return false;
 		}
 		
-		return TRUE;
+		return true;
 		
 	}
 	
@@ -67,7 +67,7 @@ class Ssh {
 	function command($command)
 	{
 		if (!$this->_connection) {
-			return FALSE;
+			return false;
 		}
 		
 		$stream = ssh2_exec($this->_connection, $command);

@@ -503,7 +503,7 @@ class Servers extends CI_Model {
     {
 		$this->db->where('id', $id);
 		
-		if (isset($data['rcon']) {
+		if (isset($data['rcon'])) {
 			$data['rcon'] = $this->encrypt->encode($data['rcon']);
 		}
 		
@@ -1461,7 +1461,7 @@ class Servers extends CI_Model {
 		}
 		
 		if ($update_db) {
-			$sql_data = array('rcon' = $new_rcon);
+			$sql_data = array('rcon' => $new_rcon);
 			$this->edit_game_server($this->server_data['id'], $sql_data);
 		}
 		

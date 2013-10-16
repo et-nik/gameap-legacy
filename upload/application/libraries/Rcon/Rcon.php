@@ -24,7 +24,7 @@ class Rcon extends CI_Driver_Library {
 	var $engine_version;
 	var $rcon_connect;
 	
-	var $errors = FALSE;
+	var $errors = false;
     
     function __construct()
     {
@@ -61,9 +61,9 @@ class Rcon extends CI_Driver_Library {
 	{
 		$engine = $this->engine;
 		
-		if (FALSE == in_array('rcon_' . $this->engine, $this->valid_drivers)) {
+		if (false == in_array('rcon_' . $this->engine, $this->valid_drivers)) {
 			$this->errors = 'Driver' . $this->engine . ' not found';
-			return FALSE;
+			return false;
 		}
 		
 		$this->rcon_connect = $this->$engine->connect();
@@ -85,7 +85,7 @@ class Rcon extends CI_Driver_Library {
 		
 		if (!$this->rcon_connect) {
 			$this->errors = 'Could not connect to server';
-			return FALSE;
+			return false;
 		}
 
 		$rcon_string = $this->$engine->command($command);

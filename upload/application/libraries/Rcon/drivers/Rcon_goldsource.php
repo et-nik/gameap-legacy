@@ -15,9 +15,9 @@ class Rcon_goldsource extends CI_Driver {
 
 		if ($this->fp) {
 			$this->getchallengenumber();
-			return TRUE;
+			return true;
 		} else {
-			return FALSE;
+			return false;
 		}
 	}
 	

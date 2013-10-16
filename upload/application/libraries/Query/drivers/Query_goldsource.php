@@ -105,7 +105,7 @@ class Query_goldsource extends CI_Driver {
 	{
 		$st = $this->request("\x54Source Engine Query",$host,$port);
 		if (!$st) {
-			return FALSE;
+			return false;
 		}
 		
 		$st = substr($st, 4);
@@ -153,7 +153,7 @@ class Query_goldsource extends CI_Driver {
 				$result['ClDLL'] = $this->cutbyte($st); // Byte: If 1 this mod has a custom client dll
 			}
 		} else {
-			return FALSE;
+			return false;
 		}
 		
 		return $result;
@@ -272,7 +272,7 @@ class Query_goldsource extends CI_Driver {
 		
 		$st = $this->request("\x56".$this->pastelong($challenge),$host,$port);
 		
-		if (!$st) { return FALSE; }
+		if (!$st) { return false; }
 		
 		$st=substr($st, 4);
 		

@@ -54,8 +54,8 @@ class Server_control extends CI_Controller {
 			$this->tpl_data['title'] 	= lang('server_control_title');
 			$this->tpl_data['heading'] 	= lang('server_control_header');
 			$this->tpl_data['content'] = '';
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, TRUE);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), TRUE);
+			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
+			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
         
         }else{
             redirect('auth');
@@ -63,7 +63,7 @@ class Server_control extends CI_Controller {
     }
     
 	// Отображение информационного сообщения
-    function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    function _show_message($message = false, $link = false, $link_text = false)
     {
         
         if (!$message) {
@@ -81,13 +81,13 @@ class Server_control extends CI_Controller {
         $local_tpl_data['message'] = $message;
         $local_tpl_data['link'] = $link;
         $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, TRUE);
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
     
     // Команды
-    public function main($server_id = FALSE)
+    public function main($server_id = false)
     {
         $this->load->driver('rcon');
         $this->load->helper('date');
@@ -99,7 +99,7 @@ class Server_control extends CI_Controller {
             
             if(!$server_id) {
 				$this->_show_message(lang('server_control_empty_server_id'));
-				return FALSE;
+				return false;
 			} else {
 					$server_id = (int)$server_id;
 			}
@@ -110,16 +110,16 @@ class Server_control extends CI_Controller {
 					
 			if(!$this->users->auth_servers_privileges['VIEW']) {
 				$this->_show_message(lang('server_control_server_not_found'));
-				return FALSE;
+				return false;
 			}
 					
 			if(!$this->servers->server_data) {
 				$this->_show_message(lang('server_control_server_not_found'));
-				return FALSE;
+				return false;
 			}
 
 			if(!$error_desc){
-				$rcon_connect = FALSE;
+				$rcon_connect = false;
 				
 				if ($this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['query_port'])) {
 					$this->servers->server_data['server_status'] = 1;
@@ -144,7 +144,7 @@ class Server_control extends CI_Controller {
 					// Отправка команды
 					$rcon_string = $this->rcon->command("status");
 					
-					$local_tpl_data['users_list'] = FALSE;
+					$local_tpl_data['users_list'] = false;
 					
 					if($rcon_string){
 							$local_tpl_data['users_list'] = $this->rcon->get_players($rcon_string, $this->servers->server_data['engine']);
@@ -175,7 +175,7 @@ class Server_control extends CI_Controller {
 					 * Декодирование json списка с командами
 					*/
 					
-					$frcon_list = json_decode($this->servers->server_data['fast_rcon'], TRUE);
+					$frcon_list = json_decode($this->servers->server_data['fast_rcon'], true);
 					if($frcon_list) {
 						$i = -1;
 						$local_tpl_data['frcon_list'] = $frcon_list;
@@ -217,7 +217,7 @@ class Server_control extends CI_Controller {
 					}
 					
 					$local_tpl_data['log_list'][$i]['log_id'] = $server_plogs[$i]['id'];
-					$local_tpl_data['log_list'][$i]['log_date'] = unix_to_human($server_plogs[$i]['date'], TRUE, 'eu');
+					$local_tpl_data['log_list'][$i]['log_date'] = unix_to_human($server_plogs[$i]['date'], true, 'eu');
 					$local_tpl_data['log_list'][$i]['log_server_id'] = $server_plogs[$i]['server_id'];
 					$local_tpl_data['log_list'][$i]['log_user_name'] = $server_plogs[$i]['user_name'];
 					$local_tpl_data['log_list'][$i]['log_command'] = $server_plogs[$i]['command'];
@@ -310,7 +310,7 @@ class Server_control extends CI_Controller {
 						
 						$local_tpl_data['task_list'][$i]['task_id'] = $task_list[$i]['id'];
 						$local_tpl_data['task_list'][$i]['task_name'] = $task_list[$i]['name'];
-						$local_tpl_data['task_list'][$i]['task_date'] = unix_to_human($task_list[$i]['date_perform'], TRUE, 'eu');
+						$local_tpl_data['task_list'][$i]['task_date'] = unix_to_human($task_list[$i]['date_perform'], true, 'eu');
 
 						$i ++;
 					
@@ -323,9 +323,9 @@ class Server_control extends CI_Controller {
 				$this->tpl_data['heading'] = lang('server_control_header') . ' "' . $this->servers->server_data['name'] . '"';
 				
 				if(file_exists('application/viewsserver_control/' . $this->servers->server_data['game'] . '.html')){
-					$this->tpl_data['content'] .= $this->parser->parse('server_control/' . $this->servers->server_data['game'] . '.html', $local_tpl_data, TRUE);
+					$this->tpl_data['content'] .= $this->parser->parse('server_control/' . $this->servers->server_data['game'] . '.html', $local_tpl_data, true);
 				}else{
-					$this->tpl_data['content'] .= $this->parser->parse('server_control/default.html', $local_tpl_data, TRUE);
+					$this->tpl_data['content'] .= $this->parser->parse('server_control/default.html', $local_tpl_data, true);
 				}
 				
 			}else{
@@ -353,7 +353,7 @@ class Server_control extends CI_Controller {
 		
 		if(!$server_id) {
 				$this->_show_message(lang('server_control_empty_server_id'));
-				return FALSE;
+				return false;
 		} else {
 				$server_id = (int)$server_id;
 		}
@@ -365,13 +365,13 @@ class Server_control extends CI_Controller {
 		/* Проверочки */
 		if(!$this->users->auth_servers_privileges['VIEW']) {
 			$this->_show_message(lang('server_control_server_not_found'));
-			return FALSE;
+			return false;
 		} elseif(!$this->servers->server_data) {
 			$this->_show_message(lang('server_control_server_not_found'));
-			return FALSE;
+			return false;
 		} elseif(!$this->users->auth_servers_privileges['TASK_MANAGE']) {
 			$this->_show_message(lang('server_control_no_task_privileges'));
-			return FALSE;
+			return false;
 		}
 		
 		/* Правила для формы */
@@ -384,8 +384,8 @@ class Server_control extends CI_Controller {
 		
 		$local_tpl_data['server_id'] = $server_id;
 		
-		if($this->form_validation->run() == FALSE) {
-			$this->tpl_data['content'] .= $this->parser->parse('servers/task_add.html', $local_tpl_data, TRUE);
+		if($this->form_validation->run() == false) {
+			$this->tpl_data['content'] .= $this->parser->parse('servers/task_add.html', $local_tpl_data, true);
 		} else {
 			
 			$sql_data['server_id'] = $server_id;
@@ -397,7 +397,7 @@ class Server_control extends CI_Controller {
 			
 			if(!$sql_data['date_perform'] = human_to_unix($this->input->post('date_perform'))) {
 				$this->_show_message(lang('server_control_date_unavailable'), 'javascript:history.back()');
-				return FALSE;
+				return false;
 			}
 			
 			$sql_data['time_add'] = $this->input->post('time_add');
@@ -414,7 +414,7 @@ class Server_control extends CI_Controller {
 			$this->panel_log->save_log($log_data);
 			
 			$this->_show_message(lang('server_control_new_task_success'), site_url('admin/server_control/main/' . $server_id), 'Далее');
-			return TRUE;
+			return true;
 			
 		}
 		
@@ -429,11 +429,11 @@ class Server_control extends CI_Controller {
      * @param int - id сервера
      *
     */
-    function delete_task($task_id, $confirm = FALSE)
+    function delete_task($task_id, $confirm = false)
     {
 		if(!$task_id) {
 				$this->_show_message(lang('server_control_empty_task_id'));
-				return FALSE;
+				return false;
 		} else {
 				$task_id = (int)$task_id;
 		}
@@ -450,13 +450,13 @@ class Server_control extends CI_Controller {
 			$task_list = $query->result_array();
 		} else {
 			$this->_show_message(lang('server_control_task_not_found'));
-			return FALSE;
+			return false;
 		}
 		
 		/* Задание может не относится к серверу, такие нам не нужны */
 		if(!$task_list[0]['server_id']) {
 			$this->_show_message(lang('server_control_task_not_found'));
-			return FALSE;
+			return false;
 		}
 		
 		/* Получение данных сервера и привилегий на сервер */
@@ -466,13 +466,13 @@ class Server_control extends CI_Controller {
 		/* Проверочки */
 		if(!$this->users->auth_servers_privileges['VIEW']) {
 			$this->_show_message(lang('server_control_task_not_found'));
-			return FALSE;
+			return false;
 		} elseif(!$this->servers->server_data) {
 			$this->_show_message(lang('server_control_task_not_found'));
-			return FALSE;
+			return false;
 		} elseif(!$this->users->auth_servers_privileges['TASK_MANAGE']) {
 			$this->_show_message(lang('server_control_no_task_privileges'));
-			return FALSE;
+			return false;
 		}
 
 		if($confirm != 'confirm') {
@@ -480,7 +480,7 @@ class Server_control extends CI_Controller {
 			/* Пользователь не подвердил намерения */
 			$confirm_tpl['message'] = lang('server_control_task_delete_confirm');
 			$confirm_tpl['confirmed_url'] = site_url('admin/server_control/delete_task/' . $task_id . '/confirm');
-			$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, TRUE);
+			$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
 
 		} else {
 			$this->db->where('id', $task_id);
@@ -496,7 +496,7 @@ class Server_control extends CI_Controller {
 			$this->panel_log->save_log($log_data);
 			
 			$this->_show_message(lang('server_control_task_saved'), site_url('/admin/server_control/main/' . $task_list[0]['server_id']), 'Далее');
-			return TRUE;
+			return true;
 		}
 		
 		$this->parser->parse('main.html', $this->tpl_data);
@@ -515,7 +515,7 @@ class Server_control extends CI_Controller {
 		
 		if(!$task_id) {
 			$this->_show_message(lang('server_control_empty_task_id'));
-			return FALSE;
+			return false;
 		} else {
 			$task_id = (int)$task_id;
 		}
@@ -534,13 +534,13 @@ class Server_control extends CI_Controller {
 			$task_list = $query->result_array();
 		} else {
 			$this->_show_message(lang('server_control_task_not_found'));
-			return FALSE;
+			return false;
 		}
 		
 		/* Задание может не относится к серверу, такие нам не нужны */
 		if(!$task_list[0]['server_id']) {
 			$this->_show_message(lang('server_control_task_not_found'));
-			return FALSE;
+			return false;
 		}
 		
 		/* Получение данных сервера и привилегий на сервер */
@@ -550,13 +550,13 @@ class Server_control extends CI_Controller {
 		/* Проверочки */
 		if(!$this->users->auth_servers_privileges['VIEW']) {
 			$this->_show_message(lang('server_control_task_not_found'));
-			return FALSE;
+			return false;
 		} elseif(!$this->servers->server_data) {
 			$this->_show_message(lang('server_control_task_not_found'));
-			return FALSE;
+			return false;
 		} elseif(!$this->users->auth_servers_privileges['TASK_MANAGE']) {
 			$this->_show_message(lang('server_control_no_task_privileges'));
-			return FALSE;
+			return false;
 		}
 		
 		/* Правила для формы */
@@ -567,7 +567,7 @@ class Server_control extends CI_Controller {
 		$this->form_validation->set_rules('date_perform', 'дата выполнения', 'trim|required|max_length[19]|xss_clean');
 		$this->form_validation->set_rules('time_add', 'период повтора', 'trim|required|integer|max_length[16]|xss_clean');
 		
-		if($this->form_validation->run() == FALSE) {
+		if($this->form_validation->run() == false) {
 			
 			$options['code'] = array(
 				'server_start' => 	lang('server_control_start'),
@@ -593,9 +593,9 @@ class Server_control extends CI_Controller {
 			$local_tpl_data['command'] = $task_list[0]['command'];	
 			$local_tpl_data['task_id'] = $task_list[0]['id'];
 			$local_tpl_data['name'] = $task_list[0]['name'];
-			$local_tpl_data['date_perform'] = unix_to_human($task_list[0]['date_perform'], TRUE, 'eu');
+			$local_tpl_data['date_perform'] = unix_to_human($task_list[0]['date_perform'], true, 'eu');
 			
-			$this->tpl_data['content'] .= $this->parser->parse('servers/task_edit.html', $local_tpl_data, TRUE);
+			$this->tpl_data['content'] .= $this->parser->parse('servers/task_edit.html', $local_tpl_data, true);
 		} else {
 			$sql_data['name'] = $this->input->post('name');
 			$sql_data['code'] = $this->input->post('code');
@@ -604,7 +604,7 @@ class Server_control extends CI_Controller {
 			
 			if(!$sql_data['date_perform'] = human_to_unix($this->input->post('date_perform'))) {
 				$this->_show_message(lang('server_control_date_unavailable'), 'javascript:history.back()');
-				return FALSE;
+				return false;
 			}
 			
 			// Сбрасываем, если заданание уже выполнялось
@@ -625,7 +625,7 @@ class Server_control extends CI_Controller {
 			$this->panel_log->save_log($log_data);
 			
 			$this->_show_message(lang('server_control_task_saved'), site_url('/admin/server_control/main/' . $task_list[0]['server_id']), 'Далее');
-			return TRUE;
+			return true;
 		}
 		
 		$this->parser->parse('main.html', $this->tpl_data);

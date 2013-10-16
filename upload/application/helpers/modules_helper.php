@@ -39,9 +39,9 @@ if (!function_exists('module_exists')) {
 		$CI =& get_instance();
 		
 		if (in_array($module, $CI->gameap_modules->modules_list)) {
-			return TRUE;
+			return true;
 		} else {
-			return FALSE;
+			return false;
 		}
 	}
 }
