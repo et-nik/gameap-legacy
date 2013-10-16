@@ -238,6 +238,9 @@ class Servers extends CI_Model {
 		/* Добавляем команду в зависимости от ОС */
 		switch(strtolower($server_data['os'])) {
 			case 'windows':
+					/* Замена нормального линуксовского слеша
+					 * на ненормальный виндовый \ */
+					$path = str_replace('/', '\\', $path);
 					$cd = "cd /D " . $path;
 				break;
 				

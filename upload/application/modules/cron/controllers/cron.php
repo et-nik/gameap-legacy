@@ -166,7 +166,7 @@ class Cron extends MX_Controller {
 				
 				switch (strtolower($this->servers_data[$server_id]['os'])) {
 					case 'windows':
-						$commands[] = 'copy ' . $link . ' ' . $this->config->config['local_script_path'] . '/' .$this->servers_data[$server_id]['dir'];
+						$commands[] = 'copy ' . $link . ' ' . $this->config->config['local_script_path'] . '\\' .$this->servers_data[$server_id]['dir'];
 						break;
 
 					default:
