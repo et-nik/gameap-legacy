@@ -42,6 +42,7 @@ class Cron extends MX_Controller {
 
 	var $servers_data = array();
 	var $_cron_result = '';
+	private $_commands_result = '';
 
 	public function __construct()
     {
@@ -110,9 +111,9 @@ class Cron extends MX_Controller {
 		}
 			
 		if ($this->servers->command($commands, $this->servers_data[$server_id])) {
-			return TRUE;
+			return true;
 		} else {
-			return FALSE;
+			return false;
 		}
 	}
 	
@@ -138,11 +139,11 @@ class Cron extends MX_Controller {
 				$connection = @ftp_connect($this->servers_data[$server_id]['ftp_host']);
 				
 				if (!$connection) {
-					return FALSE;
+					return false;
 				}
 				
 				if (!ftp_login($connection, $this->servers_data[$server_id]['ftp_login'], $this->servers_data[$server_id]['ftp_passwd'])) {
-					return FALSE;
+					return false;
 				}
 				
 				/* Загружаем файл на удаленный сервер */
@@ -155,7 +156,7 @@ class Cron extends MX_Controller {
 				
 				if (!$ftp_put_result) {
 					ftp_close($connection);
-					return FALSE;
+					return false;
 				}
 				
 				ftp_close($connection);
@@ -175,9 +176,9 @@ class Cron extends MX_Controller {
 				} 
 			}
 			
-			$this->servers->command($commands, $this->servers_data[$server_id], $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']);
+			$this->_commands_result[] = $this->servers->command($commands, $this->servers_data[$server_id], $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']);
 			
-			return TRUE;
+			return true;
 
 		} elseif ($rep_type == 'remote') {
 			
@@ -191,19 +192,19 @@ class Cron extends MX_Controller {
 					break;
 			}
 			
-			$result = $this->servers->command(
-									$command,
-									$this->servers_data[$server_id], 
-									$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+			$this->commands_result[] = $this->servers->command(
+										$command,
+										$this->servers_data[$server_id], 
+										$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 			);
 			
 			//~ if ($result) {
-				//~ return TRUE;
+				//~ return true;
 			//~ }
-			return TRUE;
+			return true;
 
 		} else {
-			return FALSE;
+			return false;
 		}
 
 	}
@@ -236,7 +237,7 @@ class Cron extends MX_Controller {
 		);
 			
 		if ($result) {
-			return TRUE;
+			return true;
 		}
 	}
 
@@ -271,37 +272,37 @@ class Cron extends MX_Controller {
 				break;
 		}
 
-		$result = $this->servers->command($command, $this->servers_data[$server_id], $this->servers_data[$server_id]['steamcmd_path']);
+		$this->_commands_result[] = $this->servers->command($command, $this->servers_data[$server_id], $this->servers_data[$server_id]['steamcmd_path']);
 
 		$exec_command = array_pop($this->servers->commands);
 
-		if(strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' fully installed.') !== FALSE
-			OR strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' already up to date.') !== FALSE
+		if(strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' fully installed.') !== false
+			OR strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' already up to date.') !== false
 		) {
 			$server_data = array('installed' => '1');
-			$server_installed = TRUE;
+			$server_installed = true;
 
 			$log_data['msg'] = 'Update server success';
 			$this->_cron_result .= "Install server success\n";
 			
-			return TRUE;
+			return true;
 			
-		} elseif(strpos($result, 'Failed to request AppInfo update') !== FALSE) {
+		} elseif(strpos($result, 'Failed to request AppInfo update') !== false) {
 			/* Сервер не установлен до конца */
 			$server_data = array('installed' => '0');
 
 			$log_data['msg'] = 'Update server failed';
 			$this->_cron_result .= "Install server failure\n";
 			
-			return FALSE;
-		} elseif(strpos($result, 'Error! App \'' . $this->games->games_list[0]['app_id'] . '\' state is') !== FALSE) {
+			return false;
+		} elseif(strpos($result, 'Error! App \'' . $this->games->games_list[0]['app_id'] . '\' state is') !== false) {
 			/* Сервер не установлен до конца */
 			$server_data = array('installed' => '0');
 
 			$log_data['msg'] = 'Error. App state after update job';
 			$this->_cron_result .= "Install server failure\n";
 			
-			return FALSE;
+			return false;
 		} else {
 			/* Неизвестная ошибка */
 			$server_data = array('installed' => '1');
@@ -310,7 +311,7 @@ class Cron extends MX_Controller {
 			$command = array_pop($this->servers->commands);
 			$this->_cron_result .= "Install server failure\n";
 			
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -602,7 +603,7 @@ class Cron extends MX_Controller {
 				break;
 			}
 
-			$cron_success = FALSE;
+			$cron_success = false;
 
 			/* Проверяем дату, чтобы выполнить то что нужно
 			 * Возможно задание уже было выполнено ранее*/
@@ -641,7 +642,7 @@ class Cron extends MX_Controller {
 				case 'server_start':
 
 					if($response = $this->servers->start($this->servers_data[$server_id])){
-						$cron_success = TRUE;
+						$cron_success = true;
 						$cron_stats['success'] ++;
 
 						$this->_cron_result .= 'Task: server #' . $server_id . '  start success' . "\n";
@@ -670,7 +671,7 @@ class Cron extends MX_Controller {
 					break;
 				case 'server_stop':
 					if($response = $this->servers->stop($this->servers_data[$server_id])){
-						$cron_success = TRUE;
+						$cron_success = true;
 						$cron_stats['success'] ++;
 
 						$this->_cron_result .= 'Task: server #' . $server_id . '  stop success' . "\n";
@@ -699,7 +700,7 @@ class Cron extends MX_Controller {
 					break;
 				case 'server_restart':
 					if($response = $this->servers->restart($this->servers_data[$server_id])){
-						$cron_success = TRUE;
+						$cron_success = true;
 						$cron_stats['success'] ++;
 
 						$this->_cron_result .= 'Task: server #' . $server_id . '  restart success' . "\n";
@@ -728,7 +729,7 @@ class Cron extends MX_Controller {
 					break;
 				case 'server_update':
 					if($response = $this->servers->update($this->servers_data[$server_id])) {
-						$cron_success = TRUE;
+						$cron_success = true;
 						$cron_stats['success'] ++;
 
 						$this->_cron_result .= 'Task: server #' . $server_id . '  update success' . "\n";
@@ -771,7 +772,7 @@ class Cron extends MX_Controller {
 						if($rcon_connect) {
 							$rcon_string = $this->rcon->command($task_list[$i]['command']);
 
-							$cron_success = TRUE;
+							$cron_success = true;
 							$cron_stats['success'] ++;
 
 							$this->_cron_result .= 'Task: server #' . $server_id . '  rcon send success' . "\n";
@@ -851,7 +852,7 @@ class Cron extends MX_Controller {
 
 		$this->_cron_result .= "== Runner ==\n";
 
-		$this->servers->get_server_list(FALSE, FALSE, array('enabled' => '1'));
+		$this->servers->get_server_list(false, false, array('enabled' => '1'));
 		//~ $this->games->get_game_list();
 
 		$i = 0;
@@ -871,7 +872,7 @@ class Cron extends MX_Controller {
 			) {
 				// Сервер не установлен
 				$this->_cron_result .= "Server #" . $server_id . " not installed\n";
-				$server_installed = FALSE;
+				$server_installed = false;
 
 				/* Получение данных об игровой модификации */
 				$this->game_types->get_gametypes_list(array('id' => $this->servers_data[$server_id]['dir']));
@@ -888,19 +889,19 @@ class Cron extends MX_Controller {
 					/* Установка из локального репозитория */
 					if ($this->_wget_files($server_id, $this->games->games_list[0]['local_repository'], 'local')) {
 						$this->_unpack_files($server_id, $this->games->games_list[0]['local_repository']);
-						$server_installed = TRUE;
+						$server_installed = true;
 					}
 					
 				} elseif ($this->games->games_list[0]['remote_repository']) {
 					/* Установка из удаленного репозитория */
 					if ($this->_wget_files($server_id, $this->games->games_list[0]['remote_repository'], 'remote')) {
 						$this->_unpack_files($server_id, $this->games->games_list[0]['remote_repository']);
-						$server_installed = TRUE;
+						$server_installed = true;
 					}
 				} elseif ($this->games->games_list[0]['app_id']) {
 					/* Установка через SteamCMD */
 					if ($this->_install_from_steamcmd($server_id)) {
-						$server_installed = TRUE;
+						$server_installed = true;
 					}
 					
 				} else {
@@ -909,14 +910,14 @@ class Cron extends MX_Controller {
 					 * отсутствуют данные локального репозитория, удаленного репозитория и steamcmd
 					 */
 					$this->_cron_result .= "Server #" . $server_id . " install failed. App_id and Repository data not specified\n";
-					$server_installed = FALSE;
+					$server_installed = false;
 				}
 
 				/* 
 				 * Завершение установки.
 				 * Установка прав на директории, задание ркон пароля
 				*/
-				if ($server_installed == TRUE) {
+				if ($server_installed == true) {
 					/* Загружаем дополнительный файлы игровой модификации */
 					if ($this->game_types->game_types_list[0]['local_repository']) {
 						if ($this->_wget_files($server_id, $this->game_types->game_types_list[0]['local_repository'], 'local')) {
@@ -931,9 +932,9 @@ class Cron extends MX_Controller {
 					/* Устанавливаем 777 права на директории, в которые загружается контент (карты, модели и пр.)
 					* и 666 на конфиг файлы, которые можно редактировать через админпанель */
 					if(strtolower($this->servers_data[$server_id]['os']) != 'windows') {
-						$config_files 	= json_decode($this->servers_data[$server_id]['config_files'], TRUE);
-						$content_dirs 	= json_decode($this->servers_data[$server_id]['content_dirs'], TRUE);
-						$log_dirs 		= json_decode($this->servers_data[$server_id]['log_dirs'], TRUE);
+						$config_files 	= json_decode($this->servers_data[$server_id]['config_files'], true);
+						$content_dirs 	= json_decode($this->servers_data[$server_id]['content_dirs'], true);
+						$log_dirs 		= json_decode($this->servers_data[$server_id]['log_dirs'], true);
 						$command = array();
 						$log = '';
 
@@ -969,7 +970,7 @@ class Cron extends MX_Controller {
 					$log_data['command'] = 'install';
 					$log_data['server_id'] = $server_id;
 					$log_data['msg'] = 'Server install successful';
-					$log_data['log_data'] = 'Commands: ' . var_export($this->servers->commands, TRUE);
+					$log_data['log_data'] = 'Results: ' . var_export($this->_commands_result, true) . 'Commands: ' . var_export($this->servers->commands, true);
 					$this->panel_log->save_log($log_data);
 
 				} else {
@@ -981,7 +982,7 @@ class Cron extends MX_Controller {
 					$log_data['command'] = 'install';
 					$log_data['server_id'] = $server_id;
 					$log_data['msg'] = 'Server install failed';
-					$log_data['log_data'] = 'Commands: ' . var_export($this->servers->commands, TRUE);
+					$log_data['log_data'] = 'Commands: ' . var_export($this->servers->commands, true);
 					$this->panel_log->save_log($log_data);
 					
 					$this->_cron_result .= 'Server install #' . $server_id . ' failed';
@@ -1022,7 +1023,7 @@ class Cron extends MX_Controller {
 					$where = array('date >=' => $time - 780,  'type' => 'cron_check', 'command' => 'server_status', 'server_id' => $server_id, 'log_data' => 'Server is down');
 					$logs = $this->panel_log->get_log($where); // Логи сервера в админпанели
 
-					$response = FALSE;
+					$response = false;
 
 					if(count($logs) >= 1) {
 						/* При последней проверке сервер был оффлайн, запускаем его*/
@@ -1031,12 +1032,12 @@ class Cron extends MX_Controller {
 						$log_data['command'] = 'start';
 						$log_data['msg'] = 'Start server success';
 
-						if(strpos($response, 'Server is already running') !== FALSE) {
+						if(strpos($response, 'Server is already running') !== false) {
 							/* Сервер запущен, видимо завис */
 							$response = $this->servers->restart($this->servers_data[$server_id]);
 							$log_data['command'] = 'restart';
 
-							if(strpos($response, 'Server restarted') !== FALSE) {
+							if(strpos($response, 'Server restarted') !== false) {
 								$log_data['msg'] = 'Restart server success';	
 							}
 
@@ -1083,7 +1084,7 @@ class Cron extends MX_Controller {
 					$rcon_connect = $this->rcon->connect();
 
 				} else {
-					$rcon_connect = FALSE;
+					$rcon_connect = false;
 				}
 
 				if($rcon_connect) {
@@ -1091,7 +1092,7 @@ class Cron extends MX_Controller {
 
 					$rcon_string = trim($rcon_string);
 
-					if(strpos($rcon_string, 'Bad rcon_password.') !== FALSE) {
+					if(strpos($rcon_string, 'Bad rcon_password.') !== false) {
 
 						$this->load->helper('safety');
 
@@ -1173,7 +1174,7 @@ class Cron extends MX_Controller {
 				 * memory_usage - использование памяти (%)
 				*/
 
-				$stats_array = json_decode($ds['stats'], TRUE);
+				$stats_array = json_decode($ds['stats'], true);
 
 				$stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
 				$data['stats'] = json_encode($stats_array);
@@ -1187,7 +1188,7 @@ class Cron extends MX_Controller {
 
 		if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
 
-			$stats_array = json_decode(@file_get_contents(APPPATH . 'cache/local_server_stats.json', TRUE));
+			$stats_array = json_decode(@file_get_contents(APPPATH . 'cache/local_server_stats.json', true));
 			$stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
 			$data['stats'] = json_encode($stats_array);
 			file_put_contents(APPPATH . 'cache/local_server_stats.json', $data['stats']);
