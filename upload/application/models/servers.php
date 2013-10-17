@@ -1369,9 +1369,11 @@ class Servers extends CI_Model {
 			case 'goldsource':
 				$servercfg_file = 'server.cfg';
 				break;
+				
 			case 'source':
 				$servercfg_file = 'cfg/server.cfg';
 				break;
+				
 			default:
 				return false;
 				break;

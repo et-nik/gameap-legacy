@@ -1742,7 +1742,7 @@ class Adm_servers extends CI_Controller {
 					/* RCON */
 					if($this->input->post('rcon') != '') {
 						/* Собственно смена rcon пароля */
-						$this->servers->change_rcon($this->input->post('rcon'), empty, false);
+						$this->servers->change_rcon($this->input->post('rcon'), null, false);
 						$sql_data['rcon'] = $this->input->post('rcon');
 					}
 				

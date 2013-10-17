@@ -163,8 +163,6 @@ class Server_command extends CI_Controller {
 		
 		if($this->servers->server_data){
 				
-			$command = strtolower($command);
-				
 			$template_file = null;
 			$no_submit_name = false;
 				
@@ -485,12 +483,12 @@ class Server_command extends CI_Controller {
 									break;
 									
 								case 'fast':
-									$rcon_string = $this->rcon->command("$rcon_command");
+									$rcon_string = $this->rcon->command($rcon_command);
 									$message = lang('server_command_cmd_sended');
 									break;
 									
 								case 'rcon_command':
-									$rcon_string = $this->rcon->command("$rcon_command");
+									$rcon_string = $this->rcon->command($rcon_command);
 									$message = lang('server_command_cmd_sended');
 									break;
 							}
@@ -564,9 +562,6 @@ class Server_command extends CI_Controller {
 	*/
 	private function check_rcon_command($rcon_command) 
 	{
-		
-		$rcon_command = strtolower($rcon_command);
-
 		/* Получаем ркон команду */
 		$rcon_command = explode(' ', $rcon_command);
 		$rcon_command['0'] = strtolower($rcon_command['0']);
@@ -586,7 +581,7 @@ class Server_command extends CI_Controller {
 				// Смена rcon пароля, правка конфиг файлов и тп.
 				if(isset($this->servers->server_data['id']) && isset($rcon_command['1'])) {
 					$this->servers->change_rcon($rcon_command['1']);
-					$sql_data['rcon'] = $this->encrypt->encode($rcon_command['1']);
+					$sql_data['rcon'] = $rcon_command['1'];
 					$this->servers->edit_game_server($this->servers->server_data['id'], $sql_data);
 				}
 				
