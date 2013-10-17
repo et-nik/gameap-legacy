@@ -4,8 +4,18 @@ class Dedicated_servers extends CI_Model {
 	
 	var $ds_list = false;				// Список удаленных серверов
 	
-	var $commands			= array(); // Команды, которые отправлялись на сервер
-    var $errors 			= ''; 	// Строка с ошибкой (если имеются)
+	var $commands; 						// Команды, которые отправлялись на сервер
+    var $errors; 						// Строка с ошибкой (если имеются)
+    
+    //-----------------------------------------------------------
+
+    public function __construct()
+	{
+		parent::__construct();
+		
+		$this->commands = &$this->servers->commands;
+		$this->errors = &$this->servers->errors;
+	}
 	
 	//-----------------------------------------------------------
 	
@@ -135,6 +145,16 @@ class Dedicated_servers extends CI_Model {
 				
 				$this->ds_list[$i]['ftp_login']			= $this->encrypt->decode($this->ds_list[$i]['ftp_login']);
 				$this->ds_list[$i]['ftp_password']		= $this->encrypt->decode($this->ds_list[$i]['ftp_password']);
+				
+				switch(strtolower($this->ds_list[$i]['control_protocol'])) {
+					case 'telnet':
+						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['telnet_path'];
+						break;
+					
+					default:
+						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
+						break;
+				}
 				
 				$i ++;
 			}
@@ -329,7 +349,7 @@ class Dedicated_servers extends CI_Model {
 	/*
 	 * Функция отправляет команду на сервер
 	*/
-	function command($command, $server_data, $path = false)
+	function command($command, $server_data = false, $path = false)
     {
 
 		/*
@@ -345,8 +365,11 @@ class Dedicated_servers extends CI_Model {
 		 * для отправки команды через ssh
 		 * 
 		*/
-
-
+		
+		if (!$server_data) {
+			$server_data = $this->ds_list[0];
+		}
+		
 		/* -------------------
 		 * 	Определяем путь 
 		 * -------------------
@@ -369,10 +392,11 @@ class Dedicated_servers extends CI_Model {
 				break;
 		}
 		
-		if($server_data['local_server']) {
+		if ($server_data['local_server']) {
 			
 			if (!$this->servers->_check_path($path)) {
-				return $this->errors;
+				$this->errors = 'Path ' . $path . " not found\n";
+				return false;
 			}
 			
 			if(is_array($command)) {
@@ -385,8 +409,13 @@ class Dedicated_servers extends CI_Model {
 					$script_file = $script_file[0];
 					$script_file = str_replace('./', '', $script_file);
 					
-					if (!$this->_check_file($path . '/' . $script_file)) {
-						$result .= $this->errors;
+					/* 
+					 * Проверяем, существует ли файл
+					 * Проверяется файлы .sh, если это команда, например wget, то 
+					 * проверки не будет 
+					*/
+					if (strpos($command, '.sh') !== false && strpos($command, '.exe') !== false && !$this->servers->_check_file($path . '/' . $script_file)) {
+						return $this->errors;
 					}
 
 					if($result) { $result .= "\n---\n"; }
@@ -407,7 +436,7 @@ class Dedicated_servers extends CI_Model {
 				 * Проверяется файлы .sh, если это команда, например wget, то 
 				 * проверки не будет 
 				*/
-				if (strpos($command, '.sh') !== false && !$this->servers->_check_file($path . '/' . $script_file)) {
+				if (strpos($command, '.sh') !== false && strpos($command, '.exe') !== false && !$this->servers->_check_file($path . '/' . $script_file)) {
 					return $this->errors;
 				}
 
@@ -476,7 +505,6 @@ class Dedicated_servers extends CI_Model {
 				if ($this->ssh->auth($server_data['ssh_login'], $server_data['ssh_password'])) {
 					if(is_array($command)) {
 						foreach($command as $cmd_arr) {
-							//~ $stream[] = ssh2_exec($connection, $cd . ' && ' . $cmd_arr);
 							$result .= $this->ssh->command($cd . ' && ' . $cmd_arr);
 							$this->commands[] = $cd . ' && ' . $cmd_arr;
 							$result = "\n/------------------------/\n\n";
@@ -492,7 +520,7 @@ class Dedicated_servers extends CI_Model {
 				}
 			}
 		}
-		
+
 		if ($result) {
 			return $result;
 		}else{

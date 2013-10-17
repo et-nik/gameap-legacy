@@ -42,7 +42,8 @@ class Cron extends MX_Controller {
 
 	var $servers_data = array();
 	var $_cron_result = '';
-	private $_commands_result = '';
+	private $_commands_result = array();
+	private $_install_result = '';
 
 	public function __construct()
     {
@@ -105,7 +106,7 @@ class Cron extends MX_Controller {
 
 			default:
 				$commands[] = 'mkdir -p ' . $this->servers_data[$server_id]['dir'];
-				$commands[] = 'chmod 777 ' . $this->servers_data[$server_id]['dir'];
+				$commands[] = 'chmod 755 ' . $this->servers_data[$server_id]['dir'];
 				
 				break;
 		}
@@ -176,7 +177,7 @@ class Cron extends MX_Controller {
 				} 
 			}
 			
-			$this->_commands_result[] = $this->servers->command($commands, $this->servers_data[$server_id], $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']);
+			$this->_install_result .= $this->servers->command($commands, $this->servers_data[$server_id], $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']);
 			
 			return true;
 
@@ -192,7 +193,7 @@ class Cron extends MX_Controller {
 					break;
 			}
 			
-			$this->commands_result[] = $this->servers->command(
+			$this->_install_result .= $this->servers->command(
 										$command,
 										$this->servers_data[$server_id], 
 										$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
@@ -230,13 +231,14 @@ class Cron extends MX_Controller {
 				break;
 		}
 
-		$result = $this->servers->command(
+		$result .= $this->servers->command(
 									$commands,
 									$this->servers_data[$server_id], 
 									$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 		);
-			
+		
 		if ($result) {
+			$this->_install_result .= $result;
 			return true;
 		}
 	}
@@ -271,10 +273,10 @@ class Cron extends MX_Controller {
 				$command = './steamcmd.sh ' . $cmd['login'] . ' ' . $cmd['install_dir'] . ' ' . $cmd['app'] . ' validate +quit';
 				break;
 		}
-
-		$this->_commands_result[] = $this->servers->command($command, $this->servers_data[$server_id], $this->servers_data[$server_id]['steamcmd_path']);
-
-		$exec_command = array_pop($this->servers->commands);
+		
+		$result = $this->servers->command($command, $this->servers_data[$server_id], $this->servers_data[$server_id]['steamcmd_path']);
+		
+		$this->_install_result .= $result;
 
 		if(strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' fully installed.') !== false
 			OR strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' already up to date.') !== false
@@ -970,7 +972,7 @@ class Cron extends MX_Controller {
 					$log_data['command'] = 'install';
 					$log_data['server_id'] = $server_id;
 					$log_data['msg'] = 'Server install successful';
-					$log_data['log_data'] = 'Results: ' . var_export($this->_commands_result, true) . 'Commands: ' . var_export($this->servers->commands, true);
+					$log_data['log_data'] = 'Commands: ' . var_export($this->dedicated_servers->commands, true) . "\n\nResults: " . $this->_install_result;
 					$this->panel_log->save_log($log_data);
 
 				} else {
