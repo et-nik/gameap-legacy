@@ -328,15 +328,21 @@ class Users extends CI_Model {
 			}
         }
         
+        if (!$user_data) {
+			return false;
+		}
+        
+        $tpl_data['id'] 				= $user_data['id'];
         $tpl_data['user_id'] 			= $user_data['id'];
         $tpl_data['user_login'] 		= $user_data['login'];
         $tpl_data['user_name'] 			= $user_data['name'];
-        $tpl_data['user_email'] 		= $user_data['email'];
         $tpl_data['user_email'] 		= $user_data['email'];
         $tpl_data['balance'] 			= $user_data['balance'];
    
         $tpl_data['user_reg_date'] = unix_to_human($user_data['reg_date'], true, 'eu');
         $tpl_data['user_last_auth'] = unix_to_human($user_data['last_auth'], true, 'eu');
+        
+        $this->user_data = $user_data;
         
         return $tpl_data;
     }
@@ -526,7 +532,7 @@ class Users extends CI_Model {
      * 
      * @return bool
     */  
-    function user_live($string, $type='id'){
+    function user_live($string, $type = 'id'){
 		
 		$type = strtolower($type);
         
@@ -601,29 +607,66 @@ class Users extends CI_Model {
     
     /**
      * Получаем код для восстановления пароля пользователя
-     * @param - where данные пользователя
+     * @param - id пользователя
      * @return string
      * 
     */  
     function get_user_recovery_code($user_id)
     {
-
-        $this->load->helper('safety');
+		$user_data = $this->get_user_data($user_id, false, true);
+		return $user_data['recovery_code'];
+    }
+    
+    // ----------------------------------------------------------------
+    
+    /**
+     * Задает код для восстановления пароля пользователя
+     * @param - id пользователя
+     * @return string
+     * 
+    */ 
+    function set_user_recovery_code($user_id)
+    {
+		$this->load->helper('safety');
         $code = generate_code(20);
         
         $this->update_user(array('recovery_code' => $code), $user_id);
         
         return $code;
-    }
+	}
+	
+	// ----------------------------------------------------------------
+    
+    /**
+     * Отправка сообщения пользователю на почту
+     * @return string
+    */  
+	function send_mail($subject = '<empty>', $message = '', $user_id)
+	{
+		$this->load->library('email');
+		
+		$user_data = $this->get_user_data($user_id, false, true);
+		
+		$this->email->to($user_data['email']);
+		$this->email->from($this->config->config['system_email'], 'AdminPanel');
+		$this->email->subject($subject);
+		$this->email->message($message);
+		
+		if ($this->email->send()) {
+			return true;
+		} else {
+			//echo $this->email->print_debugger();
+			return false;
+		}
+	}
     
     // ----------------------------------------------------------------
     
     /**
      * Отправка сообщения администратору на почту
      * @return string
-     * 
     */  
-    function admin_msg($subject = 'Без темы', $message) {
+    function admin_msg($subject = '<empty>', $message) {
 		
 		$admin_list = $this->get_users_list(array('is_admin' => '1'), 1000);
 		
