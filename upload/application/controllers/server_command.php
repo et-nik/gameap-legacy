@@ -411,7 +411,7 @@ class Server_command extends CI_Controller {
 						$rcon_connect = $this->rcon->connect();
 							
 						if(@$rcon_connect) {
-							$player_id = (int)$id;
+							$player_id = $id;
 								
 							switch($command){
 								case 'pl_ban':
