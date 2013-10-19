@@ -2,10 +2,10 @@
 
 class Dedicated_servers extends CI_Model {
 	
-	var $ds_list = false;				// Список удаленных серверов
+	var $ds_list = array();				// Список удаленных серверов
 	
-	var $commands; 						// Команды, которые отправлялись на сервер
-    var $errors; 						// Строка с ошибкой (если имеются)
+	var $commands; 							// Команды, которые отправлялись на сервер
+    var $errors; 							// Строка с ошибкой (если имеются)
     
     //-----------------------------------------------------------
 
@@ -224,6 +224,34 @@ class Dedicated_servers extends CI_Model {
 		if($this->db->update('dedicated_servers', $data)){
 			return true;
 		}else{
+			return false;
+		}
+	}
+	
+	//-----------------------------------------------------------
+	
+	/**
+     * Обновляет поле с данными для модулей
+     * 
+     * @param id 	 	id сервера
+     * @param array 	новые данные
+     * @param string	имя модуля
+     * @return bool
+     *
+    */
+	function update_modules_data($id, $data, $module_name)
+	{
+		$ds_data = $this->get_ds_data($id);
+		
+		$modules_data_array = json_decode($ds_data['modules_data'], true);
+		$modules_data_array[$module_name] = $data;
+		$modules_data_json = json_encode($modules_data_array);
+		
+		$sql_data['modules_data'] = $modules_data_json;
+		
+		if ($this->edit_dedicated_server($id, $sql_data)) {
+			return true;
+		} else {
 			return false;
 		}
 	}

@@ -34,6 +34,7 @@ class Servers extends CI_Model {
         parent::__construct();
         
         $this->load->helper('safety');
+        $this->load->library('encrypt');
     }
 
     function _strip_quotes($string) {
@@ -277,6 +278,10 @@ class Servers extends CI_Model {
     {
 		$this->load->helper('string');
 		$this->load->model('games');
+		
+		if (isset($data['rcon'])) {
+			$data['rcon'] = $this->encrypt->encode($data['rcon']);
+		}
 		
 		/* Присваиваем имя scren  */
 		$data['screen_name'] = (!isset($data['screen_name'])) ? $data['game'] . '_' . random_string('alnum', 6) . '_' . $data['server_port'] : $data['screen_name'];
@@ -598,7 +603,6 @@ class Servers extends CI_Model {
 					if (stripos($execfile, './') === false) {
 						$execfile = './' . $execfile;
 					}
-					
 				}
 				
 				$this->server_data['script_start'] 		= $execfile . ' ' . $this->game_types->game_types_list['0']['script_start'];
@@ -752,13 +756,13 @@ class Servers extends CI_Model {
 	}
 
 	//-----------------------------------------------------------
+	
 	/**
      * Получение списка игровых серверов
      * Функция аналогична get_servers_list за исключением того, что
      * ей можно задать любое условие, а не только id пользователей, 
      * которым принадлежит игровой сервер.
      * 
-     *
     */
     function get_game_servers_list($where = false, $limit = 10000)
     {
@@ -776,6 +780,20 @@ class Servers extends CI_Model {
 		}else{
 			return NULL;
 		}
+	}
+	
+	// ----------------------------------------------------------------
+	
+	/**
+	 * Получение количества игровых серверов в зависимости от условия
+	 * 
+	 * @param array 	условие
+	 * @return integer
+	 */
+	function get_servers_count($where = array()) {
+		
+		$this->db->where($where);
+		return $this->db->count_all('servers');
 	}
 
 	// ----------------------------------------------------------------

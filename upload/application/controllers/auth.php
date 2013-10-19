@@ -472,7 +472,7 @@ class Auth extends CI_Controller {
 					$log_data['msg'] = 'Recovery Password Successful';  // Сообщение для логов
 					
 					// Обновляем код восстановления
-					$this->users->get_user_recovery_code($user_list[0]['id']);
+					$this->users->set_user_recovery_code($user_list[0]['id']);
 					
 					// Пишем логи
 					$log_data['type'] = 'recovery_password';
@@ -538,7 +538,7 @@ class Auth extends CI_Controller {
 			}
 				
 			// Получаем код восстановления
-			$recovery_code = $this->users->get_user_recovery_code($user_list[0]['id']);
+			$recovery_code = $this->users->set_user_recovery_code($user_list[0]['id']);
 				
 			/* -------------------------------------- */
 			/* Отправляем код восстановления на почту */
