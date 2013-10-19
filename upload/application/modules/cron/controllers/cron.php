@@ -227,7 +227,7 @@ class Cron extends MX_Controller {
 				break;
 
 			default:
-				$commands[] = 'unzip ' . basename($pack_file) . ' && rm ' . basename($pack_file);
+				$commands[] = 'unzip -o ' . basename($pack_file) . ' && rm ' . basename($pack_file);
 				break;
 		}
 
@@ -963,16 +963,15 @@ class Cron extends MX_Controller {
 					$this->load->helper('safety');
 					$new_rcon = generate_code(8);
 					$this->servers->change_rcon($new_rcon, $this->servers_data[$server_id]);
-					$server_data['rcon'] = $this->encrypt->encode($new_rcon);
-					
-					$server_data = array('installed' => '1');
+
+					$server_data = array('installed' => '1', 'rcon' => $new_rcon);
 					$this->servers->edit_game_server($server_id, $server_data);
 
 					$log_data['type'] = 'server_command';
 					$log_data['command'] = 'install';
 					$log_data['server_id'] = $server_id;
 					$log_data['msg'] = 'Server install successful';
-					$log_data['log_data'] = 'Commands: ' . var_export($this->dedicated_servers->commands, true) . "\n\nResults: " . $this->_install_result;
+					$log_data['log_data'] = 'Commands: ' . var_export($this->dedicated_servers->commands, true) . "\n\nResults: " . $this->_install_result . "\n";
 					$this->panel_log->save_log($log_data);
 
 				} else {
@@ -1104,7 +1103,7 @@ class Cron extends MX_Controller {
 						$this->servers->change_rcon($new_rcon);
 
 						// Меняем пароль в базе
-						$sql_data['rcon'] = $this->encrypt->encode($new_rcon);
+						$sql_data['rcon'] = $new_rcon;
 						$this->servers->edit_game_server($server_id, $sql_data);
 
 						// Сохраняем логи
@@ -1114,7 +1113,6 @@ class Cron extends MX_Controller {
 						$log_data['msg'] = 'Change rcon password';
 						$log_data['log_data'] = 'Rcon command: rcon_password ' . $new_rcon . "\n";
 						$this->panel_log->save_log($log_data);
-
 
 						// Перезагружаем сервер
 						$response = $this->servers->restart($this->servers_data[$server_id]);
