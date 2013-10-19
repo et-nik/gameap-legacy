@@ -35,8 +35,8 @@ class Rcon_minecraft extends CI_Driver {
 			
 			$rplayers[] = array(
 						'user_name' => $str, 
-						'steam_id' => $str,
-						'user_id' => '',
+						'steam_id' => '',
+						'user_id' => $str,
 						'user_ip' => '',
 						'user_time' => '',
 			);
