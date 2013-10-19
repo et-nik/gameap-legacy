@@ -1134,7 +1134,7 @@ class Server_command extends CI_Controller {
 				}else{
 					/* Пользователь не подвердил намерения */
 					$confirm_tpl['message'] = lang('server_command_restart_confirm');
-					$confirm_tpl['confirmed_url'] = $this->servers->server_data['id'] . '/' . $this->security->get_csrf_hash();
+					$confirm_tpl['confirmed_url'] = site_url('server_command/restart/' . $this->servers->server_data['id'] . '/' . $this->security->get_csrf_hash());
 					$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
 				}
 			}else{
