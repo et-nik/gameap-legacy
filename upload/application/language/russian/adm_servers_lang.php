@@ -56,7 +56,7 @@ $lang['adm_servers_delete_server_failed']			= 'Ошибка удаления с�
 $lang['adm_servers_server_not_found']				= 'Сервер не найден';
 $lang['adm_servers_game_type_select_wrong']			= 'Модификация выбрана неправильно';
 $lang['adm_servers_game_type_not_found']			= 'Модификация не найдена';
-$lang['adm_servers_no_game_types_for_selected_game']= 'Для выбранной игры модификации отсутствуют. <a href="http://admin.hldm.org/adm_servers/add/game_types" target="blank">Добавить</a>';
+$lang['adm_servers_no_game_types_for_selected_game']= 'Для выбранной игры модификации отсутствуют. <a href="{site_url}adm_servers/add/game_types" target="blank">Добавить</a>';
 $lang['adm_servers_add_game_failed']				= 'Ошибка добавления игры';
 $lang['adm_servers_delete_game_failed']				= 'Ошибка удаления игры';
 $lang['adm_servers_add_game_type_failed']			= 'Ошибка добавления модификации';
