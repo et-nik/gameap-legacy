@@ -30,10 +30,12 @@
 		<td>{lang_msg}:</td>
 		<td>{log_msg}</a></td>
 	</tr>
+	<?php if($this->users->auth_data['is_admin']): ?>
 	<tr>
 		<td>{lang_log_data}:</td>
 		<td><pre>{log_data}</pre></a></td>
 	</tr>
+	<?php endif; ?>
 	<tr>
 		<td><a class="small awesome" href="javascript:history.back()">{lang_back}</a></td>
 		<td></td>

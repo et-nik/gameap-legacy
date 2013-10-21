@@ -8,7 +8,7 @@
 		<th><strong>{lang_server_ip}</strong></th>
 		<?php if(module_exists('commercial_module')): ?><th><strong>{lang_main_server_expires}</strong></th><?php endif; ?>
 		<th><strong>{lang_status}</strong></th>
-		<th width="30%"><strong>{lang_commands}</strong></th>
+		<th><strong>{lang_commands}</strong></th>
 	</tr>
 	</thead>
 {games_list}
@@ -21,7 +21,7 @@
 		<tr>
 			<td>{server_name}</td>
 			<td>{server_ip}</td>
-			<?php if(module_exists('commercial_module')): ?><td>{server_expires}</td><?php endif; ?>
+			<?php if(in_array('commercial', $this->gameap_modules->modules_list)): ?><td>{server_expires}</td><?php endif; ?>
 			<td>{server_status}</td>
 			<td>{commands}</td>
 		</tr>
