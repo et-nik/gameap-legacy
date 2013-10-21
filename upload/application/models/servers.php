@@ -1141,9 +1141,12 @@ class Servers extends CI_Model {
      * @return str
      * 
     */
-	function write_remote_file($file, $data){
+	function write_remote_file($file, $data, $server_data = false) 
+	{
 		
-		$server_data = $this->server_data;
+		if (!$server_data) {
+			$server_data = $this->server_data;
+		}
 		
 		// Определяем временный файл
 		$temp_file = tempnam(sys_get_temp_dir(), basename($file));

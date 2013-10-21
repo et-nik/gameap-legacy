@@ -113,7 +113,7 @@ class Index extends CI_Controller {
 						&& $this->users->user_privileges['srv_start']		// Право на запуск серверов
 						&& $this->users->servers_privileges['SERVER_START']	// Право на запуск этого сервера
 					) {
-						$server_commands .= '<a class="small green awesome" href=' . site_url('server_command/start/') . $this->server_data['id'] . '>' . lang('start') . '</a>&nbsp;';
+						$server_commands .= '<a class="small green awesome" href=' . site_url('server_command/start/'. $this->server_data['id'])  . '>' . lang('start') . '</a>&nbsp;';
 					}
 						
 					/* Кнопка остановка сервера */
@@ -121,17 +121,17 @@ class Index extends CI_Controller {
 						&& $this->users->user_privileges['srv_stop']		// Право на остановку серверов
 						&& $this->users->servers_privileges['SERVER_STOP']	// Право на остановку этого сервера
 					) {
-						$server_commands .= '<a class="small red awesome" href=' . site_url('server_command/stop/') . $this->server_data['id'] . '>' . lang('stop') . '</a>&nbsp;';
+						$server_commands .= '<a class="small red awesome" href=' . site_url('server_command/stop/' . $this->server_data['id']) . '>' . lang('stop') . '</a>&nbsp;';
 					}
 					
 					/* Кнопка перезапуска сервера */
 					if($this->users->user_privileges['srv_restart']				// Право на перезапуск серверов
 						&& $this->users->servers_privileges['SERVER_RESTART']	// Право на перезапуск этого сервера
 					) {
-						$server_commands .= '<a class="small yellow awesome" href=' . site_url('server_command/restart/') . $this->server_data['id'] . '>' . lang('restart') . '</a>&nbsp;';
+						$server_commands .= '<a class="small yellow awesome" href=' . site_url('server_command/restart/' . $this->server_data['id']) . '>' . lang('restart') . '</a>&nbsp;';
 					}
 					
-					$server_commands .= '<a class="small awesome" href=' . site_url('admin/server_control/main/') . $this->server_data['id'] . '>' . lang('other_commands') . ' &raquo;</a>&nbsp;';
+					$server_commands .= '<a class="small awesome" href=' . site_url('admin/server_control/main/' . $this->server_data['id']) . '>' . lang('other_commands') . ' &raquo;</a>&nbsp;';
 						
 					$this->server_data['expires'] = (int)$this->server_data['expires'];
 

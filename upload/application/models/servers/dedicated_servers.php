@@ -442,7 +442,7 @@ class Dedicated_servers extends CI_Model {
 					 * Проверяется файлы .sh, если это команда, например wget, то 
 					 * проверки не будет 
 					*/
-					if (strpos($command, '.sh') !== false && strpos($command, '.exe') !== false && !$this->servers->_check_file($path . '/' . $script_file)) {
+					if (strpos($cmd_arr, '.sh') !== false && strpos($cmd_arr, '.exe') !== false && !$this->servers->_check_file($path . '/' . $script_file)) {
 						return $this->errors;
 					}
 

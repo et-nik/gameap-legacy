@@ -121,10 +121,10 @@ class Log_view extends CI_Controller {
 		}
 		
 		/* Постраничная навигация */
-		$config['base_url'] = site_url() . 'log_view/page';
+		$config['base_url'] = site_url('log_view/page');
 		$config['total_rows'] = $this->panel_log->get_count_all_log();
 		$config['per_page'] = 100;
-		$config['full_tag_open'] = '<p align="center">';
+		$config['full_tag_open'] = '<p id="pagination">';
 		$config['full_tag_close'] = '</p>';
 		
 		$this->pagination->initialize($config); 

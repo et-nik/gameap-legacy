@@ -461,12 +461,12 @@ class Users extends CI_Model {
      * 
      * @return array
     */
-    function tpl_users_list()
+    function tpl_users_list($limit = null, $offset = 0)
     {
         $this->load->helper('date');
         
         if(empty($this->users_list)){
-			$this->get_users_list();
+			$this->get_users_list(false, $limit, $offset);
 		}
 
         $num = -1;
@@ -493,7 +493,7 @@ class Users extends CI_Model {
      * @return array
      *
     */
-    function get_users_list($where = false, $limit = false)
+    function get_users_list($where = false, $limit = false, $offset = 0)
     {
 		/*
 		 * В массиве $where храняться данные для выборки.
@@ -502,12 +502,11 @@ class Users extends CI_Model {
 		 * в этом случае будет выбран пользователь id которого = 1
 		 * 
 		*/
-		if(is_array($where)){
-			$query = $this->db->get_where('users', $where, $limit);
-		}else{
-			
-			$query = $this->db->get('users');
+		if($where) {
+			$this->db->where($where);
 		}
+		
+		$query = $this->db->get('users', $limit, $offset);
 
 		if($query->num_rows > 0){
 			
@@ -641,14 +640,22 @@ class Users extends CI_Model {
      * Отправка сообщения пользователю на почту
      * @return string
     */  
-	function send_mail($subject = '<empty>', $message = '', $user_id)
+	function send_mail($subject = '<empty>', $message = '', $user_id = false)
 	{
 		$this->load->library('email');
 		
-		$user_data = $this->get_user_data($user_id, false, true);
+		if ($user_id) {
+			$user_data = $this->get_user_data($user_id, false, true);
+		} else {
+			$user_data = &$this->user_data;
+		}
+		
+		$user_name = isset($user_data['name']) ? $user_data['name']  : $user_data['login'];
+		$message = str_replace('{user_name}', $user_name, $message);
+		$message = str_replace('{user_balance}', $user_data['balance'], $message);
 		
 		$this->email->to($user_data['email']);
-		$this->email->from($this->config->config['system_email'], 'AdminPanel');
+		$this->email->from($this->config->config['system_email'], 'GameAP');
 		$this->email->subject($subject);
 		$this->email->message($message);
 		

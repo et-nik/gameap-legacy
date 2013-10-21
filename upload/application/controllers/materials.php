@@ -7,17 +7,17 @@ class Materials extends MX_Controller {
 	
 	function index()
 	{
-		modules::run('commercial/materials_comm/index');
+		echo modules::run('commercial/materials_comm/index');
 	}
 	
 	function view($param = false)
 	{
-		modules::run('commercial/materials_comm/view', $param);
+		echo modules::run('commercial/materials_comm/view', $param);
 	}
 	
 	function category($param = false)
 	{
-		modules::run('commercial/materials_comm/category', $param);
+		echo modules::run('commercial/materials_comm/category', $param);
 	}
 	
 }
