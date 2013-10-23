@@ -143,3 +143,8 @@ $lang['servers_privileges_log_view']		= 'Просмотр файлов лого�
 /* Menu */
 $lang['menu_servers_logs']						= 'Серверные логи';
 $lang['menu_panel_logs']						= 'Логи GameAP';
+
+/* -- 0.8.2 -- */
+$lang['host']									= 'Хост';
+$lang['page']									= 'Страница';
+$lang['values'] 								= 'Значения';
