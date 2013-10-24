@@ -347,7 +347,7 @@ class Auth extends CI_Controller {
 			$vals = array(
 				'word'	 		=> $cap['word'],
 				'img_path'	 	=> './uploads/security/',
-				'img_url'	 	=> site_url() . 'uploads/security/',
+				'img_url'	 	=> base_url('uploads/security/'),
 				'font_path'	 	=> './system/fonts/U1Uabbif.ttf',
 				'img_width'	 	=> 300,
 				'img_height' 	=> 50,
