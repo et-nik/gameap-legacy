@@ -58,7 +58,7 @@ class Index extends CI_Controller {
 		$this->load->model('servers');
 
 		/* Если количество серверов больше 0 */
-		if($this->servers->get_server_list($this->users->user_id)) {
+		if($this->servers->get_server_list($this->users->auth_id)) {
 				
 			$this->load->helper('games');
 			$this->load->model('servers/games');
