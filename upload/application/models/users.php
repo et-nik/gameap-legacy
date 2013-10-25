@@ -110,11 +110,6 @@ class Users extends CI_Model {
 			$this->auth_login = $this->auth_data['login'];
 			$this->auth_data['balance'] = (int)$this->encrypt->decode($this->auth_data['balance']);
 			
-			/* Костыль */
-			$this->user_id = $user_id;
-			$this->user_login = $this->auth_data['login'];
-			/*--------*/
-			
 			/* Получение базовых привилегий */
             if(!$this->auth_privileges = json_decode($this->auth_data['privileges'], true)) {
 				foreach($this->all_user_privileges as $key => $value) {
@@ -127,11 +122,7 @@ class Users extends CI_Model {
 					}
 				}
 			}
-			
-			/* Костыль */
-			$this->user_privileges = $this->auth_privileges;
-			/*--------*/
-		
+
             return true;
         } else {
             return false;
