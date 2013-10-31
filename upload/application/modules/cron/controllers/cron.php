@@ -189,7 +189,7 @@ class Cron extends MX_Controller {
 					break;
 
 				default:
-					$command = 'wget ' . $link;
+					$command = 'wget -drc ' . $link;
 					break;
 			}
 			
@@ -643,7 +643,7 @@ class Cron extends MX_Controller {
 			switch($task_list[$i]['code']) {
 				case 'server_start':
 
-					if($response = $this->servers->start($this->servers_data[$server_id])){
+					if($response = $this->servers->start($this->servers_data[$server_id])) {
 						$cron_success = true;
 						$cron_stats['success'] ++;
 
@@ -657,7 +657,7 @@ class Cron extends MX_Controller {
 						$log_data['log_data'] = $response;
 						$this->panel_log->save_log($log_data);
 
-					}else{
+					} else {
 
 						$cron_stats['failed'] ++;
 						$this->_cron_result .= 'Task: server #' . $server_id . '  start failed' . "\n";
@@ -671,8 +671,9 @@ class Cron extends MX_Controller {
 						$this->panel_log->save_log($log_data);
 					}
 					break;
+					
 				case 'server_stop':
-					if($response = $this->servers->stop($this->servers_data[$server_id])){
+					if ($response = $this->servers->stop($this->servers_data[$server_id])) {
 						$cron_success = true;
 						$cron_stats['success'] ++;
 
@@ -686,7 +687,7 @@ class Cron extends MX_Controller {
 						$log_data['log_data'] = $response;
 						$this->panel_log->save_log($log_data);
 
-					}else{
+					} else {
 						$cron_stats['failed'] ++;
 
 						$this->_cron_result .= 'Task: server #' . $server_id . '  stop failed' . "\n";
@@ -700,8 +701,9 @@ class Cron extends MX_Controller {
 						$this->panel_log->save_log($log_data);
 					}
 					break;
+					
 				case 'server_restart':
-					if($response = $this->servers->restart($this->servers_data[$server_id])){
+					if ($response = $this->servers->restart($this->servers_data[$server_id])) {
 						$cron_success = true;
 						$cron_stats['success'] ++;
 
@@ -715,7 +717,7 @@ class Cron extends MX_Controller {
 						$log_data['log_data'] = $response;
 						$this->panel_log->save_log($log_data);
 
-					}else{
+					} else {
 						$cron_stats['failed'] ++;
 
 						$this->_cron_result .= 'Task: server #' . $server_id . '  restart failed' . "\n";
@@ -729,6 +731,7 @@ class Cron extends MX_Controller {
 						$this->panel_log->save_log($log_data);
 					}
 					break;
+					
 				case 'server_update':
 					if($response = $this->servers->update($this->servers_data[$server_id])) {
 						$cron_success = true;
@@ -758,6 +761,7 @@ class Cron extends MX_Controller {
 						$this->panel_log->save_log($log_data);
 					}
 					break;
+					
 				case 'server_rcon':
 					if($this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['query_port'])) {
 
@@ -814,6 +818,7 @@ class Cron extends MX_Controller {
 					}
 
 					break;
+					
 				default:
 					$i ++;
 					continue;
