@@ -190,4 +190,15 @@ class Rcon_samp extends CI_Driver {
 	{
 		return array();
 	}
+	
+	// ----------------------------------------------------------------
+	
+	/**
+	 * Смена rcon пароля
+	 *  
+	*/
+	function change_rcon($rcon_password = '')
+	{
+		return true;
+	}
 }

@@ -153,7 +153,8 @@ class Rcon_goldsource extends CI_Driver {
 	 * @return array
 	 *  
 	*/
-	public function get_maps(){
+	public function get_maps()
+	{
 		$maps = array();
 		$maps_ = explode("\n", $this->command("maps *"));
 		foreach($maps_ as $i => $val){
@@ -166,5 +167,37 @@ class Rcon_goldsource extends CI_Driver {
 			}
 		}
 		return $maps;
+	}
+	
+	// ----------------------------------------------------------------
+	
+	/**
+	 * Смена rcon пароля
+	 *  
+	*/
+	function change_rcon($rcon_password = '')
+	{
+		$file = $this->CI->servers->server_data['start_code'] . '/server.cfg'; // Конфиг файл
+		$file_contents = $this->CI->servers->read_file($file);
+		
+		/* Ошибка чтения, либо файл не найден */
+		if(!$file_contents) {
+			return false;
+		}
+
+		$file_contents = change_value_on_file($file_contents, 'rcon_password', $rcon_password);
+		$write_result = $this->CI->servers->write_file($file, $file_contents, $this->CI->servers->server_data);
+		
+		/* Отправляем новый rcon пароль в консоль сервера*/
+		if($write_result && $this->CI->servers->server_status($this->CI->servers->server_data['server_ip'], $this->CI->servers->server_data['server_port'])) {
+			$rcon_connect = $this->connect();
+			$this->command('rcon_password ' . $rcon_password);
+		}
+		
+		if ($write_result) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

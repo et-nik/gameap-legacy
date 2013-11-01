@@ -7,8 +7,8 @@
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
  * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
- * @license		http://gameap.ru/license.html
- * @link		http://gameap.ru
+ * @license		http://www.gameap.ru/license.html
+ * @link		http://www.gameap.ru
  * @filesource
 */
 
@@ -25,8 +25,10 @@ class Rcon extends CI_Driver_Library {
 	var $rcon_connect;
 	
 	var $errors = false;
+	
+	// ----------------------------------------------------------------
     
-    function __construct()
+    public function __construct()
     {
         $this->CI =& get_instance();
         
@@ -42,7 +44,7 @@ class Rcon extends CI_Driver_Library {
      * 
      * 
     */
-    function set_variables($host, $port, $password, $engine, $engine_version = 1)
+    public function set_variables($host, $port, $password, $engine, $engine_version = 1)
     {
 		$this->host 			= $host;
 		$this->port 			= $port;
@@ -57,7 +59,7 @@ class Rcon extends CI_Driver_Library {
 	 * Соединение с сервером
 	 * 
 	*/
-	function connect()
+	public function connect()
 	{
 		$engine = $this->engine;
 		
@@ -79,7 +81,7 @@ class Rcon extends CI_Driver_Library {
 	 * @param string
 	 * @return string
 	*/
-	function command($command)
+	public function command($command)
 	{
 		$engine = $this->engine;
 		
@@ -99,7 +101,7 @@ class Rcon extends CI_Driver_Library {
 	 * Получение списка игроков на сервере
 	 * 
 	*/
-	function get_players()
+	public function get_players()
 	{
 		$engine = $this->engine;
 		return $this->$engine->get_players();
@@ -111,10 +113,23 @@ class Rcon extends CI_Driver_Library {
 	 * Получение списка карт
 	 *  
 	*/
-	function get_maps()
+	public function get_maps()
 	{
 		$engine = $this->engine;
 		return $this->$engine->get_maps();
 	}
 	
+	// ----------------------------------------------------------------
+	
+	/**
+	 * Смена rcon пароля
+	 *  
+	*/
+	public function change_rcon($rcon_password)
+	{
+		$this->CI->load->helper('patterns_helper');
+		
+		$engine = $this->engine;
+		return $this->$engine->change_rcon($rcon_password);
+	}
 }

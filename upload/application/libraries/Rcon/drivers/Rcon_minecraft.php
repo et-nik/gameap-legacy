@@ -47,12 +47,32 @@ class Rcon_minecraft extends CI_Driver {
 	
 	// ----------------------------------------------------------------
 	
-	/*
+	/**
 	 * Получение списка карт на серввере
 	 *  
 	*/
 	function get_maps()
 	{
 		return array();
+	}
+	
+	// ----------------------------------------------------------------
+	
+	/**
+	 * Смена rcon пароля
+	 *  
+	*/
+	function change_rcon($rcon_password = '')
+	{
+		$file = 'server.properties'; // Конфиг файл
+		$file_contents = $this->CI->servers->read_file($file);
+		
+		/* Ошибка чтения, либо файл не найден */
+		if(!$file_contents) {
+			return false;
+		}
+
+		$file_contents = change_value_on_file($file_contents, 'rcon.password', $rcon_password);
+		return $this->CI->servers->write_file($file, $file_contents, $this->CI->servers->server_data);
 	}
 }
