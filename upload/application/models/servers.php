@@ -251,7 +251,7 @@ class Servers extends CI_Model {
     {
 		if(!is_array($server_data)) {
 			// был передан id, получаем данные сервера
-			$server_data = $this->get_server_data($server_data, false, true, true);
+			$server_data = $this->get_server_data($server_data);
 		}
 		
 		$command = $this->command_generate($server_data, 'update');
@@ -672,9 +672,10 @@ class Servers extends CI_Model {
      * 
      * @return bool
     */	
-	function server_live($server_id){
-		
-		if($this->db->count_all_results('servers', array('id' => $server_id)) > 0){
+	function server_live($server_id)
+	{
+		$this->db->where('id', $server_id);
+		if($this->db->count_all_results('servers') > 0){
 			return true;
 		}else{
 			return false;
@@ -691,7 +692,8 @@ class Servers extends CI_Model {
     */	
 	function ds_server_live($server_id){
 		
-		if($this->db->count_all_results('dedicated_servers', array('id' => $server_id)) > 0){
+		$this->db->where('id', $server_id);
+		if($this->db->count_all_results('dedicated_servers') > 0){
 			return true;
 		}else{
 			return false;
@@ -997,7 +999,8 @@ class Servers extends CI_Model {
      * @param str
      * @return str
     */
-	function read_local_file($file){
+	function read_local_file($file)
+	{
 		
 		if(file_exists($file)) {
 			if(is_readable($file)) {
@@ -1018,15 +1021,62 @@ class Servers extends CI_Model {
 	// ----------------------------------------------------------------
 	 
     /**
+     * Читает содержимое файла
+     * 
+     * @param string 	$file расположение файла без script_path и dir
+     * @param array		$server_data массив с данными сервера
+     * @return string
+    */
+	public function read_file($file, $server_data = array()) 
+	{
+		$server_data = empty($server_data) ? $this->server_data : $server_data;
+		$file_contents = '';
+		
+		if ($server_data['ds_id'] == 0) {
+			$file = $server_data['script_path'] . '/' . $server_data['dir'] . '/' . $file;
+			$file_contents = $this->servers->read_local_file($file);
+		} else {
+			$file = $server_data['ftp_path'] . '/' . $server_data['dir'] . '/' . $file;
+			$file_contents = $this->servers->read_remote_file($file, $server_data);
+		}
+		
+		return $file_contents;
+	}
+	
+	// ----------------------------------------------------------------
+	 
+    /**
+     * Записывает содержимое файла
+     * 
+     * @param string 	$file расположение файла без script_path и dir
+     * @param array		$server_data массив с данными сервера
+     * @return bool
+    */
+	public function write_file($file, $file_contents = '', $server_data = array()) 
+	{
+		$server_data = empty($server_data) ? $this->server_data : $server_data;
+		
+		if ($server_data['ds_id'] == 0) {
+			$file = $server_data['script_path'] . '/' . $server_data['dir'] . '/' . $file;
+			return $this->servers->write_local_file($file, $file_contents);
+		} else {
+			$file = $server_data['ftp_path'] . '/' . $server_data['dir'] . '/' . $file;
+			return $this->servers->write_remote_file($file, $file_contents, $server_data);
+		}
+	}
+	
+	// ----------------------------------------------------------------
+	 
+    /**
      * Читает содержимое файла с удаленного сервера
      * 
      * @param str
      * @return str
      * 
     */
-	function read_remote_file($file){
-		
-		$server_data = $this->server_data;
+	function read_remote_file($file, $server_data = array())
+	{
+		$server_data = empty($server_data) ? $this->server_data : $server_data;
 		
 		$connection = ftp_connect($server_data['ftp_host']);
 		
@@ -1103,7 +1153,8 @@ class Servers extends CI_Model {
      * @return bool
      * 
     */
-	function upload_remote_file($file, $remote_file, $mode = 0666){
+	function upload_remote_file($file, $remote_file, $mode = 0666)
+	{
 		
 		$server_data = $this->server_data;
 		
@@ -1141,12 +1192,9 @@ class Servers extends CI_Model {
      * @return str
      * 
     */
-	function write_remote_file($file, $data, $server_data = false) 
+	function write_remote_file($file, $data, $server_data = array()) 
 	{
-		
-		if (!$server_data) {
-			$server_data = $this->server_data;
-		}
+		$server_data = empty($server_data) ? $this->server_data : $server_data;
 		
 		// Определяем временный файл
 		$temp_file = tempnam(sys_get_temp_dir(), basename($file));
@@ -1176,6 +1224,8 @@ class Servers extends CI_Model {
     */
     function change_rcon($new_rcon, $server_data = false, $update_db = false) 
     {
+		$this->load->helper('patterns_helper');
+		
 		if($server_data) {
 			$this->server_data = $server_data;
 		}
@@ -1195,71 +1245,17 @@ class Servers extends CI_Model {
 				break;
 		}
 		
-		/* Получаем содержимое конфигурационного файла */
-		if(!$this->servers->server_data['ds_id']){
-			$file_contents = $this->servers->read_local_file($this->servers->server_data['local_path'] . '/' . 
-					$this->servers->server_data['dir'] . '/' . 
-					$this->servers->server_data['start_code'] . '/' . 
-					$servercfg_file
-			);
-		}else{
-			$file_contents = $this->servers->read_remote_file($this->servers->server_data['ftp_path'] . '/' . 
-					$this->servers->server_data['dir'] . '/' . 
-					$this->servers->server_data['start_code'] . '/' . 
-					$servercfg_file
-			);
-		}
+		$file = $this->server_data['start_code'] . '/' . $servercfg_file;
+		$file_contents = $this->read_file($file);
 		
 		/* Ошибка чтения, либо файл не найден */
 		if(!$file_contents) {
 			return false;
 		}
-		
-		$file_strings = explode("\n", $file_contents);
-		
-		$string_found = false;
-		$new_cfg_data = '';
-		$i = 0;
-		$count_i = count($file_strings);
-		while($i < $count_i) {
-			preg_match('/([\s]*)rcon_password([\s]*)([\"]?)(.*)(\"?)(\\\\?)(.*)/si', $file_strings[$i], $matches);
-			
-			/* Найдены совпадения, поэтому меняем ркон */
-			if(!empty($matches)){
-				$file_strings[$i] = 'rcon_password "' . $new_rcon . '"';
-				$string_found = true; // Строка rcon_password найдена
-			}
-			
-			/* Записываем данные в переменную, которую потом запишем как новый конфиг */
-			$new_cfg_data .= $file_strings[$i] . "\n";
-			$i++;
-		}
-		
-		if(!$string_found) {
-			/* Строка rcon_password в конфиге не найдена,
-			 * поэтому добавляем ее */
-			 $new_cfg_data .= 'rcon_password "' . $new_rcon . "\"\n";
-		}
-		
-		/* Записываем содержимое конфигурационного файла */
-		if(!$this->servers->server_data['ds_id']) {
-			$dir = $this->servers->server_data['local_path'] . '/' . $this->servers->server_data['dir'];
-			$this->servers->write_local_file($this->servers->server_data['local_path'] . '/' . 
-					$this->servers->server_data['dir'] . '/' . 
-					$this->servers->server_data['start_code'] . '/' . 
-					$servercfg_file,
-					$new_cfg_data
-			);
-		} else {
-			$dir = $this->servers->server_data['ftp_path'] . '/' . $this->servers->server_data['dir'];
-			$this->servers->write_remote_file($this->servers->server_data['ftp_path'] . '/' . 
-					$this->servers->server_data['dir'] . '/' . 
-					$this->servers->server_data['start_code'] . '/' . 
-					$servercfg_file, 
-					$new_cfg_data
-			);
-		}
-				
+
+		$file_contents = change_value_on_file($file_contents, 'rcon_password', $new_rcon);
+		$this->write_file($file, $file_contents, $this->server_data);
+	
 		/* Отправляем новый rcon пароль в консоль сервера*/
 		if($this->servers->server_status($this->server_data['server_ip'], $this->server_data['server_port'])) {
 			
@@ -1284,9 +1280,7 @@ class Servers extends CI_Model {
 		}
 		
 		return true;
-
 	}
-	
 	
 	// ----------------------------------------------------------------
 	

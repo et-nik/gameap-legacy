@@ -570,9 +570,9 @@ class Users extends CI_Model {
             $user_id  = (int)$user_id;
         }
         
-        if(!$privilege){
+        if (!$privilege) {
             $query = $this->db->get_where('users', array('login' => $string));
-        }else{
+        } else {
 			
         }
     }

@@ -289,7 +289,7 @@ class Dedicated_servers extends CI_Model {
 				/* Количество игровых серверов */
 				$this->db->count_all();
 				
-				$this->db->where('id', $dedicated_servers['id']);
+				$this->db->where('ds_id', $dedicated_servers['id']);
 				$this->db->from('servers');
 				$tpl_data[$num]['servers_count'] = $this->db->count_all_results();
 				
