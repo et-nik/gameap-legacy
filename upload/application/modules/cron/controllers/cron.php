@@ -7,8 +7,8 @@
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
  * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
- * @license		http://gameap.ru/license.html
- * @link		http://gameap.ru
+ * @license		http://www.gameap.ru/license.html
+ * @link		http://www.gameap.ru
  * @filesource
 */
 
@@ -23,7 +23,6 @@
  * пароля, если он не совпадает в админпанели и на сервере.
  *
  * @package		Game AdminPanel
- * @category	Controllers
  * @category	Controllers
  * @author		Nikita Kuznetsov (ET-NiK)
  * @sinse		0.5.6
@@ -59,6 +58,7 @@ class Cron extends MX_Controller {
 		$this->load->model('servers/games');
 		$this->load->model('servers/game_types');
 		$this->load->driver('rcon');
+		$this->load->driver('installer');
 		$this->load->library('ssh');
 		$this->load->library('telnet');
 
@@ -189,7 +189,7 @@ class Cron extends MX_Controller {
 					break;
 
 				default:
-					$command = 'wget -drc ' . $link;
+					$command = 'wget -c ' . $link . ' -o /tmp/wget.log ';
 					break;
 			}
 			
@@ -231,7 +231,7 @@ class Cron extends MX_Controller {
 				break;
 		}
 
-		$result .= $this->servers->command(
+		$result = $this->servers->command(
 									$commands,
 									$this->servers_data[$server_id], 
 									$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
@@ -944,20 +944,26 @@ class Cron extends MX_Controller {
 						$log_dirs 		= json_decode($this->servers_data[$server_id]['log_dirs'], true);
 						$command = array();
 						$log = '';
-
-						foreach($config_files as $file) {
-							$command[] = 'chmod 666 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $file['file'];
-							$log .= 'chmod 666 ' . './' . $this->servers_data[$server_id]['dir'] . '/' .  $file['file'] . "\n";
+						
+						if($config_files) {
+							foreach($config_files as $file) {
+								$command[] = 'chmod 666 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $file['file'];
+								$log .= 'chmod 666 ' . './' . $this->servers_data[$server_id]['dir'] . '/' .  $file['file'] . "\n";
+							}
 						}
-
-						foreach($content_dirs as $dir) {
-							$command[] = 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir']. '/' .  $dir['path'];
-							$log .= 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/'. $dir['path'] . "\n";
+						
+						if($content_dirs) {
+							foreach($content_dirs as $dir) {
+								$command[] = 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir']. '/' .  $dir['path'];
+								$log .= 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/'. $dir['path'] . "\n";
+							}
 						}
-
-						foreach($log_dirs as $dir) {
-							$command[] = 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'];
-							$log .= 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . "\n";
+						
+						if($log_dirs) {
+							foreach($log_dirs as $dir) {
+								$command[] = 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'];
+								$log .= 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . "\n";
+							}
 						}
 
 						$log .= "\n---\nCHMOD\n" . $log . "\n" .  $this->servers->command($command, $this->servers_data[$server_id]);
@@ -968,8 +974,24 @@ class Cron extends MX_Controller {
 					$this->load->helper('safety');
 					$new_rcon = generate_code(8);
 					$this->servers->change_rcon($new_rcon, $this->servers_data[$server_id]);
+					
+					/* Конфигурирование сервера */
+					$this->installer->set_game_variables($this->servers_data[$server_id]['start_code'], 
+													$this->servers_data[$server_id]['engine'],
+													$this->servers_data[$server_id]['engine_version']
+					);
+					
+					$this->installer->set_os($this->servers_data[$server_id]['os']);
+					$this->installer->server_data = $this->servers_data[$server_id];
+					
+					// Правка конфигов
+					$this->installer->change_config();
 
-					$server_data = array('installed' => '1', 'rcon' => $new_rcon);
+					$server_data['installed'] 		= 1;
+					$server_data['rcon']			= $new_rcon;
+					$server_data['aliases'] 		= json_encode($this->installer->get_default_parameters());
+					$server_data['start_command'] 	= $this->installer->get_start_command();
+					
 					$this->servers->edit_game_server($server_id, $server_data);
 
 					$log_data['type'] = 'server_command';
