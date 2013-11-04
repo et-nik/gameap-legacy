@@ -39,7 +39,7 @@ class Query_source extends CI_Driver {
 	*/
 	function get_status($host, $port)
 	{
-		return $this->CI->query->goldsource->get_status($host, $port);
+		return (bool)$this->CI->query->goldsource->A2S_INFO($host, $port);
 	}
 	
 	// ------------------------------------------------------------------------
