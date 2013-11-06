@@ -73,7 +73,9 @@ class Users extends CI_Model {
             'UPLOAD_CONTENTS' 		=> '{lang_servers_privileges_upload_contents}',		// Загрузка контента
             'CHANGE_CONFIG'			=> '{lang_servers_privileges_change_config}',		// Редактирование конфигов
             'LOGS_VIEW' 			=> '{lang_servers_privileges_log_view}',			// Просмотр логов
-     );
+    );
+     
+	// ----------------------------------------------------------------
 
     function __construct()
     {
@@ -109,6 +111,7 @@ class Users extends CI_Model {
 			$this->auth_id = $user_id;
 			$this->auth_login = $this->auth_data['login'];
 			$this->auth_data['balance'] = (int)$this->encrypt->decode($this->auth_data['balance']);
+			$this->auth_data['modules_data'] = ($this->auth_data['modules_data'] != '') ? json_decode($this->auth_data['modules_data'], true) : array();
 			
 			/* Получение базовых привилегий */
             if(!$this->auth_privileges = json_decode($this->auth_data['privileges'], true)) {
@@ -128,6 +131,8 @@ class Users extends CI_Model {
             return false;
         }
     }
+    
+    // ----------------------------------------------------------------
     
     /**
      * Авторизация пользователя
@@ -202,6 +207,7 @@ class Users extends CI_Model {
 		}
 		
 		$user_data['balance'] = (int)$this->encrypt->decode($user_data['balance']);
+		$user_data['modules_data'] = ($user_data['modules_data'] != '') ? json_decode($user_data['modules_data'], true) : array();
 
         if(!$no_get_privileges) {
 			
@@ -255,7 +261,12 @@ class Users extends CI_Model {
 		}
     }
     
-    function delete_user($id)
+    // ----------------------------------------------------------------
+    
+    /**
+     * Удаление пользователя
+    */
+    public function delete_user($id)
     {
 		if($this->db->delete('users', array('id' => $id))){
 			return true;
@@ -273,7 +284,7 @@ class Users extends CI_Model {
      * @param string - id пользователя, либо массив с where
      * @return bool
     */
-    function update_user($user_data, $user_id = false)
+    public function update_user($user_data, $user_id = false)
     {
         if(!$user_id){
             $user_id = $this->auth_id;
@@ -299,6 +310,34 @@ class Users extends CI_Model {
         }
     }
     
+    //-----------------------------------------------------------
+	
+	/**
+     * Обновляет поле с данными для модулей
+     * 
+     * @param id 	 	id сервера
+     * @param array 	новые данные
+     * @param string	имя модуля
+     * @return bool
+     *
+    */
+	public function update_modules_data($id, $data, $module_name)
+	{
+		$user_data = $this->get_user_data($id);
+		
+		$modules_data_array = json_decode($user_data['modules_data'], true);
+		$modules_data_array[$module_name] = $data;
+		$modules_data_json = json_encode($modules_data_array);
+		
+		$sql_data['modules_data'] = $modules_data_json;
+		
+		if ($this->update_user($sql_data, $id)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
     // ----------------------------------------------------------------
 
     /**
