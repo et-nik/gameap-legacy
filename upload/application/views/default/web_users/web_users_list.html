@@ -1,12 +1,14 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
 <br /><br />
 <table width="100%" class="zebra">
-	<tr>
-		<td width="15%"><strong>{lang_login}</strong></td>
-		<td width="15%"><strong>{lang_profile_registered}</strong></td>
-		<td width="20%"><strong>{lang_profile_last_visit}</strong></td>
-		<td><strong>{lang_commands}</strong></td>
-	</tr>
+	<tbody>
+		<tr>
+			<th width="15%">{lang_login}</th>
+			<th width="15%">{lang_profile_registered}</th>
+			<th width="20%">{lang_profile_last_visit}</th>
+			<th>{lang_commands}</th>
+		</tr>
+	</tbody>
 {users_list}
 	<tr>
 		<td>{login}</td>
@@ -16,7 +18,7 @@
 			<a class="small awesome" href="{site_url}admin/users_control/base_privileges/{id}">{lang_users_base_privileges}</a>
 			<a class="small awesome" href="{site_url}admin/users_control/servers_privileges/{id}">{lang_users_servers_privileges}</a>
 			<a class="yellow small awesome" href="{site_url}admin/users_control/edit/{id}">{lang_edit}</a>
-			<a class="red small awesome" href="{site_url}admin/users_control/delete/{id}">{lang_delete}</a>
+			<a class="red small awesome" href="{site_url}admin/users_control/delete/{id}">&#10008;</a>
 		</td>
 
 	</tr>
