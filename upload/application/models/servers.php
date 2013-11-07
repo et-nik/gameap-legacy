@@ -414,7 +414,7 @@ class Servers extends CI_Model {
 		 * которых является user_id
 		*/
 		if (!$user_id) {
-			$this->db->where_in('game', $games);
+			if (!empty($games)) { $this->db->where_in('game', $games); }
 			$this->db->where($where);
 			$query = $this->db->get('servers');
 		} else {
