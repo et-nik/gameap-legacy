@@ -87,38 +87,14 @@ class Servers extends CI_Model {
 		
 		return true;
 	}
-    
-    //-----------------------------------------------------------
-    
-    /*
-     * Генерирует команду для отправки на сервер
-     * 
-     * 
-    */
-    function command_generate($server_data, $type = 'start')
-    {
-		
-		/* Получение команд из данных сервера */
-		switch($type){
-			case 'start':
-				$command = $server_data['script_start'];
-				break;
-			case 'stop':
-				$command = $server_data['script_stop'];
-				break;
-			case 'restart':
-				$command = $server_data['script_restart'];
-				break;
-			case 'update':
-				$command = $server_data['script_update'];
-				break;
-			case 'get_console':
-				$command = $server_data['script_get_console'];
-				break;
-			default:
-				return false;
-		}
-		
+	
+	//-----------------------------------------------------------
+	
+	/*
+	 * Замена шоткодов в команде
+	*/
+	private function _replace_shotcodes_in_string($command, $server_data)
+	{
 		/*-------------------*/
 		/* Шаблонная замена */
 		/*-------------------*/
@@ -157,6 +133,58 @@ class Servers extends CI_Model {
 				}
 			}
 		}
+		
+		return $command;
+	}
+
+	//-----------------------------------------------------------
+	
+	/*
+	 * Замена шоткодов в команде
+	*/
+	private function _replace_shotcodes_in_array($command, $server_data)
+	{
+		if (is_array($command)) {
+			foreach($command as &$str) { 
+				$str = $this->_replace_shotcodes_in_string($str, $server_data); 
+			}
+		} else {
+			$command = $this->_replace_shotcodes_in_string($command, $server_data);
+		}
+		
+		return $command;
+	}
+	
+	//-----------------------------------------------------------
+    
+    /*
+     * Генерирует команду для отправки на сервер
+     * 
+     * 
+    */
+    function command_generate($server_data, $type = 'start')
+    {
+		
+		/* Получение команд из данных сервера */
+		switch($type){
+			case 'start':
+				$command = $server_data['script_start'];
+				break;
+			case 'stop':
+				$command = $server_data['script_stop'];
+				break;
+			case 'restart':
+				$command = $server_data['script_restart'];
+				break;
+			case 'update':
+				$command = $server_data['script_update'];
+				break;
+			case 'get_console':
+				$command = $server_data['script_get_console'];
+				break;
+			default:
+				return false;
+		}
 
 		return $command;
 	}
@@ -170,8 +198,10 @@ class Servers extends CI_Model {
     {
 		$this->load->model('servers/dedicated_servers');
 		
-		$result = $this->dedicated_servers->command($command, $server_data, $path);
+		$command = $this->_replace_shotcodes_in_array($command, $server_data);
 		
+		$result = $this->dedicated_servers->command($command, $server_data, $path);
+
 		$this->commands = $this->dedicated_servers->commands;
 		$this->errors = $this->dedicated_servers->commands;
 		
@@ -358,15 +388,33 @@ class Servers extends CI_Model {
      * @param array - where для запроса sql
      *
     */
-    function get_servers_list($user_id = false, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1', ))
+    function get_servers_list($user_id = false, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1'), $limit = 99999, $offset = 0, $engine = false, $engine_version = false)
     {
+		/* Если задан движок, то получаем список игр на этом движке,
+		 * а после выбираем серверы только этих игр 
+		 */
+		$games = array();
+		if ($engine) {
+			$this->db->where('engine', $engine);
+			if ($engine_version) {$this->db->where('engine_version', $engine_version);}
+			
+			$this->db->select('code');
+			$query = $this->db->get('games');
+			
+			$games_list = $query->result_array();
+			
+			foreach($games_list as &$game_data) {
+				$games[] = $game_data['code'];
+			}
+		}
+		
 		/* 
 		 * Если user_id не задан, то получаем все серверы
 		 * Если задан, то получаем лишь серверы владельцем
 		 * которых является user_id
 		*/
-
 		if (!$user_id) {
+			$this->db->where_in('game', $games);
 			$this->db->where($where);
 			$query = $this->db->get('servers');
 		} else {
@@ -387,6 +435,7 @@ class Servers extends CI_Model {
 					}
 					
 					$this->db->where_in('id', $servers);
+					if (!empty($games)) { $this->db->where_in('game', $games); }
 					
 				} else {
 					/* Количество серверов = 0 */
@@ -540,18 +589,18 @@ class Servers extends CI_Model {
 				switch ($this->server_data['control_protocol']) {
 					case 'local':
 						$this->server_data['script_path'] 	= $this->config->config['local_script_path'];
-						$this->server_data['steamcmd_path'] = $this->config->config['local_steamcmd_path'];
+						$this->server_data['steamcmd_path'] = ($this->config->config['local_steamcmd_path']) ? $this->config->config['local_steamcmd_path'] : $this->config->config['local_script_path'];
 						break;
 						
 					case 'telnet':
 						$this->server_data['script_path'] 	= $this->server_ds_data['telnet_path'];
-						$this->server_data['steamcmd_path'] = $this->server_ds_data['steamcmd_path'];
+						$this->server_data['steamcmd_path'] = ($this->server_ds_data['steamcmd_path']) ? $this->server_ds_data['steamcmd_path'] : $this->server_ds_data['telnet_path'];
 						break;
 
 					default:
 						// По умолчанию SSH
 						$this->server_data['script_path'] 	= $this->server_ds_data['ssh_path'];
-						$this->server_data['steamcmd_path'] = $this->server_ds_data['steamcmd_path'];
+						$this->server_data['steamcmd_path'] = ($this->server_ds_data['steamcmd_path']) ? $this->server_ds_data['steamcmd_path'] : $this->server_ds_data['ssh_path'];
 						break;
 				}
 				
@@ -561,7 +610,7 @@ class Servers extends CI_Model {
 				$this->server_data['control_protocol'] = 'local';
 				$this->server_data['script_path'] 	= $this->config->config['local_script_path'];
 				$this->server_data['local_path'] 	= $this->config->config['local_script_path'];
-				$this->server_data['steamcmd_path'] = $this->config->config['local_steamcmd_path'];
+				$this->server_data['steamcmd_path'] = ($this->config->config['local_steamcmd_path']) ? $this->config->config['local_steamcmd_path'] : $this->config->config['local_script_path'];
 				$this->server_data['local_server'] 	= 1;
 			}
 			
@@ -717,7 +766,7 @@ class Servers extends CI_Model {
 		}
 		
 		if (!$port) {
-				$port = $this->server_data['query_port'];
+			$port = $this->server_data['query_port'];
 		}
 
 		if (!$engine or !$engine_version) {
@@ -746,7 +795,7 @@ class Servers extends CI_Model {
 		if (!$engine_version) {
 			$engine_version = $this->games->games_list[$game_arr_id]['engine_version'];
 		}
-		
+
 		$this->query->set_engine($engine, $engine_version);
 
 		if ($this->query->get_status($host, $port)) {
@@ -765,21 +814,50 @@ class Servers extends CI_Model {
      * ей можно задать любое условие, а не только id пользователей, 
      * которым принадлежит игровой сервер.
      * 
+     * @param array 	условие для выборки
+     * @param integer	лимит
+     * @param integer 	offset
+     * @param string	движок
+     * @param integer	версия движка
+     * 
+     * @return array	
+     * 
     */
-    function get_game_servers_list($where = false, $limit = 10000)
+    function get_game_servers_list($where = false, $limit = 10000, $offset = 0, $engine = false, $engine_version = false)
     {
-		if(is_array($where)){
-			$query = $this->db->get_where('servers', $where, $limit);
-		}else{
-			$query = $this->db->get('servers');
-		}
-
-		if($query->num_rows > 0){
+		/* Если задан движок, то получаем список игр на этом движке,
+		 * а после выбираем серверы только этих игр 
+		 */
+		if ($engine) {
+			$this->db->where('engine', $engine);
+			if ($engine_version) {$this->db->where('engine_version', $engine_version);}
 			
+			$this->db->select('code');
+			$query = $this->db->get('games');
+			
+			$games_list = $query->result_array();
+			
+			foreach($games_list as &$game_data) {
+				$games[] = $game_data['code'];
+			}
+			
+			if(!empty($games)) {
+				$this->db->where_in('game', $games);
+			}
+		}
+		
+		if (is_array($where)) {
+			$this->db->where($where);
+		}
+		
+		$this->db->limit($limit, $offset);
+		$query = $this->db->get('servers');
+		
+		if ($query->num_rows > 0) {
 			$this->servers_list = $query->result_array();
 			return $this->servers_list;
 			
-		}else{
+		} else{ 
 			return NULL;
 		}
 	}
@@ -792,10 +870,29 @@ class Servers extends CI_Model {
 	 * @param array 	условие
 	 * @return integer
 	 */
-	function get_servers_count($where = array()) {
+	function get_servers_count($where = array())
+	{
 		
 		$this->db->where($where);
 		return $this->db->count_all('servers');
+	}
+	
+	// ----------------------------------------------------------------
+	
+	/**
+	 * Получение списка файлов на сервере (удаленном или локальном)
+	*/
+	public function get_files_list($server_data = false, $dir = '', $file_time = false, $file_size = false)
+	{
+		$server_data = empty($server_data) ? $this->server_data : $server_data;
+		
+		if ($server_data['ds_id'] == 0) {
+			$dir = $server_data['script_path'] . '/' . $server_data['dir'] . '/' . $dir;
+			return $this->get_local_files($server_data, $dir, $file_time, $file_size);
+		} else {
+			$dir = $server_data['ftp_path'] . '/' . $server_data['dir'] . '/' . $dir;
+			return $this->get_remote_files($server_data, $dir, $file_time, $file_size);
+		}
 	}
 
 	// ----------------------------------------------------------------
@@ -1225,55 +1322,22 @@ class Servers extends CI_Model {
     function change_rcon($new_rcon, $server_data = false, $update_db = false) 
     {
 		$this->load->helper('patterns_helper');
+		$this->load->driver('rcon');
 		
 		if($server_data) {
 			$this->server_data = $server_data;
 		}
 		
-		/* Редактируем rcon в server.cfg */
-		switch (strtolower($this->servers->server_data['engine'])) {
-			case 'goldsource':
-				$servercfg_file = 'server.cfg';
-				break;
-				
-			case 'source':
-				$servercfg_file = 'cfg/server.cfg';
-				break;
-				
-			default:
-				return false;
-				break;
-		}
+		$this->rcon->set_variables(
+								$this->server_data['server_ip'],
+								$this->server_data['server_port'],
+								$this->server_data['rcon'], 
+								$this->servers->server_data['engine'],
+								$this->servers->server_data['engine_version']
+		);
 		
-		$file = $this->server_data['start_code'] . '/' . $servercfg_file;
-		$file_contents = $this->read_file($file);
-		
-		/* Ошибка чтения, либо файл не найден */
-		if(!$file_contents) {
-			return false;
-		}
+		$this->rcon->change_rcon($new_rcon);
 
-		$file_contents = change_value_on_file($file_contents, 'rcon_password', $new_rcon);
-		$this->write_file($file, $file_contents, $this->server_data);
-	
-		/* Отправляем новый rcon пароль в консоль сервера*/
-		if($this->servers->server_status($this->server_data['server_ip'], $this->server_data['server_port'])) {
-			
-			$this->load->driver('rcon');
-
-			$this->rcon->set_variables(
-									$this->server_data['server_ip'],
-									$this->server_data['server_port'],
-									$this->server_data['rcon'], 
-									$this->servers->server_data['engine'],
-									$this->servers->server_data['engine_version']
-			);
-			
-			$rcon_connect = $this->rcon->connect();
-
-			$this->rcon->command('rcon_password ' . $new_rcon);
-		}
-		
 		if ($update_db) {
 			$sql_data = array('rcon' => $new_rcon);
 			$this->edit_game_server($this->server_data['id'], $sql_data);
@@ -1371,3 +1435,7 @@ class Servers extends CI_Model {
             
     }
 }
+
+
+/* End of file servers.php */
+/* Location: ./application/models/servers.php */

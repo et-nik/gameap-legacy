@@ -69,16 +69,16 @@ class Games extends CI_Model {
      * 
      *
     */
-    function get_games_list($where = FALSE, $limit = 10000)
+    function get_games_list($where = FALSE, $limit = 10000, $offset = 0)
     {
-		
 		$this->db->order_by('name', 'asc'); 
 		
-		if(is_array($where)){
-			$query = $this->db->get_where('games', $where, $limit);
-		}else{
-			$query = $this->db->get('games');
+		if (is_array($where)) {
+			$query = $this->db->where($where);
 		}
+		
+		$this->db->limit($limit, $offset);
+		$query = $this->db->get('games');
 
 		if($query->num_rows > 0){
 			
@@ -116,11 +116,11 @@ class Games extends CI_Model {
 				$tpl_data[$num]['game_engine'] 			= $games['engine'];
 				$tpl_data[$num]['game_engine_version'] 	= $games['engine_version'];
 				
-				$tpl_data[$num]['app_id']				= $games['app_id'];
-				$tpl_data[$num]['app_set_config']		= $games['app_set_config'];
+				$tpl_data[$num]['app_id']				= (isset($games['app_id'])) ? $games['app_id'] : '';
+				$tpl_data[$num]['app_set_config']		= (isset($games['app_set_config'])) ? $games['app_set_config'] : '';
 				
-				$tpl_data[$num]['local_repository']		= $games['local_repository'];
-				$tpl_data[$num]['remote_repository']	= $games['remote_repository'];
+				$tpl_data[$num]['local_repository']		= (isset($games['local_repository'])) ? $games['local_repository'] : '';
+				$tpl_data[$num]['remote_repository']	= (isset($games['remote_repository'])) ? $games['remote_repository'] : '';
 				
 			}
 			
