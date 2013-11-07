@@ -81,16 +81,27 @@ class Users_control extends CI_Controller {
      *  - редактирование
      *  - изменение привилегий на серверы
     */
-    public function index()
+    public function index($offset = 0)
     {
 		//Проверка, есть ли права
 		if(!$this->users->auth_privileges['usr_edit']){
 			redirect('admin');
         }
+        
+        /* Постраничная навигация */
+		$config['base_url'] = site_url('admin/users_control/index');
+		//~ $config['uri_segment'] = 4;
+		$config['total_rows'] = $this->db->count_all_results('users');
+		$config['per_page'] = 10;
+		$config['full_tag_open'] = '<p id="pagination">';
+		$config['full_tag_close'] = '</p>';
+		
+		$this->pagination->initialize($config); 
+		$local_tpl_data['pagination'] = $this->pagination->create_links();
 
 		$this->tpl_data['content'] .= $this->parser->parse('web_users/web_users.html', $this->tpl_data, true);
 
-		$tpl_local_data['users_list'] = $this->users->tpl_users_list();
+		$tpl_local_data['users_list'] = $this->users->tpl_users_list(null, $offset);
 		$this->tpl_data['content'] .= $this->parser->parse('web_users/web_users_list.html', $tpl_local_data, true);
         
         $this->parser->parse('main.html', $this->tpl_data);
@@ -263,7 +274,7 @@ class Users_control extends CI_Controller {
 			$user_data = $this->users->get_user_data($user_id, false, true);
 			
 			 /* В целях безопасности, редактировать администратора может только он сам */
-			if($user_data['is_admin'] == 1 AND $user_data['id'] != $this->users->user_id){
+			if($user_data['is_admin'] && $user_data['id'] != $this->users->auth_id){
 				
 				$local_tpl_data['message'] = lang('users_edit_admin_denied');
 					
@@ -336,9 +347,9 @@ class Users_control extends CI_Controller {
 			
 			/* Получаем данные редактируемого пользователя, но записываем их лишь в переменную $user_data */
 			$user_data = $this->users->get_user_data($user_id, false, true);
-			
+
 			/* В целях безопасности, редактировать администратора может только он сам */
-			if ($user_data['is_admin'] == 1 AND $user_data['id'] != $this->users->user_id) {
+			if ($user_data['is_admin'] && $user_data['id'] != $this->users->auth_id) {
 				$this->_show_message(lang('users_edit_admin_denied'), site_url('admin/users_control'));
 				return false;
 			}

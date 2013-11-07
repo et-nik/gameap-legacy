@@ -124,7 +124,7 @@ class Settings extends CI_Controller {
 			if($allowable_aliases && !empty($allowable_aliases)) {
 				foreach ($allowable_aliases as $alias) {
 
-					if(!$this->users->user_privileges['srv_global'] && $alias['only_admins']) {
+					if(!$this->users->auth_privileges['srv_global'] && $alias['only_admins']) {
 						/* Алиас могут редактировать только администраторы */
 						continue;
 					}
@@ -179,7 +179,7 @@ class Settings extends CI_Controller {
 			if($allowable_aliases && !empty($allowable_aliases)) {
 				foreach ($allowable_aliases as $alias) {
 
-					if(!$this->users->user_privileges['srv_global'] && $alias['only_admins']) {
+					if(!$this->users->auth_data['is_admin'] && !$this->users->auth_privileges['srv_global'] && $alias['only_admins']) {
 						/* Алиас могут редактировать только администраторы */
 						continue;
 					}
@@ -202,7 +202,7 @@ class Settings extends CI_Controller {
             // Сохраняем логи
 			$log_data['type'] = 'server_settings';
 			$log_data['command'] = 'edit_settings';
-			$log_data['user_name'] = $this->users->user_login;
+			$log_data['user_name'] = $this->users->auth_login;
 			$log_data['server_id'] = $server_id;
 			$log_data['msg'] = 'Edit settings';
 			$this->panel_log->save_log($log_data);

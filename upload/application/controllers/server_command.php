@@ -179,7 +179,7 @@ class Server_command extends CI_Controller {
 			*/
 			switch($command){
 				case 'pl_ban':
-					$privileges = (bool)($this->users->servers_privileges['PLAYERS_BAN']); 	// Привилегии
+					$privileges = (bool)($this->users->auth_servers_privileges['PLAYERS_BAN']); 	// Привилегии
 					$isset = (bool)$this->servers->server_data['ban_cmd'];		// Задана ли команда
 					
 					$submit_name = 'submit_ban';
@@ -188,7 +188,7 @@ class Server_command extends CI_Controller {
 					break;
 					
 				case 'pl_kick':
-					$privileges = (bool)($this->users->servers_privileges['PLAYERS_KICK']);
+					$privileges = (bool)($this->users->auth_servers_privileges['PLAYERS_KICK']);
 					$isset = (bool)$this->servers->server_data['kick_cmd'];		// Задана ли команда
 					
 					$submit_name = 'submit_kick';
@@ -196,7 +196,7 @@ class Server_command extends CI_Controller {
 					break;
 					
 				case 'pl_changename':
-					$privileges = (bool)($this->users->servers_privileges['PLAYERS_CH_NAME']);
+					$privileges = (bool)($this->users->auth_servers_privileges['PLAYERS_CH_NAME']);
 					$isset = (bool)$this->servers->server_data['chname_cmd'];
 					
 					$submit_name = 'submit_changename';
@@ -204,7 +204,7 @@ class Server_command extends CI_Controller {
 					break;
 					
 				case 'send_msg';
-					$privileges = (bool)($this->users->servers_privileges['SERVER_CHAT_MSG']);
+					$privileges = (bool)($this->users->auth_servers_privileges['SERVER_CHAT_MSG']);
 					$isset = (bool)$this->servers->server_data['sendmsg_cmd'];
 					
 					$submit_name = 'submit_sendmsg';
@@ -212,7 +212,7 @@ class Server_command extends CI_Controller {
 					break;
 					
 				case 'changemap';
-					$privileges = (bool)($this->users->servers_privileges['CHANGE_MAP']);
+					$privileges = (bool)($this->users->auth_servers_privileges['CHANGE_MAP']);
 					$isset = (bool)$this->servers->server_data['chmap_cmd'];
 					
 					$submit_name = 'submit_changemap';
@@ -220,7 +220,7 @@ class Server_command extends CI_Controller {
 					break;
 					
 				case 'restart':
-					$privileges = (bool)($this->users->servers_privileges['SERVER_SOFT_RESTART']);
+					$privileges = (bool)($this->users->auth_servers_privileges['SERVER_SOFT_RESTART']);
 					$isset = (bool)$this->servers->server_data['srestart_cmd'];
 
 					$submit_name = 'submit_restart';
@@ -228,7 +228,7 @@ class Server_command extends CI_Controller {
 					break;
 					
 				case 'set_password':
-					$privileges = (bool)($this->users->servers_privileges['SERVER_SET_PASSWORD']);
+					$privileges = (bool)($this->users->auth_servers_privileges['SERVER_SET_PASSWORD']);
 					$isset = (bool)$this->servers->server_data['passwd_cmd'];
 					
 					$submit_name = 'submit_set_password';
@@ -236,14 +236,14 @@ class Server_command extends CI_Controller {
 					
 				case 'fast':
 					/* Fast RCON */
-					$privileges = (bool)$this->users->servers_privileges['FAST_RCON'];
+					$privileges = (bool)$this->users->auth_servers_privileges['FAST_RCON'];
 					$isset = true;
 					//$submit_name = 'submit_set_password';
 					$no_submit_name = true;
 					break;
 					
 				case 'rcon_command':
-					$privileges = (bool)($this->users->servers_privileges['RCON_SEND']);
+					$privileges = (bool)($this->users->auth_servers_privileges['RCON_SEND']);
 					$isset = true;
 					
 					$submit_name = 'submit_rcon';
@@ -567,12 +567,12 @@ class Server_command extends CI_Controller {
 		$rcon_command['0'] = strtolower($rcon_command['0']);
 
 		/* Пользователь, у которого нет прав на смену ркон пароля не имеет права отправлять rcon_password */
-		if(!$this->users->servers_privileges['CHANGE_RCON'] && in_array('rcon_password', $rcon_command)) {
+		if(!$this->users->auth_servers_privileges['CHANGE_RCON'] && in_array('rcon_password', $rcon_command)) {
 			return false;
 		}
 		
 		/* Пользователь, у которого нет прав на выставление пароля на сервер */
-		if(!$this->users->servers_privileges['SERVER_SET_PASSWORD'] && in_array('sv_password', $rcon_command)) {
+		if(!$this->users->auth_servers_privileges['SERVER_SET_PASSWORD'] && in_array('sv_password', $rcon_command)) {
 			return false;
 		}
 		
@@ -616,15 +616,16 @@ class Server_command extends CI_Controller {
 			// Получение прав на сервер
 			$this->users->get_server_privileges($this->servers->server_data['id']);
 			
-			if(!$this->users->servers_privileges['CONSOLE_VIEW']) {
+			if(!$this->users->auth_servers_privileges['CONSOLE_VIEW']) {
 				$this->_show_message(lang('server_command_no_console_privileges'), site_url('admin/server_control/main/' . $id));
 				return false;
 			}
 			
-			if(!$this->servers->server_status()) {
-				$this->_show_message(lang('server_command_server_down'), site_url('admin/server_control/main/' . $id));
-				return false;
-			}
+			/* Код закомментирован. Сервер может зависнуть, он будет недоступен, но данные консоли можно получить */
+			//~ if(!$this->servers->server_status()) {
+				//~ $this->_show_message(lang('server_command_server_down'), site_url('admin/server_control/main/' . $id));
+				//~ return false;
+			//~ }
 			
 			/*
 			 * Список расширений php
@@ -727,7 +728,6 @@ class Server_command extends CI_Controller {
 					//$this->tpl_data['content'] = '<code>' . $file_contents. '</code>';
 				}
 				
-				
 			} else {
 				$message = lang('server_command_no_data');
 				
@@ -776,8 +776,8 @@ class Server_command extends CI_Controller {
 			 * лишь своих серверов, в этом случае нужно еще проверить -
 			 * находится ли сервер в списке
 			*/
-			if($this->users->user_privileges['srv_start']			// Право на запуск серверов
-				&& $this->users->servers_privileges['SERVER_START']	// Право на запуск этого сервера
+			if($this->users->auth_privileges['srv_start']			// Право на запуск серверов
+				&& $this->users->auth_servers_privileges['SERVER_START']	// Право на запуск этого сервера
 			) {
 				
 				/* Проверка SSH и Telnet */
@@ -805,7 +805,7 @@ class Server_command extends CI_Controller {
 						 */
 						if (strpos($response, 'Server is already running') !== false) {
 							/* Сервер запущен ранее */
-							$message = lang('server_command_server_is_already_running', base_url() . 'server_command/restart/' . $id, base_url() . 'server_command/stop/' . $id);
+							$message = lang('server_command_server_is_already_running', site_url('server_command/restart/'. $id), site_url('server_command/stop/' . $id));
 							$log_data['msg'] = 'Server is already running';		
 						} elseif($this->servers->server_status() OR strpos($response, 'Server started') !== false) {
 							/* Сервер успешно запущен */
@@ -915,8 +915,8 @@ class Server_command extends CI_Controller {
 				 * лишь своих серверов, в этом случае нужно еще проверить -
 				 * находится ли сервер в списке
 				*/
-				if($this->users->user_privileges['srv_stop']			// Право на запуск серверов
-					&& $this->users->servers_privileges['SERVER_STOP']	// Право на запуск этого сервера
+				if($this->users->auth_privileges['srv_stop']			// Право на запуск серверов
+					&& $this->users->auth_servers_privileges['SERVER_STOP']	// Право на запуск этого сервера
 				) {
 					
 					/* Проверка SSH и Telnet */
@@ -1047,8 +1047,8 @@ class Server_command extends CI_Controller {
 			 * лишь своих серверов, в этом случае нужно еще проверить -
 			 * находится ли сервер в списке
 			*/
-			if($this->users->user_privileges['srv_restart']
-				&& $this->users->servers_privileges['SERVER_RESTART']
+			if($this->users->auth_privileges['srv_restart']
+				&& $this->users->auth_servers_privileges['SERVER_RESTART']
 			) {
 				
 				/* Проверка SSH и Telnet */
@@ -1177,7 +1177,7 @@ class Server_command extends CI_Controller {
 			 * Информация о сервере хранится в $this->servers->server_data
 			 * 
 			*/
-			if ($this->users->servers_privileges['SERVER_UPDATE']) {
+			if ($this->users->auth_servers_privileges['SERVER_UPDATE']) {
 				
 				/* Проверка SSH и Telnet */
 				if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {

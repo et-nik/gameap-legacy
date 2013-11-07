@@ -115,7 +115,7 @@ class Server_control extends CI_Controller {
 			return false;
 		}
 
-		if(!$error_desc){
+		if(!$error_desc) {
 			$rcon_connect = false;
 			
 			if ($this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['query_port'])) {
@@ -319,16 +319,18 @@ class Server_control extends CI_Controller {
 			$local_tpl_data['server_name'] = $this->servers->server_data['name'];
 			$this->tpl_data['heading'] = lang('server_control_header') . ' "' . $this->servers->server_data['name'] . '"';
 			
-			if(file_exists('application/viewsserver_control/' . $this->servers->server_data['game'] . '.html')){
+			//~ echo APPPATH . 'views/' . $this->config->config['template'] . '/server_control/' . $this->servers->server_data['game'] . '.html';
+			
+			if (file_exists(APPPATH . 'views/' . $this->config->config['template'] . '/servers_control/' . $this->servers->server_data['game'] . '.html')) {
 				$this->tpl_data['content'] .= $this->parser->parse('server_control/' . $this->servers->server_data['game'] . '.html', $local_tpl_data, true);
-			}else{
+			} else {
 				$this->tpl_data['content'] .= $this->parser->parse('server_control/default.html', $local_tpl_data, true);
 			}
 			
 		}else{
 			$this->tpl_data['content'] .= '<strong>' . lang('server_control_errors_found') . ' :</strong><br />' . $error_desc;
 		}
-			
+
         $this->parser->parse('main.html', $this->tpl_data);
     }
     

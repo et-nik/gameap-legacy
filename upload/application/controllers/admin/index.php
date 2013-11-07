@@ -53,7 +53,7 @@ class Index extends CI_Controller {
 		/*
 		 * Отправка команд, на которые есть права у пользователя
 		*/
-			
+
 		/* Загрузка модели управления игровыми серверами*/
 		$this->load->model('servers');
 
@@ -64,7 +64,10 @@ class Index extends CI_Controller {
 			$this->load->model('servers/games');
 				
 			$num = 0;
-				
+			
+			$this->db->select('code, start_code, name, engine, engine_version');
+			$this->games->get_games_list();
+			
 			$local_tpl_data['games_list'] = $this->games->tpl_data_games();
 				
 			foreach ($this->servers->servers_list as $this->server_data) {
@@ -85,7 +88,7 @@ class Index extends CI_Controller {
 					
 					$template = (!isset($this->config->config['template'])) ? 'default' : $this->config->config['template'];
 					$style = (!isset($this->config->config['style'])) ? 'default' : $this->config->config['style'];
-						
+					
 					/* Работает ли сервер */
 					if($this->servers->server_status($this->server_data['server_ip'], $this->server_data['query_port'], $this->games->games_list[$game_arr_id]['engine'], $this->games->games_list[$game_arr_id]['engine_version'])) {
 						$server_status['string'] = '<img src="' . base_url() . '/themes/system/images/bullet_green.png" alt="' . lang('enabled') . '"/>';
@@ -110,23 +113,23 @@ class Index extends CI_Controller {
 					*/
 
 					if($this->server_data['server_status'] == 0				// Сервер остановлен
-						&& $this->users->user_privileges['srv_start']		// Право на запуск серверов
-						&& $this->users->servers_privileges['SERVER_START']	// Право на запуск этого сервера
+						&& $this->users->auth_privileges['srv_start']		// Право на запуск серверов
+						&& $this->users->auth_servers_privileges['SERVER_START']	// Право на запуск этого сервера
 					) {
 						$server_commands .= '<a class="small green awesome" href=' . site_url('server_command/start/'. $this->server_data['id'])  . '>' . lang('start') . '</a>&nbsp;';
 					}
 						
 					/* Кнопка остановка сервера */
 					if($this->server_data['server_status'] == 1				// Сервер запущен
-						&& $this->users->user_privileges['srv_stop']		// Право на остановку серверов
-						&& $this->users->servers_privileges['SERVER_STOP']	// Право на остановку этого сервера
+						&& $this->users->auth_privileges['srv_stop']		// Право на остановку серверов
+						&& $this->users->auth_servers_privileges['SERVER_STOP']	// Право на остановку этого сервера
 					) {
 						$server_commands .= '<a class="small red awesome" href=' . site_url('server_command/stop/' . $this->server_data['id']) . '>' . lang('stop') . '</a>&nbsp;';
 					}
 					
 					/* Кнопка перезапуска сервера */
-					if($this->users->user_privileges['srv_restart']				// Право на перезапуск серверов
-						&& $this->users->servers_privileges['SERVER_RESTART']	// Право на перезапуск этого сервера
+					if($this->users->auth_privileges['srv_restart']				// Право на перезапуск серверов
+						&& $this->users->auth_servers_privileges['SERVER_RESTART']	// Право на перезапуск этого сервера
 					) {
 						$server_commands .= '<a class="small yellow awesome" href=' . site_url('server_command/restart/' . $this->server_data['id']) . '>' . lang('restart') . '</a>&nbsp;';
 					}

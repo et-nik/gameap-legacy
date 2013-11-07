@@ -13,8 +13,11 @@
 */
 class Auth extends CI_Controller {
 	
-	var $tpl_data = array();
-	var $user_data = array();
+	public $tpl_data = array();
+	public $user_data = array();
+	
+	// Список запрещенных логинов при регистрации
+	private $_denied_logins = array('administrator', 'admin', 'system', 'gameap');
 	
 	public function __construct()
     {
@@ -347,7 +350,7 @@ class Auth extends CI_Controller {
 			$vals = array(
 				'word'	 		=> $cap['word'],
 				'img_path'	 	=> './uploads/security/',
-				'img_url'	 	=> base_url('uploads/security/'),
+				'img_url'	 	=> base_url('uploads/security') . '/',
 				'font_path'	 	=> './system/fonts/U1Uabbif.ttf',
 				'img_width'	 	=> 300,
 				'img_height' 	=> 50,

@@ -76,7 +76,7 @@ class Servers_files extends CI_Controller {
 		/* Загружаем модель */
 		$this->load->model('servers');
 		
-		$this->servers->get_server_list($this->users->auth_id);
+		$this->servers->get_servers_list($this->users->auth_id);
 		
 		$local_tpl_data['servers_list'] = $this->servers->tpl_data();
 		$local_tpl_data['url'] 			= site_url('admin/servers_files/server');
@@ -114,8 +114,8 @@ class Servers_files extends CI_Controller {
 		$this->users->get_server_privileges($server_id);
 		
 		/* Проверка на права загрузки и правки конфигурационный файлов сервера */
-		if(!$this->users->servers_privileges['UPLOAD_CONTENTS']
-		&& !$this->users->servers_privileges['CHANGE_CONFIG']
+		if(!$this->users->auth_servers_privileges['UPLOAD_CONTENTS']
+		&& !$this->users->auth_servers_privileges['CHANGE_CONFIG']
 		){
 			$this->_show_message(lang('server_files_no_privileges'), site_url('admin/servers_files'));
 			return false;
@@ -236,6 +236,9 @@ class Servers_files extends CI_Controller {
 			return false;
 		}
 		
+		$file = &$s_cfg_files[$cfg_id]['file'];
+		$dir = $this->servers->server_data['script_path'] . '/' . $this->servers->server_data['dir'] . '/';
+		
 		/*
 		 * Иногда запись файлов или чтение может завершаться ошибкой
 		 * причина чаще всего в путях
@@ -254,7 +257,6 @@ class Servers_files extends CI_Controller {
 		 * 
 		*/
 		
-		
 		if(!$this->input->post('submit')) {
 			
 			/* 
@@ -262,25 +264,14 @@ class Servers_files extends CI_Controller {
 			 * в этом случае показываем содержимое конфигурационного файла
 			 * в textarea 
 			*/
-			
-			/* Определение, является сервер локальным или удаленным 
-			 * В соответствие с тем, является сервер локальным или нет
-			 * вызываются соответствующие функции и пути
-			*/
-			if(!$this->servers->server_data['ds_id']){
-				$file = $this->servers->server_data['local_path'] . '/' . $this->servers->server_data['dir'] . '/' . $s_cfg_files[$cfg_id]['file'];
-				$file_contents = $this->servers->read_local_file($file);
-			}else{
-				$file = $this->servers->server_data['ftp_path'] . '/' . $this->servers->server_data['dir'] . '/' . $s_cfg_files[$cfg_id]['file'];
-				$file_contents = $this->servers->read_remote_file($file);
-			}
+			$file_contents = $this->servers->read_file($s_cfg_files[$cfg_id]['file']);
 			
 			if($file_contents === false) {
 				$adm_message = '';
 				
 				// Отображаем админу дополнительную информацию
 				if ($this->users->auth_data['is_admin']) {
-					$adm_message = '<p align="center">' . lang('file') . ': <strong>"' . $file . '"</strong></p>';
+					$adm_message = '<p align="center">' . lang('file') . ': <strong>"' . $dir . $file . '"</strong></p>';
 				}
 				
 				$this->_show_message($this->servers->errors . $adm_message);
@@ -291,7 +282,7 @@ class Servers_files extends CI_Controller {
 				$log_data['user_name'] = $this->users->auth_login;
 				$log_data['server_id'] = $this->servers->server_data['id'];
 				$log_data['msg'] = 'Read file failed';
-				$log_data['log_data'] = 'File: ' . $file . "\n";
+				$log_data['log_data'] = 'File: ' . $dir . $file . "\n";
 				$this->panel_log->save_log($log_data);
 				
 				return false;
@@ -314,21 +305,15 @@ class Servers_files extends CI_Controller {
 			*/
 			
 			$cfg_data = $this->input->post('file_contents', true);
-			
-			/* Определение, является сервер локальным или удаленным */
-			if(!$this->servers->server_data['ds_id']){
-				$dir = $this->servers->server_data['local_path'] . '/' . $this->servers->server_data['dir'];
-				$write_result = $this->servers->write_local_file($dir . '/' . $s_cfg_files[$cfg_id]['file'], $cfg_data);
-			}else{
-				$dir = $this->servers->server_data['ftp_path'] . '/' . $this->servers->server_data['dir'];
-				$write_result = $this->servers->write_remote_file($dir . '/' . $s_cfg_files[$cfg_id]['file'], $cfg_data);
-			}
+			$write_result = $this->servers->write_file($file, $cfg_data);
 			
 			if(!$write_result) {
+				
 				$adm_message = '';
+				
 				// Отображаем админу дополнительную информацию
 				if($this->users->auth_data['is_admin']) {
-					$adm_message = '<p align="center">' . lang('file') . ': <strong>"' . $file . '"</strong></p>';
+					$adm_message = '<p align="center">' . lang('file') . ': <strong>"' . $dir . $file . '"</strong></p>';
 				}
 				
 				$this->_show_message($this->servers->errors . $adm_message);
@@ -339,7 +324,7 @@ class Servers_files extends CI_Controller {
 				$log_data['user_name'] = $this->users->auth_login;
 				$log_data['server_id'] = $this->servers->server_data['id'];
 				$log_data['msg'] = 'Edit file failed';
-				$log_data['log_data'] = 'File: ' . $file . ' Error: ' . $this->servers->errors . "\n";
+				$log_data['log_data'] = 'File: ' . $dir . $file  . ' Error: ' . $this->servers->errors . "\n";
 				$this->panel_log->save_log($log_data);
 				
 				return false;
@@ -351,10 +336,10 @@ class Servers_files extends CI_Controller {
 			
 			$log_data['type'] = 'server_files';
 			$log_data['command'] = 'edit_config';
-			$log_data['user_name'] = $this->users->user_login;
+			$log_data['user_name'] = $this->users->auth_login;
 			$log_data['server_id'] = $this->servers->server_data['id'];
 			$log_data['msg'] = 'Config edit success';
-			$log_data['log_data'] = 'Config file: ' . $s_cfg_files[$cfg_id]['file'] . "\n";
+			$log_data['log_data'] = 'Config file: ' . $dir . '/' . $s_cfg_files[$cfg_id]['file']  . "\n";
 			$this->panel_log->save_log($log_data);
 			
 			return true;
@@ -456,7 +441,7 @@ class Servers_files extends CI_Controller {
 					/* Сохраняем логи */
 					$log_data['type'] = 'server_files';
 					$log_data['type'] = 'upload_file';
-					$log_data['user_name'] = $this->users->user_login;
+					$log_data['user_name'] = $this->users->auth_login;
 					$log_data['server_id'] = $this->servers->server_data['id'];
 					$log_data['msg'] = 'Upload file failed';
 					$log_data['log_data'] = 'Directory: ' . $this->servers->server_data['ftp_path'] . '/' . $this->servers->server_data['dir'] . '/' . $s_content_dirs[$dir_id]['path'] . ' File name: ' . $file_data['orig_name'] . "\n";
@@ -477,7 +462,7 @@ class Servers_files extends CI_Controller {
 					/* Сохраняем логи */
 					$log_data['type'] = 'server_files';
 					$log_data['command'] = 'upload_file';
-					$log_data['user_name'] = $this->users->user_login;
+					$log_data['user_name'] = $this->users->auth_login;
 					$log_data['server_id'] = $this->servers->server_data['id'];
 					$log_data['msg'] = 'Upload file success';
 					$log_data['log_data'] = 'Directory: ' . $s_content_dirs[$dir_id]['path'] . ' File name: ' . $file_data['orig_name'] . "\n";
@@ -495,7 +480,7 @@ class Servers_files extends CI_Controller {
 				/* Сохраняем логи */
 				$log_data['type'] = 'server_files';
 				$log_data['command'] = 'upload_file';
-				$log_data['user_name'] = $this->users->user_login;
+				$log_data['user_name'] = $this->users->auth_login;
 				$log_data['server_id'] = $this->servers->server_data['id'];
 				$log_data['msg'] = 'Upload file success';
 				$log_data['log_data'] = 'Directory: ' . $s_content_dirs[$dir_id]['path'] . ' File name: ' . $file_data['orig_name'] . "\n";
