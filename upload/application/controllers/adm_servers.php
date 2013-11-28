@@ -228,7 +228,8 @@ class Adm_servers extends CI_Controller {
 	 * 
 	 * Обработка статистики
 	*/
-	function _stats_processing($stats) {
+	function _stats_processing($stats) 
+	{
 		foreach($stats as $arr) {
 					
 			/* Показываем только за последние 3 часа */
@@ -243,6 +244,26 @@ class Adm_servers extends CI_Controller {
 		}
 		
 		return $data;
+	}
+	
+	// -----------------------------------------------------------------
+	
+	/**
+	 * 
+	 * Функция получает IP адрес для игрового сервера, если он не указан
+	*/
+	private function _get_default_ip($ds_id = false) 
+	{
+		if($ds_id) {
+			foreach($this->dedicated_servers->ds_list as $array) {
+				if($ds_id == $array['id']) {
+					/* Первый IP из списка */
+					return $array['ip'][0];
+				}
+			}
+		} else {
+			return '127.0.0.1';
+		}
 	}
 	
 	// -----------------------------------------------------------------
@@ -639,7 +660,11 @@ class Adm_servers extends CI_Controller {
 						$sql_data['control_protocol'] = $this->input->post('control_protocol');
 						$sql_data['location'] = $this->input->post('location');
 						$sql_data['provider'] = $this->input->post('provider');
-						$sql_data['ip'] = $this->input->post('ip');
+						
+						/* Обработка списка IP адресов */
+						$ip_list = explode(',', str_replace(' ', '', $this->input->post('ip')));
+						$sql_data['ip'] = json_encode($ip_list);
+
 						$sql_data['ram'] = (int)$this->input->post('ram');
 						$sql_data['cpu'] = (int)$this->input->post('cpu');
 						
@@ -659,7 +684,7 @@ class Adm_servers extends CI_Controller {
 						$sql_data['ftp_login'] = $this->input->post('ftp_login');
 						$sql_data['ftp_password'] = $this->input->post('ftp_password');
 						$sql_data['ftp_path'] = $this->input->post('ftp_path');
-						
+
 						/* 
 						 * Проверка указандых данных ssh, telnet, ftp
 						 * чтобы пароль подходил
@@ -736,6 +761,11 @@ class Adm_servers extends CI_Controller {
 							//~ $this->_show_message(lang('adm_servers_port_exists'));
 							//~ return false;
 						//~ }
+						
+						/* Получение IP адреса, если он не указан */
+						if (!$sql_data['server_ip']) {
+							$sql_data['server_ip'] = $this->_get_default_ip($sql_data['ds_id']);
+						}
 						
 						if ($sql_data['ds_id'] && !$this->dedicated_servers->ds_list) {
 							$this->_show_message(lang('adm_servers_selected_ds_unavailable'));
@@ -920,17 +950,19 @@ class Adm_servers extends CI_Controller {
 						}
 						
 						/* Удаление директории на выделенном сервере */
-						if(isset($this->servers->server_data['dir'])) {
-							switch($this->servers->server_data['os']) {
-							case 'Windows':
-								$command = 'rmdir /S ' . $this->servers->server_data['dir'];
-								$result = $this->servers->command($command, $this->servers->server_data);
-								break;
-							default:
-								// Linux
-								$command = 'rm -rf ' . $this->servers->server_data['dir'];
-								$result = $this->servers->command($command, $this->servers->server_data);
-								break;
+						if(isset($this->servers->server_data['dir'])
+							&& ($this->servers->server_data['ds_id'] && ($this->servers->server_data['ssh_host'] OR $this->servers->server_data['telnet_host']))
+						) {
+							switch(strtolower($this->servers->server_data['os'])) {
+								case 'windows':
+									$command = 'rmdir /S ' . $this->servers->server_data['dir'];
+									$result = $this->servers->command($command, $this->servers->server_data);
+									break;
+								default:
+									// Linux
+									$command = 'rm -rf ' . $this->servers->server_data['dir'];
+									$result = $this->servers->command($command, $this->servers->server_data);
+									break;
 							}
 						}
 						
@@ -1632,9 +1664,12 @@ class Adm_servers extends CI_Controller {
 							$sql_data['os'] = $this->input->post('os');
 							$sql_data['location'] = $this->input->post('location');
 							$sql_data['provider'] = $this->input->post('provider');
-							$sql_data['ip'] = $this->input->post('ip');
 							$sql_data['ram'] = (int)$this->input->post('ram');
 							$sql_data['cpu'] = (int)$this->input->post('cpu');
+							
+							/* Обработка списка IP адресов */
+							$ip_list = explode(',', str_replace(' ', '', $this->input->post('ip')));
+							$sql_data['ip'] = json_encode($ip_list);
 					}
 					
 					// Редактирование данных доступа к серверу (пароли ftp, ssh)
@@ -2130,15 +2165,8 @@ class Adm_servers extends CI_Controller {
 				//~ return false;
 			//~ }
 			
-			if(!$new_gs['server_ip'] && $new_gs['ds_id']) {
-				$i = 0;
-				foreach($this->dedicated_servers->ds_list as $array) {
-					if($new_gs['ds_id'] == $array['id']) {
-						$new_gs['server_ip'] = $array['ip'];
-					}
-				}
-			} else {
-				$new_gs['server_ip'] = '127.0.0.1';
+			if (!$new_gs['server_ip']) {
+				$new_gs['server_ip'] = $this->_get_default_ip($new_gs['ds_id']);
 			}
 			
 			if(!$new_gs['server_ip'] && $new_gs['ds_id'] !== '0') {
@@ -2180,7 +2208,8 @@ class Adm_servers extends CI_Controller {
 			
 			// Добавление сервера
 			if($this->servers->add_game_server($new_gs)) {
-				$this->_show_message(lang('adm_servers_server_to_be_installed'), site_url('adm_servers/edit/game_servers/' . mysql_insert_id()), lang('adm_servers_go_to_settings'));
+				$new_server_id = $this->db->call_function('insert_id', $this->db->conn_id);
+				$this->_show_message(lang('adm_servers_server_to_be_installed'), site_url('adm_servers/edit/game_servers/' . $new_server_id), lang('adm_servers_go_to_settings'));
 				return true;
 			} else {
 				$this->_show_message(lang('adm_servers_add_game_failed'));

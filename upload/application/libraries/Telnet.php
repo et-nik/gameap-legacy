@@ -42,11 +42,15 @@ class Telnet {
 	/**
 	 * Соединение с Telnet
 	*/
-	function connect($ip, $port = 23)
+	function connect($ip = false, $port = 23)
 	{
 		if ($this->ip && $this->ip == $ip && $this->_connection) {
 			/* Уже соединен с этим сервером */
 			return true;
+		}
+		
+		if (!$ip) {
+			return false;
 		}
 		
 		$this->ip = $ip;

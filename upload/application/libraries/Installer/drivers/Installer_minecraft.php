@@ -81,6 +81,9 @@ class Installer_minecraft extends CI_Driver {
 		$file = 'server.properties';
 		$file_contents = $CI->servers->read_file($file, $this->server_data);
 		
+		// Костыль. Меняет права файла на 666
+		$CI->servers->command('chmod 666 {dir}/server.properties', $this->server_data);
+		
 		// Установка портов
 		$file_contents = change_value_on_file($file_contents, 'server-port', $this->server_data['server_port']);
 		$file_contents = change_value_on_file($file_contents, 'query.port', $this->server_data['query_port']);

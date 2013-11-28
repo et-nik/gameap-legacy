@@ -316,7 +316,7 @@ class Servers extends CI_Model {
 		/* Присваиваем имя scren  */
 		$data['screen_name'] = (!isset($data['screen_name'])) ? $data['game'] . '_' . random_string('alnum', 6) . '_' . $data['server_port'] : $data['screen_name'];
 		
-		if ($this->db->insert('servers', $data)) {
+		if ($id = $this->db->insert('servers', $data)) {
 			return true;
 		} else {
 			return false;

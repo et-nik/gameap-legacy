@@ -32,8 +32,12 @@ class Ssh {
 	/**
 	 * Соединение с SSH
 	*/
-	function connect($ip, $port = 22)
+	function connect($ip = false, $port = 22)
 	{
+		if (!$ip) {
+			return false;
+		}
+		
 		$this->_connection = ssh2_connect($ip, $port);
 		
 		if (!$this->_connection) {

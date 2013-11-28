@@ -132,10 +132,13 @@ class Dedicated_servers extends CI_Model {
 			
 			$this->ds_list = $query->result_array();
 			
-			/* Расшифровываем пароли */
+			/* Выполняем необходимые действия с данными
+			 * Расшифровываем пароли, преобразуем списки из json в понятный массив */
 			$i = 0;
 			$count_ds_list = count($this->ds_list);
 			while($i < $count_ds_list) {
+				
+				$this->ds_list[$i]['ip'] 				= json_decode($this->ds_list[$i]['ip'], true);
 				
 				$this->ds_list[$i]['ssh_login']			= $this->encrypt->decode($this->ds_list[$i]['ssh_login']);
 				$this->ds_list[$i]['ssh_password'] 		= $this->encrypt->decode($this->ds_list[$i]['ssh_password']);
@@ -194,7 +197,9 @@ class Dedicated_servers extends CI_Model {
      * 
      * @return bool
     */  
-    function get_ds_data($id = false) {
+    function get_ds_data($id = false) 
+    {
+		
 		if (false == $id) {
 			return false;
 		}
@@ -280,11 +285,13 @@ class Dedicated_servers extends CI_Model {
 				$tpl_data[$num]['ds_name'] = $dedicated_servers['name'];
 				$tpl_data[$num]['ds_location'] = $dedicated_servers['location'];
 				$tpl_data[$num]['ds_provider'] = $dedicated_servers['provider'];
-				$tpl_data[$num]['ds_ip'] = $dedicated_servers['ip'];
 				$tpl_data[$num]['ds_os'] = $dedicated_servers['os'];
 				$tpl_data[$num]['ds_ram'] = $dedicated_servers['ram'];
 				$tpl_data[$num]['ds_cpu'] = $dedicated_servers['cpu'];
 				$tpl_data[$num]['ds_id'] = $dedicated_servers['id'];
+				
+				/* Список IP адресов */
+				$tpl_data[$num]['ds_ip'] = implode(', ', $dedicated_servers['ip']);
 				
 				/* Количество игровых серверов */
 				$this->db->count_all();

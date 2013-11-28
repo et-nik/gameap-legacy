@@ -69,6 +69,12 @@ class Installer_source extends CI_Driver {
 		
 		$start_command .= '-game ' . strtolower($game_code) . ' +ip {ip} +port {port} +maxplayers {maxplayers} +map {default_map} +sys_ticrate {fps}';
 		
+		switch(strtolower($game_code)) {
+			case 'csgo':
+				$start_command .= ' -usercon';
+				break;
+		}
+		
 		
 		return $start_command;
 	}

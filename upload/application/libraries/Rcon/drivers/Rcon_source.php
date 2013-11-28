@@ -37,7 +37,6 @@ class Rcon_source extends CI_Driver {
 		} else {
 			return false;
 		}
-	
     }
 
 	function auth() 
