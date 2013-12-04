@@ -4,8 +4,11 @@ class Dedicated_servers extends CI_Model {
 	
 	var $ds_list = array();				// Список удаленных серверов
 	
-	var $commands; 							// Команды, которые отправлялись на сервер
+	//~ var $commands; 							// Команды, которые отправлялись на сервер
     var $errors; 							// Строка с ошибкой (если имеются)
+    
+    private $_commands = array();
+    private $_errors	= false;
     
     //-----------------------------------------------------------
 
@@ -13,8 +16,8 @@ class Dedicated_servers extends CI_Model {
 	{
 		parent::__construct();
 		
-		$this->commands = &$this->servers->commands;
-		$this->errors = &$this->servers->errors;
+		//~ $this->commands = &$this->servers->commands;
+		//~ $this->errors = &$this->servers->errors;
 	}
 	
 	//-----------------------------------------------------------
@@ -77,6 +80,24 @@ class Dedicated_servers extends CI_Model {
 			return true;
 		} else {
 			return false;
+		}
+	}
+	
+	//-----------------------------------------------------------
+	
+	/**
+     * Получение списка отправленных команд
+     * 
+     * @param bool Если $last_command TRUE, то будет отправлена лишь последняя команда
+     * @return array
+     *
+    */
+	function get_sended_commands($last_command = false)
+	{
+		if(false == $last_command) {
+			return $this->commands;
+		} else {
+			return array_pop($this->commands);
 		}
 	}
 	
@@ -412,7 +433,7 @@ class Dedicated_servers extends CI_Model {
 		if(!$path) {
 			$path = $server_data['script_path'];
 		}
-
+		
 		/* Добавляем команду в зависимости от ОС */
 		switch(strtolower($server_data['os'])) {
 			case 'windows':
@@ -457,7 +478,9 @@ class Dedicated_servers extends CI_Model {
 					$cmd_arr = $this->_add_sudo($cmd_arr, $server_data['os']);
 					
 					$result .= exec($cd . ' && ' . $cmd_arr);
-					$this->commands[] = $cd . ' && ' . $cmd_arr;
+					
+					$this->_commands[] = $cd . ' && ' . $cmd_arr;
+					//~ $this->commands[] = $cd . ' && ' . $cmd_arr; // Костыль
 				}
 			} else {
 				
@@ -476,9 +499,10 @@ class Dedicated_servers extends CI_Model {
 				}
 
 				$command = $this->_add_sudo($command, $server_data['os']);
-				
 				$result = exec($cd . ' && ' . $command);
-				$this->commands[] = $cd . ' && ' . $command;
+				
+				$this->_commands[] = $cd . ' && ' . $command;
+				$this->commands[] = $cd . ' && ' . $command;	// Костыль
 			}
 		} else {
 			/* Удаленная машина */
@@ -510,12 +534,16 @@ class Dedicated_servers extends CI_Model {
 						//~ $this->telnet->write($cd . ' && ' . $cmd_arr  . "\r\n");
 						$result .= $this->telnet->command($cd . ' && ' . $cmd_arr  . "\r\n");
 						$result .= "\n/------------------------/\n\n";
-						$this->commands[] = $cd . ' && ' . $cmd_arr  . "\r\n";
+						
+						$this->_commands[] = $cd . ' && ' . $cmd_arr  . "\r\n";
+						//~ $this->commands[] = $cd . ' && ' . $cmd_arr  . "\r\n";		// Костыль
 					}
 				} else {
 					//~ $this->telnet->write($cd . ' && ' . $command  . "\r\n");
 					$result = $this->telnet->command($cd . ' && ' . $command  . "\r\n");
-					$this->commands[] = $cd . ' && ' . $command  . "\r\n";
+					
+					$this->_commands[] = $cd . ' && ' . $command  . "\r\n";
+					//~ $this->commands[] = $cd . ' && ' . $command  . "\r\n";			// Костыль
 				}
 				
 			} else {
@@ -541,15 +569,18 @@ class Dedicated_servers extends CI_Model {
 					if(is_array($command)) {
 						foreach($command as $cmd_arr) {
 							$result .= $this->ssh->command($cd . ' && ' . $cmd_arr);
-							$this->commands[] = $cd . ' && ' . $cmd_arr;
 							$result = "\n/------------------------/\n\n";
 							
+							$this->_commands[] = $cd . ' && ' . $cmd_arr;		
+							//~ $this->commands[] = $cd . ' && ' . $cmd_arr;		// Костыль
 						}
 						
 					} else {
 							//~ $stream[] = ssh2_exec($connection, $cd . ' && ' . $command);
 							$result = $this->ssh->command($cd . ' && ' . $command);
-							$this->commands[] = $cd . ' && ' . $command;
+							
+							$this->_commands[] = $cd . ' && ' . $command;
+							//~ $this->commands[] = $cd . ' && ' . $command;		// Костыль
 					}
 					
 				}

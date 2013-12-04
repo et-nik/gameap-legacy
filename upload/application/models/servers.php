@@ -25,7 +25,7 @@ class Servers extends CI_Model {
     );
     
     var $server_settings 	= array();
-    var $commands			= array(); // Команды, которые отправлялись на сервер
+    //~ var $commands			= array(); // Команды, которые отправлялись на сервер
     var $errors 			= ''; 	// Строка с ошибкой (если имеются)
 
     function __construct()
@@ -202,10 +202,25 @@ class Servers extends CI_Model {
 		
 		$result = $this->dedicated_servers->command($command, $server_data, $path);
 
-		$this->commands = $this->dedicated_servers->commands;
-		$this->errors = $this->dedicated_servers->commands;
+		//~ $this->commands = $this->dedicated_servers->commands;
+		//~ $this->errors = $this->dedicated_servers->errors;
 		
 		return $result;
+	}
+	
+	//-----------------------------------------------------------
+	
+	/**
+     * Получение списка отправленных команд
+     * 
+     * @param bool Если $last_command TRUE, то будет отправлена лишь последняя команда
+     * @return array
+     *
+    */
+	function get_sended_commands($last_command = false)
+	{
+		$this->load->model('servers/dedicated_servers');
+		return $this->dedicated_servers->get_sended_commands($last_command);
 	}
     
     

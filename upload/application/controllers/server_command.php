@@ -709,7 +709,7 @@ class Server_command extends CI_Controller {
 					if($this->users->auth_data['is_admin']) {
 						// Отображаем админу его информацию
 						$message = lang('server_command_no_data');
-						$adm_message = '<p align="center">' . lang('server_command_cmd') . ': <code>' . array_pop($this->servers->commands) . '</code></p>';
+						$adm_message = '<p align="center">' . lang('server_command_cmd') . ': <code>' . $this->servers->get_sended_commands(true) . '</code></p>';
 						$adm_message .= '<p align="center">' . lang('server_command_file') . ': <strong>"' . $dir . '/console.txt"</strong></p>';
 					} else {
 						$message = lang('server_command_no_data');
@@ -732,7 +732,7 @@ class Server_command extends CI_Controller {
 				$message = lang('server_command_no_data');
 				
 				if($this->users->auth_data['is_admin']) {
-					$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . array_pop($this->servers->commands) . '</code></p>';
+					$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
 				}
 				
 				$this->_show_message($message, site_url('admin/server_control/main/' . $id));
@@ -825,7 +825,7 @@ class Server_command extends CI_Controller {
 							if($this->users->auth_data['is_admin']) {
 								$message .= lang('server_command_start_adm_msg');
 								
-								$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . array_pop($this->servers->commands) . '</code></p>';
+								$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
 							}
 							
 							$log_data['msg'] = 'Start server failed';
@@ -849,7 +849,7 @@ class Server_command extends CI_Controller {
 						
 						if($this->users->auth_data['is_admin']) {
 							$message .= lang('server_command_start_adm_msg');
-							$message .= '<p>' . lang('server_command_sent_cmd') . '<br /><code>' . array_pop($this->servers->commands) . '</code></p>';
+							$message .= '<p>' . lang('server_command_sent_cmd') . '<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
 						}
 						
 						// Сохраняем логи
@@ -961,7 +961,7 @@ class Server_command extends CI_Controller {
 								
 								if($this->users->auth_data['is_admin']) {
 									$message .= lang('server_command_start_adm_msg');
-									$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . array_pop($this->servers->commands) . '</code></p>';
+									$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
 								}
 								
 								$log_data['msg'] = 'Stop server failure';
@@ -981,7 +981,7 @@ class Server_command extends CI_Controller {
 							$message = 'Ошибка остановки';
 							
 							if($this->users->auth_data['is_admin']) {
-								$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . array_pop($this->servers->commands) . '</code></p>';
+								$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
 							}
 							
 							// Сохраняем логи
@@ -1093,7 +1093,7 @@ class Server_command extends CI_Controller {
 							
 							if($this->users->auth_data['is_admin']) {
 								$message .= lang('server_command_start_adm_msg');
-								$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . array_pop($this->servers->commands) . '</code></p>';
+								$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
 							}
 							
 							$log_data['msg'] = 'Server not restarted';
@@ -1115,7 +1115,7 @@ class Server_command extends CI_Controller {
 						$message = lang('server_command_restart_failed');
 						
 						if($this->users->auth_data['is_admin']) {
-							$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . array_pop($this->servers->commands) . '</code></p>';
+							$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
 						}
 						
 						// Сохраняем логи
@@ -1219,7 +1219,7 @@ class Server_command extends CI_Controller {
 						//~ $log_data['user_name'] = $this->users->auth_login;
 						//~ $log_data['server_id'] = $this->servers->server_data['id'];
 						//~ $log_data['msg'] = 'Server update error';
-						//~ $log_data['log_data'] = 'Command: ' . array_pop($this->servers->commands) . "\nResponse: \n" . $response;
+						//~ $log_data['log_data'] = 'Command: ' . $this->servers->get_sended_commands(true) . "\nResponse: \n" . $response;
 						//~ $this->panel_log->save_log($log_data);
 					//~ }
 					//~ 
