@@ -201,9 +201,6 @@ class Servers extends CI_Model {
 		$command = $this->_replace_shotcodes_in_array($command, $server_data);
 		
 		$result = $this->dedicated_servers->command($command, $server_data, $path);
-
-		//~ $this->commands = $this->dedicated_servers->commands;
-		//~ $this->errors = $this->dedicated_servers->errors;
 		
 		return $result;
 	}

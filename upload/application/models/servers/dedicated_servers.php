@@ -15,9 +15,6 @@ class Dedicated_servers extends CI_Model {
     public function __construct()
 	{
 		parent::__construct();
-		
-		//~ $this->commands = &$this->servers->commands;
-		//~ $this->errors = &$this->servers->errors;
 	}
 	
 	//-----------------------------------------------------------
@@ -95,9 +92,9 @@ class Dedicated_servers extends CI_Model {
 	function get_sended_commands($last_command = false)
 	{
 		if(false == $last_command) {
-			return $this->commands;
+			return $this->_commands;
 		} else {
-			return array_pop($this->commands);
+			return $this->_commands[count($this->_commands)-1];
 		}
 	}
 	
@@ -407,7 +404,6 @@ class Dedicated_servers extends CI_Model {
 	*/
 	function command($command, $server_data = false, $path = false)
     {
-
 		/*
 		 * 	Чтобы сервер успешно запустился через exec нужно:
 		 *  выполнить: 
@@ -480,7 +476,6 @@ class Dedicated_servers extends CI_Model {
 					$result .= exec($cd . ' && ' . $cmd_arr);
 					
 					$this->_commands[] = $cd . ' && ' . $cmd_arr;
-					//~ $this->commands[] = $cd . ' && ' . $cmd_arr; // Костыль
 				}
 			} else {
 				
@@ -502,7 +497,6 @@ class Dedicated_servers extends CI_Model {
 				$result = exec($cd . ' && ' . $command);
 				
 				$this->_commands[] = $cd . ' && ' . $command;
-				$this->commands[] = $cd . ' && ' . $command;	// Костыль
 			}
 		} else {
 			/* Удаленная машина */
@@ -531,19 +525,15 @@ class Dedicated_servers extends CI_Model {
 
 				if(is_array($command)) {
 					foreach($command as $cmd_arr) {
-						//~ $this->telnet->write($cd . ' && ' . $cmd_arr  . "\r\n");
 						$result .= $this->telnet->command($cd . ' && ' . $cmd_arr  . "\r\n");
 						$result .= "\n/------------------------/\n\n";
 						
 						$this->_commands[] = $cd . ' && ' . $cmd_arr  . "\r\n";
-						//~ $this->commands[] = $cd . ' && ' . $cmd_arr  . "\r\n";		// Костыль
 					}
 				} else {
-					//~ $this->telnet->write($cd . ' && ' . $command  . "\r\n");
 					$result = $this->telnet->command($cd . ' && ' . $command  . "\r\n");
 					
 					$this->_commands[] = $cd . ' && ' . $command  . "\r\n";
-					//~ $this->commands[] = $cd . ' && ' . $command  . "\r\n";			// Костыль
 				}
 				
 			} else {
@@ -572,7 +562,6 @@ class Dedicated_servers extends CI_Model {
 							$result = "\n/------------------------/\n\n";
 							
 							$this->_commands[] = $cd . ' && ' . $cmd_arr;		
-							//~ $this->commands[] = $cd . ' && ' . $cmd_arr;		// Костыль
 						}
 						
 					} else {
@@ -580,16 +569,15 @@ class Dedicated_servers extends CI_Model {
 							$result = $this->ssh->command($cd . ' && ' . $command);
 							
 							$this->_commands[] = $cd . ' && ' . $command;
-							//~ $this->commands[] = $cd . ' && ' . $command;		// Костыль
 					}
 					
 				}
 			}
 		}
-
+		
 		if ($result) {
 			return $result;
-		}else{
+		} else {
 			return false;
 		}
 		

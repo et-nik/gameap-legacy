@@ -310,7 +310,7 @@ class Cron extends MX_Controller {
 			$server_data = array('installed' => '1');
 
 			$log_data['msg'] = 'Unknown error';
-			$command = array_pop($this->dedicated_servers->get_sended_commands(true));
+			$command = $this->dedicated_servers->get_sended_commands(true);
 			$this->_cron_result .= "Install server failure\n";
 			
 			return false;
@@ -927,13 +927,11 @@ class Cron extends MX_Controller {
 					 * Не удалость выбрать тип установки 
 					 * отсутствуют данные локального репозитория, удаленного репозитория и steamcmd
 					 */
-					 $log .= "App_id and Repository data not specified \n";
+					$log .= "App_id and Repository data not specified \n";
 					$this->_cron_result .= "Server #" . $server_id . " install failed. App_id and Repository data not specified\n";
 					$server_installed = false;
 				}
 				
-				print_r($this->dedicated_servers->get_sended_commands());
-
 				/* 
 				 * Завершение установки.
 				 * Установка прав на директории, задание ркон пароля
