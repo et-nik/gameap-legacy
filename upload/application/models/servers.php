@@ -1185,31 +1185,83 @@ class Servers extends CI_Model {
     */
 	function read_remote_file($file, $server_data = array())
 	{
+		$this->load->helper('string');
+		
 		$server_data = empty($server_data) ? $this->server_data : $server_data;
 		
-		$connection = ftp_connect($server_data['ftp_host']);
+		$file = reduce_double_slashes($file);
 		
-		if (ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])) {
+		if(!$server_data['ftp_host']) {
+			/* Работа с sFTP */
+			$this->load->library('sftp');
+			
+			if (!$server_data['ssh_host']) {
+				/* А SSH не настроен =( */
+				$this->errors = 'SSH не настроен';
+				return false;
+			}
+			
+			$sftp_config['hostname'] = $server_data['ssh_host'];
+			$sftp_config['username'] = $server_data['ssh_login'];
+			$sftp_config['password'] = $server_data['ssh_password'];
+			$sftp_config['debug'] = false;
+			
+			if (false == $this->sftp->connect($sftp_config)) {
+				$this->errors = 'Ошибка соединения с sftp сервером';
+				return false;
+			}
+			
+			/* Находим в списке файл, если его нет, то возвращаем ошибку */
+			$list = $this->sftp->list_files(dirname($file), true);
+			
+			if (!in_array(basename($file), $list)) {
+				$this->errors = 'File not found';
+				return false;
+			}
 			
 			// Определяем временный файл
 			$temp_file = tempnam(sys_get_temp_dir(), basename($file));
 			
 			$handle = fopen($temp_file, 'r+');
 			
-			// Производим скачивание файла
-			if (@!ftp_fget($connection, $handle, $file, FTP_ASCII, 0)) {
-				$this->errors = 'Файл не найден';
-				return false;
-			}
-
+			$this->sftp->download($file, $temp_file);
 			$file_contents = file_get_contents($temp_file);
 			
-			fclose($handle);
-			unlink($temp_file);
-			
 			return $file_contents;
+			
+			//~ 
+			//~ if (false == $this->sftp->upload($file, $remote_file)) {
+				//~ $this->errors = 'Ошибка записи файла';
+				//~ return false;
+			//~ } else {
+				//~ return true;
+			//~ }
+			
 		} else {
-			return false;
+			$connection = ftp_connect($server_data['ftp_host']);
+			
+			if (ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])) {
+				
+				// Определяем временный файл
+				$temp_file = tempnam(sys_get_temp_dir(), basename($file));
+				
+				$handle = fopen($temp_file, 'r+');
+				
+				// Производим скачивание файла
+				if (@!ftp_fget($connection, $handle, $file, FTP_ASCII, 0)) {
+					$this->errors = 'Файл не найден';
+					return false;
+				}
+
+				$file_contents = file_get_contents($temp_file);
+				
+				fclose($handle);
+				unlink($temp_file);
+				
+				return $file_contents;
+			} else {
+				return false;
+			}
 		}
 	}
 	
@@ -1264,32 +1316,62 @@ class Servers extends CI_Model {
     */
 	function upload_remote_file($file, $remote_file, $mode = 0666)
 	{
+		$server_data = &$this->server_data;
 		
-		$server_data = $this->server_data;
-		
-		$connection = ftp_connect($server_data['ftp_host']);
-		
-		if(!$connection) {
-			$this->errors = 'Ошибка соединения с ftp сервером';
-			return false;
-		}
-		
-		if(ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])) {
+		if(!$server_data['ftp_host']) {
+			/* Работа с sFTP */
+			$this->load->library('sftp');
 			
-			if (!ftp_put($connection, $remote_file, $file, FTP_BINARY)) {
+			if (!$server_data['ssh_host']) {
+				/* А SSH не настроен =( */
+				$this->errors = 'SSH не настроен';
+				return false;
+			}
+			
+			$sftp_config['hostname'] = $server_data['ssh_host'];
+			$sftp_config['username'] = $server_data['ssh_login'];
+			$sftp_config['password'] = $server_data['ssh_password'];
+			$sftp_config['debug'] = false;
+			
+			if (false == $this->sftp->connect($sftp_config)) {
+				$this->errors = 'Ошибка соединения с sftp сервером';
+			}
+			
+			if (false == $this->sftp->upload($file, $remote_file)) {
 				$this->errors = 'Ошибка записи файла';
-				ftp_close($connection);
 				return false;
 			} else {
-				@ftp_chmod($connection, $mode, $remote_file);
-				ftp_close($connection);
 				return true;
 			}
-		
+
 		} else {
-			$this->errors = 'Ошибка авторизации FTP';
-			return false;
+			/* Работа с FTP */
+			$connection = ftp_connect($server_data['ftp_host']);
+		
+			if(!$connection) {
+				$this->errors = 'Ошибка соединения с ftp сервером';
+				return false;
+			}
+			
+			if(ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])) {
+				
+				if (!ftp_put($connection, $remote_file, $file, FTP_BINARY)) {
+					$this->errors = 'Ошибка записи файла';
+					ftp_close($connection);
+					return false;
+				} else {
+					@ftp_chmod($connection, $mode, $remote_file);
+					ftp_close($connection);
+					return true;
+				}
+			
+			} else {
+				$this->errors = 'Ошибка авторизации FTP';
+				return false;
+			}
 		}
+		
+		return false;
 	}
 	
 	// ----------------------------------------------------------------

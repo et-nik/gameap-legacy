@@ -125,7 +125,10 @@ class Servers_files extends CI_Controller {
 		$this->servers->get_server_data($server_id);
 		
 		/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
-		if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']){
+		if ($this->servers->server_data['ds_id'] 
+			&& !$this->servers->server_data['ftp_host']
+			&& !$this->servers->server_data['ssh_host']
+			) {
 			$this->_show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_files'));
 			return false;
 		}

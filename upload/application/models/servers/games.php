@@ -97,7 +97,7 @@ class Games extends CI_Model {
      * 
      *
     */
-	function tpl_data_games($where = FALSE, $limit = FALSE)
+	function tpl_data_games($where = FALSE, $limit = 10000)
     {
 		$num = -1;
 		

@@ -34,14 +34,14 @@ class Sftp {
         var $public_key_url = '';
         var $private_key_url = '';
         
-        var $buffer_size = 1024;
+        var $buffer_size = 4096;
 	
 	/**
 	 * Constructor - Sets Preferences
 	 *
 	 * The constructor can be passed an array of config values
 	 */
-	function Sftp($config = array())
+	function __construct($config = array())
 	{
 		if (count($config) > 0)
 		{
@@ -298,23 +298,17 @@ class Sftp {
 		
 		$stream = @fopen("ssh2.sftp://$sftp$rempath", 'r');
 		
-		if ($stream === FALSE)
+		if ($stream === false)
 		{
-			if ($this->debug == TRUE)
+			if ($this->debug == true)
 			{
 				$this->_error('sftp_unable_to_download');
 			}
 			return FALSE;
 		}
 		
-		$contents = null;
-		
-		while (!feof($stream)) 
-		{
-                        $contents .= @fread($stream, $this->buffer_size)
-                }
-		
-		$result = file_put_contents($locpath, $contents);
+		$result = ssh2_scp_recv($this->conn, $rempath, $locpath);
+
 		@fclose($stream);
 		return $result;
 	}
