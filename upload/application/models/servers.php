@@ -1110,7 +1110,17 @@ class Servers extends CI_Model {
     */
 	function read_local_file($file)
 	{
+		/* Проверяем директорию, в которой находится файл */
+		if (!file_exists(dirname($file))) {
+			$this->errors = 'Директория с файлом не найдена';
+			return false;
+		}
 		
+		if (!is_readable(dirname($file))) {
+			$this->errors = 'Отсутствуют права на чтение директории, в которой находится файл';
+			return false;
+		}
+
 		if(file_exists($file)) {
 			if(is_readable($file)) {
 				$file_contents = file_get_contents($file);
