@@ -134,33 +134,51 @@ class Cron extends MX_Controller {
 		$commands = array();
 
 		if ($rep_type == 'local') {
+			/* Локальный репозиторий */
 			
-			/* Загружаем данные на сервер по FTP */
 			if ($this->servers_data[$server_id]['control_protocol'] != 'local') {
-				$connection = @ftp_connect($this->servers_data[$server_id]['ftp_host']);
 				
-				if (!$connection) {
-					return false;
+				/* Установка на удаленный сервер из локального репозитория 
+				 * Имеется 2 варианта:
+				 * 1. Используется локальный репозиторий на удаленной машине
+				 * 2. Используется локальный репозиторий на локальной машине, загрузка происходит по FTP
+				 */
+				 
+				switch (strtolower($this->servers_data[$server_id]['os'])) {
+					case 'windows':
+						$commands[] = 'copy ' . $link . ' ' . $this->config->config['local_script_path'] . '\\' .$this->servers_data[$server_id]['dir'];
+						break;
+
+					default:
+						$commands[] = 'cp ' . $link . ' ' . $this->config->config['local_script_path'] . '/' .$this->servers_data[$server_id]['dir'];
+						break;
 				}
-				
-				if (!ftp_login($connection, $this->servers_data[$server_id]['ftp_login'], $this->servers_data[$server_id]['ftp_passwd'])) {
-					return false;
-				}
-				
-				/* Загружаем файл на удаленный сервер */
-				$ftp_put_result = ftp_put(
-					$connection, 
-					$this->servers_data[$server_id]['ftp_path'] . '/' . $this->servers_data[$server_id]['dir'] . '/' . basename($link), 
-					$link, 
-					FTP_BINARY
-				);
-				
-				if (!$ftp_put_result) {
-					ftp_close($connection);
-					return false;
-				}
-				
-				ftp_close($connection);
+
+				/* Загрузка файлов по FTP */
+				//~ $connection = @ftp_connect($this->servers_data[$server_id]['ftp_host']);
+				//~ 
+				//~ if (!$connection) {
+					//~ return false;
+				//~ }
+				//~ 
+				//~ if (!ftp_login($connection, $this->servers_data[$server_id]['ftp_login'], $this->servers_data[$server_id]['ftp_passwd'])) {
+					//~ return false;
+				//~ }
+				//~ 
+				//~ /* Загружаем файл на удаленный сервер */
+				//~ $ftp_put_result = ftp_put(
+					//~ $connection, 
+					//~ $this->servers_data[$server_id]['ftp_path'] . '/' . $this->servers_data[$server_id]['dir'] . '/' . basename($link), 
+					//~ $link, 
+					//~ FTP_BINARY
+				//~ );
+				//~ 
+				//~ if (!$ftp_put_result) {
+					//~ ftp_close($connection);
+					//~ return false;
+				//~ }
+				//~ 
+				//~ ftp_close($connection);
 				
 			} else {
 				/* Установка на локальный сервер */
@@ -182,6 +200,7 @@ class Cron extends MX_Controller {
 			return true;
 
 		} elseif ($rep_type == 'remote') {
+			/* Удаленный репозиторий */
 			
 			switch (strtolower($this->servers_data[$server_id]['os'])) {
 				case 'windows':
