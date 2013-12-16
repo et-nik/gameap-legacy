@@ -40,7 +40,7 @@ class Adm_servers extends CI_Controller {
 			
 			/* Есть ли у пользователя права */
 			if(!$this->users->auth_privileges['srv_global']) {
-				header("HTTP/1.0 404 Not Found");
+				show_404();
 				return false;
 			}
         
@@ -51,6 +51,8 @@ class Adm_servers extends CI_Controller {
 			$this->load->model('servers/dedicated_servers');
 			$this->load->model('servers/games');
 			$this->load->model('servers/game_types');
+		} else {
+			show_404();
 		}
     }
     
