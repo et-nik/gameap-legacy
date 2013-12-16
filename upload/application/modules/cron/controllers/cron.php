@@ -142,15 +142,17 @@ class Cron extends MX_Controller {
 				 * Имеется 2 варианта:
 				 * 1. Используется локальный репозиторий на удаленной машине
 				 * 2. Используется локальный репозиторий на локальной машине, загрузка происходит по FTP
+				 * 
+				 * 2й пока недоступен и возможно не будет доступен никогда, т.к. вырезан
 				 */
 				 
 				switch (strtolower($this->servers_data[$server_id]['os'])) {
 					case 'windows':
-						$commands[] = 'copy ' . $link . ' ' . $this->config->config['local_script_path'] . '\\' .$this->servers_data[$server_id]['dir'];
+						$commands[] = 'copy ' . $link . ' ' . $this->servers_data[$server_id]['script_path'] . '\\' .$this->servers_data[$server_id]['dir'];
 						break;
 
 					default:
-						$commands[] = 'cp ' . $link . ' ' . $this->config->config['local_script_path'] . '/' .$this->servers_data[$server_id]['dir'];
+						$commands[] = 'cp ' . $link . ' ' . $this->servers_data[$server_id]['script_path'] . '/' .$this->servers_data[$server_id]['dir'];
 						break;
 				}
 
