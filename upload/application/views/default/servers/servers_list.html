@@ -11,6 +11,23 @@
 		<th><strong>{lang_commands}</strong></th>
 	</tr>
 	</thead>
+	
+	<script type="text/javascript">
+		function GetStatus(server_id) { 
+			jQuery.ajax({ 
+				url:     '{site_url}ajax/server_control/get_status/' + server_id,
+				type:     "GET",
+				dataType: "html",
+				success: function(response) {
+					document.getElementById("status_" + server_id).innerHTML = response; 
+				}, 
+				error: function(response) {
+					document.getElementById("status_" + server_id).innerHTML = "<img src=\"{site_url}themes/system/images/bullet_red.png\"/>"; 
+				} 
+			}); 
+		}
+	</script>
+	
 {games_list}
 	<tbody>
 		<tr>
@@ -22,9 +39,13 @@
 			<td>{server_name}</td>
 			<td>{server_ip}</td>
 			<?php if(in_array('commercial', $this->gameap_modules->modules_list)): ?><td>{server_expires}</td><?php endif; ?>
-			<td>{server_status}</td>
+			<td><div id="status_{server_id}"><img src="{site_url}themes/system/images/bullet_grey.png"/></div></td>
 			<td>{commands}</td>
 		</tr>
+		
+		<script type="text/javascript">
+			GetStatus({server_id});
+		</script>
 	{/servers_list}
 {/games_list}
 </table>

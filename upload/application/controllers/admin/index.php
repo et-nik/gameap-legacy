@@ -138,7 +138,8 @@ class Index extends CI_Controller {
 						
 					$this->server_data['expires'] = (int)$this->server_data['expires'];
 
-					$gs_data = $data_slist['servers_list'][] = array('server_name' => $this->server_data['name'],
+					$gs_data = $data_slist['servers_list'][] = array('server_id' => $this->server_data['id'],
+																'server_name' => $this->server_data['name'],
 																'server_game' => $this->server_data['game'],
 																'server_ip' => $this->server_data['server_ip'] . ':' . $this->server_data['server_port'],
 																'server_expires' => date ('d.m.Y',$this->server_data['expires']),
