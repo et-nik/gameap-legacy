@@ -160,7 +160,16 @@ class Dedicated_servers extends CI_Model {
 			$count_ds_list = count($this->ds_list);
 			while($i < $count_ds_list) {
 				
-				$this->ds_list[$i]['ip'] 				= json_decode($this->ds_list[$i]['ip'], true);
+				$ds_ip = $this->ds_list[$i]['ip'];
+				if (!$this->ds_list[$i]['ip'] = json_decode($ds_ip, true)) {
+					/* Строка с данными не является json, в этом случае присваиваем первому
+					 * массиву значение этой строки
+					 * Сделано для совместимости со старыми версиями после обновления
+					*/
+					$this->ds_list[$i]['ip'] = array();
+					$this->ds_list[$i]['ip'][] = $ds_ip;
+				}
+				unset($ds_ip);
 				
 				$this->ds_list[$i]['ssh_login']			= $this->encrypt->decode($this->ds_list[$i]['ssh_login']);
 				$this->ds_list[$i]['ssh_password'] 		= $this->encrypt->decode($this->ds_list[$i]['ssh_password']);

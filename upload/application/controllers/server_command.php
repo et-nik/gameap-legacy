@@ -791,8 +791,7 @@ class Server_command extends CI_Controller {
 					$this->_show_message(lang('server_command_start_not_param'));
 					return false;
 				}
-				
-				
+
 				/* Подтверждение 
 				 * Чтобы избежать случаев случайного запуска сервера
 				*/

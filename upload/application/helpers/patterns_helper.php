@@ -123,7 +123,7 @@ if ( ! function_exists('change_value_on_file')) {
 		if (!$found) {
 			$gap = !$gap ? ' ' : $gap;
 			// Значения в файле не найдены, добавляем
-			$file_contents[] = $variable_name . $gap . '"' . $variable_value . '"';
+			$file_contents[] = $variable_name . $gap . $variable_value;
 		}
 		
 		return implode("\n", $file_contents);

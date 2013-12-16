@@ -68,7 +68,6 @@ class Panel_log extends CI_Model {
     */
 	function get_log($where = array(), $limit = 10, $offset = false)
 	{
-		
 		$this->db->order_by('date', 'desc'); 
 		
 		if(is_array($where)){
