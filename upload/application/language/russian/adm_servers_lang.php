@@ -93,7 +93,7 @@ $lang['adm_servers_games_documentation']			= '<a href="http://wiki.hldm.org/inde
 $lang['adm_servers_game_types_documentation']		= '<a href="http://wiki.hldm.org/index.php/%D0%90%D0%B4%D0%BC%D0%B8%D0%BD%D0%9F%D0%B0%D0%BD%D0%B5%D0%BB%D1%8C:%D0%A2%D0%B8%D0%BF%D1%8B_%D0%B8%D0%B3%D1%80" target="blank">Документация по настройке типов игр</a>';
 $lang['adm_servers_ftp_data']						= 'FTP данные';
 $lang['adm_servers_ftp_host']						= 'Хост FTP(IP:port)';
-$lang['adm_servers_path_to_executable_file']		= 'Путь к корневой директории с программой запуска';
+$lang['adm_servers_path_to_executable_file']		= 'Путь к корневой директории с исполняемыми файлами GameAP (server.sh или server.exe)';
 $lang['adm_servers_ssh_data']						= 'SSH данные';
 $lang['adm_servers_ssh_host']						= 'Хост SSH(IP:port)';
 $lang['adm_servers_not_ssh_php']					= 'Отсутствует модуль SSH2 php, работа с сервером через SSH невозможна.';
