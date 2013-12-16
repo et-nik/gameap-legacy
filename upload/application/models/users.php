@@ -111,7 +111,7 @@ class Users extends CI_Model {
 			$this->auth_id = $user_id;
 			$this->auth_login = $this->auth_data['login'];
 			$this->auth_data['balance'] = (int)$this->encrypt->decode($this->auth_data['balance']);
-			$this->auth_data['modules_data'] = ($this->auth_data['modules_data'] != '') ? json_decode($this->auth_data['modules_data'], true) : array();
+			$this->auth_data['modules_data'] = (false == isset($this->auth_data['modules_data'])) ? json_decode($this->auth_data['modules_data'], true) : array();
 			
 			/* Получение базовых привилегий */
             if(!$this->auth_privileges = json_decode($this->auth_data['privileges'], true)) {

@@ -91,6 +91,10 @@ class Dedicated_servers extends CI_Model {
     */
 	function get_sended_commands($last_command = false)
 	{
+		if (count($this->_commands) <= 0) {
+			return;
+		}
+		
 		if(false == $last_command) {
 			return $this->_commands;
 		} else {
