@@ -234,6 +234,45 @@ $data = array(
 );
 $this->games->add_game($data);
 
+$data = array(
+		'code' => "svencoop",
+		'start_code' => "svencoop",
+		'name' => "Sven Co-op",
+		'engine' => "GoldSource",
+		'engine_version' => "1",
+		'app_id' => "90",
+		'app_set_config' => "",
+		'local_repository' => "",
+		'remote_repository' => "",
+);
+$this->games->add_game($data);
+
+$data = array(
+		'code' => "tf2",
+		'start_code' => "tf",
+		'name' => "Team Fortress 2",
+		'engine' => "Source",
+		'engine_version' => "1",
+		'app_id' => "232250",
+		'app_set_config' => "",
+		'local_repository' => "",
+		'remote_repository' => "",
+);
+$this->games->add_game($data);
+
+$data = array(
+		'code' => "tfc",
+		'start_code' => "tfc",
+		'name' => "Team Fortress Classic",
+		'engine' => "GoldSource",
+		'engine_version' => "1",
+		'app_id' => "90",
+		'app_set_config' => "90 mod tfc",
+		'local_repository' => "",
+		'remote_repository' => "",
+);
+$this->games->add_game($data);
+
 /* ----------------------------------------------------- */
 /* 						Модификации						 */
 /* ----------------------------------------------------- */
