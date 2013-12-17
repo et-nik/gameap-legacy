@@ -34,6 +34,8 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "90",
 		'app_set_config' => "",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
 
@@ -45,6 +47,8 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "90",
 		'app_set_config' => "90 mod czero",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
 
@@ -56,6 +60,8 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "740",
 		'app_set_config' => "",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
 
@@ -67,6 +73,8 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "232330",
 		'app_set_config' => "",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
 
@@ -78,6 +86,8 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "90",
 		'app_set_config' => "90 mod dod",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
 
@@ -89,9 +99,10 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "232290",
 		'app_set_config' => "",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
-
 
 $data = array(
 		'code' => "dmc",
@@ -101,6 +112,8 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "0",
 		'app_set_config' => "",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
 
@@ -112,6 +125,8 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "4020",
 		'app_set_config' => "",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
 
@@ -123,6 +138,8 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "90",
 		'app_set_config' => "",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
 
@@ -134,6 +151,8 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "232370",
 		'app_set_config' => "",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
 
@@ -145,6 +164,8 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "90",
 		'app_set_config' => "90 mod gearbox",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
 
@@ -156,6 +177,8 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "0",
 		'app_set_config' => "",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
 
@@ -167,6 +190,8 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "222860",
 		'app_set_config' => "",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
 
@@ -175,9 +200,11 @@ $data = array(
 		'start_code' => "minecraft",
 		'name' => "Minecraft",
 		'engine' => "minecraft",
-		'engine_version' => "162",
-		'app_id' => "",
+		'engine_version' => "1",
+		'app_id' => "0",
 		'app_set_config' => "",
+		'local_repository' => "",
+		'remote_repository' => "http://files2.hldm.org/repository/minecraft_craftbukkit.zip",
 );
 $this->games->add_game($data);
 
@@ -189,40 +216,21 @@ $data = array(
 		'engine_version' => "1",
 		'app_id' => "90",
 		'app_set_config' => "90 mod ricochet",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
 
-
 $data = array(
-		'code' => "svencoop",
-		'start_code' => "svencoop",
-		'name' => "Sven Co-op",
-		'engine' => "GoldSource",
+		'code' => "samp",
+		'start_code' => "samp",
+		'name' => "San-Andreas Multiplayer",
+		'engine' => "samp",
 		'engine_version' => "1",
 		'app_id' => "0",
 		'app_set_config' => "",
-);
-$this->games->add_game($data);
-
-$data = array(
-		'code' => "tf2",
-		'start_code' => "tf",
-		'name' => "Team Fortress 2",
-		'engine' => "Source",
-		'engine_version' => "1",
-		'app_id' => "232250",
-		'app_set_config' => "",
-);
-$this->games->add_game($data);
-
-$data = array(
-		'code' => "tfc",
-		'start_code' => "tfc",
-		'name' => "Team Fortress Classic",
-		'engine' => "GoldSource",
-		'engine_version' => "1",
-		'app_id' => "90",
-		'app_set_config' => "90 mod tfc",
+		'local_repository' => "",
+		'remote_repository' => "",
 );
 $this->games->add_game($data);
 
@@ -809,3 +817,63 @@ $data = array(
 		'game_types' => "",
 );
 $this->game_types->add_game_type($data);
+
+$data = array(
+		'id' => "21",
+		'game_code' => "minecraft",
+		'name' => "CraftBukkit",
+		'config_files' => "[{\"desc\":\"White list\",\"file\":\"white-list.txt\"},{\"desc\":\"Banned IPs\",\"file\":\"banned-ips.txt\"},{\"desc\":\"Banned Players\",\"file\":\"banned-players.txt\"},{\"desc\":\"Permissions\",\"file\":\"permissions.yml\"},{\"desc\":\"Server properties\",\"file\":\"server.properties\"}]",
+		'content_dirs' => "[{\"desc\":\"Plugins\",\"path\":\"plugins\",\"allowed_types\":\"jar\"}]",
+		'log_dirs' => "",
+		'fast_rcon' => "",
+		'aliases' => "",
+		'disk_size' => "5000",
+		'local_repository' => "",
+		'remote_repository' => "",
+		'execfile_windows' => "server.exe",
+		'execfile_linux' => "./server.sh",
+		'script_start' => "start {dir} {name} {ip} {port} \"{command}\" {user}",
+		'script_stop' => "stop {dir} {name} {ip} {port} \"{command}\" {user}",
+		'script_restart' => "restart {dir} {name} {ip} {port} \"{command}\" {user}",
+		'script_status' => "status {dir} {name} {ip} {port} \"{command}\" {user}",
+		'script_update' => "",
+		'script_get_console' => "get_console {dir} {name} {user}",
+		'passwd_cmd' => "",
+		'sendmsg_cmd' => "say {msg}",
+		'chmap_cmd' => "",
+		'srestart_cmd' => "reload",
+		'chname_cmd' => "",
+		'ban_cmd' => "",
+		'kick_cmd' => "",
+);
+$this->games->add_game_type($data);
+
+$data = array(
+		'id' => "22",
+		'game_code' => "samp",
+		'name' => "Standart",
+		'config_files' => "",
+		'content_dirs' => "",
+		'log_dirs' => "",
+		'fast_rcon' => "",
+		'aliases' => "",
+		'disk_size' => "5000",
+		'local_repository' => "",
+		'remote_repository' => "",
+		'execfile_windows' => "",
+		'execfile_linux' => "",
+		'script_start' => "",
+		'script_stop' => "",
+		'script_restart' => "",
+		'script_status' => "",
+		'script_update' => "",
+		'script_get_console' => "",
+		'passwd_cmd' => "",
+		'sendmsg_cmd' => "",
+		'chmap_cmd' => "",
+		'srestart_cmd' => "",
+		'chname_cmd' => "",
+		'ban_cmd' => "",
+		'kick_cmd' => "",
+);
+$this->games->add_game_type($data);

@@ -330,7 +330,7 @@ switch($page) {
 		
 		if ($this->form_validation->run() == FALSE)
 		{
-			$this->show_message(validation_errors());
+			$this->_show_message(validation_errors());
 			return FALSE;
 		}
 		
@@ -348,7 +348,7 @@ switch($page) {
 		$db_cfg['dbprefix'] = $this->input->post('dbprefix');
 		
 		if (!$this->load->database($db_cfg, TRUE)) {
-			$this->show_message(lang('install_db_error'));
+			$this->_show_message(lang('install_db_error'));
 			return FALSE;
 		}
 
@@ -395,7 +395,7 @@ switch($page) {
 		} else {
 			//~ $content .= '<p>' . lang('install_manual_database') . ':</p>';
 			//~ $content .= '<textarea>' . $new_file_data . '</textarea>';
-			$this->show_message('File application/config/database.php create error');
+			$this->_show_message('File application/config/database.php create error');
 			return FALSE;
 		}
 		
@@ -405,7 +405,7 @@ switch($page) {
 		 * ХЗ почему, но при загрузке базы данных с ручной конфигурацией
 		 * он не хочет грузить $CI->db->dbforce();
 		*/
-		$this->load->database();
+		//~ $this->load->database();
 
 		/* Структура базы данных */
 		require_once 'install_gameap/db.php';
