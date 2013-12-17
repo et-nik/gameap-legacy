@@ -87,7 +87,7 @@ switch($page) {
 		
 	case 'start':
 		$title = lang('install_title');
-		$content .= '<p>' . lang('install_welcome') . AP_VERSION .' [' . AP_DATE . ']</p>';
+		$content .= '<p>' . lang('install_welcome') . ' ' . AP_VERSION .' [' . AP_DATE . ']</p>';
 		
 		$content .= lang('install_welcome_description');
 		
@@ -346,13 +346,14 @@ switch($page) {
 		$db_cfg['database'] = $this->input->post('database');
 		$db_cfg['dbdriver'] = $this->input->post('dbdriver');
 		$db_cfg['dbprefix'] = $this->input->post('dbprefix');
-		
-		if (!$this->load->database($db_cfg, TRUE)) {
+		$db_cfg['db_debug'] = TRUE;
+
+		if (!$this->load->database($db_cfg)) {
 			$this->_show_message(lang('install_db_error'));
 			return FALSE;
+		} else {
+			$file_strings = explode("\n", file_get_contents('install_gameap/database_install.tmp'));
 		}
-
-		$file_strings = explode("\n", file_get_contents('install_gameap/database_install.tmp'));
 
 		$i = 0;
 		$count_fstr = count($file_strings);

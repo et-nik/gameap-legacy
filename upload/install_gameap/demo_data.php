@@ -885,7 +885,7 @@ $data = array(
 		'ban_cmd' => "",
 		'kick_cmd' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "22",
@@ -915,4 +915,4 @@ $data = array(
 		'ban_cmd' => "",
 		'kick_cmd' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
