@@ -159,7 +159,7 @@ $fields = array(
 		),
 		
 		'ip' => array(
-							'type' => 'TINYTEXT',
+							'type' => 'TEXT',
 		),
 		
 		'ram' => array(
@@ -225,6 +225,10 @@ $fields = array(
 		
 		'ftp_path' => array(
 							'type' => 'TINYTEXT',
+		),
+		
+		'modules_data' => array(
+							 'type' => 'TINYTEXT',
 		),
 );
 
@@ -497,6 +501,10 @@ $fields = array(
 		
 		'description' => array(
 							'type' => 'TINYTEXT',
+		),
+		
+		'cron_script' => array(
+							 'type' => 'TINYTEXT',
 		),
 		
 		'version' => array(
@@ -777,6 +785,10 @@ $fields = array(
 		
 		'privileges' => array(
 							'type' => 'TEXT',
+		),
+		
+		'modules_data' => array(
+							'type' => 'TINYTEXT',
 		),
 );
 
