@@ -595,7 +595,7 @@ class Server_command extends CI_Controller {
 	
 	/**
 	 * 
-	 * Запуск сервера
+	 * Просмотр консоли
 	 * 
 	*/
 	public function console_view($id)

@@ -89,53 +89,46 @@ class Index extends CI_Controller {
 					$template = (!isset($this->config->config['template'])) ? 'default' : $this->config->config['template'];
 					$style = (!isset($this->config->config['style'])) ? 'default' : $this->config->config['style'];
 					
-					/* Работает ли сервер */
-					if($this->servers->server_status($this->server_data['server_ip'], $this->server_data['query_port'], $this->games->games_list[$game_arr_id]['engine'], $this->games->games_list[$game_arr_id]['engine_version'])) {
-						$server_status['string'] = '<img src="' . base_url() . '/themes/system/images/bullet_green.png" alt="' . lang('enabled') . '"/>';
-						$this->server_data['server_status'] = 1;
-					} else {
-						$server_status['string'] = '<img src="' . base_url() . '/themes/system/images/bullet_red.png" alt="' . lang('disabled') . '"/>';
-						$this->server_data['server_status'] = 0;
-					}
+					/* Работает ли сервер 
+					 * Начиная с версии 0.8.6 статуст серверов подгружается через AJAX
+					*/
+					//~ if($this->servers->server_status($this->server_data['server_ip'], $this->server_data['query_port'], $this->games->games_list[$game_arr_id]['engine'], $this->games->games_list[$game_arr_id]['engine_version'])) {
+						//~ $server_status['string'] = '<img src="' . base_url() . '/themes/system/images/bullet_green.png" alt="' . lang('enabled') . '"/>';
+						//~ $this->server_data['server_status'] = 1;
+					//~ } else {
+						//~ $server_status['string'] = '<img src="' . base_url() . '/themes/system/images/bullet_red.png" alt="' . lang('disabled') . '"/>';
+						//~ $this->server_data['server_status'] = 0;
+					//~ }
 						
 					/* Проверка привилегий на сервер */
 					$this->users->get_server_privileges($this->server_data['id']);
-						
-					/* 
-					 * Кнопка запуск сервера 
+					
+					/* Строка с привилегиями на сервер для вставки в содержимое javascript 
+					 * Т.к. статус сервера подгружается при помощи AJAX, кнопки также подгружаются 
+					 * при помощи AJAX в зависимости от статуса, но на некоторые действия
+					 * у пользователя может не быть прав (например, перезапуск).
+					 * Следующие данные вставляют данные в массив privileges для javascript, чтобы можно было отображать
+					 * только доступные пользователю кнопки.
 					 * 
-					 * Кнопка будет показана в случаях
-					 * 	Если сервер остановлен и
-					 *  Если пользователь имеет право на запуск серверов и
-					 * 	Если у пользователя есть серверная привилегия на запуск
+					 * privileges['start_3'], где start - привилегия, 3 - id сервера
 					 * 
-					 * аналогично для случаев остановки и перезапуска серверов
+					 * В шаблон следует вставлять тег {server_js_privileges}, он должен располагаться между {servers_list} и {/servers_list}
+					 * 
+					 * В исходном коде страницы будет примерно следующее:
+					 * privileges['start_2'] = 1;privileges['stop_2'] = 0;privileges['restart_2'] = 1;
+					 * 
+					 * После этого в javascript можно сделать проверки, например
+					 * 
+					   if (privileges['stop_' + server_id] == 1) {
+							$("#stop_privilege").append("Остановка сервера разрешена");
+						}
+					 * 
 					*/
+					$js_privileges	= '';
+					$js_privileges 	.= 'privileges[\'start_' . $this->server_data['id'] . '\'] = ' . (int)(bool)($this->users->auth_privileges['srv_start'] && $this->users->auth_servers_privileges['SERVER_START']) . ';';
+					$js_privileges 	.= 'privileges[\'stop_' . $this->server_data['id'] . '\'] = ' . (int)(bool)($this->users->auth_privileges['srv_stop'] && $this->users->auth_servers_privileges['SERVER_STOP']) . ';';
+					$js_privileges 	.= 'privileges[\'restart_' . $this->server_data['id'] . '\'] = ' . (int)(bool)($this->users->auth_privileges['srv_restart'] && $this->users->auth_servers_privileges['SERVER_RESTART']) . ';';
 
-					if($this->server_data['server_status'] == 0				// Сервер остановлен
-						&& $this->users->auth_privileges['srv_start']		// Право на запуск серверов
-						&& $this->users->auth_servers_privileges['SERVER_START']	// Право на запуск этого сервера
-					) {
-						$server_commands .= '<a class="small green awesome" href=' . site_url('server_command/start/'. $this->server_data['id'])  . '>' . lang('start') . '</a>&nbsp;';
-					}
-						
-					/* Кнопка остановка сервера */
-					if($this->server_data['server_status'] == 1				// Сервер запущен
-						&& $this->users->auth_privileges['srv_stop']		// Право на остановку серверов
-						&& $this->users->auth_servers_privileges['SERVER_STOP']	// Право на остановку этого сервера
-					) {
-						$server_commands .= '<a class="small red awesome" href=' . site_url('server_command/stop/' . $this->server_data['id']) . '>' . lang('stop') . '</a>&nbsp;';
-					}
-					
-					/* Кнопка перезапуска сервера */
-					if($this->users->auth_privileges['srv_restart']				// Право на перезапуск серверов
-						&& $this->users->auth_servers_privileges['SERVER_RESTART']	// Право на перезапуск этого сервера
-					) {
-						$server_commands .= '<a class="small yellow awesome" href=' . site_url('server_command/restart/' . $this->server_data['id']) . '>' . lang('restart') . '</a>&nbsp;';
-					}
-					
-					$server_commands .= '<a class="small awesome" href=' . site_url('admin/server_control/main/' . $this->server_data['id']) . '>' . lang('other_commands') . ' &raquo;</a>&nbsp;';
-						
 					$this->server_data['expires'] = (int)$this->server_data['expires'];
 
 					$gs_data = $data_slist['servers_list'][] = array('server_id' => $this->server_data['id'],
@@ -143,7 +136,7 @@ class Index extends CI_Controller {
 																'server_game' => $this->server_data['game'],
 																'server_ip' => $this->server_data['server_ip'] . ':' . $this->server_data['server_port'],
 																'server_expires' => date ('d.m.Y',$this->server_data['expires']),
-																'server_status' => $server_status['string'], 
+																'server_js_privileges'	=> $js_privileges,
 																'commands' => $server_commands);
 						
 					// Вставляем данные сервера в массив								

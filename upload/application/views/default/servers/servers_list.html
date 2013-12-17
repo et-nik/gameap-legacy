@@ -13,18 +13,46 @@
 	</thead>
 	
 	<script type="text/javascript">
-		function GetStatus(server_id) { 
+		var status = new Array();
+		var privileges = new Array(['start', 'stop', 'restart']);
+		
+		function GetStatus(server_id) {
 			jQuery.ajax({ 
 				url:     '{site_url}ajax/server_control/get_status/' + server_id,
 				type:     "GET",
 				dataType: "html",
 				success: function(response) {
-					document.getElementById("status_" + server_id).innerHTML = response; 
+					status[server_id] = Number(response);
+					
+					if (response == 1) {
+						document.getElementById("status_" + server_id).innerHTML = "<img src=\"{site_url}themes/system/images/bullet_green.png\"/>";
+						
+						if (privileges['stop_' + server_id] == 1) {
+							$("#commands_" + server_id).append("<a class=\"small red awesome\" href=\"{site_url}server_command/stop/" + server_id + "\">{lang_stop}&raquo;</a>&nbsp;");
+						}
+						
+						if (privileges['restart_' + server_id] == 1) {
+							$("#commands_" + server_id).append("<a class=\"small yellow awesome\" href=\"{site_url}server_command/restart/" + server_id + "\">{lang_restart}&raquo;</a>&nbsp;");
+						}
+					} else {
+						document.getElementById("status_" + server_id).innerHTML = "<img src=\"{site_url}themes/system/images/bullet_red.png\"/>";
+						
+						if (privileges['start_' + server_id] == 1) {
+							$("#commands_" + server_id).append("<a class=\"small green awesome\" href=\"{site_url}server_command/start/" + server_id + "\">{lang_start}&raquo;</a>&nbsp;");
+						}
+						
+						if (privileges['restart_' + server_id] == 1) {
+							$("#commands_" + server_id).append("<a class=\"small yellow awesome\" href=\"{site_url}server_command/restart/" + server_id + "\">{lang_restart}&raquo;</a>&nbsp;");
+						}
+					}
+					
+					$("#commands_" + server_id).append("<a class=\"small awesome\" href=\"{site_url}admin/server_control/main/" + server_id + "\">{lang_other_commands}&raquo;</a>&nbsp;");
+					
 				}, 
 				error: function(response) {
-					document.getElementById("status_" + server_id).innerHTML = "<img src=\"{site_url}themes/system/images/bullet_red.png\"/>"; 
+					document.getElementById("status_" + server_id).innerHTML = "<img src=\"{site_url}themes/system/images/bullet_red.png\"/>";
 				} 
-			}); 
+			});
 		}
 	</script>
 	
@@ -40,10 +68,11 @@
 			<td>{server_ip}</td>
 			<?php if(in_array('commercial', $this->gameap_modules->modules_list)): ?><td>{server_expires}</td><?php endif; ?>
 			<td><div id="status_{server_id}"><img src="{site_url}themes/system/images/bullet_grey.png"/></div></td>
-			<td>{commands}</td>
+			<td><div id="commands_{server_id}"></div></td>
 		</tr>
 		
 		<script type="text/javascript">
+			{server_js_privileges}
 			GetStatus({server_id});
 		</script>
 	{/servers_list}
