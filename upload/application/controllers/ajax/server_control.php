@@ -81,13 +81,9 @@ class Server_control extends CI_Controller {
 											$this->servers->server_data['query_port'], 
 											$this->servers->server_data['engine'], 
 											$this->servers->server_data['engine_version'])) {
-			//~ $status_image = '<img src="' . base_url() . '/themes/system/images/bullet_green.png" alt="' . lang('enabled') . '"/>';
-			//~ $this->output->append_output($status_image);
 			$this->output->append_output(1);
 											
 		} else {
-			//~ $status_image = '<img src="' . base_url() . '/themes/system/images/bullet_red.png" alt="' . lang('enabled') . '"/>';
-			//~ $this->output->append_output($status_image);
 			$this->output->append_output(0);
 		}
 		
