@@ -1,27 +1,16 @@
 <?php
-/**
- * Game AdminPanel (АдминПанель)
- *
- * 
- *
- * @package		Game AdminPanel
- * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
- * @license		http://www.gameap.ru/license.html
- * @link		http://www.gameap.ru
- * @filesource	
- */
- 
- /**
- * Исходный файл исполняемого файла Windows
- * Компилируется при помощи bam compile (http://www.bambalam.se/bamcompile/)
- *
- * @package		Game AdminPanel
- * @category	Executable file source
- * @author		Nikita Kuznetsov (ET-NiK)
- * @sinse		0.4
- */
- 
+
+/*==================================================================*
+|					Game AdminPanel by ET-NiK						|
+|-------------------------------------------------------------------|
+|	Site: http://gameap.ru											|
+|   Site: http://hldm.org											|
+|	E-Mail: nikita@hldm.org											|
+|-------------------------------------------------------------------|
+| Исполняемый файл АдминПанели для Windows				 			|
+| 																	|
+*==================================================================*/
+
 // ./server.exe start {dir} {name} {ip} {port} "hlds.exe -game {game} +ip {ip} +port {port} +map crossfire"
 	
 $command 		= $_SERVER['argv'][1];			// Команда
@@ -40,7 +29,7 @@ if(!$command){
 	echo "Site: http://hldm.org \n";
 	echo "----------------------------- \n\n";
 	echo "Options: \n";
-	echo "server.exe <start|stop|restart|status> <dir> <name> <ip> <port> <name> <server_start_commands>\n\n";
+	echo "server.exe <start|stop|restart|status|get_console> <dir> <ip> <port> <name> <server_start_commands>\n\n";
 	echo "Example: \n";
 	echo "server.exe start dir hlds 127.0.0.1 27015 \"hlds.exe -game valve +map crossfire +sv_lan 0 +maxplayers 16\"\n";
 		
@@ -71,7 +60,7 @@ if(isset($start_command)) {
 if(file_exists('psexec.exe')) {
 	$psexec = 'psexec.exe -s -i -w "' . $dir . '" -d ';
 } elseif(file_exists('paexec.exe')) {
-	$psexec = 'paexec.exe \\\\localhost -s -d -w "' . $dir . '" -d ';
+	$psexec = 'paexec.exe \\localhost -s -d -w "' . $dir . '" -d ';
 } else {
 	echo "psexec.exe and paexec.exe not found\n";
 	$psexec = 'start /D "' . $dir . '" /I ';
@@ -86,7 +75,7 @@ function server_status()
 		
 	//chdir($dir);
 		
-	system("netstat -ano -p udp | findstr " . $port .">" . $dir . '\\pid.txt');
+	system("netstat -ano | findstr " . $port .">" . $dir . '\\pid.txt');
 	$file = file($dir . '\\pid.txt');
 
 	//UDP    0.0.0.0:27015          *:*                                    1508
@@ -147,6 +136,7 @@ switch($command) {
 		}
 
 		break;
+		
 	case 'stop':
 		
 		if(server_stop()){
@@ -156,6 +146,7 @@ switch($command) {
 			}
 				
 		break;
+		
 	case 'restart':
 		
 		if(server_status()){
@@ -170,6 +161,7 @@ switch($command) {
 		}
 			
 		break;
+		
 	case 'status':
 		$pid = server_status();
 		
@@ -180,6 +172,39 @@ switch($command) {
 		}
 			
 		break;
+		
+	case 'get_console':
+		if (!file_exists($dir . '\\' . 'qconsole.log')) {
+			echo 'File qconsole.log not found. Add -condebug in server start parameters';
+			exit;
+		}
+		
+		$console_content = file_get_contents($dir . '\\' . 'qconsole.log');
+		$console_content = explode("\n", $console_content);
+		
+		/* Файл может быть большим, поэтому оставляем только последние 100 строк */
+		
+		$i = 0; // Номер строки (первая строка соответствует 0)
+		foreach ($console_content as $string) {
+			if ($string == '') {
+				$i ++;
+				continue;
+			}
+			
+			if ((count($console_content) - $i) > 100) {
+				$i ++;
+				continue;
+			}
+			
+			$final_console_content[] = $string;
+			
+			$i ++;
+		}
+		
+		echo implode("\n", $final_console_content);
+		
+		break;
+		
 	default:
 		"unknown command!" . "\n";
 		break;
