@@ -116,7 +116,7 @@ case "$1" in
 		USER=$4
 	fi
 	
-	su $USER -c "screen -S $NAME -X -p 0 hardcopy $DIR/console.txt && chmod 666 $DIR/console.txt"
+	su $USER -c "screen -S $NAME -X -p 0 hardcopy -h $DIR/console.txt && chmod 666 $DIR/console.txt"
 	RESULT=`cat $DIR/console.txt`
 	echo -e "$RESULT"
 	;;
