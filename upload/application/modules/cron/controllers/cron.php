@@ -69,6 +69,88 @@ class Cron extends MX_Controller {
     // ----------------------------------------------------------------
     
     /**
+     * Получение консоли сервера
+    */
+    private function _get_console($server_id)
+    {
+		/* Для windows консоль недоступна */
+		if(strtolower($this->servers_data[$server_id]['os']) == 'windows') {
+			/* Еще одна причина не использовать Windows */
+			return;
+		}
+		
+		/*
+		 * Список расширений php
+		 */
+		$ext_list = get_loaded_extensions();
+		
+		/* 
+		 * Заданы ли данные SSH у DS сервера 
+		 * 
+		 * Если сервер является удаленным, используется telnet
+		 * и заданы хост, логин и пароль то все впорядке,
+		 * иначе отправляем пользователю сообщение
+		 * 
+		*/
+		if($this->servers_data[$server_id]['ds_id'] 
+		&& $this->servers_data[$server_id]['control_protocol'] == 'ssh'
+		&& (!$this->servers_data[$server_id]['ssh_host']
+			OR !$this->servers_data[$server_id]['ssh_login']
+			OR !$this->servers_data[$server_id]['ssh_password']
+			)
+		){
+			return;	
+		}
+		
+		/*
+		 * Есть ли модуль SSH
+		 */
+		if($this->servers_data[$server_id]['ds_id'] 
+		&& $this->servers_data[$server_id]['control_protocol'] == 'ssh'
+		&& (!in_array('ssh2', $ext_list))
+		){
+			return;	
+		}
+		
+		
+		/* 
+		 * Заданы ли данные TELNET у DS сервера 
+		 * 
+		 * Если сервер является удаленным, используется telnet
+		 * и заданы хост, логин и пароль то все впорядке,
+		 * иначе отправляем пользователю сообщение
+		 * 
+		*/
+		
+		if($this->servers_data[$server_id]['ds_id'] 
+		&& $this->servers_data[$server_id]['control_protocol'] == 'telnet'
+		&& (!$this->servers_data[$server_id]['telnet_host']
+			OR !$this->servers_data[$server_id]['telnet_login']
+			OR !$this->servers_data[$server_id]['telnet_password']
+			)
+		){
+			return;	
+		}
+		
+		if(!$this->servers_data[$server_id]['script_get_console']) {
+			return;
+		}
+		
+		/* Директория в которой располагается сервер */
+		$dir = $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'];
+
+		$command = $this->servers->command_generate($this->servers_data[$server_id], 'get_console');
+		
+		if($response = $this->servers->command($command, $this->servers->server_data)) {
+			return $response;
+		}
+		
+		return;
+	}
+    
+    // ----------------------------------------------------------------
+    
+    /**
      * Получает информацию о сервере информации о котором 
      * еще нет в массиве $this->server_data
     */
@@ -1086,6 +1168,9 @@ class Cron extends MX_Controller {
 					$response = false;
 
 					if(count($logs) >= 1) {
+						/* Перед запуском получаем консоль, чтобы знать от чего сервер упал */
+						$this->_get_console($server_id);
+						
 						/* При последней проверке сервер был оффлайн, запускаем его*/
 						$response = $this->servers->start($this->servers_data[$server_id]);
 
@@ -1104,7 +1189,6 @@ class Cron extends MX_Controller {
 						}
 					}
 
-
 					if($response) {
 						// Записываем лог запуска
 						$log_data['type'] = 'server_command';
@@ -1113,15 +1197,12 @@ class Cron extends MX_Controller {
 						$this->panel_log->save_log($log_data);
 					}
 
-
 					// Записываем лог проверки
 					$log_data['type'] = 'cron_check';
 					$log_data['command'] = 'server_status';
 					$log_data['server_id'] = $server_id;
 					$log_data['log_data'] = 'Server is down';
 					$this->panel_log->save_log($log_data);
-
-
 				}
 			}
 
@@ -1159,7 +1240,7 @@ class Cron extends MX_Controller {
 						$new_rcon = generate_code(8);
 
 						$this->servers->server_data = $this->servers_data[$server_id];
-						$this->servers->change_rcon($new_rcon);
+						$this->servers->change_rcon($new_rcon, $this->servers_data[$server_id]);
 
 						// Меняем пароль в базе
 						$sql_data['rcon'] = $new_rcon;
