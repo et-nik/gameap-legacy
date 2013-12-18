@@ -65,12 +65,13 @@ case "$1" in
     else
 		su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
 		sleep 4
-
+		
 		if [[ `su $USER -c "screen -ls |grep $NAME"` ]]
 			then
 			echo "Server started"
 		else
-		   echo -e "Server not started \rStart command:" su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
+		   echo -e "Server not started \nStart command:"
+		   echo su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
 		fi
     fi
     ;;
@@ -107,8 +108,17 @@ case "$1" in
     fi
     ;;
  get_console)
-	su $4 -c "screen -S $NAME -X -p 0 hardcopy $DIR/console.txt && chmod 666 $DIR/console.txt"
-	echo "File $DIR/console.txt created"
+	
+	if [[ $4 == '' ]]
+	then
+		USER=$(whoami)
+	else
+		USER=$4
+	fi
+	
+	su $USER -c "screen -S $NAME -X -p 0 hardcopy $DIR/console.txt && chmod 666 $DIR/console.txt"
+	RESULT=`cat $DIR/console.txt`
+	echo -e "$RESULT"
 	;;
  *)
     echo "Usage all parameters"

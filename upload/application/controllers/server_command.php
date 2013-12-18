@@ -696,37 +696,12 @@ class Server_command extends CI_Controller {
 			$command = $this->servers->command_generate($this->servers->server_data, 'get_console');
 			
 			if($response = $this->servers->command($command, $this->servers->server_data)) {
+
+				$console_contents = str_replace("\n", "<br>", $response);
+				$console_contents = '<p>' . lang('server_command_console') . ':</p><p align="left"><code>' . $console_contents . '</code></p>';
 				
-				//$this->tpl_data['content'] = $response;
-				
-				if(!$this->servers->server_data['ds_id']) {
-					$file_contents = $this->servers->read_local_file($dir . '/' . 'console.txt');
-				} else {
-					$file_contents = $this->servers->read_remote_file($this->servers->server_data['ftp_path'] . '/' . $this->servers->server_data['dir'] . '/' . 'console.txt');
-				}
-				
-				if(!$file_contents) {
-					if($this->users->auth_data['is_admin']) {
-						// Отображаем админу его информацию
-						$message = lang('server_command_no_data');
-						$adm_message = '<p align="center">' . lang('server_command_cmd') . ': <code>' . $this->servers->get_sended_commands(true) . '</code></p>';
-						$adm_message .= '<p align="center">' . lang('server_command_file') . ': <strong>"' . $dir . '/console.txt"</strong></p>';
-					} else {
-						$message = lang('server_command_no_data');
-						$adm_message = '';
-					}
-					
-					$this->_show_message($message . $adm_message);
-					
-					return false;
-				} else {
-					$file_contents = str_replace("\n", "<br>", $file_contents);
-					$file_contents = '<p>' . lang('server_command_console') . ':</p><p align="left"><code>' . $file_contents . '</code></p>';
-					
-					$this->_show_message($file_contents, site_url('admin/server_control/main/' . $id));
-					return true;
-					//$this->tpl_data['content'] = '<code>' . $file_contents. '</code>';
-				}
+				$this->_show_message($console_contents, site_url('admin/server_control/main/' . $id));
+				return true;
 				
 			} else {
 				$message = lang('server_command_no_data');

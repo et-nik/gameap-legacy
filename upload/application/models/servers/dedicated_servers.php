@@ -486,7 +486,10 @@ class Dedicated_servers extends CI_Model {
 					if($result) { $result .= "\n---\n"; }
 					$cmd_arr = $this->_add_sudo($cmd_arr, $server_data['os']);
 					
-					$result .= exec($cd . ' && ' . $cmd_arr);
+					$result .= system($cd . ' && ' . $cmd_arr);
+					//~ $result .= implode("\n", $result_array);
+					
+					//~ print_r($result_array);
 					
 					$this->_commands[] = $cd . ' && ' . $cmd_arr;
 				}
@@ -507,8 +510,9 @@ class Dedicated_servers extends CI_Model {
 				}
 
 				$command = $this->_add_sudo($command, $server_data['os']);
-				$result = exec($cd . ' && ' . $command);
-				
+				exec($cd . ' && ' . $command, $output);
+				$result = implode("\n", $output);
+
 				$this->_commands[] = $cd . ' && ' . $command;
 			}
 		} else {
