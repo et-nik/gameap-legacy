@@ -91,7 +91,7 @@ class Sftp {
 		}
 		
 		// Open up SSH connection to server with supplied credetials.
-		$this->conn = @ssh2_connect($this->hostname, $this->port);
+		$this->conn = ssh2_connect($this->hostname, $this->port);
 		
 		// Try and login...
 		if ( ! $this->_login())
@@ -138,7 +138,7 @@ class Sftp {
                 return false;
             }
         } else {
-            return @ssh2_auth_password($this->conn, $this->username, $this->password);
+            return ssh2_auth_password($this->conn, $this->username, $this->password);
         }
 	}
 
@@ -175,12 +175,17 @@ class Sftp {
 	function _scan_directory($dir, $recursive = FALSE)
 	{		
 		$tempArray = array();
+
 		$handle = opendir($dir);
+
+		if (!$handle) {
+			return false;
+		}
 		
 		// List all the files
-		while (false !== ($file = readdir($handle))) {
-			if (substr("$file", 0, 1) != "."){
-				if(is_dir($file) && $recursive){
+		while (false != ($file = readdir($handle))) {
+			if (substr("$file", 0, 1) != ".") {
+				if (is_dir($file) && $recursive) {
 					// If its a directory, interate again
 					$tempArray[$file] = $this->_scan_directory("$dir/$file");
 				} else {
@@ -188,7 +193,7 @@ class Sftp {
 				}
 			}
 		}
-		
+
 		closedir($handle);
 		return $tempArray;
 	}
@@ -431,7 +436,7 @@ class Sftp {
 		$dir = "ssh2.sftp://$sftp$path";
 		
 		$directory = $this->_scan_directory($dir, $recursive);
-		
+
 		sort($directory);
 		
 		return $directory;

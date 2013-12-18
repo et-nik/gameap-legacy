@@ -1155,7 +1155,9 @@ class Servers extends CI_Model {
 			$file = $server_data['script_path'] . '/' . $server_data['dir'] . '/' . $file;
 			$file_contents = $this->servers->read_local_file($file);
 		} else {
-			$file = $server_data['ftp_path'] . '/' . $server_data['dir'] . '/' . $file;
+			$base_path = ($server_data['ftp_host']) ? $server_data['ftp_path'] : $server_data['ssh_path'];
+			
+			$file = $base_path . '/' . $server_data['dir'] . '/' . $file;
 			$file_contents = $this->servers->read_remote_file($file, $server_data);
 		}
 		
@@ -1179,7 +1181,9 @@ class Servers extends CI_Model {
 			$file = $server_data['script_path'] . '/' . $server_data['dir'] . '/' . $file;
 			return $this->servers->write_local_file($file, $file_contents);
 		} else {
-			$file = $server_data['ftp_path'] . '/' . $server_data['dir'] . '/' . $file;
+			$base_path = ($server_data['ftp_host']) ? $server_data['ftp_path'] : $server_data['ssh_path'];
+
+			$file = $base_path . '/' . $server_data['dir'] . '/' . $file;
 			return $this->servers->write_remote_file($file, $file_contents, $server_data);
 		}
 	}
@@ -1211,7 +1215,10 @@ class Servers extends CI_Model {
 				return false;
 			}
 			
-			$sftp_config['hostname'] = $server_data['ssh_host'];
+			$explode = explode(':', $server_data['ssh_host']);
+			$sftp_config['hostname'] = $explode[0];
+			$sftp_config['port'] = (isset($explode[1])) ? $explode[1] : '22';
+			
 			$sftp_config['username'] = $server_data['ssh_login'];
 			$sftp_config['password'] = $server_data['ssh_password'];
 			$sftp_config['debug'] = false;
@@ -1221,20 +1228,26 @@ class Servers extends CI_Model {
 				return false;
 			}
 			
+			/* На некоторых серверах листинг может не работать */
 			/* Находим в списке файл, если его нет, то возвращаем ошибку */
-			$list = $this->sftp->list_files(dirname($file), true);
-			
-			if (!in_array(basename($file), $list)) {
-				$this->errors = 'File not found';
-				return false;
-			}
+			//~ $list = $this->sftp->list_files(dirname($file), true);
+			//~ 
+			//~ if (!in_array(basename($file), $list)) {
+				//~ $this->errors = 'File not found';
+				//~ return false;
+			//~ }
 			
 			// Определяем временный файл
 			$temp_file = tempnam(sys_get_temp_dir(), basename($file));
 			
 			$handle = fopen($temp_file, 'r+');
 			
-			$this->sftp->download($file, $temp_file);
+			if (false == $this->sftp->download($file, $temp_file)) {
+				$this->errors = 'File not found';
+				return false;
+			}
+			
+			
 			$file_contents = file_get_contents($temp_file);
 			
 			return $file_contents;
@@ -1338,10 +1351,13 @@ class Servers extends CI_Model {
 				return false;
 			}
 			
-			$sftp_config['hostname'] = $server_data['ssh_host'];
+			$explode = explode(':', $server_data['ssh_host']);
+			$sftp_config['hostname'] = $explode[0];
+			$sftp_config['port'] = (isset($explode[1])) ? $explode[1] : '22';
+			
 			$sftp_config['username'] = $server_data['ssh_login'];
 			$sftp_config['password'] = $server_data['ssh_password'];
-			$sftp_config['debug'] = false;
+			$sftp_config['debug'] = true;
 			
 			if (false == $this->sftp->connect($sftp_config)) {
 				$this->errors = 'Ошибка соединения с sftp сервером';

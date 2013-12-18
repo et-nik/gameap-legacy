@@ -307,7 +307,7 @@ class Servers_files extends CI_Controller {
 			 * сохраняем содержимое конфига на сервере
 			*/
 			
-			$cfg_data = $this->input->post('file_contents', true);
+			$cfg_data = $this->input->post('file_contents');
 			$write_result = $this->servers->write_file($file, $cfg_data);
 			
 			if(!$write_result) {
