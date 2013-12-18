@@ -385,7 +385,7 @@ class Server_command extends CI_Controller {
 							case 'rcon_command';
 								$rcon_command = translit($this->input->post('rcon_command', true));
 									
-								if(!$this->check_rcon_command($rcon_command)) {
+								if(!$this->_check_rcon_command($rcon_command)) {
 									$this->_show_message(lang('server_command_rcon_command_access_denied'), site_url('admin/server_control/main/' . $server_id));
 									return false;
 								}
@@ -560,7 +560,7 @@ class Server_command extends CI_Controller {
 	 * дополнительных действий, либо быть запрещены
 	 * 
 	*/
-	private function check_rcon_command($rcon_command) 
+	private function _check_rcon_command($rcon_command) 
 	{
 		/* Получаем ркон команду */
 		$rcon_command = explode(' ', $rcon_command);
@@ -607,6 +607,8 @@ class Server_command extends CI_Controller {
 		/* Получены ли необходимые данные о сервере */
 		if($this->servers->get_server_data($id)) {
 			
+			$local_tpl_data['server_id'] = $id;
+			
 			if(strtolower($this->servers->server_data['os']) == 'windows') {
 				/* Еще одна причина не использовать Windows */
 				$this->_show_message(lang('server_command_not_available_for_windows'), site_url('admin/server_control/main/' . $id), lang('next'));
@@ -620,12 +622,6 @@ class Server_command extends CI_Controller {
 				$this->_show_message(lang('server_command_no_console_privileges'), site_url('admin/server_control/main/' . $id));
 				return false;
 			}
-			
-			/* Код закомментирован. Сервер может зависнуть, он будет недоступен, но данные консоли можно получить */
-			//~ if(!$this->servers->server_status()) {
-				//~ $this->_show_message(lang('server_command_server_down'), site_url('admin/server_control/main/' . $id));
-				//~ return false;
-			//~ }
 			
 			/*
 			 * Список расширений php
@@ -697,12 +693,13 @@ class Server_command extends CI_Controller {
 			
 			if($response = $this->servers->command($command, $this->servers->server_data)) {
 
-				$console_contents = str_replace("\n", "<br>", $response);
-				$console_contents = '<p>' . lang('server_command_console') . ':</p><p align="left"><code>' . $console_contents . '</code></p>';
+				$local_tpl_data['console_content_original'] = $response;
 				
-				$this->_show_message($console_contents, site_url('admin/server_control/main/' . $id));
-				return true;
+				$console_content = str_replace("\n", "<br>", $response);
+				$local_tpl_data['console_content'] = $console_content;
 				
+				$this->tpl_data['content'] = $this->parser->parse('servers/console_view.html', $local_tpl_data, true);
+
 			} else {
 				$message = lang('server_command_no_data');
 				
@@ -808,8 +805,6 @@ class Server_command extends CI_Controller {
 							$log_data['msg'] = 'Command sended';
 						}
 						
-						//$this->tpl_data['content'] .= '<p></p><a href="/admin/server_control/main/' . $this->uri->rsegment(3) . '">Назад, к управлению сервером</a></p>';
-					
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
 						$log_data['command'] = 'start';

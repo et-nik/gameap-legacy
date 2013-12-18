@@ -66,8 +66,7 @@ class Adm_servers extends CI_Controller {
 		$this->form_validation->set_rules('code', 'код игры', 'trim|xss_clean');
 
 		if($this->form_validation->run() == false){
-			header("HTTP/1.0 404 Not Found");
-			return false;
+			show_404();
 		}
 		
 		$default = false;
@@ -104,8 +103,7 @@ class Adm_servers extends CI_Controller {
 		$this->form_validation->set_rules('ds_id', 'id физ сервера', 'trim|integer|xss_clean');
 		
 		if($this->form_validation->run() == false){
-			header("HTTP/1.0 404 Not Found");
-			return false;
+			show_404();
 		}
 		
 		$ds_id = (int)$this->input->post('ds_id');

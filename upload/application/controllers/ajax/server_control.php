@@ -55,6 +55,44 @@ class Server_control extends CI_Controller {
 		}
     }
     
+    /**
+	 * 
+	 * Проверка rcon команд, некоторые команды могут требовать
+	 * дополнительных действий, либо быть запрещены
+	 * 
+	*/
+	private function _check_rcon_command($rcon_command) 
+	{
+		/* Получаем ркон команду */
+		$rcon_command = explode(' ', $rcon_command);
+		$rcon_command['0'] = strtolower($rcon_command['0']);
+
+		/* Пользователь, у которого нет прав на смену ркон пароля не имеет права отправлять rcon_password */
+		if(!$this->users->auth_servers_privileges['CHANGE_RCON'] && in_array('rcon_password', $rcon_command)) {
+			return false;
+		}
+		
+		/* Пользователь, у которого нет прав на выставление пароля на сервер */
+		if(!$this->users->auth_servers_privileges['SERVER_SET_PASSWORD'] && in_array('sv_password', $rcon_command)) {
+			return false;
+		}
+		
+		switch ($rcon_command['0']) {
+			case 'rcon_password':
+				// Смена rcon пароля, правка конфиг файлов и тп.
+				if(isset($this->servers->server_data['id']) && isset($rcon_command['1'])) {
+					$this->servers->change_rcon($rcon_command['1']);
+					$sql_data['rcon'] = $rcon_command['1'];
+					$this->servers->edit_game_server($this->servers->server_data['id'], $sql_data);
+				}
+				
+				break;
+		}
+	
+		
+		return true;
+	}
+    
     // ----------------------------------------------------------------
     
     /**
@@ -88,6 +126,160 @@ class Server_control extends CI_Controller {
 		}
 		
 	}
+	
+	// ----------------------------------------------------------------
+    
+    /**
+     * Получение содержимого консоли
+    */
+    public function get_console($server_id = false)
+    {
+		if (!$server_id) {
+			show_404();
+		}
+		
+		if (false == $this->servers->get_server_data($server_id)) {
+			show_404();
+		}
+		
+		// Получение прав на сервер
+		$this->users->get_server_privileges($this->servers->server_data['id']);
+		
+		if (!$this->users->auth_data['is_admin'] && !$this->users->auth_servers_privileges['CONSOLE_VIEW']) {
+			show_404();
+		}
+		
+		/*
+		 * Список расширений php
+		 */
+		$ext_list = get_loaded_extensions();
+		
+		/* 
+		 * Заданы ли данные SSH у DS сервера 
+		 * 
+		 * Если сервер является удаленным, используется telnet
+		 * и заданы хост, логин и пароль то все впорядке,
+		 * иначе отправляем пользователю сообщение
+		 * 
+		*/
+		if($this->servers->server_data['ds_id'] 
+		&& $this->servers->server_data['control_protocol'] == 'ssh'
+		&& (!$this->servers->server_data['ssh_host']
+			OR !$this->servers->server_data['ssh_login']
+			OR !$this->servers->server_data['ssh_password']
+			)
+		){
+			show_404();
+		}
+		
+		/*
+		 * Есть ли модуль SSH
+		 */
+		if($this->servers->server_data['ds_id'] 
+		&& $this->servers->server_data['control_protocol'] == 'ssh'
+		&& (!in_array('ssh2', $ext_list))
+		){
+			show_404();
+		}
+		
+		
+		/* 
+		 * Заданы ли данные TELNET у DS сервера 
+		 * 
+		 * Если сервер является удаленным, используется telnet
+		 * и заданы хост, логин и пароль то все впорядке,
+		 * иначе отправляем пользователю сообщение
+		 * 
+		*/
+		
+		if($this->servers->server_data['ds_id'] 
+		&& $this->servers->server_data['control_protocol'] == 'telnet'
+		&& (!$this->servers->server_data['telnet_host']
+			OR !$this->servers->server_data['telnet_login']
+			OR !$this->servers->server_data['telnet_password']
+			)
+		){
+			show_404();
+		}
+		
+		/* Команда получения консоли не задана */
+		if(!$this->servers->server_data['script_get_console']) {
+			show_404();
+		}
+		
+		/* Директория в которой располагается сервер */
+		$dir = $this->servers->server_data['script_path'] . '/' . $this->servers->server_data['dir'];
+		
+		$command = $this->servers->command_generate($this->servers->server_data, 'get_console');
+		
+		if($response = $this->servers->command($command, $this->servers->server_data)) {
+			$console_content = str_replace("\n", "<br>", $response);
+			$this->output->append_output($console_content);
+		} else {
+			show_404();
+		}
+
+	}
+	
+	// ----------------------------------------------------------------
+    
+    /**
+     * Отправка ркон команды на сервер
+    */
+    public function send_command($server_id = false)
+    {
+		if (!$server_id) {
+			show_404();
+		}
+		
+		if (false == $this->servers->get_server_data($server_id)) {
+			show_404();
+		}
+		
+		// Получение прав на сервер
+		$this->users->get_server_privileges($this->servers->server_data['id']);
+		
+		if (!$this->users->auth_data['is_admin'] && !$this->users->auth_servers_privileges['RCON_SEND']) {
+			show_404();
+		}
+
+		$this->form_validation->set_rules('command', 'rcon command', 'trim|required|max_length[64]|min_length[1]|xss_clean');
+		
+		if($this->form_validation->run() == false){
+			show_404();
+		}
+		
+		$rcon_command = $this->input->post('command');
+		
+		if(!$this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['query_port'])) {
+			$this->output->append_output('Server is down');
+			return false;
+		}
+		
+		if(!$this->_check_rcon_command($rcon_command)) {
+			show_404();
+		}
+		
+		$this->load->driver('rcon');
+						
+		$this->rcon->set_variables(
+						$this->servers->server_data['server_ip'],
+						$this->servers->server_data['rcon_port'],
+						$this->servers->server_data['rcon'], 
+						$this->servers->servers->server_data['engine'],
+						$this->servers->servers->server_data['engine_version']
+		);
+		
+		if($this->rcon->connect()) {
+			$this->rcon->command($rcon_command);
+		} else {
+			$this->output->append_output('Rcon connect error');
+		}
+	}
+	
+	
+	
+	
 	
 }
 
