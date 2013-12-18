@@ -73,12 +73,6 @@ class Cron extends MX_Controller {
     */
     private function _get_console($server_id)
     {
-		/* Для windows консоль недоступна */
-		if(strtolower($this->servers_data[$server_id]['os']) == 'windows') {
-			/* Еще одна причина не использовать Windows */
-			return;
-		}
-		
 		/*
 		 * Список расширений php
 		 */

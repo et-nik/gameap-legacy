@@ -36,7 +36,6 @@
 						} else if (response == 'Rcon connect error') {
 							noty({layout: 'bottomCenter', type: 'error', text: 'Rcon connect error'});
 						} else {
-							document.getElementById("console_content").innerHTML = response;
 							update_console();
 							$('#command_input').val('');
 						}

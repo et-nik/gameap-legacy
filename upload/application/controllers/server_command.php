@@ -609,11 +609,11 @@ class Server_command extends CI_Controller {
 			
 			$local_tpl_data['server_id'] = $id;
 			
-			if(strtolower($this->servers->server_data['os']) == 'windows') {
-				/* Еще одна причина не использовать Windows */
-				$this->_show_message(lang('server_command_not_available_for_windows'), site_url('admin/server_control/main/' . $id), lang('next'));
-				return false;
-			}
+			//~ if(strtolower($this->servers->server_data['os']) == 'windows') {
+				//~ /* Еще одна причина не использовать Windows */
+				//~ $this->_show_message(lang('server_command_not_available_for_windows'), site_url('admin/server_control/main/' . $id), lang('next'));
+				//~ return false;
+			//~ }
 			
 			// Получение прав на сервер
 			$this->users->get_server_privileges($this->servers->server_data['id']);

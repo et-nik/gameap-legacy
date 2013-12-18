@@ -40,7 +40,7 @@ if($this->users->auth_privileges['srv_restart'] == 1
 	<a class="large awesome" href="{site_url}admin/settings/server/{server_id}">{lang_server_control_settings}</a>
 <?php endif; ?>
 
-<?php if ($this->users->auth_servers_privileges['CONSOLE_VIEW'] && $this->servers->server_data['os'] != 'Windows'): ?>
+<?php if ($this->users->auth_servers_privileges['CONSOLE_VIEW']): ?>
 	<a class="large awesome" href="{site_url}server_command/console_view/{server_id}">{lang_server_control_console_view}</a>
 <?php endif; ?>
 
