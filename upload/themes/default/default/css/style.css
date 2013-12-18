@@ -322,7 +322,7 @@ div.right {
 	padding-bottom: 2px;
 }
 
-code {
+code, .code {
     font-family: Consolas, Monaco, Courier New, Courier, monospace;
     font-size: 12px;
     background-color: #000;
