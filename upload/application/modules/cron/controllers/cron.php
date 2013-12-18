@@ -1163,7 +1163,7 @@ class Cron extends MX_Controller {
 
 					if(count($logs) >= 1) {
 						/* Перед запуском получаем консоль, чтобы знать от чего сервер упал */
-						$this->_get_console($server_id);
+						$console_data = $this->_get_console($server_id);
 						
 						/* При последней проверке сервер был оффлайн, запускаем его*/
 						$response = $this->servers->start($this->servers_data[$server_id]);
@@ -1184,6 +1184,8 @@ class Cron extends MX_Controller {
 					}
 
 					if($response) {
+						$response .= "\nConsole:\n" . $console_data;
+						
 						// Записываем лог запуска
 						$log_data['type'] = 'server_command';
 						$log_data['server_id'] = $server_id;
