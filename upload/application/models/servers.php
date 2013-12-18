@@ -424,7 +424,7 @@ class Servers extends CI_Model {
 		 * Если user_id не задан или пользователь является администратором, то получаем все серверы
 		 * Если задан, то получаем лишь серверы на которые у пользователя есть привилегия $privilege_name
 		*/
-		if (!$user_id OR $this->users->auth_data['is_admin']) {
+		if (!$user_id OR ($privilege_name == 'VIEW' && $this->users->auth_data['is_admin'])) {
 			if (!empty($games)) { $this->db->where_in('game', $games); }
 			$this->db->where($where);
 			$query = $this->db->get('servers');
