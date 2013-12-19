@@ -32,7 +32,7 @@
 						}
 						
 						if (privileges['restart_' + server_id] == 1) {
-							$("#commands_" + server_id).append("<a class=\"small yellow awesome\" href=\"{base_url}server_command/restart/" + server_id + "\">{lang_restart}</a>&nbsp;");
+							$("#commands_" + server_id).append("<a class=\"small yellow awesome\" href=\"{site_url}server_command/restart/" + server_id + "\">{lang_restart}</a>&nbsp;");
 						}
 					} else {
 						document.getElementById("status_" + server_id).innerHTML = "<img src=\"{base_url}themes/system/images/bullet_red.png\"/>";
@@ -42,7 +42,7 @@
 						}
 						
 						if (privileges['restart_' + server_id] == 1) {
-							$("#commands_" + server_id).append("<a class=\"small yellow awesome\" href=\"{base_url}server_command/restart/" + server_id + "\">{lang_restart}</a>&nbsp;");
+							$("#commands_" + server_id).append("<a class=\"small yellow awesome\" href=\"{site_url}server_command/restart/" + server_id + "\">{lang_restart}</a>&nbsp;");
 						}
 					}
 					
