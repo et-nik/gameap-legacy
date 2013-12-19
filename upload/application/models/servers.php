@@ -968,39 +968,75 @@ class Servers extends CI_Model {
     */
 	function get_remote_files($server_data, $dir, $file_time = false, $file_size = false)
 	{
-		
-		$connection = ftp_connect($server_data['ftp_host']);
-		
-		if(ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])){
+		if (!$server_data['ftp_host']) {
 			
-			$files_list = ftp_nlist($connection, $dir);
+			/* Работа с sFTP 
+			 * Требует доработки
+			*/
+			$this->load->library('sftp');
 			
-			$num = -1;
-			$maps = array();
-			
-			
-			/* Перебор файлов, и удаление расширения файла */	
-			if($files_list){
-				foreach ($files_list as $file) {
-					$num++;	
-					$files[$num]['file_name'] = $file;
-					
-					if($file_time){
-						$files[$num]['file_time'] = ftp_mdtm($connection, $file);
-					}
-					
-					if($file_size){
-						$files[$num]['file_size'] = ftp_size($connection, $file);
-					}
-				}
-			}else{
+			if (!$server_data['ssh_host']) {
+				/* SSH не настроен =( */
+				$this->errors = 'SSH не настроен';
 				return false;
 			}
 			
-			return $files;
+			$explode = explode(':', $server_data['ssh_host']);
+			$sftp_config['hostname'] = $explode[0];
+			$sftp_config['port'] = (isset($explode[1])) ? $explode[1] : '22';
+			
+			$sftp_config['username'] = $server_data['ssh_login'];
+			$sftp_config['password'] = $server_data['ssh_password'];
+			$sftp_config['debug'] = false;
+			
+			if (false == $this->sftp->connect($sftp_config)) {
+				$this->errors = 'Ошибка соединения с sftp сервером';
+				return false;
+			}
+			
+			if (!$this->sftp->file_exists(dirname($dir))) {
+				$this->errors = 'Directory ' . dirname($dir) .' not found';
+				return false;
+			}
+			
+			return $this->sftp->list_files($dir);
+			
+			
+		} else {
+			
+			$connection = ftp_connect($server_data['ftp_host']);
+			
+			if(ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])) {
+				
+				$files_list = ftp_nlist($connection, $dir);
+				
+				$num = -1;
+				$maps = array();
+				
+				
+				/* Перебор файлов, и удаление расширения файла */	
+				if($files_list){
+					foreach ($files_list as $file) {
+						$num++;	
+						$files[$num]['file_name'] = $file;
+						
+						if($file_time){
+							$files[$num]['file_time'] = ftp_mdtm($connection, $file);
+						}
+						
+						if($file_size){
+							$files[$num]['file_size'] = ftp_size($connection, $file);
+						}
+					}
+				}else{
+					return false;
+				}
+				
+				return $files;
 
-		}else{
-			return false;
+			}else{
+				return false;
+			}
 		}
 
 	}
@@ -1226,15 +1262,11 @@ class Servers extends CI_Model {
 				$this->errors = 'Ошибка соединения с sftp сервером';
 				return false;
 			}
-			
-			/* На некоторых серверах листинг может не работать */
-			/* Находим в списке файл, если его нет, то возвращаем ошибку */
-			//~ $list = $this->sftp->list_files(dirname($file), true);
-			//~ 
-			//~ if (!in_array(basename($file), $list)) {
-				//~ $this->errors = 'File not found';
-				//~ return false;
-			//~ }
+
+			if (!$this->sftp->file_exists($file)) {
+				$this->errors = 'File not found';
+				return false;
+			}
 			
 			// Определяем временный файл
 			$temp_file = tempnam(sys_get_temp_dir(), basename($file));

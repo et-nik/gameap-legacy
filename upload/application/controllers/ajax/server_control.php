@@ -213,7 +213,7 @@ class Server_control extends CI_Controller {
 		$command = $this->servers->command_generate($this->servers->server_data, 'get_console');
 		
 		if($response = $this->servers->command($command, $this->servers->server_data)) {
-			$console_content = str_replace("\n", "<br>", $response);
+			$console_content = str_replace("\n", "<br />", htmlspecialchars($response));
 			$this->output->append_output($console_content);
 		} else {
 			show_404();

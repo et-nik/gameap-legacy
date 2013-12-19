@@ -36,6 +36,7 @@ class Servers_log extends CI_Controller {
 		
 		$this->load->database();
         $this->load->model('users');
+        $this->lang->load('server_files');
         $this->lang->load('servers_log');
         
         if ($this->users->check_user()) {
@@ -119,7 +120,7 @@ class Servers_log extends CI_Controller {
 		$this->servers->get_server_data($server_id);
 		
 		/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
-		if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']){
+		if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']) {
 			$this->_show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_log'));
 			return false;
 		}

@@ -600,7 +600,6 @@ class Server_command extends CI_Controller {
 	*/
 	public function console_view($id)
     {
-		
 		$this->tpl_data['title'] 	= lang('server_command_title_console_view');
 		$this->tpl_data['heading'] 	= lang('server_command_header_console_view');
 			
@@ -695,7 +694,7 @@ class Server_command extends CI_Controller {
 
 				$local_tpl_data['console_content_original'] = $response;
 				
-				$console_content = str_replace("\n", "<br>", $response);
+				$console_content = str_replace("\n", "<br />", htmlspecialchars($response));
 				$local_tpl_data['console_content'] = $console_content;
 				
 				$this->tpl_data['content'] = $this->parser->parse('servers/console_view.html', $local_tpl_data, true);

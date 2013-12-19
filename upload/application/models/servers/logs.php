@@ -133,8 +133,6 @@ class Logs extends Servers {
 		$this->load->helper('date');
 		$this->load->helper('file');
 		
-		//print_r($dir);
-		
 		// Заменяем некоторые символы для безопасности
 		$dir = str_replace('..', '', $dir);
 		$dir = str_replace('//', '/', $dir);
@@ -155,10 +153,11 @@ class Logs extends Servers {
 			$dir = $this->servers->server_data['local_path'] . '/' . $this->servers->server_data['dir'] . '/' . $dir;
 		}else{
 			// Сервер удаленный
-			$dir = $this->servers->server_data['ftp_path'] . '/' . $this->servers->server_data['dir'] . '/' . $dir;
+			$base_path = ($this->servers->server_data['ftp_host']) ? $this->servers->server_data['ftp_path'] : $this->servers->server_data['ssh_path'];
+			$dir = $base_path . '/' . $this->servers->server_data['dir'] . '/' . $dir;
 		}
 
-		if($dir){
+		if ($dir) {
 			$num = -1;
 			$log_files = array();
 			

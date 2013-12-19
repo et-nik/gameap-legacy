@@ -197,6 +197,18 @@ class Sftp {
 		closedir($handle);
 		return $tempArray;
 	}
+	
+	// --------------------------------------------------------------------
+
+	/**
+	 * Существует ли файл
+	 */
+	function file_exists($file)
+	{
+		$sftp = $this->conn_sftp;
+		return file_exists("ssh2.sftp://$sftp$file");
+	}
+	
 	// --------------------------------------------------------------------
 
 
