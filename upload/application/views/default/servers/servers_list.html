@@ -6,7 +6,9 @@
 	<tr>
 		<th><strong>{lang_server_name}</strong></th>
 		<th><strong>{lang_server_ip}</strong></th>
-		<?php if(module_exists('commercial_module')): ?><th><strong>{lang_main_server_expires}</strong></th><?php endif; ?>
+<!--
+		<?php /* if(module_exists('commercial')): */?><th><strong>{lang_main_server_expires}</strong></th><?php /* endif; */?>
+-->
 		<th><strong>{lang_status}</strong></th>
 		<th><strong>{lang_commands}</strong></th>
 	</tr>
@@ -28,7 +30,7 @@
 						document.getElementById("status_" + server_id).innerHTML = "<img src=\"{base_url}themes/system/images/bullet_green.png\"/>";
 						
 						if (privileges['stop_' + server_id] == 1) {
-							$("#commands_" + server_id).append("<a class=\"small red awesome\" href=\"{base_url}server_command/stop/" + server_id + "\">{lang_stop}</a>&nbsp;");
+							$("#commands_" + server_id).append("<a class=\"small red awesome\" href=\"{site_url}server_command/stop/" + server_id + "\">{lang_stop}</a>&nbsp;");
 						}
 						
 						if (privileges['restart_' + server_id] == 1) {
@@ -38,7 +40,7 @@
 						document.getElementById("status_" + server_id).innerHTML = "<img src=\"{base_url}themes/system/images/bullet_red.png\"/>";
 						
 						if (privileges['start_' + server_id] == 1) {
-							$("#commands_" + server_id).append("<a class=\"small green awesome\" href=\"{base_url}server_command/start/" + server_id + "\">{lang_start}</a>&nbsp;");
+							$("#commands_" + server_id).append("<a class=\"small green awesome\" href=\"{site_url}server_command/start/" + server_id + "\">{lang_start}</a>&nbsp;");
 						}
 						
 						if (privileges['restart_' + server_id] == 1) {
@@ -46,7 +48,7 @@
 						}
 					}
 					
-					$("#commands_" + server_id).append("<a class=\"small awesome\" href=\"{base_url}admin/server_control/main/" + server_id + "\">{lang_other_commands}&raquo;</a>&nbsp;");
+					$("#commands_" + server_id).append("<a class=\"small awesome\" href=\"{site_url}admin/server_control/main/" + server_id + "\">{lang_other_commands}&raquo;</a>&nbsp;");
 					
 				}, 
 				error: function(response) {
