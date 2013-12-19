@@ -12,7 +12,7 @@
 # 
 # Параметры запуска
 #
-# @command - команда (start|stop|restart|status)
+# @command - команда (start|stop|restart|status|get_console)
 # @dir - директория относительно скрипта
 # @name - имя для screen
 # @serverip - ip сервера
@@ -88,13 +88,21 @@ case "$1" in
 
  restart)
     if [[ `su $USER -c "screen -ls |grep $NAME"` ]]
-       then
-       kill `ps aux | grep -v grep | grep -i $USER | grep -i screen | grep -i $NAME | awk '{print $2}'`
+		then
+		kill `ps aux | grep -v grep | grep -i $USER | grep -i screen | grep -i $NAME | awk '{print $2}'`
        
-       sleep 2
-
+		sleep 2
+       
 		su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
-		echo "Server restarted"
+		sleep 4
+		
+		if [[ `su $USER -c "screen -ls |grep $NAME"` ]]
+			then
+			echo "Server restarted"
+		else
+		   echo -e "Server not restarted \nStart command:"
+		   echo su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
+		fi
     else
        echo "Coulnd't find a running server"
     fi
