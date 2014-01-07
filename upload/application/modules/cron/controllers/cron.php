@@ -6,7 +6,7 @@
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
+ * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
  * @license		http://www.gameap.ru/license.html
  * @link		http://www.gameap.ru
  * @filesource
@@ -49,9 +49,9 @@ class Cron extends MX_Controller {
         parent::__construct();
         
         /* Скрипт можно запустить только из командной строки (через cron)*/
-        if(php_sapi_name() != 'cli'){
-			show_404();
-		}
+        //~ if(php_sapi_name() != 'cli'){
+			//~ show_404();
+		//~ }
 
 		$this->load->model('servers');
 		$this->load->model('servers/dedicated_servers');
@@ -1073,7 +1073,12 @@ class Cron extends MX_Controller {
 								$log .= 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . "\n";
 							}
 						}
-
+						
+						if ($this->servers_data[$server_id]['su_user'] != '') {
+							$command[] = 'chown -R ' . $this->servers_data[$server_id]['su_user'] . ' ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'];
+							$log .= 'chown -R ' . $this->servers_data[$server_id]['su_user'] . ' ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . "\n";;
+						}
+						
 						$log .= "\n---\nCHMOD\n" . $log . "\n" .  $this->servers->command($command, $this->servers_data[$server_id]);
 					}
 

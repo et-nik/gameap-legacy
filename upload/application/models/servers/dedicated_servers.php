@@ -181,6 +181,10 @@ class Dedicated_servers extends CI_Model {
 				$this->ds_list[$i]['ftp_password']		= $this->encrypt->decode($this->ds_list[$i]['ftp_password']);
 				
 				switch(strtolower($this->ds_list[$i]['control_protocol'])) {
+					case 'ssh':
+						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
+						break;
+						
 					case 'telnet':
 						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['telnet_path'];
 						break;

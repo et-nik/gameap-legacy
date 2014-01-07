@@ -39,7 +39,7 @@ class Install extends MX_Controller {
     }
     
     // Отображение информационного сообщения
-    private function show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
+    private function _show_message($message = FALSE, $link = FALSE, $link_text = FALSE)
     {
         
         if (!$message) {

@@ -6,9 +6,9 @@
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
- * @license		http://gameap.ru/license.html
- * @link		http://gameap.ru
+ * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
+ * @license		http://www.gameap.ru/license.html
+ * @link		http://www.gameap.ru
  * @filesource
 */
 class Users extends CI_Model {
@@ -187,7 +187,8 @@ class Users extends CI_Model {
      * @param bool      - если true то данные привиление не будут получены
      * @return array
     */
-    function get_user_data($user_id = false, $to_this = false, $no_get_privileges = false){
+    function get_user_data($user_id = false, $to_this = false, $no_get_privileges = false)
+    {
         
         if(!$user_id){
             return false;

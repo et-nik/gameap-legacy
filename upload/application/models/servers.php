@@ -1000,8 +1000,7 @@ class Servers extends CI_Model {
 			}
 			
 			return $this->sftp->list_files($dir);
-			
-			
+
 		} else {
 			
 			$connection = ftp_connect($server_data['ftp_host']);

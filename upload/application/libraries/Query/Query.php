@@ -43,8 +43,29 @@ class Query extends CI_Driver_Library {
 	/**
 	 * Получение списка игроков на сервере
 	*/
-	function get_players($host, $port, $engine = false)
+	function get_players($host, $port = 0, $engine = false)
 	{
+		if (is_array($host)) {
+			
+			/* Данные переданы в массиве в первом параметре 
+			 * 
+			 * Передача параметров обычным способом
+			 * $this->query->get_status('31.31.202.96', 27015, 'goldsource');
+			 * 
+			 * Передача в массиве в первом параметре функции
+			 * $server_data = array('server_port' => '31.31.202.96', 'server_port' => 27015, 'engine' => 'golsource');
+			 * $this->query->get_status($server_data);
+			 * 
+			 * Второй способ удобен, если вы получаете массив с данными игрового сервера
+			 * непосредственно из модели servers ( get_server_data ) а после
+			 * передаете его сразу в query
+			*/
+			
+			$port = $host['server_port'];
+			$engine = strtolower($host['engine']);
+			$host = $host['server_ip'];
+		}
+		
 		if ($engine == false) {
 			$engine = $this->engine;
 		}
@@ -57,8 +78,28 @@ class Query extends CI_Driver_Library {
 	/**
 	 * Получение информации о сервере
 	*/
-	function get_info($host, $port, $engine = false)
+	function get_info($host, $port = 0, $engine = false)
 	{
+		if (is_array($host)) {
+			
+			/* Данные переданы в массиве в первом параметре 
+			 * 
+			 * Передача параметров обычным способом
+			 * $this->query->get_status('31.31.202.96', 27015, 'goldsource');
+			 * 
+			 * Передача в массиве в первом параметре функции
+			 * $server_data = array('server_port' => '31.31.202.96', 'server_port' => 27015, 'engine' => 'golsource');
+			 * $this->query->get_status($server_data);
+			 * 
+			 * Второй способ удобен, если вы получаете массив с данными игрового сервера
+			 * непосредственно из модели servers ( get_server_data )
+			*/
+			
+			$port = $host['server_port'];
+			$engine = strtolower($host['engine']);
+			$host = $host['server_ip'];
+		}
+		
 		if ($engine == false) {
 			$engine = $this->engine;
 		}
@@ -71,8 +112,28 @@ class Query extends CI_Driver_Library {
 	/**
 	 * Получение переменных сервера
 	*/
-	function get_rules($host, $port, $engine = false)
+	function get_rules($host, $port = 0, $engine = false)
 	{
+		if (is_array($host)) {
+			
+			/* Данные переданы в массиве в первом параметре 
+			 * 
+			 * Передача параметров обычным способом
+			 * $this->query->get_status('31.31.202.96', 27015, 'goldsource');
+			 * 
+			 * Передача в массиве в первом параметре функции
+			 * $server_data = array('server_port' => '31.31.202.96', 'server_port' => 27015, 'engine' => 'golsource');
+			 * $this->query->get_status($server_data);
+			 * 
+			 * Второй способ удобен, если вы получаете массив с данными игрового сервера
+			 * непосредственно из модели servers ( get_server_data )
+			*/
+			
+			$port = $host['server_port'];
+			$engine = strtolower($host['engine']);
+			$host = $host['server_ip'];
+		}
+		
 		if ($engine == false) {
 			$engine = $this->engine;
 		}
@@ -85,8 +146,28 @@ class Query extends CI_Driver_Library {
 	/**
 	 * Статус сервера
 	*/
-	function get_status($host, $port, $engine = false)
+	function get_status($host, $port = 0, $engine = false)
 	{
+		if (is_array($host)) {
+			
+			/* Данные переданы в массиве в первом параметре 
+			 * 
+			 * Передача параметров обычным способом
+			 * $this->query->get_status('31.31.202.96', 27015, 'goldsource');
+			 * 
+			 * Передача в массиве в первом параметре функции
+			 * $server_data = array('server_port' => '31.31.202.96', 'server_port' => 27015, 'engine' => 'golsource');
+			 * $this->query->get_status($server_data);
+			 * 
+			 * Второй способ удобен, если вы получаете массив с данными игрового сервера
+			 * непосредственно из модели servers ( get_server_data )
+			*/
+			
+			$port = $host['server_port'];
+			$engine = strtolower($host['engine']);
+			$host = $host['server_ip'];
+		}
+		
 		if ($engine == false) {
 			$engine = $this->engine;
 		}
@@ -99,8 +180,28 @@ class Query extends CI_Driver_Library {
 	/**
 	 * Пинг сервера
 	*/
-	function ping($host, $port, $engine = false)
+	function ping($host, $port = 0, $engine = false)
 	{
+		if (is_array($host)) {
+			
+			/* Данные переданы в массиве в первом параметре 
+			 * 
+			 * Передача параметров обычным способом
+			 * $this->query->get_status('31.31.202.96', 27015, 'goldsource');
+			 * 
+			 * Передача в массиве в первом параметре функции
+			 * $server_data = array('server_port' => '31.31.202.96', 'server_port' => 27015, 'engine' => 'golsource');
+			 * $this->query->get_status($server_data);
+			 * 
+			 * Второй способ удобен, если вы получаете массив с данными игрового сервера
+			 * непосредственно из модели servers ( get_server_data )
+			*/
+			
+			$port = $host['server_port'];
+			$engine = strtolower($host['engine']);
+			$host = $host['server_ip'];
+		}
+		
 		if ($engine == false) {
 			$engine = $this->engine;
 		}
