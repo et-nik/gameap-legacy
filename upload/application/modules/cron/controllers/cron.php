@@ -48,10 +48,10 @@ class Cron extends MX_Controller {
     {
         parent::__construct();
         
-        /* Скрипт можно запустить только из командной строки (через cron)*/
-        //~ if(php_sapi_name() != 'cli'){
-			//~ show_404();
-		//~ }
+        //~ /* Скрипт можно запустить только из командной строки (через cron)*/
+        if(php_sapi_name() != 'cli'){
+			show_404();
+		}
 
 		$this->load->model('servers');
 		$this->load->model('servers/dedicated_servers');
