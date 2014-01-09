@@ -121,18 +121,18 @@ class Rcon_goldsource extends CI_Driver {
 			$return = array();
 			
 			// # 7 "seeking chiters" 818 HLTV hltv:0/128 delay:0 1:17:53 178.124.124.119:44892
-			$pattern = '!#([\s]*)(\d*)([\s]*)"(.*?)"(\s*)(\d*)(\s*)([a-zA-Z0-9\_\:]*)(\s*)(hltv\:0\/128 delay\:0|[a-z\-\:0-9]*)(\s*)([0-9\:]*)(\s*)(\s*|\d*)(\s*)(\s*|\d*)(\s*)([0-9\.]*):(\d*)!si';
+			$pattern = '!#\s*\d*\s*"(.*?)"\s*(\d*)\s*([a-zA-Z0-9\_\:]*)\s*(hltv\:0\/128 delay\:0|[a-z\-\:0-9]*)\s*([0-9\:]*)\s*(\s*|\d*)\s*(\s*|\d*)\s*([0-9\.]*):(\d*)!si';
 			$matches = get_matches($pattern, $result);
 			
 			$count = count($matches);
 			$a = 0;
 			while ($a < $count) {
 				$return[] = array(
-						'user_name' => $matches[$a]['4'], 
-						'steam_id' => $matches[$a]['8'],
-						'user_id' => $matches[$a]['6'],
-						'user_ip' => $matches[$a]['18'],
-						'user_time' => $matches[$a]['12'],
+						'user_name' => htmlspecialchars($matches[$a]['1']), 
+						'user_id' => $matches[$a]['2'],
+						'steam_id' => $matches[$a]['3'],
+						'user_ip' => $matches[$a]['8'],
+						'user_time' => $matches[$a]['5'],
 					);
 				
 				$a++;
