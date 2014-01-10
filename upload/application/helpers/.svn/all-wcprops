@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/admin/!svn/ver/32/application/helpers
+END
+index.html
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/admin/!svn/ver/15/application/helpers/index.html
+END
+string_helper.php
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/admin/!svn/ver/32/application/helpers/string_helper.php
+END
+analytics_helper.php
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/admin/!svn/ver/15/application/helpers/analytics_helper.php
+END
+modules_helper.php
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/admin/!svn/ver/15/application/helpers/modules_helper.php
+END
+safety_helper.php
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/admin/!svn/ver/15/application/helpers/safety_helper.php
+END
+games_helper.php
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/admin/!svn/ver/15/application/helpers/games_helper.php
+END
+date_helper.php
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/admin/!svn/ver/31/application/helpers/date_helper.php
+END
+patterns_helper.php
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/admin/!svn/ver/15/application/helpers/patterns_helper.php
+END
+translit_helper.php
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/admin/!svn/ver/15/application/helpers/translit_helper.php
+END
+language_helper.php
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/admin/!svn/ver/15/application/helpers/language_helper.php
+END
