@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/admin/!svn/ver/15/application/models/servers
+END
+games.php
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/admin/!svn/ver/15/application/models/servers/games.php
+END
+game_types.php
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/admin/!svn/ver/15/application/models/servers/game_types.php
+END
+dedicated_servers.php
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/admin/!svn/ver/15/application/models/servers/dedicated_servers.php
+END
+logs.php
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/admin/!svn/ver/15/application/models/servers/logs.php
+END
