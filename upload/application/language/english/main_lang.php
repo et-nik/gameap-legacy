@@ -144,3 +144,6 @@ $lang['servers_privileges_log_view']		= 'Allow logs view';
 $lang['menu_servers_logs']						= 'Server logs';
 $lang['menu_panel_logs']						= 'GameAP logs';
 
+/* -- 0.8.8 -- */
+$lang['go']										= 'Перейти';
+

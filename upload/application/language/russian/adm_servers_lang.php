@@ -202,3 +202,6 @@ $lang['adm_servers_remote_repository_gtdesc']		= 'Путь к архиву с ф
 
 // 0.8.6
 $lang['adm_servers_ip_description']					= 'Если IP адресов несколько, то укажите их через запятую.';
+
+// 0.8.8
+$lang['adm_servers_go_to_game']						= 'Перейти к игре';

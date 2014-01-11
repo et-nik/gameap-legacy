@@ -148,3 +148,6 @@ $lang['menu_panel_logs']						= 'Логи GameAP';
 $lang['host']									= 'Хост';
 $lang['page']									= 'Страница';
 $lang['values'] 								= 'Значения';
+
+/* -- 0.8.8 -- */
+$lang['go']										= 'Перейти';
