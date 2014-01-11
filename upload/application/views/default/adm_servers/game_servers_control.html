@@ -23,7 +23,7 @@
 					<th><strong>{lang_action}</strong></th>
 					<th><strong>{lang_command}</strong></th>
 					<th><strong>{lang_user}</strong></th>
-					<th>&nbsp;</td>
+					<th>&nbsp;</th>
 				</tr>
 			{log_list}
 				<tr>
@@ -80,18 +80,33 @@
 
 				<tr>
 					<td>{lang_game}:</td>
-					<td>{server_game}</td>
+					<td><a href="{site_url}adm_servers/edit/games/{server_game_code}" target="blank">{server_game}</a></td>
 				</tr>
 
 				<tr>
 					<td>{lang_dedicated_server}:</td>
 					<td>{ds_name}</td>
 				</tr>
-
+				
 				<tr>
 					<td>{lang_adm_servers_game_type}:</td>
-					<td>{game_type_dropdown}</td>
+					<td>{game_type_dropdown}&nbsp;<a id="game_type_link" href="#" target="blank">{lang_go} ></a></td>
 				</tr>
+				
+				<script lang="javascript">
+					var gt_id =	$("select[name='game_type']").val();
+
+					$(document).ready(function() {
+						
+						$('#game_type_link').attr('href', '{site_url}adm_servers/edit/game_types/' + gt_id);
+						
+						$("select[name='game_type']").change(function() {
+							gt_id =	$("select[name='game_type']").val();
+							$('#game_type_link').attr('href', '{site_url}adm_servers/edit/game_types/' + gt_id);
+						});
+						
+					});
+				</script>
 
 				<tr>
 					<td>{lang_adm_servers_connect_data}:</td>

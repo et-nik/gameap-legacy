@@ -149,7 +149,7 @@ class Games extends CI_Model {
 		$count_games = count($this->games_list);
 		$i = 0;
 		
-		while($i < $count_games){
+		while($i < $count_games) {
 			
 			$this->name_games[$this->games_list[$i]['code']] = $this->games_list[$i]['name'];
 			

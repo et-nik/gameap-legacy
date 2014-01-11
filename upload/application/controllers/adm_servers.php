@@ -1252,7 +1252,7 @@ class Adm_servers extends CI_Controller {
 				}
 				
 				// Модификация
-				$where = array('game_code' => $servers_list[0]['server_game']);
+				$where = array('game_code' => $this->servers->server_data['game']);
 				$gametypes_list = $this->game_types->get_gametypes_list($where);
 				
 				$i = 0;
@@ -1490,7 +1490,7 @@ class Adm_servers extends CI_Controller {
 					
 				$tpl_list = $this->game_types->tpl_data_game_types();
 				$local_tpl_data = $tpl_list[0];
-				
+				$local_tpl_data['game_code'] = $gt_list[0]['game_code'];
 				
 				/* Делаем список с играми */
 				$games_list = $this->games->get_games_list();

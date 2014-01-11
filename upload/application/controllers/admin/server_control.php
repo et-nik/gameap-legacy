@@ -399,7 +399,7 @@ class Server_control extends CI_Controller {
 			}
 			
 			$sql_data['time_add'] = $this->input->post('time_add');
-			
+
 			$this->db->insert('cron', $sql_data);
 			
 			// Сохраняем логи
@@ -411,7 +411,7 @@ class Server_control extends CI_Controller {
 			$log_data['log_data'] = 'Name: ' . $sql_data['name'];
 			$this->panel_log->save_log($log_data);
 			
-			$this->_show_message(lang('server_control_new_task_success'), site_url('admin/server_control/main/' . $server_id), 'Далее');
+			$this->_show_message(lang('server_control_new_task_success'), site_url('admin/server_control/main/' . $server_id), lang('next'));
 			return true;
 			
 		}

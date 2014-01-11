@@ -1,4 +1,5 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="awesome" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>
 <h2>{lang_server_control_add_task}</h2>
 
 <form action="{site_url}admin/server_control/add_task/{server_id}" method="post" accept-charset="utf-8">
@@ -19,7 +20,7 @@
 			<option value="server_stop">{lang_server_control_stop}</option>
 			<option value="server_restart">{lang_server_control_restart}</option>
 			<option value="server_update">{lang_server_control_update}</option>
-			<option value="server_rcon">{lang_rcon_command}</option>
+			<option value="server_rcon">{lang_server_control_rcon_command}</option>
 		 </select>
 	</td>
 </tr>

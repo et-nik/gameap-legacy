@@ -704,6 +704,7 @@ class Servers extends CI_Model {
     */
 	function tpl_data()
     {
+		$this->load->model('servers/games');
 		$num = -1;
 		
 		$tpl_data = array();
@@ -715,11 +716,12 @@ class Servers extends CI_Model {
 		foreach ($this->servers_list as $server_data){
 			$num++;
 			
-			$tpl_data[$num]['server_id'] 	= $server_data['id'];
-			$tpl_data[$num]['server_game'] 	= $server_data['game'];
-			$tpl_data[$num]['server_name'] 	= $server_data['name'];
-			$tpl_data[$num]['server_ip'] 	= $server_data['server_ip'];
-			$tpl_data[$num]['server_port'] 	= $server_data['server_port'];
+			$tpl_data[$num]['server_id'] 			= $server_data['id'];
+			$tpl_data[$num]['server_game_code'] 	= $server_data['game'];
+			$tpl_data[$num]['server_game'] 			= $this->games->game_name_by_code($server_data['game']);
+			$tpl_data[$num]['server_name'] 			= $server_data['name'];
+			$tpl_data[$num]['server_ip'] 			= $server_data['server_ip'];
+			$tpl_data[$num]['server_port'] 			= $server_data['server_port'];
 		}
 		
 		return $tpl_data;
