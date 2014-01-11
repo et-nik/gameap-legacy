@@ -99,10 +99,10 @@ class Installer extends CI_Driver_Library {
 	/**
 	 * Получение настроек по умолчанию
 	*/
-	public function get_default_parameters()
+	public function get_default_parameters($aliases_values = array())
 	{
 		$engine = $this->_engine;
-		return $this->$engine->get_default_parameters($this->_game_code, $this->_os);
+		return $this->$engine->get_default_parameters($this->_game_code, $this->_os, $aliases_values);
 	}
 	
 	// ------------------------------------------------------------------------

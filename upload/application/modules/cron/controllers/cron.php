@@ -1099,11 +1099,17 @@ class Cron extends MX_Controller {
 					
 					// Правка конфигов
 					$this->installer->change_config();
+					
+					$aliases_values = array();
+					$aliases_values = json_decode($this->servers_data[$server_id]['aliases'], true);
 
 					$server_data['installed'] 		= 1;
 					$server_data['rcon']			= $new_rcon;
-					$server_data['aliases'] 		= json_encode($this->installer->get_default_parameters());
-					$server_data['start_command'] 	= $this->installer->get_start_command();
+					$server_data['aliases'] 		= json_encode($this->installer->get_default_parameters($aliases_values));
+					
+					if (!$this->servers_data[$server_id]['start_command']) {
+						$server_data['start_command'] 	= $this->installer->get_start_command();
+					}
 					
 					$this->servers->edit_game_server($server_id, $server_data);
 					
