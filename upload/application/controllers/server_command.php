@@ -72,9 +72,33 @@ class Server_command extends CI_Controller {
 	// -----------------------------------------------------------------------
 	
 	/**
+	 * Обрезка пустых строк консоли
+	*/
+	private function _crop_console($console_text)
+	{
+		$console_data = explode("\n", $console_text);
+		
+		$i = 0;
+		$count_console_data = count($console_data);
+		while ($i < $count_console_data) {
+			if ($console_data[$i] != "") {
+				break;
+			}
+			
+			unset($console_data[$i]);
+			$i ++;
+		}
+		
+		return implode("\n", $console_data);
+	}
+	
+	// -----------------------------------------------------------------------
+	
+	/**
 	 * Проверка SSH данных
 	*/
-	function _check_ssh() {
+	private function _check_ssh() 
+	{
 
 		/* 
 		 * Заданы ли данные SSH у DS сервера 
@@ -692,6 +716,7 @@ class Server_command extends CI_Controller {
 			
 			if($response = $this->servers->command($command, $this->servers->server_data)) {
 
+				$response = $this->_crop_console($response);
 				$local_tpl_data['console_content_original'] = $response;
 				
 				$console_content = str_replace("\n", "<br />", htmlspecialchars($response));

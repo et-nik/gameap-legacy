@@ -3,18 +3,25 @@
 
 $lang['date_year']		= 'Год';
 $lang['date_years']		= 'Лет';
+$lang['date_years2']	= 'Года';
 $lang['date_month']		= 'Месяц';
 $lang['date_months']	= 'Месяцев';
+$lang['date_months2']	= 'Месяца';
 $lang['date_week']		= 'Неделя';
 $lang['date_weeks']		= 'Недель';
+$lang['date_weeks2']	= 'Недели';
 $lang['date_day']		= 'День';
 $lang['date_days']		= 'Дней';
+$lang['date_days2']		= 'Дня';
 $lang['date_hour']		= 'Час';
 $lang['date_hours']		= 'Часов';
+$lang['date_hours2']	= 'Часа';
 $lang['date_minute']	= 'Минута';
 $lang['date_minutes']	= 'Минут';
+$lang['date_minutes2']	= 'Минуты';
 $lang['date_second']	= 'Секунда';
 $lang['date_seconds']	= 'Секунд';
+$lang['date_seconds2']	= 'Секунды';
 
 $lang['UM12']	= '(UTC -12:00) Бейкер/Хауленд';
 $lang['UM11']	= '(UTC -11:00) Ниуэ';
