@@ -24,7 +24,7 @@ body {
 #content{
     margin: 0 10px 10px 10px;
     padding: 10px;
-	/* margin-left: 200px; */
+     margin-left: 200px; 
     border: 1px solid #D0D0D0;
     -webkit-box-shadow: 0 0 8px #D0D0D0;
 }
@@ -635,6 +635,7 @@ ul.tabs li.active, ul.tabs li.active a:hover  {
 .accordion div {
 	margin: 25px 0 25px 0;
 }
+
 
 img.ruble-img { height: 1.5ex; }
 span.dot { position:absolute; text-indent: -1000em; }
