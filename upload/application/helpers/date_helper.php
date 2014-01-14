@@ -68,10 +68,11 @@ if ( ! function_exists('now'))
  * Добавление одного месяца к unix дате
  * 
  * @param string unix дата
+ * @param integer количество месяцев
  */
 if ( ! function_exists('add_month_to_unix_time'))
 {
-	function add_month_to_unix_time($unix_time = 0)
+	function add_month_to_unix_time($unix_time = 0, $multiply = 1)
 	{
 		if ($unix_time <= 0) {
 			$unix_time = now();
@@ -79,7 +80,7 @@ if ( ! function_exists('add_month_to_unix_time'))
 		
 		$month = date('n', $unix_time);
 		
-		return $unix_time + 86400 * days_in_month($month);
+		return $unix_time + 86400 * days_in_month($month) * $multiply;
 	}
 }
 
@@ -89,10 +90,11 @@ if ( ! function_exists('add_month_to_unix_time'))
  * Добавление одного года к unix дате
  * 
  * @param string  unix дата
+ * @param integer количество лет
  */
 if ( ! function_exists('add_year_to_unix_time'))
 {
-	function add_year_to_unix_time($unix_time = '')
+	function add_year_to_unix_time($unix_time = '', $multiply = 1)
 	{
 		
 		if ($unix_time <= 0) {
@@ -108,7 +110,7 @@ if ( ! function_exists('add_year_to_unix_time'))
 			$day_in_year = 365;
 		}
 		
-		return $unix_time + $day_in_year * 86400;
+		return $unix_time + $day_in_year * 86400 * $multiply;
 	}
 }
 
