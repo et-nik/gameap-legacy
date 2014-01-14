@@ -55,6 +55,29 @@ class Server_control extends CI_Controller {
 		}
     }
     
+    // -----------------------------------------------------------------------
+	
+	/**
+	 * Обрезка пустых строк консоли
+	*/
+	private function _crop_console($console_text)
+	{
+		$console_data = explode("\n", $console_text);
+		
+		$i = 0;
+		$count_console_data = count($console_data);
+		while ($i < $count_console_data) {
+			if ($console_data[$i] != "") {
+				break;
+			}
+			
+			unset($console_data[$i]);
+			$i ++;
+		}
+		
+		return implode("\n", $console_data);
+	}
+    
     /**
 	 * 
 	 * Проверка rcon команд, некоторые команды могут требовать
@@ -213,6 +236,7 @@ class Server_control extends CI_Controller {
 		$command = $this->servers->command_generate($this->servers->server_data, 'get_console');
 		
 		if($response = $this->servers->command($command, $this->servers->server_data)) {
+			$response = $this->_crop_console($response);
 			$console_content = str_replace("\n", "<br />", htmlspecialchars($response));
 			$this->output->append_output($console_content);
 		} else {
