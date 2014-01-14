@@ -80,6 +80,7 @@ case "$1" in
     if [[ `su $USER -c "screen -ls |grep $NAME"` ]]
        then
        kill `ps aux | grep -v grep | grep -i $USER | grep -i screen | grep -i $NAME | awk '{print $2}'`
+       su $USER -c  "screen -X -S $NAME kill"
        echo "Server stopped"
     else
        echo "Coulnd't find a running server"
@@ -90,7 +91,7 @@ case "$1" in
     if [[ `su $USER -c "screen -ls |grep $NAME"` ]]
 		then
 		kill `ps aux | grep -v grep | grep -i $USER | grep -i screen | grep -i $NAME | awk '{print $2}'`
-       
+		su $USER -c  "screen -X -S $NAME kill"
 		sleep 2
        
 		su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
