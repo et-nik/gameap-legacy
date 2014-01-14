@@ -680,7 +680,7 @@ class Cron extends MX_Controller {
 		 * причине задания двухчасовой давносте не были выполнены они не 
 		 * будут выполнены вновь
 		 * */
-		$where = array('date_perform >' => $time - 3600, 'date_perform <' => $time);
+		$where = array('date_perform >' => $time - 3600, 'date_perform <' => $time, 'started' => 0);
 		$query = $this->db->get_where('cron', $where);
 
 		$task_list = $query->result_array();
