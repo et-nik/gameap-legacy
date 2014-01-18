@@ -179,10 +179,7 @@ class Server_command extends CI_Controller {
 	
 	function rcon($command = false, $server_id = false, $id = false, $confirm = false)
 	{
-		if(!$this->check_errors($server_id)){
-			$this->servers->get_server_data($server_id);
-		}
-			
+		$this->servers->get_server_data($server_id);
 		$this->users->get_server_privileges($server_id);
 		
 		if($this->servers->server_data){
@@ -559,25 +556,7 @@ class Server_command extends CI_Controller {
 		
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
-	
-	
-	/**
-	 * 
-	 * Проверка на ошибки
-	 * 
-	*/
-	private function check_errors($id)
-	{
-		$error_desc = false;
-		
-		if(!$id){
-			$error_desc .= 'не указан параметр server_command <br />';
-		}
-		
-		return $error_desc;
-	}
-	
-	
+
 	/**
 	 * 
 	 * Проверка rcon команд, некоторые команды могут требовать
@@ -748,14 +727,10 @@ class Server_command extends CI_Controller {
 	 * Запуск сервера
 	 * 
 	*/
-	public function start($id, $confirm = false)
+	public function start($server_id, $confirm = false)
     {
-		if(!$this->check_errors($id)){
-			$this->servers->get_server_data($id);
-		}
-		
 		/* Получены ли необходимые данные о сервере */
-		if($this->servers->server_data) {
+		if($this->servers->get_server_data($server_id)) {
 			
 			// Получение прав на сервер
 			$this->users->get_server_privileges($this->servers->server_data['id']);
@@ -800,7 +775,7 @@ class Server_command extends CI_Controller {
 						 */
 						if (strpos($response, 'Server is already running') !== false) {
 							/* Сервер запущен ранее */
-							$message = lang('server_command_server_is_already_running', site_url('server_command/restart/'. $id), site_url('server_command/stop/' . $id));
+							$message = lang('server_command_server_is_already_running', site_url('server_command/restart/'. $server_id), site_url('server_command/stop/' . $server_id));
 							$log_data['msg'] = 'Server is already running';		
 						} elseif($this->servers->server_status() OR strpos($response, 'Server started') !== false) {
 							/* Сервер успешно запущен */
@@ -855,7 +830,7 @@ class Server_command extends CI_Controller {
 						$this->panel_log->save_log($log_data);
 					}
 					
-					$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
+					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
 					return true;
 					
 				} else {
@@ -866,7 +841,7 @@ class Server_command extends CI_Controller {
 				}
 				
 			}else{
-				$this->_show_message(lang('server_command_no_start_privileges'), site_url('admin/server_control/main/' . $id), lang('next'));
+				$this->_show_message(lang('server_command_no_start_privileges'), site_url('admin/server_control/main/' . $server_id), lang('next'));
 				return false;
 			}
 		} else {
@@ -882,133 +857,124 @@ class Server_command extends CI_Controller {
 	 * Остановка сервера
 	 * 
 	*/
-	public function stop($id, $confirm = false)
+	public function stop($server_id, $confirm = false)
     {
-		// Проверка, авторизован ли юзверь
-		if($this->users->auth_id){
-
-			if(!$this->check_errors($id)){
-				$this->servers->get_server_data($id);
-			}
+		if($this->servers->get_server_data($server_id)){
 			
-			if($this->servers->server_data){
+			// Получение прав на сервер
+			$this->users->get_server_privileges($this->servers->server_data['id']);
+			
+			/* 
+			 * Проверка прав на управление сервером
+			 * Права пользователя храняться в $this->users->user_privileges
+			 * Серверы, которыми владеет пользователь $this->users->user_servers
+			 * Информация о сервере хранится в $this->servers->server_data
+			 * 
+			 * Если в привилегиях пользователя стоит 2, то он имеет права
+			 * на запуск любых серверов
+			 * Если в привилегиях стоит 1, то он имеет права на запуск
+			 * лишь своих серверов, в этом случае нужно еще проверить -
+			 * находится ли сервер в списке
+			*/
+			if($this->users->auth_privileges['srv_stop']			// Право на запуск серверов
+				&& $this->users->auth_servers_privileges['SERVER_STOP']	// Право на запуск этого сервера
+			) {
 				
-				// Получение прав на сервер
-				$this->users->get_server_privileges($this->servers->server_data['id']);
+				/* Проверка SSH и Telnet */
+				if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
+					$this->_show_message();
+					return false;
+				}
+
+				/* Заданы ли параметры запуска */
+				if (!$this->servers->server_data['script_stop']){
+					$this->_show_message(lang('server_command_stop_not_param'));
+					return false;
+				}
 				
-				/* 
-				 * Проверка прав на управление сервером
-				 * Права пользователя храняться в $this->users->user_privileges
-				 * Серверы, которыми владеет пользователь $this->users->user_servers
-				 * Информация о сервере хранится в $this->servers->server_data
-				 * 
-				 * Если в привилегиях пользователя стоит 2, то он имеет права
-				 * на запуск любых серверов
-				 * Если в привилегиях стоит 1, то он имеет права на запуск
-				 * лишь своих серверов, в этом случае нужно еще проверить -
-				 * находится ли сервер в списке
+				/* Подтверждение 
+				 * Чтобы избежать случаев случайного запуска сервера
 				*/
-				if($this->users->auth_privileges['srv_stop']			// Право на запуск серверов
-					&& $this->users->auth_servers_privileges['SERVER_STOP']	// Право на запуск этого сервера
-				) {
-					
-					/* Проверка SSH и Telnet */
-					if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
-						$this->_show_message();
-						return false;
-					}
-	
-					/* Заданы ли параметры запуска */
-					if (!$this->servers->server_data['script_stop']){
-						$this->_show_message(lang('server_command_stop_not_param'));
-						return false;
-					}
-					
-					/* Подтверждение 
-					 * Чтобы избежать случаев случайного запуска сервера
-					*/
-					if($confirm == $this->security->get_csrf_hash()){
-						if($response = $this->servers->stop($this->servers->server_data)){
-							
-							/* 
-							 * В некоторых случаях (так обычно и бывает)
-							 * strpos($response, 'blablabla') может возвращать 0, 
-							 * а нам нужен именно false
-							 */
-							if(strpos($response, 'Coulnd\'t find a running server') !== false) {
-								$message = lang('server_command_running_server_not_found');
-								$log_data['msg'] = 'Coulnd\'t find a running server';
-							} elseif(strpos($response, 'Server stopped') !== false) {
-								$message = lang('server_command_stopped');
-								$log_data['msg'] = 'Stop server success';
-							} elseif(strpos($response, 'file not found') !== false) {
-								/* Не найден исполняемый файл */
-								$message = lang('server_command_start_file_not_found');
-								$log_data['msg'] = 'Executable file not found';
-							} elseif(strpos($response, 'file not executable') !== false) {
-								/* Нет прав на запуск файла */
-								$message = lang('server_command_start_file_not_executable');
-								$log_data['msg'] = 'File not executable';
-							} elseif(strpos($response, 'Server not stopped') !== false) {
-								$message = lang('server_command_stop_failed');
-								
-								if($this->users->auth_data['is_admin']) {
-									$message .= lang('server_command_start_adm_msg');
-									$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
-								}
-								
-								$log_data['msg'] = 'Stop server failure';
-							} else {
-								$message = lang('server_command_cmd_sended');
-								$log_data['msg'] = 'Command sended';
-							}
-							
-							// Сохраняем логи
-							$log_data['type'] = 'server_command';
-							$log_data['command'] = 'stop';
-							$log_data['user_name'] = $this->users->auth_login;
-							$log_data['server_id'] = $this->servers->server_data['id'];
-							$log_data['log_data'] = $response;
-							$this->panel_log->save_log($log_data);
-						} else {
-							$message = 'Ошибка остановки';
+				if($confirm == $this->security->get_csrf_hash()){
+					if($response = $this->servers->stop($this->servers->server_data)){
+						
+						/* 
+						 * В некоторых случаях (так обычно и бывает)
+						 * strpos($response, 'blablabla') может возвращать 0, 
+						 * а нам нужен именно false
+						 */
+						if(strpos($response, 'Coulnd\'t find a running server') !== false) {
+							$message = lang('server_command_running_server_not_found');
+							$log_data['msg'] = 'Coulnd\'t find a running server';
+						} elseif(strpos($response, 'Server stopped') !== false) {
+							$message = lang('server_command_stopped');
+							$log_data['msg'] = 'Stop server success';
+						} elseif(strpos($response, 'file not found') !== false) {
+							/* Не найден исполняемый файл */
+							$message = lang('server_command_start_file_not_found');
+							$log_data['msg'] = 'Executable file not found';
+						} elseif(strpos($response, 'file not executable') !== false) {
+							/* Нет прав на запуск файла */
+							$message = lang('server_command_start_file_not_executable');
+							$log_data['msg'] = 'File not executable';
+						} elseif(strpos($response, 'Server not stopped') !== false) {
+							$message = lang('server_command_stop_failed');
 							
 							if($this->users->auth_data['is_admin']) {
+								$message .= lang('server_command_start_adm_msg');
 								$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
 							}
 							
-							// Сохраняем логи
-							$log_data['type'] = 'server_command';
-							$log_data['command'] = 'stop';
-							$log_data['user_name'] = $this->users->auth_login;
-							$log_data['server_id'] = $this->servers->server_data['id'];
-							$log_data['msg'] = 'Stop server error';
-							$log_data['log_data'] = $this->servers->errors;
-							$this->panel_log->save_log($log_data);
+							$log_data['msg'] = 'Stop server failure';
+						} else {
+							$message = lang('server_command_cmd_sended');
+							$log_data['msg'] = 'Command sended';
 						}
 						
-						$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
-						return true;
+						// Сохраняем логи
+						$log_data['type'] = 'server_command';
+						$log_data['command'] = 'stop';
+						$log_data['user_name'] = $this->users->auth_login;
+						$log_data['server_id'] = $this->servers->server_data['id'];
+						$log_data['log_data'] = $response;
+						$this->panel_log->save_log($log_data);
+					} else {
+						$message = 'Ошибка остановки';
 						
-					}else{
-						/* Пользователь не подвердил намерения */
-						$confirm_tpl['message'] = lang('server_command_stop_confirm');
-						$confirm_tpl['confirmed_url'] = site_url('server_command/stop/' . $this->servers->server_data['id'] . '/' . $this->security->get_csrf_hash());
-						$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
+						if($this->users->auth_data['is_admin']) {
+							$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
+						}
+						
+						// Сохраняем логи
+						$log_data['type'] = 'server_command';
+						$log_data['command'] = 'stop';
+						$log_data['user_name'] = $this->users->auth_login;
+						$log_data['server_id'] = $this->servers->server_data['id'];
+						$log_data['msg'] = 'Stop server error';
+						$log_data['log_data'] = $this->servers->errors;
+						$this->panel_log->save_log($log_data);
 					}
 					
+					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
+					return true;
+					
 				}else{
-						$this->_show_message(lang('server_command_no_stop_privileges'), site_url('admin/server_control/main/' . $id), lang('next'));
-						return false;
+					/* Пользователь не подвердил намерения */
+					$confirm_tpl['message'] = lang('server_command_stop_confirm');
+					$confirm_tpl['confirmed_url'] = site_url('server_command/stop/' . $this->servers->server_data['id'] . '/' . $this->security->get_csrf_hash());
+					$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
 				}
-			} else {
-				$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), lang('next'));
-				return false;
+				
+			}else{
+					$this->_show_message(lang('server_command_no_stop_privileges'), site_url('admin/server_control/main/' . $server_id), lang('next'));
+					return false;
 			}
+		} else {
+			$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), lang('next'));
+			return false;
 		}
 		
 		$this->parser->parse('main.html', $this->tpl_data);
-		
 	}
 	
 	
@@ -1017,13 +983,9 @@ class Server_command extends CI_Controller {
 	 * Перезагрузка сервера
 	 * 
 	*/
-	public function restart($id, $confirm = false)
+	public function restart($server_id, $confirm = false)
     {
-		if(!$this->check_errors($id)){
-			$this->servers->get_server_data($id);
-		}
-		
-		if($this->servers->server_data){
+		if($this->servers->get_server_data($server_id)){
 			
 			// Получение прав на сервер
 			$this->users->get_server_privileges($this->servers->server_data['id']);
@@ -1121,7 +1083,7 @@ class Server_command extends CI_Controller {
 						$this->panel_log->save_log($log_data);
 					}
 					
-					$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
+					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
 					return true;
 					
 				}else{
@@ -1132,7 +1094,7 @@ class Server_command extends CI_Controller {
 				}
 			}else{
 					$message = lang('server_command_no_restart_privileges');
-					$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
+					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
 					return false;
 					
 					break;
@@ -1152,13 +1114,9 @@ class Server_command extends CI_Controller {
 	 * Обновление сервера
 	 * 
 	*/
-	public function update($id, $confirm = false)
+	public function update($server_id, $confirm = false)
     {
-		if(!$this->check_errors($id)){
-			$this->servers->get_server_data($id);
-		}
-		
-		if($this->servers->server_data){
+		if ($this->servers->get_server_data($server_id)) {
 			
 			// Получение прав на сервер
 			$this->users->get_server_privileges($this->servers->server_data['id']);
@@ -1217,7 +1175,16 @@ class Server_command extends CI_Controller {
 					//~ }
 					//~ 
 					
-					$sql_data['server_id'] = $id;
+					/* Проверяем, возможно задание уже имеется */
+					$where = array('code' => 'server_update', 'server_id' => $server_id);
+					$query = $this->db->get_where('cron', $where, 1);
+					
+					if ($query->num_rows > 0) {
+						$this->_show_message('Задание уже имеется, установите для него новую дату.');
+						return false;
+					}
+					
+					$sql_data['server_id'] = $server_id;
 			
 					$sql_data['name'] = 'Update server';
 					$sql_data['code'] = 'server_update';
@@ -1231,12 +1198,12 @@ class Server_command extends CI_Controller {
 					$log_data['type'] = 'server_task';
 					$log_data['command'] = 'add_task';
 					$log_data['user_name'] = $this->users->user_login;
-					$log_data['server_id'] = $id;
+					$log_data['server_id'] = $server_id;
 					$log_data['msg'] = 'Add new task';
 					$log_data['log_data'] = 'Name: ' . $sql_data['name'];
 					$this->panel_log->save_log($log_data);
 
-					$this->_show_message(lang('server_command_cmd_sended'), site_url('admin/server_control/main/' . $id), lang('next'));
+					$this->_show_message(lang('server_command_cmd_sended'), site_url('admin/server_control/main/' . $server_id), lang('next'));
 					return true;
 					
 				} else {
@@ -1247,7 +1214,7 @@ class Server_command extends CI_Controller {
 				}
 			} else {
 					$message = lang('server_command_no_update_privileges');
-					$this->_show_message($message, site_url('admin/server_control/main/' . $id), lang('next'));
+					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
 					return false;
 					
 					break;
