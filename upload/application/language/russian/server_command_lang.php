@@ -60,3 +60,6 @@ $lang['server_command_restart_failed'] 						= 'Не удалось переза
 $lang['server_command_update_failed'] 						= 'Ошибка обновления';
 $lang['server_command_start_file_not_found'] 				= 'Исполняемый файл не найден';
 $lang['server_command_start_file_not_executable'] 			= 'У исполняемого файла отсутствуют права на запуск';
+
+// 0.8.10
+$lang['server_command_update_task_exists']					= 'Задание обновления уже имеется, установите для него новую дату.';

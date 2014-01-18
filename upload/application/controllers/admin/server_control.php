@@ -48,6 +48,7 @@ class Server_control extends CI_Controller {
 			
 			$this->load->model('servers');
 			$this->lang->load('server_control');
+			$this->lang->load('server_command');
 			
 			//Base Template
 			$this->tpl_data['title'] 	= lang('server_control_title');
@@ -385,6 +386,19 @@ class Server_control extends CI_Controller {
 		if($this->form_validation->run() == false) {
 			$this->tpl_data['content'] .= $this->parser->parse('servers/task_add.html', $local_tpl_data, true);
 		} else {
+			
+			/* 
+			 * Если создать множество заданий cron с обновлением игровых серверов,
+			 * то возможно замедлить работу выделенного сервера
+			 * В этом случае нужно проверить, имеется ли задание обновления
+			*/
+			$where = array('code' => 'server_update', 'server_id' => $server_id);
+			$query = $this->db->get_where('cron', $where, 1);
+			
+			if ($query->num_rows > 0) {
+				$this->_show_message(lang('server_command_update_task_exists'), site_url('admin/server_control/' . $server_id));
+				return false;
+			}
 			
 			$sql_data['server_id'] = $server_id;
 			

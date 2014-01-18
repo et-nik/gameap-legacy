@@ -1180,7 +1180,7 @@ class Server_command extends CI_Controller {
 					$query = $this->db->get_where('cron', $where, 1);
 					
 					if ($query->num_rows > 0) {
-						$this->_show_message('Задание уже имеется, установите для него новую дату.');
+						$this->_show_message(lang('server_command_update_task_exists'), site_url('admin/server_control/' . $server_id));
 						return false;
 					}
 					
