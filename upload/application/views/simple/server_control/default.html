@@ -1,0 +1,224 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<div class="full_w">
+	<div class="h_title">{lang_server_control_base_commands}</div>
+	<div class="entry">
+		<?php 
+		if(($this->users->auth_privileges['srv_start'] == 1 
+				AND $this->users->auth_servers_privileges['SERVER_START'])
+			AND ($this->servers->server_data['server_status'] == 0)
+		):
+
+		?>
+			<a class="button" href="{site_url}server_command/start/{server_id}">&#9658;&nbsp;{lang_start}</a>
+		<?php endif; ?>
+
+		<?php 
+		if(($this->users->auth_privileges['srv_stop'] == 1 
+				AND $this->users->auth_servers_privileges['SERVER_STOP'])
+			AND ($this->servers->server_data['server_status'] == 1)
+		):
+		?>
+			<a class="button" href="{site_url}server_command/stop/{server_id}">&#9632;&nbsp;{lang_stop}</a>
+		<?php endif; ?>
+
+		<?php 
+		if($this->users->auth_privileges['srv_restart'] == 1 
+			AND $this->users->auth_servers_privileges['SERVER_RESTART']
+		):
+		?>
+			<a class="button" href="{site_url}server_command/restart/{server_id}">&#10162;&nbsp;{lang_restart}</a>
+		<?php endif; ?>
+
+		<?php if($this->users->auth_servers_privileges['SERVER_SOFT_RESTART'] AND $this->servers->server_data['srestart_cmd']): ?>
+			<a class="button" href="{site_url}server_command/rcon/restart/{server_id}/<?php echo $this->security->get_csrf_hash(); ?>">&#10162;&nbsp;{lang_soft_restart}</a>
+		<?php endif; ?>
+
+		<?php if($this->users->auth_servers_privileges['SERVER_UPDATE']): ?>
+			<a class="button" href={site_url}server_command/update/{server_id}>&#10162;&nbsp;{lang_update}</a>
+		<?php endif; ?>
+
+		<?php if ($this->users->auth_servers_privileges['SERVER_SETTINGS']): ?>
+			<a class="button" href="{site_url}admin/settings/server/{server_id}">{lang_server_control_settings}</a>
+		<?php endif; ?>
+
+		<?php if ($this->users->auth_servers_privileges['CONSOLE_VIEW']): ?>
+			<a class="button" href="{site_url}server_command/console_view/{server_id}">{lang_server_control_console_view}</a>
+		<?php endif; ?>
+	</div>
+</div>
+
+
+<?php if ($this->servers->server_data['server_status']): ?>
+	<?php /* Сервер запущен */ ?>
+
+
+	<?php if ($this->players): ?>
+		<div class="full_w">
+			<div class="h_title">{lang_server_control_players_control}</div>
+			<table width="100%" class="zebra">
+				<thead>
+				<tr>
+					<th><strong>{lang_nick}</strong></th>
+					<th><strong>{lang_steamid}</strong></th>
+					<th><strong>{lang_ip}</strong></th>
+					<th><strong>{lang_commands}</strong></th>
+				</tr>
+				</thead>
+			{users_list}
+				<tr>
+					<td width="20%">{user_name}</td>
+					<td width="20%">{steam_id}</td>
+					<td width="20%">{user_ip}</td>
+					<td>
+						<?php if ($this->servers->server_data['kick_cmd']): ?>
+							<a class="small awesome" href="{site_url}server_command/rcon/pl_kick/{server_id}/{user_id}/">{lang_server_control_kick}<a/> 
+						<?php endif; ?>
+						
+						<?php if ($this->servers->server_data['ban_cmd']): ?>
+							<a class="small awesome" href="{site_url}server_command/rcon/pl_ban/{server_id}/{user_id}/">{lang_server_control_ban}<a/> 
+						<?php endif; ?>
+						
+						<?php if ($this->servers->server_data['chname_cmd']): ?>
+							<a class="small awesome" href="{site_url}server_command/rcon/pl_changename/{server_id}/{user_id}/">{lang_server_control_ch_name}<a/>
+						<?php endif; ?>
+					</td>
+				</tr>
+			{/users_list}
+			</table>
+		</div>
+	<?php endif; ?>
+
+	<?php if ($this->users->auth_servers_privileges['FAST_RCON']): ?>
+		<div class="full_w">
+			<div class="h_title">{lang_rcon}</div>
+			
+			<form action="{site_url}server_command/rcon/rcon_command/{server_id}" method="post" accept-charset="utf-8">
+				<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+				<table width="50%">
+					<tr>
+						<td colspan="2"><p>{frcon_list}<a class="small awesome" href="{site_url}server_command/rcon/fast/{server_id}/{id_fr}/<?php echo $this->security->get_csrf_hash(); ?>">{desc}<a/>&nbsp;{/frcon_list}</p></td>
+					</tr>
+				<?php if ($this->users->auth_servers_privileges['RCON_SEND']): ?>
+					<tr>
+						<td>{lang_server_control_rcon_command}:</td>
+						<td><input type="text" name="rcon_command" size="32"/>&nbsp;&nbsp;<input type="submit" name="submit_rcon" value="{lang_send}" /></td>
+					</tr>
+				<?php endif; /* RCON */?>
+				</table>
+			</form>
+		</div>
+	<?php endif; ?>
+
+	<?php if ($this->servers->server_data['sendmsg_cmd']): ?>
+		<div class="full_w">
+			<div class="h_title">{lang_server_control_chat}</div>
+			<form action="{site_url}server_command/rcon/send_msg/{server_id}/" method="post" accept-charset="utf-8">
+				<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+				<table width="50%">
+					<tr>
+						<td>Сообщение:</td>
+						<td><input type="text" name="msg_text" size="50"/>&nbsp;&nbsp;<input type="submit" name="submit_sendmsg" value="{lang_send}" /></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+	<?php endif; ?>
+
+	<?php if ($this->servers->server_data['chmap_cmd'] && $this->servers->server_data['maps_list'] ): ?>
+		<div class="full_w">
+			<div class="h_title">{lang_maps}</div>
+			<form action="{site_url}server_command/rcon/changemap/{server_id}/" method="post" accept-charset="utf-8">
+				<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+				<table width="50%">
+					<tr>
+						<td>{lang_server_control_select_map}</td>
+						<td>
+							<select name="map">
+								{maps_list}
+									<option value="{map_name}">{map_name}</option>
+								{/maps_list}
+							 </select>
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><input type="submit" name="submit_changemap" value="{lang_server_control_change_map}" /></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+	<?php endif; ?>
+
+	<?php if ($this->users->auth_servers_privileges['SERVER_SET_PASSWORD'] && $this->servers->server_data['passwd_cmd']): ?>
+		<div class="full_w">
+			<div class="h_title">{lang_server_control_password_to_server}</div>
+			<form action="{site_url}server_command/rcon/set_password/{server_id}" method="post" accept-charset="utf-8">
+				<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+				<div class="element">
+					<label for="content">{lang_server_control_set_password}:</label>
+					<input type="text" name="password" size="16"/>&nbsp;&nbsp;
+					<input type="submit" name="submit_set_password" value="{lang_send}" /><br />
+					{lang_server_control_leave_blank_that_unset}
+					
+				</div>
+			</form>
+		</div>
+	<?php endif; ?>
+
+<?php endif; ?>
+
+<?php if ($this->users->auth_servers_privileges['LOGS_VIEW']): ?>
+	<div class="full_w">
+		<div class="h_title">{lang_server_control_password_to_server}</div>
+		<table width="100%" class="zebra">
+			<thead>
+			<tr>
+				<th><strong>{lang_time}</strong></th>
+				<th><strong>{lang_action}</strong></th>
+				<th><strong>{lang_command}</strong></th>
+				<th><strong>{lang_user}</strong></th>
+				<th>&nbsp;</td>
+			</tr>
+			</thead>
+		{log_list}
+			<tr>
+				<td width="20%">{log_date}</td>
+				<td width="20%">{log_type}</td>
+				<td width="20%">{log_command}</td>
+				<td width="20%">{log_user_name}</td>
+				<td><a class="small awesome" href={site_url}log_view/view/{log_id}>{lang_view}</a></td>
+			</tr>
+		{/log_list}
+		</table>
+	</div>
+<?php endif; ?>
+
+<?php if ($this->users->auth_servers_privileges['TASK_MANAGE']): ?>
+	<div class="full_w">
+		<div class="h_title">{lang_tasks}</div>
+		<div class="entry">
+			<a class="button" href={site_url}admin/server_control/add_task/{server_id}>{lang_server_control_add_task}</a>
+		</div>
+		<table width="100%" class="zebra">
+			<thead>
+			<tr>
+				<th><strong>{lang_time}</strong></th>
+				<th><strong>{lang_title}</strong></th>
+				<th><strong>{lang_action}</strong></th>
+				<th>&nbsp;</td>
+			</tr>
+			</thead>
+		{task_list}
+			<tr>
+				<td width="20%">{task_date}</td>
+				<td width="20%">{task_name}</td>
+				<td width="20%">{task_action}</td>
+				<td>
+					<a class="green small awesome" title="{lang_edit}" href="{site_url}admin/server_control/edit_task/{task_id}">E<a/>&nbsp;
+					<a class="red small awesome" title="{lang_delete}" href="{site_url}admin/server_control/delete_task/{task_id}">X<a/>&nbsp;
+				</td>
+			</tr>
+		{/task_list}
+		</table>
+	</div>
+<?php endif; ?>

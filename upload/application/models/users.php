@@ -235,9 +235,6 @@ class Users extends CI_Model {
         
         if ($to_this) {
 			/* Сохранять значения в $this->****  */
-            //$this->user_id = $user_data['id'];
-            //$this->user_login = $user_data['login'];
-            
             $this->user_data = $user_data;
             $this->user_privileges = $user_privileges;
         }

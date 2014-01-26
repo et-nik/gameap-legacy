@@ -1,0 +1,73 @@
+<a class="awesome" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>
+<a onclick="update_console();return false;" href="#" class="green awesome">{lang_update}</a>
+
+<h2>{lang_server_command_console}</h2>
+
+<script type="text/javascript">
+		var update_time = 10 * 1000;
+		var autoupdate = 1;
+		var block = 0;
+		
+		function update_console() {
+			if (block == 1) {
+				return;
+			}
+			
+			block = 1;
+			
+			$.ajax({ 
+					url:     '{site_url}ajax/server_control/get_console/' + {server_id},
+					type:     "GET",
+					dataType: "html",
+					success: function(response) {
+						document.getElementById("console_content").innerHTML = response;
+						block = 0;
+					},
+			});
+		}
+		
+		function send_command() {
+			var command = $('#command_input').val();
+			
+			$.ajax({ 
+					url:     '{site_url}ajax/server_control/send_command/' + {server_id},
+					type:     "POST",
+					data:
+					{
+						'command': command,
+						'<?php echo $this->security->get_csrf_token_name(); ?>': '<?php echo $this->security->get_csrf_hash(); ?>'
+					},
+					success: function(response) {
+						if (response == 'Server is down') {
+							noty({layout: 'bottomCenter', type: 'error', text: '{lang_server_command_server_down}'});
+						} else if (response == 'Rcon connect error') {
+							noty({layout: 'bottomCenter', type: 'error', text: 'Rcon connect error'});
+						} else {
+							update_console();
+							$('#command_input').val('');
+						}
+					},
+			});
+		}
+		
+		$(document).ready(function () {
+			
+			if (autoupdate == 1) {
+				setInterval(function(){update_console();}, update_time);
+			}
+
+			$('#command_input').keyup(function(event)
+			{
+				if (event.which == 13)
+				{
+					send_command();
+				}
+			});
+			
+		});
+		
+</script>
+
+<p align="left"><div id="console_content" class="code" style="height:250px;overflow:scroll;">{console_content}</div></p>
+<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+<p><input id="command_input" type="text" style="width:75%" name="command" />&nbsp;<a onclick="send_command();return false;" class="small blue awesome">{lang_send}</a></p>

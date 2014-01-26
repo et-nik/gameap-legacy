@@ -1,0 +1,20 @@
+{pagination}
+<table width="100%" class="zebra">
+	<thead>
+		<th><strong>{lang_time}</strong></th>
+		<th><strong>{lang_action}</strong></th>
+		<th><strong>{lang_command}</strong></th>
+		<th><strong>{lang_user}</strong></th>
+		<th>&nbsp;</td>
+	</thead>
+{log_list}
+	<tr>
+		<td width="20%">{log_date}</td>
+		<td width="20%">{log_type}</td>
+		<td width="20%">{log_command}</td>
+		<td width="20%">{log_user_name}</td>
+		<td><a class="small awesome" href={site_url}log_view/view/{log_id}>{lang_view}</a></td>
+	</tr>
+{/log_list}
+</table>
+{pagination}

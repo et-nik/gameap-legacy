@@ -96,9 +96,14 @@ if ( ! function_exists('change_value_on_file')) {
 	{
 		$found = false;
 		$file_contents = explode("\n", $file_contents);
-		$pattern = '/(' . $variable_name . ')[\s*|\=][\"\']?(\w*)[\"\']?/six';
-		$pattern_gap = '/(\w*)([\s*|\=])[\"\']?(\w*)[\"\']?/six';
-		$gap = false;
+		
+		// Паттерн строки
+		$pattern = '/\s*[\"\']?(' . $variable_name . ')[\"\']?[\s*|\=]+[\"\']?(\w*)[\"\']?/six';
+		
+		// Паттер для определения промежутка
+		$pattern_gap = '/(\w*)\s*([\s*|\=])\s*[\"\']?(\w*)[\"\']([\;]?)?/six';
+		$gap = false;	// Промежуток
+		$end = false;  // Окончание (бывает, что в конце строки имеется ;)
 		
 		foreach($file_contents as &$string) {
 
@@ -116,6 +121,7 @@ if ( ! function_exists('change_value_on_file')) {
 			if (!$gap) {
 				if (preg_match($pattern_gap, $string, $matches)) {
 					$gap = $matches[2];
+					$end = $matches[4];
 				}
 			}
 		}
@@ -123,7 +129,7 @@ if ( ! function_exists('change_value_on_file')) {
 		if (!$found) {
 			$gap = !$gap ? ' ' : $gap;
 			// Значения в файле не найдены, добавляем
-			$file_contents[] = $variable_name . $gap . $variable_value;
+			$file_contents[] = $variable_name . $gap . $variable_value . $end;
 		}
 		
 		return implode("\n", $file_contents);

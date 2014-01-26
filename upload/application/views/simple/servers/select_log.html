@@ -1,0 +1,20 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<div class="full_w">
+	<div class="h_title">{lang_servers_log_select_type}</div>
+	<table width="75%" class="zebra">
+		<tbody>
+			<tr>
+				<th><strong>{lang_description}</strong></th>
+				<th><strong>{lang_path}</strong></th>
+				<th><strong>&nbsp;</strong></th>
+			</tr>
+		</tbody>
+	{ldir_list}
+		<tr>
+			<td>{desc}</td>
+			<td>{path}</td>
+			<td align="center"><a class="button" href="{site_url}admin/servers_log/list_logs/{server_id}/{id_dir}">{lang_select}</a></td>
+		</tr>
+	{/ldir_list}
+	</table>
+</div>

@@ -30,8 +30,8 @@ class Telnet {
 
 	/* (c) thies@thieso.net */
 
-	var $_connection 	= false;
-	var $_auth			= false;
+	private 	$_connection 	= false;
+	private 	$_auth			= false;
 	var $errors = '';
 	
 	private $ip;
@@ -56,14 +56,13 @@ class Telnet {
 		$this->ip = $ip;
 		$this->port = $port;
 		
-		$this->_connection = fsockopen($this->ip, $this->port);
-		socket_set_timeout($this->_connection, 7);
-
-		if (!$this->_connection) {
+		if ($this->_connection = fsockopen($this->ip, $this->port)) {
+			socket_set_timeout($this->_connection, 7);
+		} else {
 			return false;
 		}
-		
-		$this->auth = false;
+
+		$this->_auth = false;
 		return $this->_connection;
 	}
 
@@ -74,7 +73,9 @@ class Telnet {
 	*/
 	function auth($login, $password)
 	{
-		if ($this->auth == true) {
+		if (!$this->_connection) { return false;}
+		
+		if ($this->_auth == true) {
 			return NULL;
 		}
 		
@@ -87,12 +88,12 @@ class Telnet {
 		$this->_write("\r\n");
 		$this->_read_till(":> ");
 		
-		$this->auth = true;
+		$this->_auth = true;
 	}
 
 	function command($command)
 	{
-		if(!$this->_connection) { return false;}
+		if (!$this->_connection) { return false;}
 		
 		$this->_write($command . "\n\r");
 
@@ -143,6 +144,8 @@ class Telnet {
 
 	function _read_till($what) 
 	{
+		if (!$this->_connection) { return false;}
+		
 		$buf = '';
 
 		while (1) {

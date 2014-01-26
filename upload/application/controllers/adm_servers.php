@@ -574,7 +574,7 @@ class Adm_servers extends CI_Controller {
 					$tpl_file_add = 'adm_servers/games_add.html';
 					
 					$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[32]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('code', lang('adm_servers_game_code'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
+					$this->form_validation->set_rules('code', lang('adm_servers_game_code'), 'trim|required|max_length[64]|min_length[2]|xss_clean');
 					$this->form_validation->set_rules('start_code', lang('adm_servers_game_start_code'), 'trim|required|max_length[32]|min_length[2]|xss_clean');
 					$this->form_validation->set_rules('engine', lang('adm_servers_engine'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
 					$this->form_validation->set_rules('engine_version', lang('adm_servers_engine_version'), 'trim|numeric|max_length[11]|xss_clean');
@@ -599,7 +599,7 @@ class Adm_servers extends CI_Controller {
 					$this->tpl_data['title'] 	= lang('adm_servers_title_add_game_type');
 					$this->tpl_data['heading'] 	= lang('adm_servers_heading_add_game_type');
 					
-					$this->form_validation->set_rules('code', 'код игры', 'trim|required|max_length[64]|min_length[3]|xss_clean');
+					$this->form_validation->set_rules('code', 'код игры', 'trim|required|max_length[64]|min_length[2]|xss_clean');
 					$this->form_validation->set_rules('name', 'название игры', 'trim|required|max_length[32]|min_length[3]|xss_clean');
 					
 					$this->form_validation->set_rules('disk_size', 'размер диска', 'trim|numeric|required|max_length[11]|xss_clean');
@@ -1457,8 +1457,8 @@ class Adm_servers extends CI_Controller {
 					
 				/* Правила для проверки формы */
 				$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('code', lang('adm_servers_game_code'), 'trim|required|max_length[32]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('start_code', lang('adm_servers_game_start_code'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('code', lang('adm_servers_game_code'), 'trim|required|max_length[32]|min_length[2]|xss_clean');
+				$this->form_validation->set_rules('start_code', lang('adm_servers_game_start_code'), 'trim|required|max_length[64]|min_length[2]|xss_clean');
 					
 				$this->form_validation->set_rules('engine', lang('adm_servers_engine'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
 				$this->form_validation->set_rules('engine_version', lang('adm_servers_engine_version'), 'trim|required|max_length[64]|xss_clean');
@@ -1581,7 +1581,7 @@ class Adm_servers extends CI_Controller {
 				*/
 				
 				$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('game_code', lang('adm_servers_game_code'), 'trim|required|max_length[32]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('game_code', lang('adm_servers_game_code'), 'trim|required|max_length[32]|min_length[2]|xss_clean');
 				
 				/* Параметры запуска */
 				$this->form_validation->set_rules('execfile_linux', lang('adm_servers_linux_execute'), 'trim|max_length[32]|xss_clean');

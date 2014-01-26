@@ -90,19 +90,17 @@ class Users_control extends CI_Controller {
         
         /* Постраничная навигация */
 		$config['base_url'] = site_url('admin/users_control/index');
-		//~ $config['uri_segment'] = 4;
+		$config['uri_segment'] = 4;
 		$config['total_rows'] = $this->db->count_all_results('users');
-		$config['per_page'] = 10;
+		$config['per_page'] = 20;
 		$config['full_tag_open'] = '<p id="pagination">';
 		$config['full_tag_close'] = '</p>';
 		
 		$this->pagination->initialize($config); 
 		$local_tpl_data['pagination'] = $this->pagination->create_links();
 
-		$this->tpl_data['content'] .= $this->parser->parse('web_users/web_users.html', $this->tpl_data, true);
-
-		$tpl_local_data['users_list'] = $this->users->tpl_users_list(null, $offset);
-		$this->tpl_data['content'] .= $this->parser->parse('web_users/web_users_list.html', $tpl_local_data, true);
+		$local_tpl_data['users_list'] = $this->users->tpl_users_list($config['per_page'], $offset);
+		$this->tpl_data['content'] .= $this->parser->parse('web_users/web_users_list.html', $local_tpl_data, true);
         
         $this->parser->parse('main.html', $this->tpl_data);
     }
@@ -213,7 +211,7 @@ class Users_control extends CI_Controller {
 			 * Не указан ID сервера
 			 * Показываем список серверов
 			*/
-			if(!$server_id){
+			if (!$server_id) {
 				
 				$this->load->model('servers');
 				
@@ -232,17 +230,9 @@ class Users_control extends CI_Controller {
 			foreach ($user_privileges as $privilege_name => $privilege_value)
 			{
 				$num++;
-				
-				$chechbox_data = array(
-					'name'        => 'newsletter',
-					'id'          => 'newsletter',
-					'value'       => 'accept',
-					'checked'     => true,
-					'style'       => 'margin:10px',
-				);
-				
-				$local_tpl_data['privilege_list'][$num]['form_checkbox'] = form_checkbox($privilege_name, '1', $privilege_value);
-				$local_tpl_data['privilege_list'][$num]['human_name'] = $this->users->all_privileges[$privilege_name];
+
+				$local_tpl_data['privilege_list'][$num]['form_checkbox'] 	= form_checkbox($privilege_name, '1', $privilege_value);
+				$local_tpl_data['privilege_list'][$num]['human_name'] 		= $this->users->all_privileges[$privilege_name];
 			}
 			
 			$local_tpl_data['server_id'] = $server_id;

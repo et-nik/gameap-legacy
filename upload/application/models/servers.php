@@ -325,7 +325,7 @@ class Servers extends CI_Model {
 			$data['rcon'] = $this->encrypt->encode($data['rcon']);
 		}
 		
-		/* Присваиваем имя scren  */
+		/* Присваиваем имя screen  */
 		$data['screen_name'] = (!isset($data['screen_name'])) ? $data['game'] . '_' . random_string('alnum', 6) . '_' . $data['server_port'] : $data['screen_name'];
 		
 		if ($id = $this->db->insert('servers', $data)) {

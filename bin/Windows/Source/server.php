@@ -1,15 +1,27 @@
 <?php
 
-/*==================================================================*
-|					Game AdminPanel by ET-NiK						|
-|-------------------------------------------------------------------|
-|	Site: http://gameap.ru											|
-|   Site: http://hldm.org											|
-|	E-Mail: nikita@hldm.org											|
-|-------------------------------------------------------------------|
-| Исполняемый файл АдминПанели для Windows				 			|
-| 																	|
-*==================================================================*/
+/**
+ * Game AdminPanel (АдминПанель)
+ *
+ * 
+ *
+ * @package    Game AdminPanel
+ * @author    Nikita Kuznetsov (ET-NiK)
+ * @copyright  Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
+ * @license    http://www.gameap.ru/license.html
+ * @link    http://www.gameap.ru
+ * @filesource  
+ */
+ 
+ /**
+ * Исходный файл исполняемого файла Windows
+ * Компилируется при помощи bam compile (http://www.bambalam.se/bamcompile/)
+ *
+ * @package    Game AdminPanel
+ * @category  Executable file source
+ * @author    Nikita Kuznetsov (ET-NiK)
+ * @sinse    0.4
+ */
 
 // ./server.exe start {dir} {name} {ip} {port} "hlds.exe -game {game} +ip {ip} +port {port} +map crossfire"
 	
@@ -52,15 +64,33 @@ if(isset($start_command)) {
 	}
 }
 
-//echo $programm . "\n";
-//echo $arguments . "\n";
+// Узнаем CPU с наименьшей загрузкой
+function get_lowload_cpu()
+{
+	exec("wmic CPU get LoadPercentage",$res);
 
-//echo __FILE__;
+	// Избавляемся от LoadPercentage столбца
+	unset($res[0]);
+	// Сносим отступ в конце вывода
+	unset($res[count($res)]);
+
+	$cpu = 1;
+	$cpu_load = 0;
+	
+	foreach ($res as $n => $load) {
+		if ($cpu_load > $load OR !$cpu_load) {
+			$cpu = $n;
+			$cpu_load = $load;
+		}
+	}
+
+	return array($cpu, $cpu_load);
+}
 
 if(file_exists('psexec.exe')) {
-	$psexec = 'psexec.exe -s -i -w "' . $dir . '" -d ';
+	$psexec = 'psexec.exe -s -i -d '.$useCpu[0].' -w "' . $dir . '"';
 } elseif(file_exists('paexec.exe')) {
-	$psexec = 'paexec.exe \\localhost -s -d -w "' . $dir . '" -d ';
+	$psexec = 'paexec.exe \\\\localhost -s -d -w "' . $dir . '"';
 } else {
 	echo "psexec.exe and paexec.exe not found\n";
 	$psexec = 'start /D "' . $dir . '" /I ';

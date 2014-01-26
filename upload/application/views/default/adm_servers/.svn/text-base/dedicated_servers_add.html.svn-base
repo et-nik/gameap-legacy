@@ -1,0 +1,190 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="awesome" href="{site_url}adm_servers/view/dedicated_servers">« {lang_adm_servers_dedicated_servers}</a>
+<h2>{lang_adm_servers_heading_add_ds}</h2>
+
+<p>{lang_adm_servers_ds_documentation}</p>
+
+<form action="{site_url}adm_servers/add/dedicated_servers" method="post" accept-charset="utf-8">
+	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+
+	<table class="zebra" width="100%">
+	<tr>
+		<td width="45%">{lang_name}:</td>
+		<td><input type="text" name="name" /></td>
+	</tr>
+
+	<tr>
+		<td>{lang_operationg_system}:</td>
+		<td>
+			<select name="os">
+				<option value="Linux" selected="selected">Linux</option>
+				<option value="Windows">Windows</option>
+			 </select>
+		</td>
+	</tr>
+
+	<tr>
+		<td>{lang_adm_servers_location}:</td>
+		<td><input type="text" name="location" value="Russia" /></td>
+	</tr>
+
+	<tr>
+		<td>{lang_adm_servers_provider}:</td>
+		<td><input type="text" name="provider" /></td>
+	</tr>
+
+	<tr>
+		<td>{lang_ip}:<br /><span class="description">{lang_adm_servers_ip_description}</span></td>
+		<td><input type="text" name="ip" /></td>
+	</tr>
+
+	<tr>
+		<td>{lang_adm_servers_ram}:</td>
+		<td><input type="text" name="ram" /></td>
+	</tr>
+
+	<tr>
+		<td>{lang_adm_servers_cpu}:</td>
+		<td><input type="text" name="cpu" /></td>
+	</tr>
+	</table>
+
+	<br />
+
+
+	<ul class="tabs">
+		<li><a href="#access_data">{lang_adm_servers_ds_access}</a></li>
+		<li><a href="#ftp_data">{lang_adm_servers_ftp_data}</a></li>
+        <li><a href="#ssh_data">{lang_adm_servers_ssh_data}</a></li>
+        <li><a href="#telnet_data">{lang_adm_servers_telnet_data}</a></li>
+    </ul>
+    
+    <div id="access_data" class="tab_content">
+		<table class="zebra" width="100%">
+			<tbody>
+				<tr>
+					<td colspan="2"><p class="hr"><span class="description">{lang_adm_servers_ds_access_desc}</span></p></td>
+				</tr>
+			</tbody>
+			
+			<tr>
+				<td>{lang_adm_servers_steamcmd_path}:<br /><span class="description">[ {lang_adm_servers_steamcmd_path_desc} ]</span></td>
+				<td><input type="text" name="steamcmd_path" /></td>
+			</tr>
+			
+			<tr>
+				<td width="40%">{lang_adm_servers_control_protocol}:</td>
+				<td>
+					<select name="control_protocol">
+						<?php if(in_array('ssh2', get_loaded_extensions())): ?>
+						<option value="0" selected="selected">{lang_adm_servers_default}</option>
+						<option value="ssh">SSH</option>
+						<?php endif; ?>
+						<option value="telnet">Telnet</option>
+					 </select>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<div id="ssh_data" class="tab_content">
+		<table class="zebra" width="100%">
+			<tbody>
+				<tr>
+					<td colspan="2"><p class="hr">{lang_adm_servers_ssh_data}</p></td>
+				</tr>
+			</tbody>
+			
+			<?php if(in_array('ssh2', get_loaded_extensions())): ?>
+			<tr>
+				<td width="30%">{lang_adm_servers_ssh_host}:</td>
+				<td><input type="text" name="ssh_host" /></td>
+			</tr>
+
+			<tr>
+				<td>{lang_login}:</td>
+				<td><input type="text" name="ssh_login" /></td>
+			</tr>
+
+			<tr>
+				<td>{lang_password}:</td>
+				<td><input type="text" name="ssh_password" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_path_to_executable_file}:</td>
+				<td><input type="text" name="ssh_path" /></td>
+			</tr>
+			<?php else: ?>
+			<tr>
+				<td colspan="2">{lang_adm_servers_not_ssh_php}</td>
+			</tr>
+			<?php endif; ?>
+		</table>
+	</div>
+	
+	<div id="telnet_data" class="tab_content">
+		<table class="zebra" width="100%">
+			<tbody>
+				<tr>
+					<td colspan="2"><p class="hr">{lang_adm_servers_telnet_data}</p></td>
+				</tr>
+			</tbody>
+
+			<tr>
+				<td width="30%">{lang_adm_servers_telnet_host}:</td>
+				<td><input type="text" name="telnet_host" /></td>
+			</tr>
+
+			<tr>
+				<td>{lang_login}:</td>
+				<td><input type="text" name="telnet_login" /></td>
+			</tr>
+
+			<tr>
+				<td>{lang_password}:</td>
+				<td><input type="text" name="telnet_password"  /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_path_to_executable_file}:</td>
+				<td><input type="text" name="telnet_path" /></td>
+			</tr>
+		</table>
+	</div>
+
+	<div id="ftp_data" class="tab_content">
+		<table class="zebra" width="100%">
+			<tbody>
+				<tr>
+					<td colspan="2"><p class="hr">{lang_adm_servers_ftp_data}</p></td>
+				</tr>
+			</tbody>
+
+
+			<tr>
+				<td width="30%">{lang_adm_servers_ftp_host}:</td>
+				<td><input type="text" name="ftp_host" /></td>
+			</tr>
+
+			<tr>
+				<td>{lang_login}:</td>
+				<td><input type="text" name="ftp_login" /></td>
+			</tr>
+
+			<tr>
+				<td>{lang_password}:</td>
+				<td><input type="text" name="ftp_password" /></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_path_to_executable_file}:</td>
+				<td><input type="text" name="ftp_path" /></td>
+			</tr>
+
+		</table>
+	</div>
+
+	<br />
+	<input class="button" type="submit" name="dsadd_submit" value="{lang_add}" />
+</form>

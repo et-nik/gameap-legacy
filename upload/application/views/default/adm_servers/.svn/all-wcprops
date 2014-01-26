@@ -1,0 +1,119 @@
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/admin/!svn/ver/36/application/views/default/adm_servers
+END
+dedicated_servers_list.html
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/dedicated_servers_list.html
+END
+game_servers_list.html
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/game_servers_list.html
+END
+dedicated_servers.html
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/dedicated_servers.html
+END
+dedicated_servers_control.html
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/dedicated_servers_control.html
+END
+game_servers_control.html
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/admin/!svn/ver/37/application/views/default/adm_servers/game_servers_control.html
+END
+game_servers.html
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/game_servers.html
+END
+install_game_server.html
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/install_game_server.html
+END
+dublicate_game_type.html
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/dublicate_game_type.html
+END
+games_list.html
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/games_list.html
+END
+dedicated_servers_add.html
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/dedicated_servers_add.html
+END
+game_types_list.html
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/game_types_list.html
+END
+game_servers_add.html
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/game_servers_add.html
+END
+games_control.html
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/games_control.html
+END
+games.html
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/games.html
+END
+dedicated_servers_stats.html
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/dedicated_servers_stats.html
+END
+game_types_control.html
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/game_types_control.html
+END
+game_types.html
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/game_types.html
+END
+games_add.html
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/games_add.html
+END
+game_types_add.html
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/admin/!svn/ver/15/application/views/default/adm_servers/game_types_add.html
+END

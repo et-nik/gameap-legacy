@@ -6,9 +6,9 @@
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
- * @license		http://gameap.ru/license.html
- * @link		http://gameap.ru
+ * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
+ * @license		http://www.gameap.ru/license.html
+ * @link		http://www.gameap.ru
  * @filesource	
  */
  
@@ -419,7 +419,7 @@ class Server_control extends CI_Controller {
 			// Сохраняем логи
 			$log_data['type'] = 'server_task';
 			$log_data['command'] = 'add_task';
-			$log_data['user_name'] = $this->users->user_login;
+			$log_data['user_name'] = $this->users->auth_login;
 			$log_data['server_id'] = $server_id;
 			$log_data['msg'] = 'Add new task';
 			$log_data['log_data'] = 'Name: ' . $sql_data['name'];
@@ -501,7 +501,7 @@ class Server_control extends CI_Controller {
 			// Сохраняем логи
 			$log_data['type'] = 'server_task';
 			$log_data['command'] = 'delete_task';
-			$log_data['user_name'] = $this->users->user_login;
+			$log_data['user_name'] = $this->users->auth_login;
 			$log_data['server_id'] = $task_list[0]['server_id'];
 			$log_data['msg'] = 'Delete task';
 			$log_data['log_data'] = '';
@@ -630,7 +630,7 @@ class Server_control extends CI_Controller {
 			// Сохраняем логи
 			$log_data['type'] = 'server_task';
 			$log_data['command'] = 'edit_task';
-			$log_data['user_name'] = $this->users->user_login;
+			$log_data['user_name'] = $this->users->auth_login;
 			$log_data['server_id'] = $task_list[0]['server_id'];
 			$log_data['msg'] = 'Edit task';
 			$log_data['log_data'] = 'Name: ' . $sql_data['name'];

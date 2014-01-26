@@ -44,7 +44,7 @@ define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 |
 */
 
-define('AP_VERSION',	'0.8.9');
+define('AP_VERSION',	'0.8.10');
 define('AP_DATE',	'14.01.2014');
 
 

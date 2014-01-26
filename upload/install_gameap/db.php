@@ -172,7 +172,6 @@ $fields = array(
 		
 		'stats' => array(
 							 'type' => 'TEXT',
-							 'default' => '',
 		),
 		
 		'steamcmd_path' => array(

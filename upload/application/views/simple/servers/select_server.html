@@ -1,0 +1,18 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<div class="full_w">
+	<div class="h_title">{lang_select_server}</div>
+	<table width="75%" class="zebra">
+		<tr>
+			<th><strong>{lang_name}</strong></th>
+			<th>{lang_ip}</strong></th>
+			<th><strong>&nbsp;</strong></th>
+		</tr>
+	{servers_list}
+		<tr>
+			<td>{server_name}</td>
+			<td>{server_ip}:{server_port}</td>
+			<td align="center"><a class="table-icon edit" href="{url}/{server_id}" title="{lang_select}"></a></td>
+		</tr>
+	{/servers_list}
+	</table>
+</div>

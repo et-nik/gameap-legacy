@@ -1,9 +1,13 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
-<br /><br />
+<?php if($this->users->auth_privileges['usr_create']): ?>
+<a class="awesome" href="{site_url}admin/users_control/add">{lang_users_add_user}</a>
+<?php endif; ?>
+<br />
+{pagination}
 <table width="100%" class="zebra">
 	<tbody>
 		<tr>
-			<th width="15%">{lang_login}</th>
+			<th width="10%">{lang_login}</th>
 			<th width="15%">{lang_profile_registered}</th>
 			<th width="20%">{lang_profile_last_visit}</th>
 			<th>{lang_commands}</th>
@@ -24,3 +28,4 @@
 	</tr>
 {/users_list}
 </table>
+{pagination}
