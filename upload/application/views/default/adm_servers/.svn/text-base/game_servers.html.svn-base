@@ -1,3 +1,0 @@
-<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
-<a class="awesome" href="{site_url}adm_servers/add/game_servers">{lang_adm_servers_add_game_server}</a>
-<a class="awesome" href="{site_url}adm_servers/install_game_server">{lang_adm_servers_install_game_server}</a>
