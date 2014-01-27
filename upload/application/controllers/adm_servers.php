@@ -6,7 +6,7 @@
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
+ * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
  * @license		http://www.gameap.ru/license.html
  * @link		http://www.gameap.ru
  * @filesource
@@ -110,14 +110,11 @@ class Adm_servers extends CI_Controller {
 	 * Проверка SSH
 	 * 
 	*/
-    function _check_ssh($ssh_host, $ssh_login, $ssh_password) {
-		
+    function _check_ssh($ssh_host, $ssh_login, $ssh_password) 
+    {
 		// Разделяем на Host:Port
 		$ssh_host = explode(':', $ssh_host);
-							
-		if(!isset($ssh_host[1])) {
-			$ssh_host[1] = 22;
-		}
+		$ssh_host[1] = (isset($ssh_host[1])) ? (int)$ssh_host[1] : 22;
 		
 		$connection = ssh2_connect($ssh_host[0], $ssh_host[1]);
 		
@@ -135,23 +132,36 @@ class Adm_servers extends CI_Controller {
 	 * Проверка FTP
 	 * 
 	*/
-	function _check_ftp($ftp_host, $ftp_login, $ftp_password) {
-		
+	function _check_ftp($ftp_host, $ftp_login, $ftp_password) 
+	{
+		$this->load->library('ftp');
+
 		// Разделяем на Host:Port
 		$ftp_host = explode(':', $ftp_host);
-							
-		if(!isset($ftp_host[1])) {
-			$ftp_host[1] = 21;
-		}
-
-		$connection = ftp_connect($ftp_host[0], $ftp_host[1]);
-
-		/* Если не удалось соединиться или неверные данные */
-		if (!$connection OR !ftp_login($connection, $ftp_login, $ftp_password)) {
-			return false;
-		} else {
+		$ftp_host[1] = (isset($ftp_host[1])) ? (int)$ftp_host[1] : 21;
+		
+		$ftp_config['hostname'] 	= $ftp_host[0];
+		$ftp_config['port']     	= $ftp_host[1];
+		$ftp_config['username'] 	= $ftp_login;
+		$ftp_config['password'] 	= $ftp_password;
+		$ftp_config['passive']  	= false;
+		
+		if ($this->ftp->connect($ftp_config)) {
 			return true;
+		} else {
+			return false;
 		}
+	}
+
+	// -----------------------------------------------------------------
+	
+	/**
+	 * Поиск пути к server.sh/server.exe
+	 * Соединение с ftp сервером уже должно быть выполнено!
+	*/
+	private function _found_ftp_path($ftp_path = false)
+	{
+		return $this->ftp->search(array('server.sh', 'server.exe'), $ftp_path);
 	}
 	
 	// -----------------------------------------------------------------
@@ -230,6 +240,8 @@ class Adm_servers extends CI_Controller {
 	*/
 	function _stats_processing($stats) 
 	{
+		$data = array();
+		
 		foreach($stats as $arr) {
 					
 			/* Показываем только за последние 3 часа */
@@ -245,7 +257,7 @@ class Adm_servers extends CI_Controller {
 		
 		return $data;
 	}
-	
+
 	// -----------------------------------------------------------------
 	
 	/**
@@ -307,7 +319,6 @@ class Adm_servers extends CI_Controller {
 					$this->tpl_data['title'] 	= lang('adm_servers_title_ds');
 					$this->tpl_data['heading'] 	= lang('adm_servers_heading_ds');
 					
-					$parse_file = 'adm_servers/dedicated_servers.html';				// В этом файле обычно меню
 					$parse_list_file = 'adm_servers/dedicated_servers_list.html';	// Шаблон списка
 					
 					if ($tpl_list = $this->dedicated_servers->tpl_data_ds()) {
@@ -323,7 +334,6 @@ class Adm_servers extends CI_Controller {
 					$this->tpl_data['title'] 	= lang('adm_servers_title_gs');
 					$this->tpl_data['heading'] 	= lang('adm_servers_heading_gs');
 					
-					$parse_file = 'adm_servers/game_servers.html';				// В этом файле обычно меню
 					$parse_list_file = 'adm_servers/game_servers_list.html';	// Шаблон списка
 					
 					if($this->servers->get_server_list(false, false, array())){
@@ -340,7 +350,6 @@ class Adm_servers extends CI_Controller {
 					$this->tpl_data['title'] 	= lang('adm_servers_title_games');
 					$this->tpl_data['heading']	= lang('adm_servers_heading_games');
 					
-					$parse_file = 'adm_servers/games.html';			// В этом файле обычно меню
 					$parse_list_file = 'adm_servers/games_list.html';	// Шаблон списка
 				
 					if ($this->games->get_games_list()) {
@@ -359,7 +368,6 @@ class Adm_servers extends CI_Controller {
 					$this->tpl_data['title'] 	= lang('adm_servers_title_gt');
 					$this->tpl_data['heading'] 	= lang('adm_servers_heading_gt');
 					
-					$parse_file = 'adm_servers/game_types.html';			// В этом файле обычно меню
 					$parse_list_file = 'adm_servers/game_types_list.html';	// Шаблон списка
 					
 					if($this->game_types->get_gametypes_list()){
@@ -507,56 +515,56 @@ class Adm_servers extends CI_Controller {
 					break;
 					
 				case 'game_servers':
-				
-					/* --------------------------------------------	*/
-					/* 				Игровые серверы 				*/
-					/* --------------------------------------------	*/
+					redirect('adm_servers/install_game_server');
+					//~ /* --------------------------------------------	*/
+					//~ /* 				Игровые серверы 				*/
+					//~ /* --------------------------------------------	*/
+					//~ 
+					//~ $this->load->model('servers/dedicated_servers');
+					//~ $this->load->model('servers/games');
+					//~ 
+					//~ // Добавление нового сервера
+					//~ $this->tpl_data['title'] 	= lang('adm_servers_title_add_gs');
+					//~ $this->tpl_data['heading'] 	= lang('adm_servers_heading_add_gs');
+					//~ 
+					//~ // Получаем данные DS для шаблона
+					//~ $local_tpl_data['ds_list'] = $this->dedicated_servers->tpl_data_ds();
+					//~ 
+					//~ // Получаем данные игр для шаблона
+					//~ $local_tpl_data['games_list'] = $this->games->tpl_data_games();
+					//~ 
+					//~ if(empty($this->games->games_list)) {
+						//~ $this->_show_message(lang('adm_servers_empty_games_list', base_url() . 'adm_servers/add/games'));
+						//~ return false;
+					//~ }
+					//~ 
+					//~ $tpl_file_add = 'adm_servers/game_servers_add.html';
+					//~ 
+					//~ /* Проверка формы */
+					//~ $this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
+					//~ 
+					//~ $this->form_validation->set_rules('server_ip', lang('ip'), 'trim|max_length[64]|min_length[4]|xss_clean');
+					//~ $this->form_validation->set_rules('server_port', lang('port'), 'trim|required|integer|max_length[6]|min_length[2]|xss_clean');
+					//~ $this->form_validation->set_rules('query_port', lang('adm_servers_query_port'), 'trim|integer|max_length[6]|min_length[2]|xss_clean');
+					//~ $this->form_validation->set_rules('rcon_port', lang('adm_servers_rcon_port'), 'trim|integer|max_length[6]|min_length[2]|xss_clean');
+					//~ 
+					//~ $this->form_validation->set_rules('rcon', 'RCON password', 'trim|max_length[64]|min_length[3]|xss_clean');
+					//~ $this->form_validation->set_rules('code',  lang('adm_servers_game_code'), 'trim|required|max_length[32]|min_length[3]|xss_clean');
+					//~ $this->form_validation->set_rules('game_type', lang('adm_servers_game_type'), 'trim|required|integer|xss_clean');
+					//~ $this->form_validation->set_rules('dir', lang('adm_servers_server_dir'), 'trim|required|max_length[64]|xss_clean');
+					//~ $this->form_validation->set_rules('ds_id', lang('dedicated_server'), 'trim|numeric|max_length[11]|xss_clean');
+					//~ 
+					//~ $this->form_validation->set_rules('screen_name', lang('dedicated_server'), 'trim|max_length[64]|min_length[3]|xss_clean');
+					//~ $this->form_validation->set_rules('su_user', lang('adm_servers_user_start'), 'trim|max_length[64]|xss_clean');
+					//~ $this->form_validation->set_rules('start_command', lang('adm_servers_command_start'), 'trim|max_length[512]|xss_clean');
 					
-					$this->load->model('servers/dedicated_servers');
-					$this->load->model('servers/games');
-					
-					// Добавление нового сервера
-					$this->tpl_data['title'] 	= lang('adm_servers_title_add_gs');
-					$this->tpl_data['heading'] 	= lang('adm_servers_heading_add_gs');
-					
-					// Получаем данные DS для шаблона
-					$local_tpl_data['ds_list'] = $this->dedicated_servers->tpl_data_ds();
-					
-					// Получаем данные игр для шаблона
-					$local_tpl_data['games_list'] = $this->games->tpl_data_games();
-					
-					if(empty($this->games->games_list)) {
-						$this->_show_message(lang('adm_servers_empty_games_list', base_url() . 'adm_servers/add/games'));
-						return false;
-					}
-					
-					$tpl_file_add = 'adm_servers/game_servers_add.html';
-					
-					/* Проверка формы */
-					$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-					
-					$this->form_validation->set_rules('server_ip', lang('ip'), 'trim|max_length[64]|min_length[4]|xss_clean');
-					$this->form_validation->set_rules('server_port', lang('port'), 'trim|required|integer|max_length[6]|min_length[2]|xss_clean');
-					$this->form_validation->set_rules('query_port', lang('adm_servers_query_port'), 'trim|integer|max_length[6]|min_length[2]|xss_clean');
-					$this->form_validation->set_rules('rcon_port', lang('adm_servers_rcon_port'), 'trim|integer|max_length[6]|min_length[2]|xss_clean');
-					
-					$this->form_validation->set_rules('rcon', 'RCON password', 'trim|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('code',  lang('adm_servers_game_code'), 'trim|required|max_length[32]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('game_type', lang('adm_servers_game_type'), 'trim|required|integer|xss_clean');
-					$this->form_validation->set_rules('dir', lang('adm_servers_server_dir'), 'trim|required|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('ds_id', lang('dedicated_server'), 'trim|numeric|max_length[11]|xss_clean');
-					
-					$this->form_validation->set_rules('screen_name', lang('dedicated_server'), 'trim|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('su_user', lang('adm_servers_user_start'), 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('start_command', lang('adm_servers_command_start'), 'trim|max_length[512]|xss_clean');
-
-					$ds_id = (int)$this->input->post('ds_id');
-					
-					/* Проверка, существует ли DS */
-					if(!$this->servers->ds_server_live($ds_id) && $ds_id !== 0){
-						$this->tpl_data['content'] .= '<p>' . lang('adm_servers_selected_ds_unavailable') . '</p>';
-						return false;
-					}
+					//~ $ds_id = (int)$this->input->post('ds_id');
+					//~ 
+					//~ /* Проверка, существует ли DS */
+					//~ if(!$this->servers->ds_server_live($ds_id) && $ds_id !== 0){
+						//~ $this->tpl_data['content'] .= '<p>' . lang('adm_servers_selected_ds_unavailable') . '</p>';
+						//~ return false;
+					//~ }
 
 					break;
 					
@@ -601,9 +609,7 @@ class Adm_servers extends CI_Controller {
 					
 					$this->form_validation->set_rules('code', 'код игры', 'trim|required|max_length[64]|min_length[2]|xss_clean');
 					$this->form_validation->set_rules('name', 'название игры', 'trim|required|max_length[32]|min_length[3]|xss_clean');
-					
-					$this->form_validation->set_rules('disk_size', 'размер диска', 'trim|numeric|required|max_length[11]|xss_clean');
-					
+
 					if($tpl_list = $this->games->tpl_data_games()) {
 						$local_tpl_data['games_list'] = $tpl_list;
 					}
@@ -698,10 +704,17 @@ class Adm_servers extends CI_Controller {
 						}
 						
 						if(!empty($sql_data['ftp_host'])) {
+							// Верны ли указанные данные ftp
 							if (false == $this->_check_ftp($sql_data['ftp_host'], $sql_data['ftp_login'], $sql_data['ftp_password'])) {
 								$this->_show_message(lang('adm_servers_ftp_data_unavailable'), 'javascript:history.back()');
 								return false;
 							}
+							
+							// Ищем server.sh/server.exe
+							if (!$sql_data['ftp_path'] = $this->_found_ftp_path($sql_data['ftp_path'])) {
+							$this->_show_message(lang('adm_servers_ftp_path_not_found'), 'javascript:history.back()');
+							return false;
+						}
 						}
 						
 						// Добавление сервера
@@ -722,88 +735,89 @@ class Adm_servers extends CI_Controller {
 						/* 				Игровые серверы 				*/
 						/* --------------------------------------------	*/
 						
-						$this->load->model('servers/dedicated_servers');
-						$this->load->model('servers/game_types');
+						redirect('adm_servers/install_game_server');
 						
-						// Форма проверена, все хорошо, добавляем сервер
-						$sql_data['name'] = $this->input->post('name');
-						
-						/* Если ip сервера не указан, то используем ip ДС */
-						//if(!$this->input->post('server_ip')){
-						//	$sql_data['server_ip'] = $this->input->post('server_ip');
-						//}
-
-						$sql_data['server_ip'] 		= $this->input->post('server_ip');
-						$sql_data['server_port'] 	= $this->input->post('server_port');
-						$sql_data['query_port'] 	= $this->input->post('query_port');
-						$sql_data['rcon_port'] 		= $this->input->post('rcon_port');
-						$sql_data['enabled'] 		= (int)(bool)$this->input->post('enabled');
-						$sql_data['installed'] 		= '1';
-						
-						$sql_data['rcon'] 			= $this->input->post('rcon');
-						$sql_data['game'] 			= $this->input->post('code');
-						$sql_data['game_type'] 		= $this->input->post('game_type');
-						$sql_data['dir'] 			= $this->input->post('dir');
-						$sql_data['ds_id'] 			= $this->input->post('ds_id');
-						
+						//~ $this->load->model('servers/dedicated_servers');
+						//~ $this->load->model('servers/game_types');
+						//~ 
+						//~ // Форма проверена, все хорошо, добавляем сервер
+						//~ $sql_data['name'] = $this->input->post('name');
+						//~ 
+						//~ /* Если ip сервера не указан, то используем ip ДС */
+						//~ //if(!$this->input->post('server_ip')){
+						//~ //	$sql_data['server_ip'] = $this->input->post('server_ip');
+						//~ //}
+						//~ $sql_data['server_ip'] 		= $this->input->post('server_ip');
+						//~ $sql_data['server_port'] 	= $this->input->post('server_port');
+						//~ $sql_data['query_port'] 	= $this->input->post('query_port');
+						//~ $sql_data['rcon_port'] 		= $this->input->post('rcon_port');
+						//~ $sql_data['enabled'] 		= (int)(bool)$this->input->post('enabled');
+						//~ $sql_data['installed'] 		= '1';
+						//~ 
+						//~ $sql_data['rcon'] 			= $this->input->post('rcon');
+						//~ $sql_data['game'] 			= $this->input->post('code');
+						//~ $sql_data['game_type'] 		= $this->input->post('game_type');
+						//~ $sql_data['dir'] 			= $this->input->post('dir');
+						//~ $sql_data['ds_id'] 			= $this->input->post('ds_id');
+						//~ 
 						//~ $sql_data['screen_name'] 	= $this->input->post('screen_name');
 						//~ $sql_data['su_user'] 		= $this->input->post('su_user');
 						//~ $sql_data['start_command'] 	= $this->input->post('start_command');
-						
-						
-						if (!$sql_data['ds_id']) {
-							$where = array('id' => $sql_data['ds_id']);
-							$this->dedicated_servers->get_ds_list($where);
-						}
-						
-						/* Не занят ли порт на выделенном сервере*/
+						//~ 
+						//~ 
+						//~ if (!$sql_data['ds_id']) {
+							//~ $where = array('id' => $sql_data['ds_id']);
+							//~ $this->dedicated_servers->get_ds_list($where);
+						//~ }
+						//~ 
+						//~ /* Не занят ли порт на выделенном сервере*/
 						//~ if (!$this->dedicated_servers->check_ports($sql_data['ds_id'], array($sql_data['server_port'], $sql_data['rcon_port'], $sql_data['query_port']))) {
 							//~ $this->_show_message(lang('adm_servers_port_exists'));
 							//~ return false;
 						//~ }
-						
-						/* Получение IP адреса, если он не указан */
-						if (!$sql_data['server_ip']) {
-							$sql_data['server_ip'] = $this->_get_default_ip($sql_data['ds_id']);
-						}
-						
-						if ($sql_data['ds_id'] && !$this->dedicated_servers->ds_list) {
-							$this->_show_message(lang('adm_servers_selected_ds_unavailable'));
-							return false;
-						}
-						
-						$this->games->get_games_list(array('code' => $sql_data['game']), 1);
-						
-						if (!$this->games->games_list) {
-							$this->_show_message(lang('adm_servers_game_not_found'));
-							return false;
-						}
-						
-						/* Присвоение стандартных параметров */
-						$sql_data = $this->_gs_default_data($sql_data);
-
-						if ($this->input->post('start_command')) {
-							$sql_data['start_command'] 	= $this->input->post('start_command');
-						}
-
-						/* Чтобы ид модификации был правильный и подходил для выбранной игры */
-						$where = array('id' => $sql_data['game_type'], 'game_code' => $sql_data['game']);
-						if (!$this->game_types->get_gametypes_list($where, 1)) {
-							$this->_show_message(lang('adm_servers_game_type_select_wrong'));
-							return false;
-						}
-
-						$local_tpl_data = array();
-						
-						// Добавление сервера
-						if ($this->servers->add_game_server($sql_data)) {
-							$local_tpl_data['message'] = lang('adm_servers_add_server_successful');
-						} else {
-							$local_tpl_data['message'] = lang('adm_servers_add_server_failed');
-						}
-						
-						$local_tpl_data['link'] = site_url('adm_servers/view/game_servers');
-						$local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_servers');
+						//~ 
+						//~ /* Получение IP адреса, если он не указан */
+						//~ if (!$sql_data['server_ip']) {
+							//~ $sql_data['server_ip'] = $this->_get_default_ip($sql_data['ds_id']);
+						//~ }
+						//~ 
+						//~ if ($sql_data['ds_id'] && !$this->dedicated_servers->ds_list) {
+							//~ $this->_show_message(lang('adm_servers_selected_ds_unavailable'));
+							//~ return false;
+						//~ }
+						//~ 
+						//~ $this->games->get_games_list(array('code' => $sql_data['game']), 1);
+						//~ 
+						//~ if (!$this->games->games_list) {
+							//~ $this->_show_message(lang('adm_servers_game_not_found'));
+							//~ return false;
+						//~ }
+						//~ 
+						//~ /* Присвоение стандартных параметров */
+						//~ $sql_data = $this->_gs_default_data($sql_data);
+//~ 
+						//~ if ($this->input->post('start_command')) {
+							//~ $sql_data['start_command'] 	= $this->input->post('start_command');
+						//~ }
+//~ 
+						//~ /* Чтобы ид модификации был правильный и подходил для выбранной игры */
+						//~ $where = array('id' => $sql_data['game_type'], 'game_code' => $sql_data['game']);
+						//~ if (!$this->game_types->get_gametypes_list($where, 1)) {
+							//~ $this->_show_message(lang('adm_servers_game_type_select_wrong'));
+							//~ return false;
+						//~ }
+//~ 
+						//~ $local_tpl_data = array();
+						//~ 
+						//~ // Добавление сервера
+						//~ if ($this->servers->add_game_server($sql_data)) {
+							//~ $local_tpl_data['message'] = lang('adm_servers_add_server_successful');
+						//~ } else {
+							//~ $local_tpl_data['message'] = lang('adm_servers_add_server_failed');
+						//~ }
+						//~ 
+						//~ $local_tpl_data['link'] = site_url('adm_servers/view/game_servers');
+						//~ $local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_servers');
 						
 						break;
 						
@@ -850,7 +864,6 @@ class Adm_servers extends CI_Controller {
 					
 						$sql_data['game_code'] = $this->input->post('code');
 						$sql_data['name'] = $this->input->post('name');
-						$sql_data['disk_size'] = $this->input->post('disk_size');
 						
 						if($this->game_types->add_game_type($sql_data)) {
 							$local_tpl_data['message'] = lang('adm_servers_add_game_type_successful');
@@ -1104,7 +1117,7 @@ class Adm_servers extends CI_Controller {
 		$local_tpl_data = array();
 		$error_msg = false;
 		
-		switch($type){
+		switch($type) {
 			case 'dedicated_servers':
 			
 				/* --------------------------------------------	*/
@@ -1148,7 +1161,7 @@ class Adm_servers extends CI_Controller {
 				$local_tpl_data['servers_list'] = $this->servers->tpl_data();
 					
 				// Редактирование основных параметров
-				if($this->input->post('edit_ds')){
+				if ($this->input->post('edit_ds')) {
 						
 					/* 
 					 * Правила для формы
@@ -1167,7 +1180,7 @@ class Adm_servers extends CI_Controller {
 				}
 					
 					// Редактирование данных доступа к серверу (пароли ftp, ssh)
-				if($this->input->post('edit_access_ds')){
+				if ($this->input->post('edit_access_ds')) {
 					$this->form_validation->set_rules('steamcmd_path', 'путь к SteamCMD', 'trim|max_length[256]|xss_clean');
 					
 					$this->form_validation->set_rules('ssh_host', 'SSH хост', 'trim|max_length[64]|xss_clean');
@@ -1368,9 +1381,9 @@ class Adm_servers extends CI_Controller {
 				
 				if ($this->servers->server_data['installed'] == '0') {
 					$local_tpl_data['information'][]['text'] = lang('adm_servers_serv_not_installed') . '<br />';
-				} elseif($this->servers->server_data['installed'] == '1') {
+				} elseif ($this->servers->server_data['installed'] == '1') {
 					$local_tpl_data['information'][]['text'] = lang('adm_servers_serv_installed') . '<br />';
-				}elseif($this->servers->server_data['installed'] == '2') {
+				} elseif ($this->servers->server_data['installed'] == '2') {
 					$local_tpl_data['information'][]['text'] = lang('adm_servers_serv_installed_proccess') . '<br />';
 				}
 				
@@ -1674,22 +1687,22 @@ class Adm_servers extends CI_Controller {
 					
 					// Редактирование данных доступа к серверу (пароли ftp, ssh)
 					if($this->input->post('edit_access_ds')) {
-							$sql_data['steamcmd_path'] = $this->input->post('steamcmd_path');
-							$sql_data['control_protocol'] = $this->input->post('control_protocol');
-							$sql_data['ssh_host'] = $this->input->post('ssh_host');
-							$sql_data['ssh_login'] = $this->input->post('ssh_login');
-							$sql_data['ssh_password'] = $this->input->post('ssh_password');
-							$sql_data['ssh_path'] = $this->input->post('ssh_path');
+							$sql_data['steamcmd_path'] 		= $this->input->post('steamcmd_path');
+							$sql_data['control_protocol'] 	= $this->input->post('control_protocol');
+							$sql_data['ssh_host'] 			= $this->input->post('ssh_host');
+							$sql_data['ssh_login'] 			= $this->input->post('ssh_login');
+							$sql_data['ssh_password'] 		= $this->input->post('ssh_password');
+							$sql_data['ssh_path'] 			= $this->input->post('ssh_path');
 							
-							$sql_data['telnet_host'] = $this->input->post('telnet_host');
-							$sql_data['telnet_login'] = $this->input->post('telnet_login');
-							$sql_data['telnet_password'] = $this->input->post('telnet_password');
-							$sql_data['telnet_path'] = $this->input->post('telnet_path');
+							$sql_data['telnet_host'] 		= $this->input->post('telnet_host');
+							$sql_data['telnet_login']		= $this->input->post('telnet_login');
+							$sql_data['telnet_password'] 	= $this->input->post('telnet_password');
+							$sql_data['telnet_path']		= $this->input->post('telnet_path');
 							
-							$sql_data['ftp_host'] = $this->input->post('ftp_host');
-							$sql_data['ftp_login'] = $this->input->post('ftp_login');
-							$sql_data['ftp_password'] = $this->input->post('ftp_password');
-							$sql_data['ftp_path'] = $this->input->post('ftp_path');	
+							$sql_data['ftp_host'] 			= $this->input->post('ftp_host');
+							$sql_data['ftp_login'] 			= $this->input->post('ftp_login');
+							$sql_data['ftp_password'] 		= $this->input->post('ftp_password');
+							$sql_data['ftp_path'] 			= $this->input->post('ftp_path');	
 					}
 					
 					/* 
@@ -1728,6 +1741,11 @@ class Adm_servers extends CI_Controller {
 						
 						if (false == $this->_check_ftp($sql_data['ftp_host'], $sql_data['ftp_login'], $ftp_password)) {
 							$this->_show_message(lang('adm_servers_ftp_data_unavailable'), 'javascript:history.back()');
+							return false;
+						}
+						
+						if (!$sql_data['ftp_path'] = $this->_found_ftp_path($sql_data['ftp_path'])) {
+							$this->_show_message(lang('adm_servers_ftp_path_not_found'), 'javascript:history.back()');
 							return false;
 						}
 					}
@@ -2151,14 +2169,17 @@ class Adm_servers extends CI_Controller {
 			$new_gs['name'] 		= $this->input->post('name');
 			$new_gs['server_ip'] 	= $this->input->post('server_ip');
 			$new_gs['server_port'] 	= $this->input->post('server_port');
-			//$new_gs['rcon'] 		= $this->input->post('rcon'); // Ркон задается случайной строкой после установки
+			//$new_gs['rcon'] 		= $this->input->post('rcon'); 		// Ркон задается случайной строкой после установки
 			$new_gs['game'] 		= $this->input->post('code');
 			$new_gs['game_type'] 	= $this->input->post('game_type');
 			$new_gs['ds_id'] 		= $this->input->post('ds_id');
 			$new_gs['dir'] 			= $this->input->post('dir');
 			$new_gs['enabled']		= '1';
-			$new_gs['installed']	= '0';
 			
+			// Если отмечен флаг "Установить сервер", то сервер считается еще не установленным и будет установлен
+			$new_gs['installed']	= $this->input->post('install_server') ? 0 : 1;
+			
+
 			/* Не занят ли порт на выделенном сервере*/
 			//~ if (!$this->dedicated_servers->check_ports($sql_data['ds_id'], array($sql_data['server_port'], $sql_data['rcon_port'], $sql_data['query_port']))) {
 				//~ $this->_show_message(lang('adm_servers_port_exists'));
@@ -2205,11 +2226,11 @@ class Adm_servers extends CI_Controller {
 				return false;
 			}
 			
-			
 			// Добавление сервера
 			if($this->servers->add_game_server($new_gs)) {
 				$new_server_id = $this->db->call_function('insert_id', $this->db->conn_id);
-				$this->_show_message(lang('adm_servers_server_to_be_installed'), site_url('adm_servers/edit/game_servers/' . $new_server_id), lang('adm_servers_go_to_settings'));
+				$succes_mesage = $new_gs['installed'] ? lang('adm_servers_add_server_successful') : lang('adm_servers_server_to_be_installed');
+				$this->_show_message($succes_mesage, site_url('adm_servers/edit/game_servers/' . $new_server_id), lang('adm_servers_go_to_settings'));
 				return true;
 			} else {
 				$this->_show_message(lang('adm_servers_add_game_failed'));

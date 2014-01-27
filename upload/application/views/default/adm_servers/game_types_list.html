@@ -1,5 +1,5 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
-
+<a class="awesome" href="{site_url}adm_servers/add/game_types">{lang_adm_servers_add_game_type}</a>
 <script type="text/javascript">
 $(document).ready(function(){
 	
@@ -21,18 +21,16 @@ $(document).ready(function(){
 		<h3>{game_name}</h3>
 		
 		<div>
-			<table style="border: solid 1px #c4c4c4;" class="zebra" width="100%">
+			<table style="margin-left:50px;border: solid 1px #c4c4c4;" class="zebra" width="90%">
 
 				<tr>
 					<th><strong>{lang_adm_servers_game_type}</strong></th>
-					<th><strong>{lang_adm_servers_disk_size}</strong></th>
 					<th>&nbsp;</th>
 				</tr>
 			{gt_list}
 				<tr>
 					<td>{gt_name}</td>
-					<td>{gt_size}</td>
-					<td><a class="small awesome" href="{site_url}adm_servers/edit/game_types/{gt_id}">{lang_control}</a>
+					<td align="center"><a class="small awesome" href="{site_url}adm_servers/edit/game_types/{gt_id}">{lang_control}</a>
 					&nbsp;<a class="red small awesome" href="{site_url}adm_servers/delete/game_types/{gt_id}">X</a></td>
 				</tr>
 			{/gt_list}

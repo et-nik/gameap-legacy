@@ -123,7 +123,7 @@ $lang['adm_servers_steamcmd_parameters']			= 'SteamCMD параметры';
 $lang['adm_servers_game_control']					= 'Управление играми';
 $lang['adm_servers_new_game']						= 'Новая игра';
 $lang['adm_servers_new_game_server']				= 'Новый игровой сервер';
-$lang['adm_servers_add_game_server']				= 'Добавить сервер';
+$lang['adm_servers_add_game_server']				= 'Добавить/Установить сервер';
 $lang['adm_servers_install_game_server']			= 'Установка сервера';
 $lang['adm_servers_connect_data']					= 'Данные для подключения (IP:port)';
 $lang['adm_servers_rcon_password']					= 'RCON пароль';
@@ -205,3 +205,6 @@ $lang['adm_servers_ip_description']					= 'Если IP адресов неско
 
 // 0.8.8
 $lang['adm_servers_go_to_game']						= 'Перейти к игре';
+
+// 0.9
+$lang['adm_servers_ftp_path_not_found']				= 'На FTP сервере не найден путь к исполняемым файлам (server.sh или server.exe) ';

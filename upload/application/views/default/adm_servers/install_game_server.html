@@ -50,11 +50,16 @@
 			<td>{lang_adm_servers_server_dir}:<br /><span class="description">{lang_adm_servers_server_dir_desc}</span></td>
 			<td><input type="text" name="dir" /></td>
 		</tr>
-
+		
 		<tr>
 			<td colspan="2"><p>{lang_adm_servers_absolute_path_to_server} <strong>"<span id="install_dir"></span>"</strong></p></td>
 		</tr>
-
+		
+		<tr>
+			<td>Выполнить установку сервера: <br /><span class="description">[ Укажите, если директория пуста и требуется установить сервер в указанную директорию.  ]</span></td>
+			<td><input type="checkbox" name="install_server" value="accept" checked="checked" /></td>
+		</tr>
+		
 		<script type="text/javascript">
 		var ds_path;
 			

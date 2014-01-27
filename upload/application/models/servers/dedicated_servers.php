@@ -436,7 +436,7 @@ class Dedicated_servers extends CI_Model {
 		*/
 		
 		if (!$server_data) {
-			$server_data = $this->ds_list[0];
+			$server_data = &$this->ds_list[0];
 		}
 		
 		/* -------------------
