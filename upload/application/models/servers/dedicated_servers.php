@@ -312,7 +312,7 @@ class Dedicated_servers extends CI_Model {
 			$this->get_ds_list();
 		}
 		
-		if($this->ds_list){
+		if ($this->ds_list) {
 		
 			foreach ($this->ds_list as $dedicated_servers) {
 				$num++;
@@ -339,7 +339,7 @@ class Dedicated_servers extends CI_Model {
 			
 			return $tpl_data;
 			
-		}else{
+		} else {
 			return array();
 		}
 	}
