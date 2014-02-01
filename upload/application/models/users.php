@@ -384,23 +384,33 @@ class Users extends CI_Model {
     */
     function get_server_privileges($server_id = false, $user_id = false, $no_insert_this = false)
     {
-        
-        if(!$user_id){
+        $user_privileges = array();
+       
+        if (!$user_id) {
             $user_id = $this->auth_id;
+            
+            if ($this->auth_data['is_admin']) {
+				// У админа имеются все привилегии
+				foreach($this->all_privileges as $key => $value) {
+					$user_privileges[$key] = 1;
+				}
+				
+				$this->auth_servers_privileges = $user_privileges;
+				return $user_privileges;
+			}
         }
         
         if(!is_numeric($user_id)){
             return false;
         }
 
-        if(!$server_id){
+        if (!$server_id) {
             $where = array('user_id' => $user_id);
-        }else{
+        } else {
             $where = array('user_id' => $user_id, 'server_id' => $server_id);
         }
         
         $query = $this->db->get_where('servers_privileges', $where);
-        $user_privileges = array();
         foreach ($query->result_array() as $privileges)
         {
             if(array_key_exists($privileges['privilege_name'], $this->all_privileges)){
@@ -419,8 +429,6 @@ class Users extends CI_Model {
         /* Если не запрашиваются данные другого пользователя
          * в этом случае записываем еще в $this->servers_privileges
         */
-        
-        //print_r($user_privileges);
         
         if(!$no_insert_this){
             $this->servers_privileges = $user_privileges;

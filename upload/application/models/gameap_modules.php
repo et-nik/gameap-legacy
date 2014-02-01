@@ -105,9 +105,9 @@ class Gameap_modules extends CI_Model {
     {
 		$this->db->order_by('name', 'asc'); 
 		
-		if(is_array($where)){
+		if (is_array($where)) {
 			$query = $this->db->get_where('modules', $where, $limit);
-		}else{
+		} else {
 			$query = $this->db->get('modules');
 		}
 
@@ -168,7 +168,7 @@ class Gameap_modules extends CI_Model {
     */
 	function get_menu_modules()
     {
-		if (!empty($this->modules_data)) {
+		if (empty($this->modules_data)) {
 			$this->get_modules_data();
 		}
 		
