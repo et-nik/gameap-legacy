@@ -6,7 +6,7 @@
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
+ * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
  * @license		http://www.gameap.ru/license.html
  * @link		http://www.gameap.ru
  * @filesource
@@ -30,12 +30,14 @@ class Telnet {
 
 	/* (c) thies@thieso.net */
 
-	private 	$_connection 	= false;
-	private 	$_auth			= false;
+	var $_connection 	= false;
+	var $_auth			= false;
 	var $errors = '';
 	
 	private $ip;
 	private $port;
+	
+	private $_prompt = ':> ';
 
 	// ----------------------------------------------------------------
 
@@ -56,13 +58,14 @@ class Telnet {
 		$this->ip = $ip;
 		$this->port = $port;
 		
-		if ($this->_connection = fsockopen($this->ip, $this->port)) {
-			socket_set_timeout($this->_connection, 7);
-		} else {
+		$this->_connection = @fsockopen($this->ip, $this->port);
+		socket_set_timeout($this->_connection, 5);
+
+		if (!$this->_connection) {
 			return false;
 		}
-
-		$this->_auth = false;
+		
+		$this->auth = false;
 		return $this->_connection;
 	}
 
@@ -73,9 +76,7 @@ class Telnet {
 	*/
 	function auth($login, $password)
 	{
-		if (!$this->_connection) { return false;}
-		
-		if ($this->_auth == true) {
+		if ($this->auth == true) {
 			return NULL;
 		}
 		
@@ -83,21 +84,35 @@ class Telnet {
 		$this->_write( $login . "\r\n");
 		$this->_read_till("word: ");
 		$this->_write( $password . "\r\n");
-		$this->_read_till(":> ");
+		$auth_string = $this->_read_till($this->_prompt);
+		
+		/* В Windows при неудачной попытке пишется "Login Failed"
+		 * В Linux при неудачной попытке пишется "Login incorrect"
+		*/
+		if (strpos($auth_string, 'Login Failed') !== false OR strpos($auth_string, 'Login incorrect') !== false) {
+			$this->_auth = false;
+			return false;
+		}
 
 		$this->_write("\r\n");
-		$this->_read_till(":> ");
+		$this->_read_till($this->_prompt);
 		
 		$this->_auth = true;
+		return true;
 	}
+	
+	// ----------------------------------------------------------------
 
+	/**
+	 * Выполнение команды
+	*/
 	function command($command)
 	{
-		if (!$this->_connection) { return false;}
-		
+		if(!$this->_connection OR !$this->_auth) { return false;}
+
 		$this->_write($command . "\n\r");
 
-		$result = explode("\n", $this->_read_till(":> "));
+		$result = explode("\n", $this->_read_till($this->_prompt));
 		
 		$last_element = count($result)-1;
 		unset($result[0]);
@@ -106,6 +121,16 @@ class Telnet {
 		}
 
 		return trim(implode("\n", $result));
+	}
+	
+	// ----------------------------------------------------------------
+
+	/**
+	 * Выполнение команды
+	*/
+	function exec($command) 
+	{
+		return $this->command($command);
 	}
 
 	// ----------------------------------------------------------------
@@ -144,8 +169,6 @@ class Telnet {
 
 	function _read_till($what) 
 	{
-		if (!$this->_connection) { return false;}
-		
 		$buf = '';
 
 		while (1) {
