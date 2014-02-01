@@ -65,6 +65,7 @@ $lang['adm_servers_ds_contains_game_servers']		= 'На выделенном се
 $lang['adm_servers_game_contains_game_servers']		= 'Имеются серверы данной игры. Удаление невозможно.';
 $lang['adm_servers_game_type_contains_game_servers'] = 'Имеются серверы данной модификации. Удаление невозможно.';
 $lang['adm_servers_unknown_page']					= 'Неизвестная страница';
+$lang['adm_servers_telnet_data_unavailable']		= 'Telnet данные неверны. Проверьте правильность заполненных данных.';
 $lang['adm_servers_ssh_data_unavailable']			= 'SSH данные неверны. Проверьте правильность заполненных данных.';
 $lang['adm_servers_ftp_data_unavailable']			= 'FTP данные неверны. Проверьте правильность заполненных данных.';
 $lang['adm_servers_error_server_edit']				= 'Ошибка редактирования сервера';

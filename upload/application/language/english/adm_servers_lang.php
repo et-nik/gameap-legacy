@@ -65,6 +65,7 @@ $lang['adm_servers_ds_contains_game_servers']		= 'You cannot delete dedicated se
 $lang['adm_servers_game_contains_game_servers']		= 'You cannot delete game which used servers servers. Delete servers first.';
 $lang['adm_servers_game_type_contains_game_servers'] = 'You cannot delete game mods which used for servers. Delete servers first.';
 $lang['adm_servers_unknown_page']					= 'Undefined page';
+$lang['adm_servers_telnet_data_unavailable']		= 'Telnet data is incorrect. Check  this data first.';
 $lang['adm_servers_ssh_data_unavailable']			= 'SSH data is incorrect. Check  this data first.';
 $lang['adm_servers_ftp_data_unavailable']			= 'FTP  data is incorrect. Check this data first.';
 $lang['adm_servers_error_server_edit']				= 'Failed to edit server settings';
