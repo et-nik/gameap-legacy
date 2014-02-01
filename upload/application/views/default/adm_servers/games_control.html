@@ -1,8 +1,27 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
 <a class="awesome" href="{site_url}adm_servers/view/games">« {lang_adm_servers_back_to_games}</a>
+<a class="awesome" onclick="$('#popup').arcticmodal()">{lang_adm_servers_modifications}</a>
 <h2>{lang_adm_servers_game_control}</h2>
 
 <p>{lang_adm_servers_games_documentation}</p>
+
+<div style="display: none;">
+    <div class="box-modal" id="popup">
+        <div class="box-modal_close arcticmodal-close">close</div>
+			
+        
+			<table width="100%" class="zebra">
+					<tr>
+						<td colspan="5"><strong>{lang_adm_servers_modifications}</strong></td>
+					</tr>
+				{gt_list}
+					<tr>
+						<td align="center"><a href="{site_url}adm_servers/edit/game_types/{gt_id}">{gt_name}</a></td>
+					</tr>
+				{/gt_list}
+			</table>
+    </div>
+</div>
 
 <form action="{site_url}adm_servers/edit/games/{game_code}" method="post" accept-charset="utf-8">
 	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
