@@ -75,6 +75,7 @@ $lang['thanks'] 						= 'Thanks';
 $lang['recovery'] 						= 'Send';
 $lang['value'] 							= 'Value';
 $lang['value_not_set'] 					= 'Not set';
+$lang['version']						= 'Version';
 $lang['view'] 							= 'View';
 $lang['update'] 						= 'Update';
 $lang['upload'] 						= 'Upload';
@@ -145,5 +146,12 @@ $lang['menu_servers_logs']						= 'Server logs';
 $lang['menu_panel_logs']						= 'GameAP logs';
 
 /* -- 0.8.8 -- */
-$lang['go']										= 'Перейти';
+$lang['go']										= 'Go';
+
+/* -- 0.9 -- */
+
+/* Menu */
+$lang['menu_files_config']						= 'Server configuration';
+
+$lang['modules']								= 'Modules';
 

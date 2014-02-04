@@ -74,6 +74,7 @@ $lang['type'] = 'Тип';
 $lang['thanks'] = 'Подяка';
 $lang['recovery'] = 'Відновити';
 $lang['view'] = 'Перегляд';
+$lang['version'] = 'Версія';
 $lang['update'] = 'Оновлення';
 $lang['upload'] = 'Завантажити';
 $lang['user'] = 'Користувач';
@@ -149,3 +150,10 @@ $lang['values'] 								= 'Значення';
 
 /* -- 0.8.8 -- */
 $lang['go']										= 'Перейти';
+
+/* -- 0.9 -- */
+
+/* Menu */
+$lang['menu_files_config']						= 'Конфігурація серверів';
+
+$lang['modules']								= 'Модулі';

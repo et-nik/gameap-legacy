@@ -76,6 +76,7 @@ $lang['recovery'] 						= 'Восстановить';
 $lang['view'] 							= 'Просмотр';
 $lang['value'] 							= 'Значение';
 $lang['value_not_set'] 					= 'Значение не задано';
+$lang['version']						= 'Версия';
 $lang['update'] 						= 'Обновление';
 $lang['upload'] 						= 'Загрузить';
 $lang['user'] 							= 'Пользователь';
@@ -156,3 +157,5 @@ $lang['go']										= 'Перейти';
 
 /* Menu */
 $lang['menu_files_config']						= 'Конфигурация серверов';
+
+$lang['modules']								= 'Модули';
