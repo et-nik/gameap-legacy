@@ -96,7 +96,7 @@ class Settings extends CI_Controller {
 		}
 		
 		/* Пользователь должен быть админом либо иметь привилегии настройки */			
-		if(!$this->users->auth_data['is_admin'] && !$this->users->servers_privileges['SERVER_SETTINGS']) {
+		if(!$this->users->auth_data['is_admin'] && !$this->users->auth_servers_privileges['SERVER_SETTINGS']) {
 			$this->_show_message(lang('settings_not_privileges_for_server'));
 			return false;
 		}

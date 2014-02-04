@@ -178,13 +178,13 @@ class Log_view extends CI_Controller {
 			$this->users->get_server_privileges($log_list[0]['server_id']);
 			
 			/* У пользователя на этот сервер должны быть права */
-			if(!$this->users->servers_privileges['VIEW']) {
+			if(!$this->users->auth_servers_privileges['VIEW']) {
 				$this->_show_message(lang('log_view_record_not_found'));
 				return false;
 			}
 			
 			/* Если пользователю нельзя видеть rcon пароль */
-			if(!$this->users->servers_privileges['CHANGE_RCON'] && strtolower($log_list[0]['command']) == 'rcon_password') {
+			if(!$this->users->auth_servers_privileges['CHANGE_RCON'] && strtolower($log_list[0]['command']) == 'rcon_password') {
 				$this->_show_message(lang('log_view_log_access_denied'), '/admin/server_control/main/' . $log_list[0]['server_id']);
 				return false;
 			}

@@ -166,10 +166,11 @@ class Users extends CI_Model {
 			$this->auth_data['modules_data'] 	= (isset($this->auth_data['modules_data'])) ? json_decode($this->auth_data['modules_data'], true) : array();
 			
 			$this->auth_data['privileges'] 			= $this->_decode_base_privileges($this->auth_data['privileges']);
-			$this->auth_data['servers_privileges'] 	= $this->_decode_servers_privileges($this->auth_data['servers_privileges']);
+			//~ $this->auth_data['servers_privileges'] 	= $this->_decode_servers_privileges($this->auth_data['servers_privileges']);
 			
 			// Что-то вроде костыля
-			$this->auth_privileges = &$this->auth_data['privileges'];
+			$this->auth_privileges = $this->auth_data['privileges'];
+			$this->auth_servers_privileges = $this->get_server_privileges();
 
             return true;
         } else {
@@ -252,11 +253,11 @@ class Users extends CI_Model {
 		$user_data['balance'] 				= (int)$this->encrypt->decode($user_data['balance']);
 		$user_data['modules_data'] 			= ($user_data['modules_data'] != '') ? json_decode($user_data['modules_data'], true) : array();
 		$user_data['privileges'] 			= $this->_decode_base_privileges($user_data['privileges']);
-		$user_data['servers_privileges'] 	= $this->_decode_servers_privileges($user_data['servers_privileges']);
+		//~ $user_data['servers_privileges'] 	= $this->_decode_servers_privileges($user_data['servers_privileges']);
 
 		$this->user_data 			= $user_data;
 		$this->user_privileges 		= &$user_data['privileges'];
-		$this->servers_privileges 	= &$user_data['servers_privileges'];
+		//~ $this->servers_privileges 	= &$user_data['servers_privileges'];
 
         return $user_data;
     }
@@ -421,7 +422,7 @@ class Users extends CI_Model {
 			}
         }
         
-        if(!is_numeric($user_id)){
+        if (!is_numeric($user_id)) {
             return false;
         }
 
@@ -437,11 +438,13 @@ class Users extends CI_Model {
         if (!empty($row_array)) {
 			$array_privileges = json_decode($row_array['privileges'], true);
 			
-			foreach($array_privileges as &$privilege) {
-				$user_privileges[ $privilege['privilege_name'] ] = $privilege['privilege_value'];
+			foreach($array_privileges as $key => $value) {
+				if (array_key_exists($key, $this->all_privileges)) { 
+					$user_privileges[$key] = $value; 
+				}
 			}
 		}
-
+		
         // Заполнение пустых привилегий
         foreach ($this->all_privileges as $key => $value)
         {
@@ -513,11 +516,15 @@ class Users extends CI_Model {
 			$user_id 	? $this->db->where('user_id', $user_id) : null;
 			$server_id 	? $this->db->where('server_id', $server_id) : null;
 			
+			foreach($this->_set_privileges as $array) {
+				$set_privileges[ $array['privilege_name'] ] = $array['privilege_value'];
+			}
+			
 			if ($this->db->count_all_results('servers_privileges') > 0) {
 				$this->db->where(array('user_id' => $user_id, 'server_id' => $server_id));
-				return $this->db->update('servers_privileges', array('privileges' => json_encode($this->_set_privileges)));
+				return $this->db->update('servers_privileges', array('privileges' => json_encode($set_privileges)));
 			} else {
-				return $this->db->insert('servers_privileges', array('user_id' => $user_id, 'server_id' => $server_id, 'privileges' => json_encode($this->_set_privileges)));
+				return $this->db->insert('servers_privileges', array('user_id' => $user_id, 'server_id' => $server_id, 'privileges' => json_encode($set_privileges)));
 			}
 		}
 		

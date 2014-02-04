@@ -436,13 +436,20 @@ class Servers extends CI_Model {
 				 * privilege_name = $privilege_name
 				 * privilege_value = 1	(разрешено)
 				*/
-				$query = $this->db->get_where('servers_privileges', array('user_id' => $user_id, 'privilege_name' => $privilege_name, 'privilege_value' => '1'));
+				$query = $this->db->get_where('servers_privileges', array('user_id' => $user_id));
 				
-				if($query->num_rows > 0){
+				if ($query->num_rows > 0) {
 
-					$this->db->where($where);
-					foreach ($query->result_array() as $privileges){
-						$servers[] = $privileges['server_id'];
+					//~ $this->db->where($where);
+					foreach ($query->result_array() as $privileges) {
+						
+						$json_decode = json_decode($privileges['privileges'], true);
+						
+						if ($json_decode) {
+							if ($json_decode[$privilege_name] == 1) {
+								$servers[] = $privileges['server_id'];
+							}
+						}
 					}
 					
 					$this->db->where_in('id', $servers);
