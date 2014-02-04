@@ -34,6 +34,8 @@ class Users extends CI_Model {
     
     /* Списки и пользователи которые получает авторизованный пользователь */
     var $users_list = array();				// Список пользователей
+    
+    private $_set_privileges	= array();
 
     /* Все базовые привилегии */
     var $all_user_privileges = array(
@@ -85,7 +87,57 @@ class Users extends CI_Model {
         $this->load->helper('safety');
         $this->load->library('encrypt');
     }
-
+    
+    // ----------------------------------------------------------------
+    
+	private function _decode_servers_privileges($privileges_json)
+    {
+		$servers_privileges = json_decode($privileges_json, true);
+		
+		foreach($this->all_privileges as $key => $value) {
+			$servers_privileges[$key] = isset($servers_privileges[$key]) ? $servers_privileges[$key] : 0;
+		}
+		
+		return $servers_privileges;
+	}
+	
+	// ----------------------------------------------------------------
+	
+	private function _decode_base_privileges($privileges_json)
+    {
+		$base_privileges = json_decode($privileges_json, true);
+		
+		foreach($this->all_user_privileges as $key => $value) {
+			/* 
+			 * key в привилегиях меньше 3х знаков
+			 * используется для обозначения категории
+			*/
+			if(strlen($key) > 3) {
+				$base_privileges[$key] = isset($base_privileges[$key]) ? $base_privileges[$key] : 0;
+			}
+		}
+		
+		return $base_privileges;
+	}
+	
+	// ----------------------------------------------------------------
+	
+	private function _get_server_privileges($server_id, $servers_privileges = false) 
+	{
+		if (!$servers_privileges) {
+			$servers_privileges =& $this->servers_privileges;
+		}
+		
+		if (isset($servers_privileges[$server_id])) {
+			return $servers_privileges[$server_id];
+		}
+		
+		foreach ($this->all_privileges as $key => $value) {
+			$servers_privileges[$server_id][$key] = 0;
+		}
+		
+		return $servers_privileges[$server_id];
+	}
 
     // ----------------------------------------------------------------
 
@@ -108,23 +160,16 @@ class Users extends CI_Model {
 
         if ($query->num_rows > 0) {
 			
-			$this->auth_id = $user_id;
-			$this->auth_login = $this->auth_data['login'];
-			$this->auth_data['balance'] = (int)$this->encrypt->decode($this->auth_data['balance']);
-			$this->auth_data['modules_data'] = (isset($this->auth_data['modules_data'])) ? json_decode($this->auth_data['modules_data'], true) : array();
+			$this->auth_id 						= $user_id;
+			$this->auth_login 					= $this->auth_data['login'];
+			$this->auth_data['balance'] 		= (int)$this->encrypt->decode($this->auth_data['balance']);
+			$this->auth_data['modules_data'] 	= (isset($this->auth_data['modules_data'])) ? json_decode($this->auth_data['modules_data'], true) : array();
 			
-			/* Получение базовых привилегий */
-            if(!$this->auth_privileges = json_decode($this->auth_data['privileges'], true)) {
-				foreach($this->all_user_privileges as $key => $value) {
-					/* 
-					 * key в привилегиях меньше 3х знаков
-					 * используется для обозначения категории
-					*/
-					if (strlen($key) > 3) {
-						$this->auth_privileges[$key] = 0;
-					}
-				}
-			}
+			$this->auth_data['privileges'] 			= $this->_decode_base_privileges($this->auth_data['privileges']);
+			$this->auth_data['servers_privileges'] 	= $this->_decode_servers_privileges($this->auth_data['servers_privileges']);
+			
+			// Что-то вроде костыля
+			$this->auth_privileges = &$this->auth_data['privileges'];
 
             return true;
         } else {
@@ -182,14 +227,11 @@ class Users extends CI_Model {
     /**
      * Получает данные пользователя
      * 
-     * @param int       - id пользователя
-     * @param bool      - записать данные в $this->user_data
-     * @param bool      - если true то данные привиление не будут получены
+     * @param int   id пользователя
      * @return array
     */
-    function get_user_data($user_id = false, $to_this = false, $no_get_privileges = false)
+    function get_user_data($user_id = false)
     {
-        
         if(!$user_id){
             return false;
         }
@@ -207,39 +249,16 @@ class Users extends CI_Model {
 			return false;
 		}
 		
-		$user_data['balance'] = (int)$this->encrypt->decode($user_data['balance']);
-		$user_data['modules_data'] = ($user_data['modules_data'] != '') ? json_decode($user_data['modules_data'], true) : array();
+		$user_data['balance'] 				= (int)$this->encrypt->decode($user_data['balance']);
+		$user_data['modules_data'] 			= ($user_data['modules_data'] != '') ? json_decode($user_data['modules_data'], true) : array();
+		$user_data['privileges'] 			= $this->_decode_base_privileges($user_data['privileges']);
+		$user_data['servers_privileges'] 	= $this->_decode_servers_privileges($user_data['servers_privileges']);
 
-        if(!$no_get_privileges) {
-			
-			if(!$user_privileges = json_decode($user_data['privileges'], true)) {
-				foreach($this->all_user_privileges as $key => $value) {
-					
-					/* 
-					 * key в привилегиях меньше 3х знаков
-					 * используется для обозначения категории
-					*/
-					if(strlen($key) > 3) {
-						$this->user_privileges[$key] = 0;
-					}
-				}
-				
-				$user_privileges = $this->user_privileges;
-			}
-			
-            //$query_users_privileges = $this->db->get_where('users_privileges', array('user_id' => $user_data['id']), 1);
-            //$user_privileges = $query_users_privileges->row_array();
-        } else {
-            $user_privileges = array();
-        }
-        
-        if ($to_this) {
-			/* Сохранять значения в $this->****  */
-            $this->user_data = $user_data;
-            $this->user_privileges = $user_privileges;
-        }
-        
-        return array_merge($user_data, $user_privileges);
+		$this->user_data 			= $user_data;
+		$this->user_privileges 		= &$user_data['privileges'];
+		$this->servers_privileges 	= &$user_data['servers_privileges'];
+
+        return $user_data;
     }
 
     // ----------------------------------------------------------------
@@ -344,15 +363,17 @@ class Users extends CI_Model {
      * 
      * @return array
     */
-    function tpl_userdata($id = false, $user_data = false)
+    function tpl_userdata($user_id = false, $user_data = false)
     {
         $this->load->helper('date');
-        
-        if (!$id) {
+
+        if (!$user_id) {
             $user_data = $this->auth_data;
         } else {
-			if (!$user_data) {
-				$user_data = $this->get_user_data($id, false, true);
+			if (!empty($this->user_data)) {
+				$user_data = $this->user_data;
+			} else {
+				$user_data = $this->get_user_data($user_id);
 			}
         }
         
@@ -370,8 +391,6 @@ class Users extends CI_Model {
         $tpl_data['user_reg_date'] = unix_to_human($user_data['reg_date'], true, 'eu');
         $tpl_data['user_last_auth'] = unix_to_human($user_data['last_auth'], true, 'eu');
         
-        $this->user_data = $user_data;
-        
         return $tpl_data;
     }
     
@@ -380,9 +399,11 @@ class Users extends CI_Model {
     /**
      * Получение привилегий на отдельные серверы
      * 
+     * @param integer
+     * @param integer
      * @return array
     */
-    function get_server_privileges($server_id = false, $user_id = false, $no_insert_this = false)
+    function get_server_privileges($server_id = false, $user_id = false)
     {
         $user_privileges = array();
        
@@ -410,13 +431,16 @@ class Users extends CI_Model {
             $where = array('user_id' => $user_id, 'server_id' => $server_id);
         }
         
-        $query = $this->db->get_where('servers_privileges', $where);
-        foreach ($query->result_array() as $privileges)
-        {
-            if(array_key_exists($privileges['privilege_name'], $this->all_privileges)){
-                $user_privileges[$privileges['privilege_name']] = $privileges['privilege_value'];
-            }
-        }
+        $query = $this->db->get_where('servers_privileges', $where, 1);
+        $row_array = $query->row_array();
+        
+        if (!empty($row_array)) {
+			$array_privileges = json_decode($row_array['privileges'], true);
+			
+			foreach($array_privileges as &$privilege) {
+				$user_privileges[ $privilege['privilege_name'] ] = $privilege['privilege_value'];
+			}
+		}
 
         // Заполнение пустых привилегий
         foreach ($this->all_privileges as $key => $value)
@@ -430,65 +454,75 @@ class Users extends CI_Model {
          * в этом случае записываем еще в $this->servers_privileges
         */
         
-        if(!$no_insert_this){
-            $this->servers_privileges = $user_privileges;
-            $this->auth_servers_privileges = $user_privileges;
-        }
-        
+        if ($user_id != $this->auth_id) {
+			$this->servers_privileges 		= $user_privileges;
+		} else {
+			$this->auth_servers_privileges 	= $user_privileges;
+		}
+            
         return $user_privileges;
     }
     
     // ----------------------------------------------------------------
 
     /**
-     * Запись привилегий на отдельные серверы
+     * Задать привилегию для сервера
+     * Для обновления привилегий в базе данных, нужно использовать
+     * метод update_server_privileges
      * 
+     * @param string
+     * @param string
+     * @param integer
+     * @param integer
      * @return string
     */
-    function set_server_privileges($privilege_name, $rule, $server_id, $user_id = false)
+    public function set_server_privileges($privilege_name, $rule, $server_id, $user_id = false)
     {
-        if(!$user_id){
+        if (!$user_id) {
             $user_id = $this->auth_id;
-        }else{
+        } else {
             $user_id  = (int)$user_id;
         }
         
-        $where = array('user_id' => $user_id, 
-                       'server_id' => $server_id,
-                       'privilege_name' => $privilege_name);
-        
-        $query = $this->db->get_where('servers_privileges', $where);
-        
-        $data = array(
-            'user_id' =>            $user_id,
-            'server_id' =>          $server_id,
-            'privilege_name' =>     $privilege_name,
-            'privilege_value' =>    $rule
+        $this->_set_privileges[] = array(
+			'user_id' =>            $user_id,
+			'server_id' =>          $server_id,
+			'privilege_name' =>     $privilege_name,
+			'privilege_value' =>    $rule,
         );
-        
-        $this->db->where('user_id', $user_id);
-        $this->db->where('server_id', $server_id);
-        $this->db->where('privilege_name', $privilege_name);
-            
-        if($query->num_rows > 0){
-           /* Если привилегия уже есть в базе данных, то обновляем */
-           if($this->db->update('servers_privileges', $data)){
-                return true;
-            }else{
-                return false;
-            }
-            
-        }else{
-			/* Привилегии нет в базе данных, создаем новую строку */
-			if($this->db->insert('servers_privileges', $data)){
-                return true;
-            }else{
-                return false;
-            }
+    }
+    
+    // ----------------------------------------------------------------
+    
+    /**
+     * Обновляет данные серверных привилегий в базе данных
+     * 
+     * @param integer
+     * @param integer
+     * @param array
+     * @return bool
+    */
+    public function update_server_privileges($user_id = null, $server_id = null, $privileges = array()) 
+    {
+		if (!empty($privileges)) {
+			$this->_set_privileges = $privileges;
 		}
 
-            
-    }
+		if (!empty($this->_set_privileges)) {
+			
+			$user_id 	? $this->db->where('user_id', $user_id) : null;
+			$server_id 	? $this->db->where('server_id', $server_id) : null;
+			
+			if ($this->db->count_all_results('servers_privileges') > 0) {
+				$this->db->where(array('user_id' => $user_id, 'server_id' => $server_id));
+				return $this->db->update('servers_privileges', array('privileges' => json_encode($this->_set_privileges)));
+			} else {
+				return $this->db->insert('servers_privileges', array('user_id' => $user_id, 'server_id' => $server_id, 'privileges' => json_encode($this->_set_privileges)));
+			}
+		}
+		
+		return;
+	}
 
     // ----------------------------------------------------------------
     
@@ -497,7 +531,7 @@ class Users extends CI_Model {
      * 
      * @return array
     */
-    function tpl_users_list($limit = null, $offset = 0)
+    public function tpl_users_list($limit = null, $offset = 0)
     {
         $this->load->helper('date');
         

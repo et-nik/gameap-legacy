@@ -6,9 +6,9 @@
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
- * @license		http://gameap.ru/license.html
- * @link		http://gameap.ru
+ * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
+ * @license		http://www.gameap.ru/license.html
+ * @link		http://www.gameap.ru
  * @filesource
 */
 class Users_control extends CI_Controller {
@@ -25,7 +25,7 @@ class Users_control extends CI_Controller {
     public function __construct()
     {
         parent::__construct();
-		
+        
 		$this->load->database();
         $this->load->model('users');
         $this->lang->load('profile');
@@ -183,15 +183,15 @@ class Users_control extends CI_Controller {
     */
     public function servers_privileges($user_id = null, $server_id = null)
     {
-		$user_id = (int)$user_id;
-		$server_id = (int)$server_id;
+		$user_id 	= (int)$user_id;
+		$server_id 	= (int)$server_id;
 		
 		$this->tpl_data['heading'] = lang('users_heading_index');
-		
+
 		//Проверка, есть ли права на добавление
-		if(!$this->users->auth_privileges['usr_edit_privileges']){
+		if (!$this->users->auth_privileges['usr_edit_privileges']) {
 				$this->tpl_data['content'] .= lang('users_no_privileges_for_edit_privileges');
-		}else{
+		} else {
 			
 			if (!$user_id) {
 				$this->_show_message(lang('users_empty_id'));
@@ -225,17 +225,18 @@ class Users_control extends CI_Controller {
 			}
 				
 			$user_privileges = $this->users->get_server_privileges($server_id, $user_id, true);
-
-			$num = -1;
+			
+			$num = 0;
 			foreach ($user_privileges as $privilege_name => $privilege_value)
 			{
-				$num++;
-
 				$local_tpl_data['privilege_list'][$num]['form_checkbox'] 	= form_checkbox($privilege_name, '1', $privilege_value);
 				$local_tpl_data['privilege_list'][$num]['human_name'] 		= $this->users->all_privileges[$privilege_name];
+				
+				$num ++;
 			}
 			
-			$local_tpl_data['server_id'] = $server_id;
+			$local_tpl_data['user_id']		= $user_id;		// Костыль
+			$local_tpl_data['server_id'] 	= $server_id;
 			
 			$this->tpl_data['content'] .= $this->parser->parse('web_users/web_users_privileges.html', $local_tpl_data, true);
 		}
@@ -256,12 +257,15 @@ class Users_control extends CI_Controller {
 		$server_id = (int)$server_id;
 		
 		//Проверка, есть ли права на редактирование привилегий
-		if(!$this->users->auth_privileges['usr_edit_privileges']){
+		if (!$this->users->auth_privileges['usr_edit_privileges']) {
 				$this->tpl_data['content'] .= lang('users_no_privileges_for_edit_privileges');
-		}else{
+		} else {
 			
 			/* Получаем данные редактируемого пользователя, но записываем их лишь в переменную $user_data */
-			$user_data = $this->users->get_user_data($user_id, false, true);
+			if (!$user_data = $this->users->get_user_data($user_id)) {
+				$this->_show_message(lang('users_id_unavailable'));
+				return false;
+			}
 			
 			 /* В целях безопасности, редактировать администратора может только он сам */
 			if($user_data['is_admin'] && $user_data['id'] != $this->users->auth_id){
@@ -281,11 +285,6 @@ class Users_control extends CI_Controller {
 				return false;
 			}
 			
-			if (!$this->users->user_live($user_id, 'ID')) {
-				$this->_show_message(lang('users_id_unavailable'));
-				return false;
-			}
-
 			if(!$server_id){
 				$this->_show_message(lang('users_empty_id_server'));
 				return false;
@@ -302,6 +301,8 @@ class Users_control extends CI_Controller {
 				$privilege_value = (bool)$this->input->post($privilege_name, true);
 				$this->users->set_server_privileges($privilege_name, $privilege_value, $server_id, $user_id);
 			}
+			
+			$this->users->update_server_privileges($user_id, $server_id);
 			
 			$local_tpl_data = array();
 			$local_tpl_data['message'] = lang('users_srv_privileges_saved');
@@ -336,7 +337,7 @@ class Users_control extends CI_Controller {
 			$local_tpl_data = array();
 			
 			/* Получаем данные редактируемого пользователя, но записываем их лишь в переменную $user_data */
-			$user_data = $this->users->get_user_data($user_id, false, true);
+			$user_data = $this->users->get_user_data($user_id);
 
 			/* В целях безопасности, редактировать администратора может только он сам */
 			if ($user_data['is_admin'] && $user_data['id'] != $this->users->auth_id) {
@@ -403,7 +404,7 @@ class Users_control extends CI_Controller {
 				if($user_id) {
 					
 					 /* Получаем данные редактируемого пользователя, но записываем их лишь в переменную $user_data */
-					$user_data = $this->users->get_user_data($user_id, false, true);
+					$user_data = $this->users->get_user_data($user_id);
 					
 					/* В целях безопасности, администратора нельзя удалить */
 					if ($user_data['is_admin']) {
@@ -453,7 +454,7 @@ class Users_control extends CI_Controller {
 			return false;
 		}
 		
-		if(!$this->users->get_user_data($user_id, true)){
+		if(!$this->users->get_user_data($user_id)){
 			$this->_show_message(lang('users_id_unavailable'), site_url('admin/users_control'));
 			return false;
 		}
@@ -482,7 +483,6 @@ class Users_control extends CI_Controller {
 			}
 		}
 		
-        
         if ($this->form_validation->run() == false) {
 			$this->tpl_data['content'] = $this->parser->parse('web_users/base_privileges_edit.html', $local_tpl_data, true);
 			
