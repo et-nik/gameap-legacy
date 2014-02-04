@@ -80,13 +80,11 @@ class Game_types extends CI_Model {
 		}
 
 		if($query->num_rows > 0) {
-			
 			$this->game_types_list = $query->result_array();
 			return $this->game_types_list;
-			
 		} else {
 			$this->game_types_list = array();
-			return NULL;
+			return array();
 		}
 	}
 	
