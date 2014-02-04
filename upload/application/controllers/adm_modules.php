@@ -43,6 +43,8 @@ class Adm_modules extends CI_Controller {
         $this->load->database();
         $this->load->model('users');
         
+        $this->lang->load('adm_modules');
+        
         if ($this->users->check_user()) {
 			
 			/* Есть ли у пользователя права */
@@ -51,8 +53,8 @@ class Adm_modules extends CI_Controller {
 			}
 			
 			//Base Template
-			$this->tpl_data['title'] 	= '';
-			$this->tpl_data['heading'] 	= '';
+			$this->tpl_data['title'] 	= lang('adm_modules_title_index');
+			$this->tpl_data['heading'] 	= lang('adm_modules_heading_index');
 			$this->tpl_data['content'] 	= '';
 			
 			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
@@ -220,10 +222,10 @@ class Adm_modules extends CI_Controller {
 	public function update_list()
 	{
 		if ($this->_update_list()) {
-			$this->_show_message('Modules list updated', site_url('adm_modules'));
+			$this->_show_message(lang('adm_modules_update_success'), site_url('adm_modules'));
 			return true;
 		} else {
-			$this->_show_message('Modules list update failure');
+			$this->_show_message(lang('adm_modules_update_failure'));
 			return false;
 		}
 	}
