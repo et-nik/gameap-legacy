@@ -150,7 +150,7 @@ class Servers_files extends CI_Controller {
 		 * servers/servers_files_content_dirs.html - контент
 		 * 
 		*/
-		if($this->users->servers_privileges['CHANGE_CONFIG']) {
+		if($this->users->auth_servers_privileges['CHANGE_CONFIG']) {
 			$cfg_files = json_decode($this->servers->server_data['config_files'], true);
 			
 			if($cfg_files) {
@@ -168,7 +168,7 @@ class Servers_files extends CI_Controller {
 			$this->tpl_data['content'] .= $this->parser->parse('servers/servers_files_cfg.html', $local_tpl_data, true);
 		}
 
-		if($this->users->servers_privileges['UPLOAD_CONTENTS']){
+		if($this->users->auth_servers_privileges['UPLOAD_CONTENTS']){
 			/* Чтобы шоткод отображался нормально*/
 
 			$content_dirs = json_decode($this->servers->server_data['content_dirs'], true);
@@ -223,7 +223,7 @@ class Servers_files extends CI_Controller {
 		$this->users->get_server_privileges($server_id);
 		
 		/* Проверка привилегий на правку конфигов */
-		if (!$this->users->servers_privileges['CHANGE_CONFIG']) {
+		if (!$this->users->auth_servers_privileges['CHANGE_CONFIG']) {
 			$this->_show_message(lang('server_files_no_cfg_privileges'));
 			return false;
 		}
@@ -382,7 +382,7 @@ class Servers_files extends CI_Controller {
 		$this->users->get_server_privileges($server_id);
 		
 		/* Проверка привилегий на правку конфигов */
-		if (!$this->users->servers_privileges['UPLOAD_CONTENTS']) {
+		if (!$this->users->auth_servers_privileges['UPLOAD_CONTENTS']) {
 			$this->_show_message(lang('server_files_no_cfg_privileges'));
 			return false;
 		}

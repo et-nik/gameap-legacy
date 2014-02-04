@@ -128,7 +128,7 @@ class Servers_log extends CI_Controller {
 		/* Проверка привилегий на сервер */
 		$this->users->get_server_privileges($server_id);
 		
-		if(!$this->users->servers_privileges['LOGS_VIEW']){
+		if(!$this->users->auth_servers_privileges['LOGS_VIEW']){
 			$this->_show_message(lang('servers_log_no_privileges'), site_url('admin/servers_log'));
 			return false;
 		}
@@ -269,7 +269,7 @@ class Servers_log extends CI_Controller {
 		/* Проверка привилегий на сервер */
 		$this->users->get_server_privileges($server_id);
 		
-		if(!$this->users->servers_privileges['LOGS_VIEW']){
+		if(!$this->users->auth_servers_privileges['LOGS_VIEW']){
 			$this->_show_message(lang('servers_log_no_privileges'), site_url('admin/servers_log'));
 			return false;
 		}
