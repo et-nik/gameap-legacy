@@ -1,8 +1,8 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
 <?php if($this->users->auth_privileges['usr_create']): ?>
 <a class="awesome" href="{site_url}admin/users_control/add">{lang_users_add_user}</a>
+<br /><br />
 <?php endif; ?>
-<br />
 {pagination}
 <table width="100%" class="zebra">
 	<tbody>
