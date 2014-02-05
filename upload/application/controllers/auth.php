@@ -19,6 +19,8 @@ class Auth extends CI_Controller {
 	// Список запрещенных логинов при регистрации
 	private $_denied_logins = array('administrator', 'admin', 'system', 'gameap');
 	
+	// -----------------------------------------------------------------------------------------
+
 	public function __construct()
     {
         parent::__construct();
@@ -63,23 +65,25 @@ class Auth extends CI_Controller {
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
-    private function check_captcha($word)
+    // -----------------------------------------------------------------------------------------
+
+    /**
+     * Проверка капчи
+    */ 
+    private function _check_captcha($word)
     {
-			// Удаление старой капчи
-			$expiration = time()-7200; // Двухчасовое ограничение
-			
-			$this->db->delete('captcha', array('captcha_time <' => $expiration));
-			
-			// Проверяем капчу
-			$query = $this->db->get_where('captcha', array('word' => $word, 'ip_address' => $this->input->ip_address(), 'captcha_time >' => $expiration), 1);
-			
-			if($query->num_rows > 0) {
-				return true;
-			}
-			
-			return false;
+		if ($word == $this->session->flashdata('captcha')) {
+			return true;
+		}
+		
+		return false;
 	}
 	
+	// -----------------------------------------------------------------------------------------
+
+    /**
+     * Главная страница
+    */ 
 	public function index()
 	{
 		// Обычно библиотека запущена
@@ -102,8 +106,6 @@ class Auth extends CI_Controller {
      * 
      * @param code - необязательный параметр для авторизации пользователей, 
      * подвергшихся брутфорс атаке.
-     * 
-     *
     */
     public function in($code = false)
     {
@@ -192,7 +194,7 @@ class Auth extends CI_Controller {
 							$this->email->from($this->config->config['system_email'], 'АдминПанель');
 							$this->email->to($user_data['email']); 
 
-							$this->email->subject(lang($lang['auth_account_unblock']));
+							$this->email->subject(lang('auth_account_unblock'));
 							
 							$email_message = lang('auth_mail_goto_link') . site_url() . 'auth/in/' . $user_code ;
 							
@@ -294,6 +296,11 @@ class Auth extends CI_Controller {
         $this->parser->parse('login.html', $this->tpl_data);
     }
     
+    // -----------------------------------------------------------------------------------------
+
+    /**
+     * Выход
+    */ 
     public function out()
     {
 		$this->tpl_data['menu'] = '';
@@ -322,8 +329,14 @@ class Auth extends CI_Controller {
         $this->parser->parse('main.html', $this->tpl_data);
 	}
 	
+	// -----------------------------------------------------------------------------------------
+
+    /**
+     * Регистрация пользователя
+    */ 
 	function register()
     {
+        $this->load->library('session');
         
         $this->tpl_data['heading'] 	= lang('auth_title_register');
         $this->tpl_data['title'] 	= lang('auth_heading_register');
@@ -360,13 +373,10 @@ class Auth extends CI_Controller {
 			$captcha = create_captcha($vals);
 			$this->tpl_data['captcha'] = $captcha['image'];
 			
-			$data = array(
-				'captcha_time'	=> time(),
-				'ip_address'	=> $this->input->ip_address(),
-				'word'	 		=> $cap['word']
-			);
+			$this->session->set_flashdata('captcha', $cap['word']);
 			
-			$query = $this->db->insert('captcha', $data);
+			//~ 
+			//~ $query = $this->db->insert('captcha', $data);
             
             $this->parser->parse('register.html', $this->tpl_data);
         } else {
@@ -375,7 +385,7 @@ class Auth extends CI_Controller {
 			$this->load->model('password');
 			
 			// Проверяем, правильно ли введено сообщение
-			if(!$this->check_captcha($this->input->post('image'))){
+			if (!$this->_check_captcha($this->input->post('image'))) {
 				// Сохраняем логи
 				$log_data['type'] = 'reg';
 				$log_data['user_name'] = $this->input->post('login');
@@ -421,6 +431,12 @@ class Auth extends CI_Controller {
 		}
 	}
 	
+	
+	// -----------------------------------------------------------------------------------------
+
+    /**
+     * Восстановление пароля
+    */ 
 	function recovery_password($code = false)
 	{
 		$this->tpl_data['heading'] 	= lang('auth_title_recovery_password');
@@ -514,9 +530,9 @@ class Auth extends CI_Controller {
         $this->form_validation->set_rules('login', 'логин', 'trim|max_length[12]|xss_clean');
 		$this->form_validation->set_rules('email', 'email адрес', 'trim|max_length[64]|min_length[0]|valid_email|xss_clean');
         
-		if ($this->form_validation->run() == false){
+		if ($this->form_validation->run() == false) {
 			$this->parser->parse('recovery_password.html', $this->tpl_data);
-		}else{
+		} else {
 			
 			$login = $this->input->post('login');
 			$email = $this->input->post('email');
@@ -557,22 +573,30 @@ class Auth extends CI_Controller {
 			$this->email->subject(lang('auth_recovery_password'));
 			$url_recovery = site_url('auth/recovery_password/' . $recovery_code);
 			$this->email->message(lang('auth_recovery_mail_goto_link') . ': ' . $url_recovery);	
-				
-			if($this->email->send()){
-				$this->_show_message(lang('recovery_recovery_msg_accept_send') . ' ' . $user_list[0]['email'] , site_url('auth/in'), 'Далее');
-				$log_data['msg'] = 'Send Recovery Code. Email: ' . $user_list[0]['email'];
-			}else{
-				$this->_show_message(lang('auth_recovery_msg_send_error'), site_url('auth/in'), 'Далее');
-				$log_data['msg'] = 'Mail Send Error';				// Сообщение для логов
-			}
-				
-			/* Пригодится для дебага */
-			//echo $this->email->print_debugger();
 			
-			// Сохраняем логи
-			$log_data['type'] = 'recovery_password';
-			$log_data['user_name'] = $user_list[0]['login'];
-			$this->panel_log->save_log($log_data);
+			if(count($this->panel_log->get_log(array('date >' => time() - 86400, 'user_name' => $user_data['login'], 'msg' => 'Send Recovery Code. Email: ' . $user_list[0]['email']))) < 1 ) {
+				
+				if($this->email->send()){
+					$this->_show_message(lang('recovery_recovery_msg_accept_send') . ' ' . $user_list[0]['email'] , site_url('auth/in'), lang('next'));
+					$log_data['msg'] = 'Send Recovery Code. Email: ' . $user_list[0]['email'];
+				}else{
+					$this->_show_message(lang('auth_recovery_msg_send_error'), site_url('auth/in'), 'Далее');
+					$log_data['msg'] = 'Mail Send Error';				// Сообщение для логов
+				}
+					
+				/* Пригодится для дебага */
+				//echo $this->email->print_debugger();
+				
+				// Сохраняем логи
+				$log_data['type'] = 'recovery_password';
+				$log_data['user_name'] = $user_list[0]['login'];
+				$this->panel_log->save_log($log_data);
+				
+			} else {
+				// Письмо уже отправлено ранее, несколько писем лучше не отправлять
+				$this->_show_message(lang('recovery_recovery_msg_accept_send') . ' ' . $user_list[0]['email'] , site_url('auth/in'), lang('next'));
+				return false;
+			}
 			
 			
 		}
