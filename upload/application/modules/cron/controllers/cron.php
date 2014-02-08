@@ -48,7 +48,7 @@ class Cron extends MX_Controller {
     {
         parent::__construct();
         
-        //~ /* Скрипт можно запустить только из командной строки (через cron)*/
+        /* Скрипт можно запустить только из командной строки (через cron) */
         if(php_sapi_name() != 'cli'){
 			show_404();
 		}
@@ -57,10 +57,13 @@ class Cron extends MX_Controller {
 		$this->load->model('servers/dedicated_servers');
 		$this->load->model('servers/games');
 		$this->load->model('servers/game_types');
+		
 		$this->load->driver('rcon');
 		$this->load->driver('installer');
+		
 		$this->load->library('ssh');
 		$this->load->library('telnet');
+		$this->load->library('query');
 
 		set_time_limit(0);
 		$this->load->database();
@@ -584,16 +587,17 @@ class Cron extends MX_Controller {
 			/* Использование процессора */
 			$stats_explode = preg_replace('| +|', ' ', array_pop(explode("\n", trim($stats_string['cpu_load']))));
 			$stats_explode = explode(' ', trim($stats_explode));
-			$stats['cpu_usage'] = (int)$stats_explode[12] + $stats_explode[13];
+			
+			$stats['cpu_usage'] = (isset($stats_explode[12]) &&  isset($stats_explode[13])) ? (int)$stats_explode[12] + $stats_explode[13] : false;
 
 			/* Использование памяти */
 			$stats_explode = preg_replace('| +|', ' ', $stats_string['memory_usage']);
 			$stats_explode = explode("\n", trim($stats_explode));
 			$stats_explode = explode(' ', $stats_explode[1]);
-			$stats['memory_usage'] = (int)round(($stats_explode[2]/$stats_explode[1])*100);
-
-			if($stats['cpu_usage'] > 100) {$stats['cpu_usage'] = 100;}
-			if($stats['memory_usage'] > 100) {$stats['memory_usage'] = 100;}
+			$stats['memory_usage'] = (isset($stats_explode[1]) &&  isset($stats_explode[2])) ? (int)round(($stats_explode[2]/$stats_explode[1])*100) : false;
+			
+			$stats['cpu_usage'] 	= ($stats['cpu_usage'] > 100) ? 100 : $stats['cpu_usage'];
+			$stats['memory_usage'] 	= ($stats['memory_usage'] > 100) ? 100 : $stats['memory_usage'];
 
 			return $stats;
 		}
