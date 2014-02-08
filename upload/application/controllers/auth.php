@@ -6,7 +6,7 @@
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
+ * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
  * @license		http://www.gameap.ru/license.html
  * @link		http://www.gameap.ru
  * @filesource
@@ -72,11 +72,7 @@ class Auth extends CI_Controller {
     */ 
     private function _check_captcha($word)
     {
-		if ($word == $this->session->flashdata('captcha')) {
-			return true;
-		}
-		
-		return false;
+		return (bool)($word == $this->session->flashdata('captcha'));
 	}
 	
 	// -----------------------------------------------------------------------------------------

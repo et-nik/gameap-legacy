@@ -37,6 +37,8 @@ class Server_control extends CI_Controller {
 	// Количество игроков на сервере
 	var $players = 0;
 	
+	//--------------------------------------------------------------------------
+	
 	public function __construct()
     {
         parent::__construct();
@@ -62,6 +64,8 @@ class Server_control extends CI_Controller {
         }
     }
     
+	//--------------------------------------------------------------------------
+    
 	// Отображение информационного сообщения
     function _show_message($message = false, $link = false, $link_text = false)
     {
@@ -85,21 +89,123 @@ class Server_control extends CI_Controller {
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
+    // --------------------------------------------------------------------------
     
-    // Команды
+    /**
+     * Получение списка frcon команд
+     */
+    private function _get_frcon_list()
+    {
+		$tpl_list = array();
+		
+		$frcon_list = json_decode($this->servers->server_data['fast_rcon'], true);
+		if ($frcon_list) {
+			$tpl_list = $frcon_list;
+			$i = 0;
+			foreach($frcon_list as $array) {
+				$tpl_list[$i]['id_fr'] = $i;
+				$i ++;
+			}
+		}
+		
+		return $tpl_list;
+	}
+	
+	// --------------------------------------------------------------------------
+    
+    /**
+     * Получение списка игроков
+     */
+	private function _get_players_list()
+	{
+		$tpl_list = array();
+		
+		if ($rcon_string) {
+			$tpl_list = $this->rcon->get_players($rcon_string, $this->servers->server_data['engine']);
+		}
+		
+		if (!empty($tpl_list)) {
+			/* В качестве условия в шаблоне */
+			$this->players = 1;
+		}
+		
+		return $tpl_list;
+	}
+	
+	// --------------------------------------------------------------------------
+    
+    /**
+     * Получение списка карт для вставки в шаблон
+     */
+	private function _get_maps_list()
+	{
+		$tpl_list = array();
+		
+		/* 
+		/* Если FTP настроен или сервер локальный, то получаем список карт
+		 * напрямую из списка сервера
+		 * иначе берем через ркон
+		*/
+		if (!$this->servers->server_data['ds_id'] OR $this->servers->server_data['ftp_host']) {
+			$tpl_list = $this->servers->get_server_maps();
+		} else {
+			$this->tpl_data['content'] .= '<p>' . lang('server_control_no_ftp') . '</p>';
+			$tpl_list = $this->rcon->get_maps();
+		}
+		
+		return $tpl_list;
+	}
+	
+	// --------------------------------------------------------------------------
+    
+    /**
+     * Получение списка карт для вставки в шаблон
+     */
+	private function _get_base_cvars()
+	{
+		$tpl_data = array();
+		$server_id = $this->servers->server_data['id'];
+		
+		// Список базовых кваров
+		$query['id'] 	= $server_id;
+		$query['type'] 	= $this->servers->server_data['engine'];
+		$query['host']	= $this->servers->server_data['server_ip'];
+		$query['port']	= $this->servers->server_data['server_port'];
+		$this->query->set_data($query);
+		
+		if ($base_cvars = $this->query->get_base_cvars()) {
+			$base_cvars = $base_cvars[$server_id];
+
+			$tpl_data[] = array('cvar_name' => lang('cvarname_hostname'), 'cvar_value' => $base_cvars['hostname']);
+			$tpl_data[] = array('cvar_name' => lang('cvarname_map'), 'cvar_value' => $base_cvars['map']);
+			$tpl_data[] = array('cvar_name' => lang('cvarname_players'), 
+													'cvar_value' => $base_cvars['players'] . '/' . $base_cvars['maxplayers']
+													);
+			
+			$password_status = 	$base_cvars['password'] ? lang('set') : lang('no_set');				
+			$tpl_data[] = array('cvar_name' => lang('password'), 'cvar_value' => $password_status);
+		}
+		
+		return $tpl_data;
+	}
+
+    //--------------------------------------------------------------------------
+	
+	/**
+     * Главная страница управления сервером
+     * 
+     * @param int - id сервера
+     *
+    */
     public function main($server_id = false)
     {
+        $this->load->library('query');
         $this->load->driver('rcon');
         $this->load->helper('date');
-
-        $error = 0;
-        $error_desc = null;
 
 		if(!$server_id) {
 			$this->_show_message(lang('server_control_empty_server_id'));
 			return false;
-		} else {
-				$server_id = (int)$server_id;
 		}
 		
 		/* Получение данных сервера и привилегий на сервер */
@@ -116,220 +222,184 @@ class Server_control extends CI_Controller {
 			return false;
 		}
 
-		if(!$error_desc) {
-			$rcon_connect = false;
+		$rcon_connect = false;
+		
+		if ($this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['query_port'])) {
+			$this->servers->server_data['server_status'] = 1;
 			
-			if ($this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['query_port'])) {
-				$this->servers->server_data['server_status'] = 1;
-				
-				$this->rcon->set_variables(
-											$this->servers->server_data['server_ip'],
-											$this->servers->server_data['rcon_port'],
-											$this->servers->server_data['rcon'], 
-											$this->servers->servers->server_data['engine'],
-											$this->servers->servers->server_data['engine_version']
-				);
-				
-				$rcon_connect = $this->rcon->connect();
-				
-			} else {
-				$this->servers->server_data['server_status'] = 0;
-			}
+			$this->rcon->set_variables(
+										$this->servers->server_data['server_ip'],
+										$this->servers->server_data['rcon_port'],
+										$this->servers->server_data['rcon'], 
+										$this->servers->servers->server_data['engine'],
+										$this->servers->servers->server_data['engine_version']
+			);
 			
+			$rcon_connect = $this->rcon->connect();
 			
-			if($this->servers->server_data['server_status']) {
+		} else {
+			$this->servers->server_data['server_status'] = 0;
+		}
+		
+		
+		if ($this->servers->server_data['server_status']) {
 
-				// Отправка команды
-				$rcon_string = $this->rcon->command("status");
-				
-				$local_tpl_data['users_list'] = false;
-				
-				if($rcon_string){
-						$local_tpl_data['users_list'] = $this->rcon->get_players($rcon_string, $this->servers->server_data['engine']);
-				}
-				
-				if(!$local_tpl_data['users_list']){
-					$this->tpl_data['content'] .= lang('server_control_empty_player_list');
-				}else{
-					$this->players = 1;
-				}
-				
-				/* 
-				 * == Список карт ==
-				/* Если FTP настроен или сервер локальный, то получаем список карт
-				 * напрямую из списка сервера
-				 * иначе берем через ркон
-				*/
-				if(!$this->servers->server_data['ds_id'] OR $this->servers->server_data['ftp_host']){
-					$local_tpl_data['maps_list'] = $this->servers->get_server_maps();
-				}else{
-					$this->tpl_data['content'] .= '<p>' . lang('server_control_no_ftp') . '</p>';
-					$local_tpl_data['maps_list'] = $this->rcon->get_maps();
-				}
-				
-				/*
-				 * FAST RCON
-				 * 
-				 * Декодирование json списка с командами
-				*/
-				
-				$frcon_list = json_decode($this->servers->server_data['fast_rcon'], true);
-				if($frcon_list) {
-					$i = -1;
-					$local_tpl_data['frcon_list'] = $frcon_list;
-					foreach($frcon_list as $array) {
-						$i ++;
-						$local_tpl_data['frcon_list'][$i]['id_fr'] = $i;
-					}
-				} else {
-					$local_tpl_data['frcon_list'] = array();
-				}
-				
-				
-			} else {
-				// Ошибка соединения с сервером
-				$this->tpl_data['content'] .= lang('server_control_server_down');
+			// Отправка команды
+			$rcon_string = $this->rcon->command("status");
+			
+			$local_tpl_data['users_list'] 	= array();
+			
+			if($rcon_string){
+				$local_tpl_data['users_list'] = $this->rcon->get_players($rcon_string, $this->servers->server_data['engine']);
 			}
 			
-			/* Получение последних действий с сервером
-			 *  
-			 * количество получаемых логов = 50
-			 * количество отображаемых логов = 10
-			 * 
-			 * Некоторые из получаемых логов могут не относиться к серверам, из-за этого
-			 * таблица может быть пустой
-			 * 
-			*/
-			$where = array('server_id' => $server_id);
-			$server_plogs = $this->panel_log->get_log($where, 50); // Логи сервера в админпанели
+			if ($local_tpl_data['users_list']) {
+				$this->players = 1;
+			}
+
+			$local_tpl_data['maps_list']	= $this->_get_maps_list();
+			$local_tpl_data['frcon_list'] 	= $this->_get_frcon_list();
+			$local_tpl_data['base_cvars'] 	= $this->_get_base_cvars();
 			
-			$local_tpl_data['log_list'] = array();
 			
-			$log_num = 0;
-			$i = 0;
-			$count_i = count($server_plogs);
-			while($i < $count_i){
-				
-				if($log_num == 10) {
+			
+		} else {
+			// Ошибка соединения с сервером
+			$this->tpl_data['content'] .= lang('server_control_server_down');
+		}
+		
+		/* Получение последних действий с сервером
+		 *  
+		 * количество получаемых логов = 50
+		 * количество отображаемых логов = 10
+		 * 
+		 * Некоторые из получаемых логов могут не относиться к серверам, из-за этого
+		 * таблица может быть пустой
+		 * 
+		*/
+		$where = array('server_id' => $server_id);
+		$server_plogs = $this->panel_log->get_log($where, 50); // Логи сервера в админпанели
+		
+		$local_tpl_data['log_list'] = array();
+		
+		$log_num = 0;
+		$i = 0;
+		$count_i = count($server_plogs);
+		while ($i < $count_i) {
+			
+			if($log_num == 10) {
+				break;
+			}
+			
+			$local_tpl_data['log_list'][$i]['log_id'] = $server_plogs[$i]['id'];
+			$local_tpl_data['log_list'][$i]['log_date'] = unix_to_human($server_plogs[$i]['date'], true, 'eu');
+			$local_tpl_data['log_list'][$i]['log_server_id'] = $server_plogs[$i]['server_id'];
+			$local_tpl_data['log_list'][$i]['log_user_name'] = $server_plogs[$i]['user_name'];
+			$local_tpl_data['log_list'][$i]['log_command'] = $server_plogs[$i]['command'];
+			
+			
+			/* Код действия на понятный язык */
+			switch($server_plogs[$i]['type']){
+				case 'server_rcon':
+					$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_rcon_send');
+					$log_num ++;
 					break;
-				}
-				
-				$local_tpl_data['log_list'][$i]['log_id'] = $server_plogs[$i]['id'];
-				$local_tpl_data['log_list'][$i]['log_date'] = unix_to_human($server_plogs[$i]['date'], true, 'eu');
-				$local_tpl_data['log_list'][$i]['log_server_id'] = $server_plogs[$i]['server_id'];
-				$local_tpl_data['log_list'][$i]['log_user_name'] = $server_plogs[$i]['user_name'];
-				$local_tpl_data['log_list'][$i]['log_command'] = $server_plogs[$i]['command'];
-				
-				
-				/* Код действия на понятный язык */
-				switch($server_plogs[$i]['type']){
-					case 'server_rcon':
-						$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_rcon_send');
-						$log_num ++;
+					
+				case 'server_command':
+					$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_command');
+					$log_num ++;
+					break;
+					
+				case 'server_update':
+					$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_update');
+					$log_num ++;
+					break;
+				case 'server_task':
+					$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_srv_task');
+					$log_num ++;
+					break;
+					
+				case 'server_settings':
+					$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_settings');
+					$log_num ++;
+					break;
+					
+				case 'server_files':
+					$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_file_operation');
+					$log_num ++;
+					break;
+					
+				default:
+					// Тип лога неизвестен, удаляем его из списка (не из базы)
+					unset($local_tpl_data['log_list'][$i]);
+					break;
+			}
+			
+			$i ++;
+		}
+		
+		/* Крон задания */
+		$local_tpl_data['task_list'] = array();
+		
+		if($this->users->auth_servers_privileges['TASK_MANAGE']) {
+			
+			$where = array('server_id' => $server_id);
+			$query = $this->db->order_by('date_perform', 'asc');
+			$query = $this->db->get_where('cron', $where);
+			
+			if($query->num_rows > 0) {
+				$task_list = $query->result_array();
+			} else {
+				$task_list = array();
+			}
+			
+			$i = 0;
+			$count_i = count($task_list);
+			while($i < $count_i) {
+
+				switch($task_list[$i]['code']) {
+					case 'server_start':
+						$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_start');
 						break;
 						
-					case 'server_command':
-						$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_command');
-						$log_num ++;
+					case 'server_stop':
+						$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_stop');
+						break;
+						
+					case 'server_restart':
+						$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_restart');
 						break;
 						
 					case 'server_update':
-						$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_update');
-						$log_num ++;
-						break;
-					case 'server_task':
-						$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_srv_task');
-						$log_num ++;
+						$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_update');
 						break;
 						
-					case 'server_settings':
-						$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_settings');
-						$log_num ++;
-						break;
-						
-					case 'server_files':
-						$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_file_operation');
-						$log_num ++;
+					case 'server_rcon':
+						$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_rcon_send');
 						break;
 						
 					default:
-						// Тип лога неизвестен, удаляем его из списка (не из базы)
-						unset($local_tpl_data['log_list'][$i]);
+						continue;
 						break;
 				}
 				
+				$local_tpl_data['task_list'][$i]['task_id'] = $task_list[$i]['id'];
+				$local_tpl_data['task_list'][$i]['task_name'] = $task_list[$i]['name'];
+				$local_tpl_data['task_list'][$i]['task_date'] = unix_to_human($task_list[$i]['date_perform'], true, 'eu');
+
 				$i ++;
 			}
 			
-			/* Крон задания */
-			$local_tpl_data['task_list'] = array();
-			
-			if($this->users->auth_servers_privileges['TASK_MANAGE']) {
-				
-				$where = array('server_id' => $server_id);
-				$query = $this->db->order_by('date_perform', 'asc');
-				$query = $this->db->get_where('cron', $where);
-				
-				if($query->num_rows > 0) {
-					$task_list = $query->result_array();
-				} else {
-					$task_list = array();
-				}
-				
-				$i = 0;
-				$count_i = count($task_list);
-				while($i < $count_i) {
+		}
+		
+		$local_tpl_data['server_id'] = $server_id;
+		$local_tpl_data['server_name'] = $this->servers->server_data['name'];
+		$this->tpl_data['heading'] = lang('server_control_header') . ' "' . $this->servers->server_data['name'] . '"';
 
-					switch($task_list[$i]['code']) {
-						case 'server_start':
-							$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_start');
-							break;
-							
-						case 'server_stop':
-							$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_stop');
-							break;
-							
-						case 'server_restart':
-							$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_restart');
-							break;
-							
-						case 'server_update':
-							$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_update');
-							break;
-							
-						case 'server_rcon':
-							$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_rcon_send');
-							break;
-							
-						default:
-							continue;
-							break;
-					}
-					
-					$local_tpl_data['task_list'][$i]['task_id'] = $task_list[$i]['id'];
-					$local_tpl_data['task_list'][$i]['task_name'] = $task_list[$i]['name'];
-					$local_tpl_data['task_list'][$i]['task_date'] = unix_to_human($task_list[$i]['date_perform'], true, 'eu');
-
-					$i ++;
-				
-				}
-				
-			}
-			
-			$local_tpl_data['server_id'] = $server_id;
-			$local_tpl_data['server_name'] = $this->servers->server_data['name'];
-			$this->tpl_data['heading'] = lang('server_control_header') . ' "' . $this->servers->server_data['name'] . '"';
-			
-			//~ echo APPPATH . 'views/' . $this->config->config['template'] . '/server_control/' . $this->servers->server_data['game'] . '.html';
-			
-			if (file_exists(APPPATH . 'views/' . $this->config->config['template'] . '/servers_control/' . $this->servers->server_data['game'] . '.html')) {
-				$this->tpl_data['content'] .= $this->parser->parse('server_control/' . $this->servers->server_data['game'] . '.html', $local_tpl_data, true);
-			} else {
-				$this->tpl_data['content'] .= $this->parser->parse('server_control/default.html', $local_tpl_data, true);
-			}
-			
-		}else{
-			$this->tpl_data['content'] .= '<strong>' . lang('server_control_errors_found') . ' :</strong><br />' . $error_desc;
+		if (file_exists(APPPATH . 'views/' . $this->config->config['template'] . '/servers_control/' . $this->servers->server_data['game'] . '.html')) {
+			$this->tpl_data['content'] .= $this->parser->parse('server_control/' . $this->servers->server_data['game'] . '.html', $local_tpl_data, true);
+		} else {
+			$this->tpl_data['content'] .= $this->parser->parse('server_control/default.html', $local_tpl_data, true);
 		}
 
         $this->parser->parse('main.html', $this->tpl_data);

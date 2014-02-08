@@ -6,7 +6,7 @@
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
+ * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
  * @license		http://www.gameap.ru/license.html
  * @link		http://www.gameap.ru
  * @filesource
@@ -88,18 +88,7 @@ class Index extends CI_Controller {
 					
 					$template = (!isset($this->config->config['template'])) ? 'default' : $this->config->config['template'];
 					$style = (!isset($this->config->config['style'])) ? 'default' : $this->config->config['style'];
-					
-					/* Работает ли сервер 
-					 * Начиная с версии 0.8.6 статуст серверов подгружается через AJAX
-					*/
-					//~ if($this->servers->server_status($this->server_data['server_ip'], $this->server_data['query_port'], $this->games->games_list[$game_arr_id]['engine'], $this->games->games_list[$game_arr_id]['engine_version'])) {
-						//~ $server_status['string'] = '<img src="' . base_url() . '/themes/system/images/bullet_green.png" alt="' . lang('enabled') . '"/>';
-						//~ $this->server_data['server_status'] = 1;
-					//~ } else {
-						//~ $server_status['string'] = '<img src="' . base_url() . '/themes/system/images/bullet_red.png" alt="' . lang('disabled') . '"/>';
-						//~ $this->server_data['server_status'] = 0;
-					//~ }
-						
+
 					/* Проверка привилегий на сервер */
 					$this->users->get_server_privileges($this->server_data['id']);
 					

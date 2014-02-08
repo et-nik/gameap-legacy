@@ -522,3 +522,6 @@ class Servers_files extends CI_Controller {
 	}
     
 }
+
+/* End of file server_files.php */
+/* Location: ./application/controllers/admin/server_files.php */
