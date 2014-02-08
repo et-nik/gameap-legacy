@@ -6,27 +6,28 @@
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
- * @license		http://gameap.ru/license.html
- * @link		http://gameap.ru
+ * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
+ * @license		http://www.gameap.ru/license.html
+ * @link		http://www.gameap.ru
  * @filesource
 */
 class Servers extends CI_Model {
 
-    var $server_id   = '';				// ИД сервера
-    var $servers_list = array();		// Список игровых серверов
-    var $server_data = array();		// Данные сервера
-    var $server_ds_data = array();		// Данные DS игрового сервера
-    var $server_game_data = array();	// Данные игры к которой принадлежит сервер
+    public $server_id   		= 0;			// ИД сервера
+	public $servers_list 		= array();		// Список игровых серверов
+    public $server_data 		= array();		// Данные сервера
+    public $server_query_data 	= array();		// query данные сервера
+    public $server_ds_data 	= array();		// Данные DS игрового сервера
+    public $server_game_data 	= array();		// Данные игры к которой принадлежит сервер
     
-    var $all_settings = array(
+    public $all_settings = array(
 		'SERVER_AUTOSTART'			=> 'Автостарт сервера в случае его падения (через cron)',
 		'SERVER_RCON_AUTOCHANGE' 	=> 'Автоматическая смена rcon пароля, в случае если в админпанели и на сервере он не совпадает',
     );
     
-    var $server_settings 	= array();
-    //~ var $commands			= array(); // Команды, которые отправлялись на сервер
-    var $errors 			= ''; 	// Строка с ошибкой (если имеются)
+    public $server_settings 	= array();
+    //~ public $commands			= array(); // Команды, которые отправлялись на сервер
+    public $errors 			= ''; 	// Строка с ошибкой (если имеются)
 
     function __construct()
     {
@@ -36,8 +37,10 @@ class Servers extends CI_Model {
         $this->load->helper('safety');
         $this->load->library('encrypt');
     }
-
-    function _strip_quotes($string) {
+    
+	//-----------------------------------------------------------
+	
+   private function _strip_quotes($string) {
 		$string = str_replace('"', '', $string);
 		$string = str_replace('\'', '', $string);
 		
@@ -45,13 +48,37 @@ class Servers extends CI_Model {
 	}
 	
 	//-----------------------------------------------------------
+	
+	private function _get_engine() 
+	{
+		if (!isset($this->games->games_list)) {
+			$this->load->models('servers/games');
+			$this->games->get_games_list();
+		}
+			
+		/* Получение id игры в массиве */
+		$i = 0;
+		$count = count($this->games->games_list);
+		while($i < $count) {
+			if ($this->server_data['game'] == $this->games->games_list[$i]['code']) {
+				$game_arr_id = $i;
+				break;
+			}
+			$i++;
+		}
+			
+		$engine 		= $this->games->games_list[$game_arr_id]['engine'];
+		$engine_version = $this->games->games_list[$game_arr_id]['engine_version'];
+		
+		return array($engine, $engine_version);
+	}
+	
+	//-----------------------------------------------------------
     
     /*
      * Проверяет директорию на необходимые права
-     * 
-     * 
     */
-	function _check_path($path) {
+	private function _check_path($path) {
 		
 		if (!is_dir($path)) {
 			/* Это не директория */
@@ -60,7 +87,6 @@ class Servers extends CI_Model {
 		}
 
 		return true;
-		
 	}
 	
 	//-----------------------------------------------------------
@@ -72,7 +98,7 @@ class Servers extends CI_Model {
      * @return bool
      * 
     */
-	function _check_file($file) {
+	private function _check_file($file) {
 		if (!file_exists($file)) {
 			$this->errors = 'Error: ' . $file . ' file not found';
 			return false;
@@ -769,7 +795,7 @@ class Servers extends CI_Model {
 		}
 		
 	}
-	
+
 	// ----------------------------------------------------------------
     
     /**
@@ -779,7 +805,7 @@ class Servers extends CI_Model {
     */	
 	function server_status($host = false, $port = false, $engine = false, $engine_version = false)
 	{
-		$this->load->driver('query');
+		$this->load->library('query');
 		
 		if (!$host) {
 			$host = $this->server_data['server_ip'];
@@ -790,40 +816,19 @@ class Servers extends CI_Model {
 		}
 
 		if (!$engine or !$engine_version) {
-
-			if (!isset($this->games->games_list)) {
-				$this->load->models('servers/games');
-				$this->games->get_games_list();
-			}
-			
-			/* Получение id игры в массиве */
-			$i = 0;
-			$count = count($this->games->games_list);
-			while($i < $count) {
-				if ($this->server_data['game'] == $this->games->games_list[$i]['code']) {
-					$game_arr_id = $i;
-					break;
-				}
-				$i++;
-			}
+			$engine 			= $this->_get_engine();
+			$engine_version 	= $engine[1];
+			$engine 			= $engine[0];
 		}
 		
-		if (!$engine) {
-			$engine = $this->games->games_list[$game_arr_id]['engine'];
-		}
+		$server['id'] = isset($this->server_data['id']) ? $this->server_data['id'] : 'get_status';
+		$server['type'] = $engine;
+		$server['host'] = $host . ':' . $port;
+		$this->query->set_data($server);
 		
-		if (!$engine_version) {
-			$engine_version = $this->games->games_list[$game_arr_id]['engine_version'];
-		}
-
-		$this->query->set_engine($engine, $engine_version);
-
-		if ($this->query->get_status($host, $port)) {
-			return true;
-		}else{
-			return false;
-		}
+		$request = $this->query->get_status();
 		
+		return (bool)$request[ $server['id'] ];
 	}
 
 	//-----------------------------------------------------------

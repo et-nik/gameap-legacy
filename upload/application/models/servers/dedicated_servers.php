@@ -61,6 +61,22 @@ class Dedicated_servers extends CI_Model {
 	}
 	
 	//-----------------------------------------------------------
+    
+    /*
+     * Проверяет директорию на необходимые права
+    */
+	private function _check_path($path) {
+		
+		if (!is_dir($path)) {
+			/* Это не директория */
+			$this->errors = "Dir " . $path . " not found";
+			return false;
+		}
+
+		return true;
+	}
+	
+	//-----------------------------------------------------------
 	
 	/**
      * Добавление выделенного сервера
@@ -463,7 +479,7 @@ class Dedicated_servers extends CI_Model {
 		
 		if ($server_data['local_server']) {
 			
-			if (!$this->servers->_check_path($path)) {
+			if (!$this->_check_path($path)) {
 				$this->errors = 'Path ' . $path . " not found\n";
 				return false;
 			}
