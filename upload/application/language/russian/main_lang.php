@@ -159,3 +159,7 @@ $lang['go']										= 'Перейти';
 $lang['menu_files_config']						= 'Конфигурация серверов';
 
 $lang['modules']								= 'Модули';
+
+$lang['set']									= 'Задан';
+$lang['no_set']									= 'Не задан';
+

@@ -65,3 +65,8 @@ $lang['server_control_repeat_period'] 					= 'Период повтора';
 
 // 0.7.2
 $lang['server_control_command_not_set'] 				= 'Команда не задана';
+
+/* -- 0.9 -- */
+$lang['cvarname_hostname']								= 'Имя сервера';
+$lang['cvarname_map']									= 'Текущая карта';
+$lang['cvarname_players']								= 'Игроки';
