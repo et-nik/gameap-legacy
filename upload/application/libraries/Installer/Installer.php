@@ -61,7 +61,7 @@ class Installer extends CI_Driver_Library {
     public function set_game_variables($game_code, $engine, $engine_version = 1)
     {
 		$this->_game_code 			= $game_code;
-		$this->_engine 				= $engine;
+		$this->_engine 				= strtolower($engine);
 		$this->_engine_version 		= $engine_version;
 	}
 	
@@ -99,7 +99,7 @@ class Installer extends CI_Driver_Library {
 			return '';
 		}
 		
-		return $this->$engine->get_start_command($this->_game_code, $this->_os);
+		return $this->{$engine}->get_start_command($this->_game_code, $this->_os);
 	}
 	
 	// ------------------------------------------------------------------------
@@ -116,7 +116,7 @@ class Installer extends CI_Driver_Library {
 			return '';
 		}
 		
-		return $this->$engine->get_default_parameters($this->_game_code, $this->_os, $aliases_values);
+		return $this->{$engine}->get_default_parameters($this->_game_code, $this->_os, $aliases_values);
 	}
 	
 	// ------------------------------------------------------------------------
@@ -132,7 +132,7 @@ class Installer extends CI_Driver_Library {
 			$this->errors = 'Driver' . $this->engine . ' not found';
 			return false;
 		}
-		
-		return $this->$engine->change_config();
+
+		return $this->{$engine}->change_config();
 	}
 }
