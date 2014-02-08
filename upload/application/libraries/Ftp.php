@@ -646,7 +646,7 @@ class CI_FTP {
 	 * @param string
 	 *
 	 */
-	function search($file, $dir = '/')
+	function search($file, $dir = '/', $exclude_dirs = array(), $depth = 4)
 	{
 		if ( ! $this->_is_conn())
 		{
@@ -684,7 +684,11 @@ class CI_FTP {
 				continue;
 			}
 			
-			if ($found_dir = $this->search($file, $ftp_dir)) {
+			if (in_array(str_replace('/', '', $dir), $exclude_dirs)) {
+				continue;
+			}
+			
+			if ($found_dir = $this->search($file, $ftp_dir, array(), $depth - 1)) {
 				return $found_dir;
 			}
 		}
