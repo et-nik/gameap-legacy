@@ -447,6 +447,10 @@ class Sftp {
 		$sftp = $this->conn_sftp;
 		$dir = "ssh2.sftp://$sftp$path";
 		
+		if (!is_dir($dir)) {
+			return false;
+		}
+		
 		$directory = $this->_scan_directory($dir, $recursive);
 
 		sort($directory);
@@ -513,6 +517,65 @@ class Sftp {
 		$CI =& get_instance();
 		$CI->lang->load('sftp');
 		show_error($CI->lang->line($line));
+	}
+	
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Рекурсивный поиск файла или директории
+	 * 
+	 * @param string or array
+	 * @param string	
+	 * @param array		исключаемые директории
+	 * @param integer  глубина рекурсии
+	 */
+	function search($file, $dir = '/', $exclude_dirs = array(), $depth = 4)
+	{
+		if (!$this->_is_conn()){
+			return false;
+		}
+		
+		if (!$depth) {
+			return false;
+		}
+		
+		$dir = $dir ? $dir : '/';
+		
+		$list_files = $this->list_files($dir);
+		$list_base_name = array();
+		
+		if (!is_array($list_files)) {
+			return;
+		}
+		
+		// Избавляемся от пути, оставляем лишь имя файла
+		foreach($list_files as &$sftp_file) {
+			$list_base_name[] = basename($sftp_file);
+		}
+		
+		if (is_array($file)) {
+			foreach($file as $value) {
+				if (in_array($value, $list_base_name)) {
+					return $dir;
+				}
+			}
+		} else {
+			if (in_array($sfile, $list_base_name)) {
+				return $dir;
+			}
+		}
+		
+		foreach($list_files as $sftp_dir) {
+			$sftp_dir = $dir . '/' . $sftp_dir;
+			
+			if (in_array(str_replace('/', '', $dir), $exclude_dirs)) {
+				continue;
+			}
+			
+			if ($found_dir = $this->search($file, $sftp_dir, array(), $depth - 1)) {
+				return $found_dir;
+			}
+		}
 	}
 
 }

@@ -203,6 +203,29 @@ class Adm_servers extends CI_Controller {
 	// -----------------------------------------------------------------
 	
 	/**
+	 * Поиск пути к server.sh/server.exe 
+	 * Если sftp отключен, то вернет false
+	*/
+	private function _found_sftp_path($sftp_path = false, $sftp_config)
+	{
+		$this->load->library('sftp');
+		
+		// Исключаемые директории. В них поиск не ведется
+		$exclude_dirs = array('bin', 'boot', 'cdrom', 'dev', 'etc', 'lib',
+								'lib32', 'lib64', 'proc', 'media', 'mnt', 'run', 'sbin',
+								'selinux', 'sys', 'tmp',
+							);
+
+		if (false == $this->sftp->connect($sftp_config)) {
+			return false;
+		}
+		
+		return $this->sftp->search(array('server.sh', 'server.exe'), $sftp_path, $exclude_dirs, 4);
+	}
+	
+	// -----------------------------------------------------------------
+	
+	/**
 	 * Данные по умолчанию для игрового сервера
 	 * 
 	 * @param array - некоторые данные о сервере (такие как ОС, движок и др.)
@@ -560,7 +583,7 @@ class Adm_servers extends CI_Controller {
 					$this->tpl_data['heading'] 	= lang('adm_servers_heading_add_game_type');
 					
 					$this->form_validation->set_rules('code', 'код игры', 'trim|required|max_length[64]|min_length[2]|xss_clean');
-					$this->form_validation->set_rules('name', 'название игры', 'trim|required|max_length[32]|min_length[3]|xss_clean');
+					$this->form_validation->set_rules('name', 'название игры', 'trim|required|max_length[32]|min_length[2]|xss_clean');
 
 					if($tpl_list = $this->games->tpl_data_games()) {
 						$local_tpl_data['games_list'] = $tpl_list;
@@ -652,6 +675,21 @@ class Adm_servers extends CI_Controller {
 						if (!empty($sql_data['ssh_host'])) {
 							if (false == $this->_check_ssh($sql_data['ssh_host'], $sql_data['ssh_login'], $sql_data['ssh_password'])) {
 								$this->_show_message(lang('adm_servers_ssh_data_unavailable'), 'javascript:history.back()');
+								return false;
+							}
+							
+							$ssh_host = explode(':', $sql_data['ssh_host']);
+							$ssh_host[1] = (isset($ssh_host[1])) ? (int)$ssh_host[1] : 22;
+							
+							$sftp_config['hostname'] 	= $ssh_host[0];
+							$sftp_config['port'] 		= $ssh_host[1];
+							$sftp_config['username'] 	= $sql_data['ssh_login'];
+							$sftp_config['password'] 	= $sql_data['ssh_password'];
+							$sftp_config['debug'] 		= false;
+							
+							// Ищем server.sh/server.exe
+							if (!$sql_data['ssh_path'] = $this->_found_sftp_path($sql_data['ssh_path'], $sftp_config)) {
+								$this->_show_message(lang('adm_servers_sftp_path_not_found'), 'javascript:history.back()');
 								return false;
 							}
 						}
@@ -1461,11 +1499,8 @@ class Adm_servers extends CI_Controller {
 						$local_tpl_data['aliases_list'][$i]['only_admins'] 	= form_checkbox('alias_only_admins[' . $i . ']', 'accept', $array['only_admins']);
 						$i ++;
 					}
-					
-					//$local_tpl_data['aliases_list'] = $json_decode;
-					
+
 				}
-				
 				
 				/*
 				 * Данные для проверки формы 
@@ -1607,6 +1642,21 @@ class Adm_servers extends CI_Controller {
 							$this->_show_message(lang('adm_servers_ssh_data_unavailable'), 'javascript:history.back()');
 							return false;
 						}
+						
+						$ssh_host = explode(':', $sql_data['ssh_host']);
+						$ssh_host[1] = (isset($ssh_host[1])) ? (int)$ssh_host[1] : 22;
+						
+						$sftp_config['hostname'] 	= $ssh_host[0];
+						$sftp_config['port'] 		= $ssh_host[1];
+						$sftp_config['username'] 	= $sql_data['ssh_login'];
+						$sftp_config['password'] 	= $ssh_password;
+						$sftp_config['debug'] 		= false;
+						
+						if (!$sql_data['ssh_path'] = $this->_found_sftp_path($sql_data['ssh_path'], $sftp_config)) {
+							$this->_show_message(lang('adm_servers_sftp_path_not_found'), 'javascript:history.back()');
+							return false;
+						}
+						
 					}
 					
 					// FTP
