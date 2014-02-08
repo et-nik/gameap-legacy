@@ -53,7 +53,7 @@
 				}, 
 				error: function(response) {
 					document.getElementById("status_" + server_id).innerHTML = "<img src=\"{base_url}themes/system/images/bullet_red.png\"/>";
-					$("#commands_" + server_id).append("<a class=\"small awesome\" href=\"{base_url}admin/server_control/main/" + server_id + "\">{lang_other_commands}&raquo;</a>&nbsp;");
+					$("#commands_" + server_id).append("<a class=\"small awesome\" href=\"{site_url}admin/server_control/main/" + server_id + "\">{lang_other_commands}&raquo;</a>&nbsp;");
 				} 
 			});
 		}

@@ -46,17 +46,28 @@ if($this->users->auth_privileges['srv_restart'] == 1
 
 <?php if ($this->servers->server_data['server_status']): ?>
 	<?php /* Сервер запущен */ ?>
+	
+	<p class="hr"><strong>{lang_status}</strong></p>
+	
+	<table style="margin-left:100px;width:60%;" class="zebra">
+		{base_cvars}
+		<tr>
+			<td width="35%">{cvar_name}:</td>
+			<td>{cvar_value}</td>
+		</tr>
+		{/base_cvars}
+	</table>
 
 	<?php if ($this->players): ?>
 		<p class="hr"><strong>{lang_server_control_players_control}</strong></p>
 		<table width="100%" class="zebra">
 			<thead>
-			<tr>
-				<th><strong>{lang_nick}</strong></th>
-				<th><strong>{lang_steamid}</strong></th>
-				<th><strong>{lang_ip}</strong></th>
-				<th><strong>{lang_commands}</strong></th>
-			</tr>
+				<tr>
+					<th><strong>{lang_nick}</strong></th>
+					<th><strong>{lang_steamid}</strong></th>
+					<th><strong>{lang_ip}</strong></th>
+					<th><strong>{lang_commands}</strong></th>
+				</tr>
 			</thead>
 		{users_list}
 			<tr>
