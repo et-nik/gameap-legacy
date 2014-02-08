@@ -85,8 +85,13 @@ class Rcon extends CI_Driver_Library {
 	{
 		$engine = $this->engine;
 		
-		if (!$this->rcon_connect) {
-			$this->errors = 'Could not connect to server';
+		if (false == in_array('rcon_' . $this->engine, $this->valid_drivers)) {
+			$this->errors = 'Driver' . $this->engine . ' not found';
+			return false;
+		}
+		
+		if (false == in_array('rcon_' . $this->engine, $this->valid_drivers)) {
+			$this->errors = 'Driver' . $this->engine . ' not found';
 			return false;
 		}
 
@@ -104,6 +109,12 @@ class Rcon extends CI_Driver_Library {
 	public function get_players()
 	{
 		$engine = $this->engine;
+		
+		if (false == in_array('rcon_' . $this->engine, $this->valid_drivers)) {
+			$this->errors = 'Driver' . $this->engine . ' not found';
+			return false;
+		}
+		
 		return $this->$engine->get_players();
 	}
 	
@@ -116,6 +127,12 @@ class Rcon extends CI_Driver_Library {
 	public function get_maps()
 	{
 		$engine = $this->engine;
+		
+		if (false == in_array('rcon_' . $this->engine, $this->valid_drivers)) {
+			$this->errors = 'Driver' . $this->engine . ' not found';
+			return false;
+		}
+		
 		return $this->$engine->get_maps();
 	}
 	
@@ -130,6 +147,12 @@ class Rcon extends CI_Driver_Library {
 		$this->CI->load->helper('patterns_helper');
 		
 		$engine = $this->engine;
+		
+		if (false == in_array('rcon_' . $this->engine, $this->valid_drivers)) {
+			$this->errors = 'Driver' . $this->engine . ' not found';
+			return false;
+		}
+		
 		return $this->$engine->change_rcon($rcon_password);
 	}
 }
