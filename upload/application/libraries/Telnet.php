@@ -50,7 +50,7 @@ class Telnet {
 			/* Уже соединен с этим сервером */
 			return true;
 		}
-		
+
 		if (!$ip) {
 			return false;
 		}
@@ -65,7 +65,7 @@ class Telnet {
 			return false;
 		}
 		
-		$this->auth = false;
+		$this->_auth = false;
 		return $this->_connection;
 	}
 
@@ -76,10 +76,10 @@ class Telnet {
 	*/
 	function auth($login, $password)
 	{
-		if ($this->auth == true) {
-			return NULL;
+		if ($this->_auth == true) {
+			return true;
 		}
-		
+
 		$this->_read_till("ogin: ");
 		$this->_write( $login . "\r\n");
 		$this->_read_till("word: ");
@@ -110,7 +110,7 @@ class Telnet {
 	{
 		if(!$this->_connection OR !$this->_auth) { return false;}
 
-		$this->_write($command . "\n\r");
+		$this->_write($command . "\r\n");
 
 		$result = explode("\n", $this->_read_till($this->_prompt));
 		
@@ -118,8 +118,10 @@ class Telnet {
 		unset($result[0]);
 		if (strpos($result[$last_element], '>') !== false) {
 			unset($result[$last_element]);
+		} elseif (strpos($result[$last_element], '~$') !== false) {
+			unset($result[$last_element]);
 		}
-
+		
 		return trim(implode("\n", $result));
 	}
 	
