@@ -447,7 +447,7 @@ class Cron extends MX_Controller {
 				break;
 
 		}
-
+		
 		/* 
 		 * Для Windows будут следующие команды:
 		 * 		Загруженность процессора:	wmic cpu get LoadPercentage
@@ -559,13 +559,13 @@ class Cron extends MX_Controller {
 					$telnet_port = $telnet_data['1'];
 				}
 
-				$this->telnet->connect($telnet_ip, $telnet_port);
-				$this->telnet->auth($ds['telnet_login'], $ds['telnet_password']);
+				if ($this->telnet->connect($telnet_ip, $telnet_port) && $this->telnet->auth($ds['telnet_login'], $ds['telnet_password'])) {
+					$stats_string['cpu_load'] = $this->telnet->command('top -b -n 1 | grep Cpu');
+					$stats_string['memory_usage'] = $this->telnet->command('free');
+				}
 
-				$stats_string['cpu_load'] = $this->telnet->command('vmstat');
-				$stats_string['memory_usage'] = $this->telnet->command('free');
 			} elseif ($control_protocol == 'local') {
-				$stats_string['cpu_load'] = shell_exec('vmstat');
+				$stats_string['cpu_load'] = shell_exec('top -b -n 1 | grep Cpu');
 				$stats_string['memory_usage'] = shell_exec('free');
 			} else {
 				$ssh_data = explode(':', $ds['ssh_host']);
@@ -580,21 +580,34 @@ class Cron extends MX_Controller {
 				$this->ssh->connect($ssh_ip, $ssh_port);
 				$this->ssh->auth($ds['ssh_login'], $ds['ssh_password']);
 
-				$stats_string['cpu_load'] = $this->ssh->command('vmstat');
+				$stats_string['cpu_load'] = $this->ssh->command('top -b -n 1 | grep Cpu');
 				$stats_string['memory_usage'] = $this->ssh->command('free');
 			}
-
-			/* Использование процессора */
+			
+			/* Использование процессора 
+			 * Cpu(s): 24.0%us, 10.2%sy,  0.0%ni, 61.9%id,  3.8%wa,  0.0%hi,  0.1%si,  0.0%st
+			 */
 			$stats_explode = preg_replace('| +|', ' ', array_pop(explode("\n", trim($stats_string['cpu_load']))));
 			$stats_explode = explode(' ', trim($stats_explode));
 			
-			$stats['cpu_usage'] = (isset($stats_explode[12]) &&  isset($stats_explode[13])) ? (int)$stats_explode[12] + $stats_explode[13] : false;
+			$stats['cpu_usage'] = (isset($stats_explode[1]) &&  isset($stats_explode[2])) 
+										? (int)$stats_explode[1] + (int)$stats_explode[2] 
+										: false;
 
-			/* Использование памяти */
+			/* Использование памяти 
+			 *               total       used       free     shared    buffers     cached
+				Mem:       3960788    3292828     667960          0     121120    1186676
+				-/+ buffers/cache:    1985032    1975756
+				Swap:      2008060          0    2008060
+
+			 */
 			$stats_explode = preg_replace('| +|', ' ', $stats_string['memory_usage']);
 			$stats_explode = explode("\n", trim($stats_explode));
 			$stats_explode = explode(' ', $stats_explode[1]);
-			$stats['memory_usage'] = (isset($stats_explode[1]) &&  isset($stats_explode[2])) ? (int)round(($stats_explode[2]/$stats_explode[1])*100) : false;
+			
+			$stats['memory_usage'] = (isset($stats_explode[1]) &&  isset($stats_explode[2]) && isset($stats_explode[5])) 
+										? (int)round((($stats_explode[2]-$stats_explode[5])/$stats_explode[1])*100) 
+										: false;
 			
 			$stats['cpu_usage'] 	= ($stats['cpu_usage'] > 100) ? 100 : $stats['cpu_usage'];
 			$stats['memory_usage'] 	= ($stats['memory_usage'] > 100) ? 100 : $stats['memory_usage'];
@@ -653,8 +666,6 @@ class Cron extends MX_Controller {
 			}
 			
 			$array_scripts[] = $value['cron_script'];
-			
-			//~ $this->_cron_result .= $value['short_name'] . " cron started\n";
 			
 			/* Выполняем cron скрипт из модуля */
 			$this->_cron_result .= "Start {$value['short_name']}\n";
@@ -1040,11 +1051,15 @@ class Cron extends MX_Controller {
 				*/
 				if ($server_installed == true) {
 					/* Загружаем дополнительный файлы игровой модификации */
-					if ($this->game_types->game_types_list[0]['local_repository']) {
+					if (isset($this->game_types->game_types_list[0]['local_repository'])
+						&& $this->game_types->game_types_list[0]['local_repository']
+					) {
 						if ($this->_wget_files($server_id, $this->game_types->game_types_list[0]['local_repository'], 'local')) {
 							$this->_unpack_files($server_id, $this->game_types->game_types_list[0]['local_repository']);
 						}
-					} elseif ($this->game_types->game_types_list[0]['remote_repository']) {
+					} elseif (isset($this->game_types->game_types_list[0]['remote_repository'])
+								&& $this->game_types->game_types_list[0]['remote_repository']
+					) {
 						if ($this->_wget_files($server_id, $this->game_types->game_types_list[0]['remote_repository'], 'remote')) {
 							$this->_unpack_files($server_id, $this->game_types->game_types_list[0]['remote_repository']);
 						}
@@ -1327,6 +1342,7 @@ class Cron extends MX_Controller {
 				*/
 
 				$stats_array = json_decode($ds['stats'], true);
+				$stats_array = array_slice($stats_array, -20);
 
 				$stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
 				$data['stats'] = json_encode($stats_array);
@@ -1334,23 +1350,34 @@ class Cron extends MX_Controller {
 			}
 		}
 
-		// Статистика для локального сервера
-		$ds = array('os' => $this->config->config['local_os'], 'control_protocol' => 'local'); 
-		$stats = $this->_stats_processing($ds);
+		/* Статистика для локального сервера 
+		 * Для сбора статистики понадобится функция shell_exec, которую иногда отключают.
+		 */
+		$disable_functions = ini_get('disable_functions');
+		$disable_functions = explode(',', $disable_functions);
+		
+		if (!in_array('shell_exec', $disable_functions)) {
+			$ds = array('os' => $this->config->config['local_os'], 'control_protocol' => 'local'); 
+			$stats = $this->_stats_processing($ds);
 
-		if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
+			if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
 
-			$stats_array = json_decode(@file_get_contents(APPPATH . 'cache/local_server_stats.json', true));
-			$stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
-			$data['stats'] = json_encode($stats_array);
-			file_put_contents(APPPATH . 'cache/local_server_stats.json', $data['stats']);
+				$stats_array = json_decode(@file_get_contents(APPPATH . 'cache/local_server_stats.json', true));
+				$stats_array = array_slice($stats_array, -20);
+				
+				$stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
+				$data['stats'] = json_encode($stats_array);
+				file_put_contents(APPPATH . 'cache/local_server_stats.json', $data['stats']);
 
-			$this->_cron_result .= 'Local server stats successful' . "\n";
+				$this->_cron_result .= 'Local server stats successful' . "\n";
 
+			} else {
+				$this->_cron_result .= 'Local server stats failed'. "\n";
+			}
 		} else {
-			$this->_cron_result .= 'Local server stats failed'. "\n";
+			$this->_cron_result .= 'Local server stats failed. Function shell_exec disabled'. "\n";
 		}
-
+		
 		/*==================================================*/
 		/*    	ВЫПОЛНЕНИЕ CRON СКРИПТОВ ИЗ МОДУЛЕЙ			*/
 		/*==================================================*/
