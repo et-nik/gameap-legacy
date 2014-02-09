@@ -517,7 +517,7 @@ class Adm_servers extends CI_Controller {
 					$this->form_validation->set_rules('control_protocol', lang('adm_servers_control_protocol'), 'trim|max_length[8]|xss_clean');
 					$this->form_validation->set_rules('location', lang('adm_servers_location'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
 					$this->form_validation->set_rules('provider', lang('adm_servers_provider'), 'trim|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('ip', lang('ip'), 'trim|required|max_length[64]|xss_clean');
+					$this->form_validation->set_rules('ip', lang('ip'), 'trim|required|xss_clean');
 					$this->form_validation->set_rules('ram', lang('adm_servers_ram'), 'trim|max_length[64]|xss_clean');
 					$this->form_validation->set_rules('cpu', lang('adm_servers_cpu'), 'trim|max_length[64]|xss_clean');
 					$this->form_validation->set_rules('steamcmd_path', lang('adm_servers_steamcmd_path'), 'trim|max_length[256]|xss_clean');
@@ -1085,7 +1085,7 @@ class Adm_servers extends CI_Controller {
 					$this->form_validation->set_rules('os', 'операционная система', 'trim|required|max_length[64]|min_length[3]|xss_clean');
 					$this->form_validation->set_rules('location', 'расположение', 'trim|required|max_length[64]|min_length[3]|xss_clean');
 					$this->form_validation->set_rules('provider', 'провайдер', 'trim|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('ip', 'IP', 'trim|required|max_length[64]|xss_clean');
+					$this->form_validation->set_rules('ip', 'IP', 'trim|required|xss_clean');
 					$this->form_validation->set_rules('ram', 'RAM', 'trim|max_length[64]|xss_clean');
 					$this->form_validation->set_rules('cpu', 'CPU', 'trim|max_length[64]|xss_clean');
 				}
