@@ -570,7 +570,7 @@ class Auth extends CI_Controller {
 			$url_recovery = site_url('auth/recovery_password/' . $recovery_code);
 			$this->email->message(lang('auth_recovery_mail_goto_link') . ': ' . $url_recovery);	
 			
-			if(count($this->panel_log->get_log(array('date >' => time() - 86400, 'user_name' => $user_data['login'], 'msg' => 'Send Recovery Code. Email: ' . $user_list[0]['email']))) < 1 ) {
+			if(count($this->panel_log->get_log(array('date >' => time() - 86400, 'user_name' => $user_list[0]['login'], 'msg' => 'Send Recovery Code. Email: ' . $user_list[0]['email']))) < 1 ) {
 				
 				if($this->email->send()){
 					$this->_show_message(lang('recovery_recovery_msg_accept_send') . ' ' . $user_list[0]['email'] , site_url('auth/in'), lang('next'));
