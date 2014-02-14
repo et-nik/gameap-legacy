@@ -143,6 +143,12 @@ class Users_control extends CI_Controller {
 		}
 
 		if ($this->form_validation->run() == false) {
+			
+			if (validation_errors()) {
+				$this->_show_message(validation_errors());
+				return false;
+			}
+			
 			//$this->tpl_data['content'] .= 'Ошибка добавления пользователя';
 			$this->tpl_data['content'] .= $this->parser->parse('web_users/web_users_add.html', $local_tpl_data, true);	
 		} else {
@@ -357,7 +363,13 @@ class Users_control extends CI_Controller {
 				$this->form_validation->set_rules('new_password', 'Пароль', 'trim|md5');
 				
 				if (!$this->form_validation->run()){
-							$this->tpl_data['content'] .= '<p>' . lang('users_form_unavailable') . '</p>';
+					
+					if (validation_errors()) {
+						$this->_show_message(validation_errors());
+						return false;
+					}
+					
+					$this->tpl_data['content'] .= '<p>' . lang('users_form_unavailable') . '</p>';
 				}else{
 					
 					if($this->input->post('new_password') !== ''){
@@ -484,8 +496,13 @@ class Users_control extends CI_Controller {
 		}
 		
         if ($this->form_validation->run() == false) {
-			$this->tpl_data['content'] = $this->parser->parse('web_users/base_privileges_edit.html', $local_tpl_data, true);
 			
+			if (validation_errors()) {
+				$this->_show_message(validation_errors());
+				return false;
+			}
+			
+			$this->tpl_data['content'] = $this->parser->parse('web_users/base_privileges_edit.html', $local_tpl_data, true);
 		} else {
 			foreach($this->users->all_user_privileges as $key => $value) {
 				

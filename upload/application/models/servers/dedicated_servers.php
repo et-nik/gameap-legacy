@@ -468,7 +468,12 @@ class Dedicated_servers extends CI_Model {
 			case 'windows':
 					/* Замена нормального линуксовского слеша
 					 * на ненормальный виндовый \ */
-					$path = str_replace('/', '\\', $path);
+					$path = str_replace('/', "\\", $path);
+					
+					if (strpos($command, 'mkdir') !== false) {
+						$command = str_replace('/', "\\", $command);
+					}
+						
 					$cd = "cd /D " . $path;
 				break;
 				

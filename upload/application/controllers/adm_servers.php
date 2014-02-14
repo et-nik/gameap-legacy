@@ -611,6 +611,11 @@ class Adm_servers extends CI_Controller {
 
 			/* Проверяем форму */
 			if ($this->form_validation->run() == false) {
+				
+				if (validation_errors()) {
+					$this->_show_message(validation_errors());
+					return false;
+				}
 
 				if (!isset($tpl_file_add)) {
 					$this->_show_message('', $link = 'javascript:history.back()');
@@ -1576,9 +1581,11 @@ class Adm_servers extends CI_Controller {
 		 */
 		if ($this->form_validation->run() == false) {
 			
-			//------------------------------------
-			//		Отображение формы и/или ошибок
-			//------------------------------------
+			if (validation_errors()) {
+				$this->_show_message(validation_errors());
+				return false;
+			}
+			
 			$this->tpl_data['content'] .= $this->parser->parse($tpl_file_edit, $local_tpl_data, true);
 		} else {
 			
@@ -2114,6 +2121,11 @@ class Adm_servers extends CI_Controller {
 		//$this->form_validation->set_rules('screen_name', 'имя screen', 'trim|required|max_length[64]|min_length[3]|xss_clean');
 
 		if ($this->form_validation->run() == false) {
+			
+			if (validation_errors()) {
+				$this->_show_message(validation_errors());
+				return false;
+			}
 
 			// Получаем данные DS для шаблона
 			$local_tpl_data['ds_list'] = $this->dedicated_servers->tpl_data_ds();
@@ -2303,6 +2315,11 @@ class Adm_servers extends CI_Controller {
 		$this->form_validation->set_rules('code', lang('game'), 'trim|required|max_length[64]|xss_clean');
 		
 		if ($this->form_validation->run() == false) {
+			
+			if (validation_errors()) {
+				$this->_show_message(validation_errors());
+				return false;
+			}
 
 			/* Если были ошибки проверки формы, то отображаем ошибки, если нет, то отображаем форму */
 			if ($validation_errors = validation_errors()) {

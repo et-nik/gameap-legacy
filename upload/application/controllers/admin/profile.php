@@ -94,7 +94,13 @@ class Profile extends CI_Controller {
 				$this->form_validation->set_rules('name', 'Имя', 'trim|xss_clean');
 				$this->form_validation->set_rules('email', 'E-Mail', 'trim|required|valid_email');
 				
-				if (!$this->form_validation->run()){
+				if (!$this->form_validation->run()) {
+					
+					if (validation_errors()) {
+						$this->_show_message(validation_errors());
+						return false;
+					}
+					
 					$this->tpl_data['content'] .= lang('profile_form_unavailable');
 				}else{
 					$user_new_data['name'] = $this->input->post('name', true);
@@ -132,7 +138,13 @@ class Profile extends CI_Controller {
 				$this->form_validation->set_rules('new_password_confirm', 'Подтверждение пароля', 'trim|required|md5');
 				
 				if (!$this->form_validation->run()){
-							$this->tpl_data['content'] .= lang('profile_form_unavailable');
+					
+					if (validation_errors()) {
+						$this->_show_message(validation_errors());
+						return false;
+					}
+					
+					$this->tpl_data['content'] .= lang('profile_form_unavailable');
 				}else{
 					
 					$password_encrypt = $this->input->post('old_password', true);

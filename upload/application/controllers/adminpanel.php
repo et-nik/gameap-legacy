@@ -235,6 +235,12 @@ class Adminpanel extends CI_Controller {
 		$this->form_validation->set_rules('actions', 'действия', 'trim|min_length[3]|xss_clean');
 		
 		if ($this->form_validation->run() == false) {
+			
+			if (validation_errors()) {
+				$this->_show_message(validation_errors());
+				return false;
+			}
+			
 			$this->tpl_data['content'] = $this->parser->parse('adminpanel/send_error.html', $local_tpl_data, true);
 		} else {
 			$upload_config['upload_path'] = sys_get_temp_dir();

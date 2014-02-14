@@ -64,12 +64,11 @@ class Games extends CI_Model {
 	}
 	
 	//-----------------------------------------------------------
+	
 	/**
      * Получение списка игр
-     * 
-     *
     */
-    function get_games_list($where = FALSE, $limit = 10000, $offset = 0)
+    function get_games_list($where = FALSE, $limit = 99999, $offset = 0)
     {
 		$this->db->order_by('name', 'asc'); 
 		
@@ -91,13 +90,12 @@ class Games extends CI_Model {
 	}
 	
 	//-----------------------------------------------------------
+	
 	/**
      * Получение данных игр для шаблона
      * (вырезаны ненужные данные - пароли и пр.)
-     * 
-     *
     */
-	function tpl_data_games($where = FALSE, $limit = 10000)
+	function tpl_data_games($where = FALSE, $limit = 99999)
     {
 		$num = -1;
 		

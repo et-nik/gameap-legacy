@@ -454,6 +454,12 @@ class Server_control extends CI_Controller {
 		$local_tpl_data['server_id'] = $server_id;
 		
 		if($this->form_validation->run() == false) {
+			
+			if (validation_errors()) {
+				$this->_show_message(validation_errors());
+				return false;
+			}
+			
 			$this->tpl_data['content'] .= $this->parser->parse('servers/task_add.html', $local_tpl_data, true);
 		} else {
 			
@@ -650,6 +656,11 @@ class Server_control extends CI_Controller {
 		$this->form_validation->set_rules('time_add', 'период повтора', 'trim|required|integer|max_length[16]|xss_clean');
 		
 		if($this->form_validation->run() == false) {
+			
+			if (validation_errors()) {
+				$this->_show_message(validation_errors());
+				return false;
+			}
 			
 			$options['code'] = array(
 				'server_start' => 	lang('server_control_start'),

@@ -49,7 +49,6 @@ class Index extends CI_Controller {
 	public function index()
 	{
 		$this->tpl_data['content'] .= '<p><strong>' . lang('ap_wellcome') . '</strong></p>';
-
 		/*
 		 * Отправка команд, на которые есть права у пользователя
 		*/
