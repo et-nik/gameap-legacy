@@ -445,7 +445,7 @@ if ( ! function_exists('mysql_to_unix'))
  */
 if ( ! function_exists('unix_to_human'))
 {
-	function unix_to_human($time = '', $seconds = FALSE, $fmt = 'us')
+	function unix_to_human($time = '', $seconds = FALSE, $fmt = 'ru')
 	{
 		//$r  = date('Y', $time).'-'.date('m', $time).'-'.date('d', $time).' ';
 		$r  = date('d', $time).'-'.date('m', $time).'-'.date('Y', $time).' ';
