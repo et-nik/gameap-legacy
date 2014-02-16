@@ -462,25 +462,27 @@ class Server_control extends CI_Controller {
 			
 			$this->tpl_data['content'] .= $this->parser->parse('servers/task_add.html', $local_tpl_data, true);
 		} else {
-			
-			/* 
-			 * Если создать множество заданий cron с обновлением игровых серверов,
-			 * то возможно замедлить работу выделенного сервера
-			 * В этом случае нужно проверить, имеется ли задание обновления
-			*/
-			$where = array('code' => 'server_update', 'server_id' => $server_id);
-			$query = $this->db->get_where('cron', $where, 1);
-			
-			if ($query->num_rows > 0) {
-				$this->_show_message(lang('server_command_update_task_exists'), site_url('admin/server_control/' . $server_id));
-				return false;
-			}
-			
+
 			$sql_data['server_id'] = $server_id;
 			
 			$sql_data['name'] = $this->input->post('name');
 			$sql_data['code'] = $this->input->post('code');
 			$sql_data['command'] = $this->input->post('command');
+			
+			if ($sql_data['code'] == 'server_update') {
+				/* 
+				 * Если создать множество заданий cron с обновлением игровых серверов,
+				 * то возможно замедлить работу выделенного сервера
+				 * В этом случае нужно проверить, имеется ли задание обновления
+				*/
+				$where = array('code' => 'server_update', 'server_id' => $server_id);
+				$query = $this->db->get_where('cron', $where, 1);
+				
+				if ($query->num_rows > 0) {
+					$this->_show_message(lang('server_command_update_task_exists'), site_url('admin/server_control/' . $server_id));
+					return false;
+				}
+			}
 
 			
 			if(!$sql_data['date_perform'] = human_to_unix($this->input->post('date_perform'))) {
