@@ -37,6 +37,7 @@ class Installer_goldsource extends CI_Driver {
 		$game_code = strtolower($game_code);
 		
 		$default_maps = array(
+						'ag' 		=> 'ag_crossfire',
 						'valve' 	=> 'crossfire',
 						'gearbox'	=> 'op4_demise',
 						'cstrike' 	=> 'de_dust2',
