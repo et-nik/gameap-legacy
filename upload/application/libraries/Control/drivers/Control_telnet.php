@@ -22,11 +22,11 @@
  * http://marc.info/?l=php-general&m=99394407709109
  *
  * @package		Game AdminPanel
- * @category	Libraries
+ * @category	Drivers
  * @author		Nikita Kuznetsov (ET-NiK)
 */
  
-class Telnet {
+class Control_telnet extends CI_Driver {
 
 	/* (c) thies@thieso.net */
 
@@ -38,6 +38,19 @@ class Telnet {
 	private $port;
 	
 	private $_prompt = ':> ';
+	
+	// ---------------------------------------------------------------------
+	
+	/**
+	 * Проверяет необходимые права на файл
+	 * 
+	 * @param str	файл
+	 * @param str 	строка с правами (rwx)
+	 */
+	public function check_file($file, $privileges = '')
+	{
+		return true;
+	}
 
 	// ----------------------------------------------------------------
 
@@ -59,9 +72,10 @@ class Telnet {
 		$this->port = $port;
 		
 		$this->_connection = @fsockopen($this->ip, $this->port);
-		socket_set_timeout($this->_connection, 5);
+		@socket_set_timeout($this->_connection, 5);
 
 		if (!$this->_connection) {
+			throw new Exception('Connection failed');
 			return false;
 		}
 		
@@ -90,6 +104,7 @@ class Telnet {
 		 * В Linux при неудачной попытке пишется "Login incorrect"
 		*/
 		if (strpos($auth_string, 'Login Failed') !== false OR strpos($auth_string, 'Login incorrect') !== false) {
+			throw new Exception('Login failed');
 			$this->_auth = false;
 			return false;
 		}
@@ -109,11 +124,11 @@ class Telnet {
 	function command($command)
 	{
 		if(!$this->_connection OR !$this->_auth) { return false;}
-
+		
 		$this->_write($command . "\r\n");
 
 		$result = explode("\n", $this->_read_till($this->_prompt));
-		
+
 		$last_element = count($result)-1;
 		unset($result[0]);
 		if (strpos($result[$last_element], '>') !== false) {
@@ -121,7 +136,7 @@ class Telnet {
 		} elseif (strpos($result[$last_element], '~$') !== false) {
 			unset($result[$last_element]);
 		}
-		
+
 		return trim(implode("\n", $result));
 	}
 	

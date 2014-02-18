@@ -6,7 +6,7 @@
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
+ * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
  * @license		http://www.gameap.ru/license.html
  * @link		http://www.gameap.ru
  * @filesource
@@ -19,13 +19,27 @@
  * через SSH
  *
  * @package		Game AdminPanel
- * @category	Libraries
+ * @category	Drivers
  * @author		Nikita Kuznetsov (ET-NiK)
 */
  
-class Ssh {
+class Control_ssh extends CI_Driver {
+	
 	var $_connection = false;
 	var $errors = '';
+	
+	// ---------------------------------------------------------------------
+	
+	/**
+	 * Проверяет необходимые права на файл
+	 * 
+	 * @param str	файл
+	 * @param str 	строка с правами (rwx)
+	 */
+	public function check_file($file, $privileges = '')
+	{
+		return true;
+	}
 	
 	// ----------------------------------------------------------------
 	
@@ -46,6 +60,8 @@ class Ssh {
 		
 		return $this->_connection;
 	}
+	
+	// ----------------------------------------------------------------
 	
 	function auth($login, $password)
 	{
