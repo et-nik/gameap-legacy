@@ -44,8 +44,8 @@ define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 |
 */
 
-define('AP_VERSION',	'0.9_dev2');
-define('AP_DATE',	'15.02.2014');
+define('AP_VERSION',	'0.9-dev3');
+define('AP_DATE',	'18.02.2014');
 
 
 /* End of file constants.php */
