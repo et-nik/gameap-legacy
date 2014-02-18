@@ -113,23 +113,27 @@ class Adm_servers extends CI_Controller {
 	*/
 	private function _check_telnet($telnet_host, $telnet_login, $telnet_password)
 	{
-		$this->load->library('telnet');
-		
+		$this->load->driver('control');
+
 		if ($telnet_login == '' OR $telnet_password == '') {
 			/* В Telnet не разрешены пустые логины или пароли */
 			return false;
 		}
-		
+
 		// Разделяем на Host:Port
 		$telnet_host = explode(':', $telnet_host);
 		$telnet_host[1] = (isset($telnet_host[1])) ? (int)$telnet_host[1] : 23;
 		
-		if (!$this->telnet->connect($telnet_host[0], $telnet_host[1])) {
-			// Соединение не удалось
+		$this->control->set_driver('telnet');
+		
+		try {
+			$this->control->connect($telnet_host[0], $telnet_host[1]);
+			$this->control->auth($telnet_login, $telnet_password);
+		} catch (Exception $e) {
 			return false;
 		}
 		
-		return $this->telnet->auth($telnet_login, $telnet_password);
+		return true;
 	}
     
     // -----------------------------------------------------------
@@ -144,18 +148,22 @@ class Adm_servers extends CI_Controller {
 	*/
     function _check_ssh($ssh_host, $ssh_login, $ssh_password) 
     {
+		$this->load->driver('control');
+		
 		// Разделяем на Host:Port
 		$ssh_host = explode(':', $ssh_host);
 		$ssh_host[1] = (isset($ssh_host[1])) ? (int)$ssh_host[1] : 22;
 		
-		$connection = ssh2_connect($ssh_host[0], $ssh_host[1]);
+		$this->control->set_driver('ssh');
 		
-		/* Если не удалось соединиться или неверные данные */
-		if (!$connection OR !ssh2_auth_password($connection, $ssh_login, $ssh_password)) {
+		try {
+			$this->control->connect($ssh_host[0], $ssh_host[1]);
+			$this->control->auth($ssh_login, $ssh_password);
+		} catch (Exception $e) {
 			return false;
-		} else {
-			return true;
 		}
+		
+		return true;
 	}
 
 	// -----------------------------------------------------------------

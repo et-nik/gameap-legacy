@@ -187,8 +187,13 @@ class Dedicated_servers extends CI_Model {
 				}
 				unset($ds_ip);
 				
+				$this->ds_list[$i]['control_ip'] 		= 'localhost';
+				$this->ds_list[$i]['control_port'] 		= 0;
+				$this->ds_list[$i]['control_login']		= '';
+				$this->ds_list[$i]['control_password']	= '';
+				
 				$this->ds_list[$i]['ssh_login']			= $this->encrypt->decode($this->ds_list[$i]['ssh_login']);
-				$this->ds_list[$i]['ssh_password'] 		= $this->encrypt->decode($this->ds_list[$i]['ssh_password']);
+				$this->ds_list[$i]['ssh_password']		= $this->encrypt->decode($this->ds_list[$i]['ssh_password']);
 				
 				$this->ds_list[$i]['telnet_login']		= $this->encrypt->decode($this->ds_list[$i]['telnet_login']);
 				$this->ds_list[$i]['telnet_password']	= $this->encrypt->decode($this->ds_list[$i]['telnet_password']);
@@ -199,17 +204,33 @@ class Dedicated_servers extends CI_Model {
 				switch(strtolower($this->ds_list[$i]['control_protocol'])) {
 					case 'ssh':
 						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
+						
+						$explode = explode(':', $this->ds_list[$i]['ssh_host']);
+						$this->ds_list[$i]['control_ip'] 		= $explode[0];
+						$this->ds_list[$i]['control_port'] 		= isset($explode[1]) ? $explode[1] : 22;
+
+						$this->ds_list[$i]['control_login']			= $this->ds_list[$i]['ssh_login'];
+						$this->ds_list[$i]['control_password'] 		= $this->ds_list[$i]['ssh_password'];
+						
 						break;
 						
 					case 'telnet':
 						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['telnet_path'];
+						
+						$explode = explode(':', $this->ds_list[$i]['telnet_host']);
+						$this->ds_list[$i]['control_ip'] 		= $explode[0];
+						$this->ds_list[$i]['control_port'] 		= isset($explode[1]) ? $explode[1] : 23;
+
+						$this->ds_list[$i]['control_login']			= $this->ds_list[$i]['telnet_login'];
+						$this->ds_list[$i]['control_password'] 		= $this->ds_list[$i]['telnet_password'];
+
 						break;
 					
-					default:
+					case 'telnet':
 						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
 						break;
 				}
-				
+
 				$i ++;
 			}
 			
@@ -384,245 +405,34 @@ class Dedicated_servers extends CI_Model {
 		}
 		
 	}
-	
-	//-----------------------------------------------------------
-    
-    /*
-     * Добавляет sudo к команде
-     * 
-     * 
-    */
-	private function _add_sudo($command, $server_data) {
-		/* Если игровой сервер локальный, т.е. запущен на том же физическом сервере, что
-		 * и админпанель, то запускаться он будет от пользователя www-data, который сделать 
-		 * это не сможет, для решения проблемы необходимо чтобы скрипт запускался из-под рута
-		*/
-		
-		if(is_array($server_data)) {
-			$os = $server_data['os'];
-		} else {
-			$os = $server_data;
-		}
 
-		switch(strtolower($os)){
-			case 'ubuntu':
-				$command =  'sudo ' . $command;
-				break;
-				
-			case 'debian':
-				$command =  'sudo ' . $command;
-				break;
-				
-			case 'linux':
-				$command =  'sudo ' . $command;
-				break;
-				
-			case 'centos':
-				$command =  'sudo ' . $command;
-				break;
-				
-			default:
-				/* Для windows никаких sudo не требуется */
-				//$command = $command;
-				break;
-		}
-		
-		return $command;
-	}
-	
 	//-----------------------------------------------------------
 	
 	/*
 	 * Функция отправляет команду на сервер
+	 * 
 	*/
 	function command($command, $server_data = false, $path = false)
     {
-		/*
-		 * 	Чтобы сервер успешно запустился через exec нужно:
-		 *  выполнить: 
-		 * 				sudo nano /etc/sudoers
-		 *	добавить в конец: 
-		 * 				www-data ALL = NOPASSWD: /путь/к/скрипту
-		 * 
-		 * Условие проверяет, является ли сервер локальным,
-		 * если является то запускается простая команда exec
-		 * если является удаленным, то идет обращение к функции ssh_command
-		 * для отправки команды через ssh
-		 * 
-		*/
+		$this->load->driver('control');
 		
-		if (!$server_data) {
-			$server_data = &$this->ds_list[0];
+		$command = $this->servers->replace_shotcodes($command, $server_data);
+		
+		$path = $path ? $path : $server_data['script_path'];
+		$this->control->set_data(array('os' => $server_data['os'], 'path' => $path));
+		$this->control->set_driver($server_data['control_protocol']);
+
+		try {
+			$this->control->connect($server_data['control_ip'], $server_data['control_port']);
+			$this->control->auth($server_data['control_login'], $server_data['control_password']);
+			$result = $this->control->command($command, $path);
+		} catch (Exception $e) {
+			$result = '';
+			$this->_errors = $e->getMessage();
 		}
 		
-		/* -------------------
-		 * 	Определяем путь 
-		 * -------------------
-		*/
-		if(!$path) {
-			$path = $server_data['script_path'];
-		}
-		
-		/* Добавляем команду в зависимости от ОС */
-		switch(strtolower($server_data['os'])) {
-			case 'windows':
-					/* Замена нормального линуксовского слеша
-					 * на ненормальный виндовый \ */
-					$path = str_replace('/', "\\", $path);
-					
-					if (strpos($command, 'mkdir') !== false) {
-						$command = str_replace('/', "\\", $command);
-					}
-						
-					$cd = "cd /D " . $path;
-				break;
-				
-			default:
-					$cd = "cd " . $path;
-				break;
-		}
-		
-		if ($server_data['local_server']) {
-			
-			if (!$this->_check_path($path)) {
-				$this->errors = 'Path ' . $path . " not found\n";
-				return false;
-			}
-			
-			if(is_array($command)) {
-				$result = '';
-
-				foreach($command as $cmd_arr) {
-					
-					/* Проверка существования исполняемого файла и прав на выполнение */
-					$script_file = explode(' ', $cmd_arr);
-					$script_file = $script_file[0];
-					$script_file = str_replace('./', '', $script_file);
-					
-					/* 
-					 * Проверяем, существует ли файл
-					 * Проверяется файлы .sh, если это команда, например wget, то 
-					 * проверки не будет 
-					*/
-					if (strpos($cmd_arr, '.sh') !== false && strpos($cmd_arr, '.exe') !== false && !$this->servers->_check_file($path . '/' . $script_file)) {
-						return $this->errors;
-					}
-
-					if($result) { $result .= "\n---\n"; }
-					
-					$command = $this->_add_sudo($command, $server_data['os']);
-					exec($cd . ' && ' . $cmd_arr, $output);
-					$result .= implode("\n", $output);
-					$result .= "\n/------------------------/\n\n";
-
-					$this->_commands[] = $cd . ' && ' . $cmd_arr;
-				}
-			} else {
-				
-				/* Проверка существования исполняемого файла и прав на выполнение */
-				$script_file = explode(' ', $command);
-				$script_file = $script_file[0];
-				$script_file = str_replace('./', '', $script_file);
-				
-				/* 
-				 * Проверяем, существует ли файл
-				 * Проверяется файлы .sh, если это команда, например wget, то 
-				 * проверки не будет 
-				*/
-				if (strpos($command, '.sh') !== false && strpos($command, '.exe') !== false && !$this->servers->_check_file($path . '/' . $script_file)) {
-					return $this->errors;
-				}
-
-				$command = $this->_add_sudo($command, $server_data['os']);
-				exec($cd . ' && ' . $command, $output);
-				$result = implode("\n", $output);
-
-				$this->_commands[] = $cd . ' && ' . $command;
-			}
-		} else {
-			/* Удаленная машина */
-
-			if (strtolower($server_data['control_protocol']) == 'telnet') { 
-				
-				/* Загрузка необходимой библиотеки */
-				$this->load->library('telnet');
-				
-				//~ $result = $this->telnet_command($command, $server_data, $path);
-				
-				/* Получение данных для соединения */
-				$telnet_data = explode(':', $server_data['telnet_host']);
-				$telnet_ip = $telnet_data['0'];
-				
-				if(!isset($telnet_data['1'])){
-					$telnet_port = 23; // Стандартный порт telnet
-				}else{
-					$telnet_port = $telnet_data['1'];
-				}
-				
-				$this->telnet->connect($telnet_ip, $telnet_port);
-				$this->telnet->auth($server_data['telnet_login'], $server_data['telnet_password']);
-				
-				$result = '';
-
-				if(is_array($command)) {
-					foreach($command as $cmd_arr) {
-						$result .= $this->telnet->command($cd . ' && ' . $cmd_arr  . "\r\n");
-						$result .= "\n/------------------------/\n\n";
-						
-						$this->_commands[] = $cd . ' && ' . $cmd_arr  . "\r\n";
-					}
-				} else {
-					$result = $this->telnet->command($cd . ' && ' . $command  . "\r\n");
-					
-					$this->_commands[] = $cd . ' && ' . $command  . "\r\n";
-				}
-				
-			} else {
-				
-				/* Загрузка необходимой библиотеки */
-				$this->load->library('ssh');
-				
-				$result = '';
-				
-				$ssh_data = explode(':', $server_data['ssh_host']);
-		
-				$ssh_ip = $ssh_data['0'];
-				
-				if(!isset($ssh_data['1'])){
-					$ssh_port = 22;
-				}else{
-					$ssh_port = $ssh_data['1'];
-				}
-				
-				$this->ssh->connect($ssh_ip, $ssh_port);
-				
-				if ($this->ssh->auth($server_data['ssh_login'], $server_data['ssh_password'])) {
-					if(is_array($command)) {
-						foreach($command as $cmd_arr) {
-							$result .= $this->ssh->command($cd . ' && ' . $cmd_arr);
-							$result = "\n/------------------------/\n\n";
-							
-							$this->_commands[] = $cd . ' && ' . $cmd_arr;		
-						}
-						
-					} else {
-							//~ $stream[] = ssh2_exec($connection, $cd . ' && ' . $command);
-							$result = $this->ssh->command($cd . ' && ' . $command);
-							
-							$this->_commands[] = $cd . ' && ' . $command;
-					}
-					
-				}
-			}
-		}
-		
-		if ($result) {
-			return $result;
-		} else {
-			return false;
-		}
-		
-		return false;
+		$this->_commands = $this->control->get_sended_commands();
+		return $result;
 	}
 
 }

@@ -116,6 +116,13 @@ class Servers extends CI_Model {
 	
 	//-----------------------------------------------------------
 	
+	public function replace_shotcodes($command, $server_data) 
+	{
+		return $this->_replace_shotcodes_in_array($command, $server_data);
+	}
+	
+	//-----------------------------------------------------------
+	
 	/*
 	 * Замена шоткодов в команде
 	*/
@@ -219,16 +226,13 @@ class Servers extends CI_Model {
 	
 	/*
 	 * Функция отправляет команду на выделенный сервер
+	 * 
+	 * УСТАРЕЛА!
 	*/
 	function command($command, $server_data, $path = false)
     {
 		$this->load->model('servers/dedicated_servers');
-		
-		$command = $this->_replace_shotcodes_in_array($command, $server_data);
-		
-		$result = $this->dedicated_servers->command($command, $server_data, $path);
-		
-		return $result;
+		return $this->dedicated_servers->command($command, $server_data, $path);
 	}
 	
 	//-----------------------------------------------------------
@@ -593,36 +597,17 @@ class Servers extends CI_Model {
 				
 				$this->server_data['local_server'] = 0;
 				
-				switch (strtolower($this->server_ds_data['control_protocol'])) {
-					case 'ssh':
-						$this->server_data['control_protocol'] = 'ssh';
-						break;
-					
-					case 'telnet':
-						$this->server_data['control_protocol'] = 'telnet';
-						break;
-					
-					default:
-						if ($this->server_data['os'] == 'windows') {
-							$this->server_data['control_protocol'] = 'telnet';
-						} else {
-							$this->server_data['control_protocol'] = 'ssh';
-						}
-						
-						break;
+				
+				if (!$this->server_ds_data['control_protocol']) {
+					if ($this->server_data['os'] == 'windows') {
+						$control_protocol = 'telnet';
+					} else {
+						$control_protocol = 'ssh';
+					}
+				} else {
+					$control_protocol = strtolower($this->server_ds_data['control_protocol']);
 				}
 
-				$this->server_data['ssh_host'] = $this->server_ds_data['ssh_host'];
-				$this->server_data['ssh_login'] = $this->server_ds_data['ssh_login'];
-				$this->server_data['ssh_password'] = $this->server_ds_data['ssh_password'];
-				$this->server_data['ssh_passwd'] = $this->server_ds_data['ssh_password'];
-				$this->server_data['ssh_path'] = $this->server_ds_data['ssh_path'];
-				
-				$this->server_data['telnet_host'] = $this->server_ds_data['telnet_host'];
-				$this->server_data['telnet_login'] = $this->server_ds_data['telnet_login'];
-				$this->server_data['telnet_password'] = $this->server_ds_data['telnet_password'];
-				$this->server_data['telnet_path'] = $this->server_ds_data['telnet_path'];
-				
 				$this->server_data['ftp_host'] = $this->server_ds_data['ftp_host'];
 				$this->server_data['ftp_login'] = $this->server_ds_data['ftp_login'];
 				$this->server_data['ftp_password'] = $this->server_ds_data['ftp_password'];
@@ -630,7 +615,7 @@ class Servers extends CI_Model {
 				$this->server_data['ftp_path'] = $this->server_ds_data['ftp_path'];
 				
 				/* Определение пути до скрипта и до steamcmd */
-				switch ($this->server_data['control_protocol']) {
+				switch ($control_protocol) {
 					case 'local':
 						$this->server_data['script_path'] 	= $this->config->config['local_script_path'];
 						$this->server_data['steamcmd_path'] = ($this->config->config['local_steamcmd_path']) ? $this->config->config['local_steamcmd_path'] : $this->config->config['local_script_path'];
@@ -1016,8 +1001,11 @@ class Servers extends CI_Model {
 			return $this->sftp->list_files($dir);
 
 		} else {
+			$explode = explode(':', $server_data['ftp_host']);
+			$ftp_host = $explode[0];
+			$ftp_port = (isset($explode[1])) ? $explode[1] : 21;
 			
-			$connection = ftp_connect($server_data['ftp_host']);
+			$connection = ftp_connect($ftp_host, $ftp_port, 20);
 			
 			if(ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])) {
 				

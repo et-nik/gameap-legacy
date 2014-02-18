@@ -752,10 +752,10 @@ class Server_command extends CI_Controller {
 			) {
 				
 				/* Проверка SSH и Telnet */
-				if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
-					$this->_show_message();
-					return false;
-				}
+				//~ if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
+					//~ $this->_show_message();
+					//~ return false;
+				//~ }
 
 				/* Заданы ли параметры запуска */
 				if (!$this->servers->server_data['script_start']){
@@ -880,11 +880,11 @@ class Server_command extends CI_Controller {
 				&& $this->users->auth_servers_privileges['SERVER_STOP']	// Право на запуск этого сервера
 			) {
 				
-				/* Проверка SSH и Telnet */
-				if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
-					$this->_show_message();
-					return false;
-				}
+				//~ /* Проверка SSH и Telnet */
+				//~ if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
+					//~ $this->_show_message();
+					//~ return false;
+				//~ }
 
 				/* Заданы ли параметры запуска */
 				if (!$this->servers->server_data['script_stop']){
@@ -1007,10 +1007,10 @@ class Server_command extends CI_Controller {
 			) {
 				
 				/* Проверка SSH и Telnet */
-				if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
-					$this->_show_message();
-					return false;
-				}
+				//~ if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
+					//~ $this->_show_message();
+					//~ return false;
+				//~ }
 
 				/* Заданы ли параметры запуска */
 				if (!$this->servers->server_data['script_restart']){
@@ -1146,34 +1146,6 @@ class Server_command extends CI_Controller {
 				 * Чтобы избежать случаев случайного обновления
 				*/
 				if ($confirm == $this->security->get_csrf_hash()) {
-					
-					/* Прямое обновление
-					 * устарело, теперь обновление через cron */
-					//~ if ($response = $this->servers->update($this->servers->server_data)) {
-						//~ $message = lang('server_command_cmd_sended');
-						//~ 
-						//~ // Сохраняем логи
-						//~ $log_data['type'] = 'server_command';
-						//~ $log_data['command'] = 'update';
-						//~ $log_data['user_name'] = $this->users->auth_login;
-						//~ $log_data['server_id'] = $this->servers->server_data['id'];
-						//~ $log_data['msg'] = 'Server update success';
-						//~ $log_data['log_data'] = $response;
-						//~ $this->panel_log->save_log($log_data);
-					//~ 
-					//~ } else {
-						//~ $message = lang('server_command_update_failed');
-						//~ 
-						//~ // Сохраняем логи
-						//~ $log_data['type'] = 'server_command';
-						//~ $log_data['command'] = 'update';
-						//~ $log_data['user_name'] = $this->users->auth_login;
-						//~ $log_data['server_id'] = $this->servers->server_data['id'];
-						//~ $log_data['msg'] = 'Server update error';
-						//~ $log_data['log_data'] = 'Command: ' . $this->servers->get_sended_commands(true) . "\nResponse: \n" . $response;
-						//~ $this->panel_log->save_log($log_data);
-					//~ }
-					//~ 
 					
 					/* Проверяем, возможно задание уже имеется */
 					$where = array('code' => 'server_update', 'server_id' => $server_id);

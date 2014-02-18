@@ -58,11 +58,12 @@ class Cron extends MX_Controller {
 		$this->load->model('servers/games');
 		$this->load->model('servers/game_types');
 		
+		$this->load->driver('control');
 		$this->load->driver('rcon');
 		$this->load->driver('installer');
 		
-		$this->load->library('ssh');
-		$this->load->library('telnet');
+		//~ $this->load->library('ssh');
+		//~ $this->load->library('telnet');
 		$this->load->library('query');
 
 		set_time_limit(0);
@@ -447,54 +448,28 @@ class Cron extends MX_Controller {
 				break;
 
 		}
-		
-		/* 
-		 * Для Windows будут следующие команды:
-		 * 		Загруженность процессора:	wmic cpu get LoadPercentage
-		 * 		Получение свободной памяти: wmic os get FreePhysicalMemory
-		 * 		Получение всей памяти:		wmic os get TotalVisibleMemorySize 
-		 * 
-		 * Для Linux команды будут следующими:
-		 * 									vmstats
-		*/
+
 		if (strtolower($ds['os']) == 'windows') {
-
-			if ($control_protocol == 'telnet') {
-				$telnet_data = explode(':', $ds['telnet_host']);
-
-				$telnet_ip = $telnet_data['0'];
-				$telnet_port = 23;
-
-				if (isset($telnet_data['1'])) {
-					$telnet_port = $telnet_data['1'];
-				}
-
-				$this->telnet->connect($telnet_ip, $telnet_port);
-				$this->telnet->auth($ds['telnet_login'], $ds['telnet_password']);
-
-				$stats_string['cpu_load'] = $this->telnet->command('wmic cpu get LoadPercentage');
-				$stats_string['free_memory'] = $this->telnet->command('wmic os get FreePhysicalMemory');
-				$stats_string['total_memory'] = $this->telnet->command('wmic os get TotalVisibleMemorySize');
-			} elseif ($control_protocol == 'local') {
-				$stats_string['cpu_load'] = shell_exec('wmic cpu get LoadPercentage');
-				$stats_string['free_memory'] = shell_exec('wmic os get FreePhysicalMemory');
-				$stats_string['total_memory'] = shell_exec('wmic os get TotalVisibleMemorySize');
-			} else {
-				$ssh_data = explode(':', $ds['ssh_host']);
-
-				$ssh_ip = $ssh_data['0'];
-				$ssh_port = 22;
-
-				if (isset($ssh_data['1'])) {
-					$ssh_port = $ssh_data['1'];
-				}
-
-				$this->ssh->connect($ssh_ip, $ssh_port);
-				$this->ssh->auth($ds['ssh_login'], $ds['ssh_password']);
-
-				$stats_string['cpu_load'] = $this->ssh->command('wmic cpu get LoadPercentage');
-				$stats_string['free_memory'] = $this->ssh->command('wmic os get FreePhysicalMemory');
-				$stats_string['total_memory'] = $this->ssh->command('wmic os get TotalVisibleMemorySize');
+			 /* Для Windows будут следующие команды:
+			 * 		Загруженность процессора:	wmic cpu get LoadPercentage
+			 * 		Получение свободной памяти: wmic os get FreePhysicalMemory
+			 * 		Получение всей памяти:		wmic os get TotalVisibleMemorySize 
+			*/
+			
+			$this->control->set_data(array('os' => 'windows'));
+			$this->control->set_driver($control_protocol);
+			
+			try {
+				$this->control->connect($ds['control_ip'], $ds['os']['control_port']);
+				$this->control->auth($ds['control_login'], $ds['control_password']);
+				
+				$stats_string['cpu_load'] 		= $this->control->command('wmic cpu get LoadPercentage');
+				$stats_string['free_memory'] 	= $this->control->command('wmic os get FreePhysicalMemory');
+				$stats_string['total_memory'] 	= $this->control->command('wmic os get TotalVisibleMemorySize');
+				
+			} catch (Exception $e) {
+				//~ $this->_errors = $e->getMessage();
+				return false;
 			}
 
 			/* Обработака загруженности процессора */
@@ -549,49 +524,45 @@ class Cron extends MX_Controller {
 			return $stats;
 
 		} else {
-			if ($control_protocol == 'telnet') {
-				$telnet_data = explode(':', $ds['telnet_host']);
+			
+			/* Для Linux выполняются две команды
+			 * 	1. 'top -b -n 2 | grep Cpu'
+			 * параметру -n присвоена 2, т.к. на тестовом сервере Debian
+			 * первое значение всегда было одинаковым вне зависимости
+			 * от реальной нагрузки, видимо где-то кешируется.
+			 * 
+			 * 2. free
+			 * Информация о памяти
+			 * Можно было бы использовать одну команду с top, и парсить значения,
+			 *  но с давных времен используется две.
+			*/
+			$this->control->set_data(array('os' => 'linux'));
+			$this->control->set_driver($control_protocol);
 
-				$telnet_ip = $telnet_data['0'];
-				$telnet_port = 23;
-
-				if (isset($telnet_data['1'])) {
-					$telnet_port = $telnet_data['1'];
-				}
-
-				if ($this->telnet->connect($telnet_ip, $telnet_port) && $this->telnet->auth($ds['telnet_login'], $ds['telnet_password'])) {
-					$stats_string['cpu_load'] = $this->telnet->command('top -b -n 1 | grep Cpu');
-					$stats_string['memory_usage'] = $this->telnet->command('free');
-				}
-
-			} elseif ($control_protocol == 'local') {
-				$stats_string['cpu_load'] = shell_exec('top -b -n 1 | grep Cpu');
-				$stats_string['memory_usage'] = shell_exec('free');
-			} else {
-				$ssh_data = explode(':', $ds['ssh_host']);
-
-				$ssh_ip = $ssh_data['0'];
-				$ssh_port = 22;
-
-				if (isset($ssh_data['1'])) {
-					$ssh_port = $ssh_data['1'];
-				}
-
-				$this->ssh->connect($ssh_ip, $ssh_port);
-				$this->ssh->auth($ds['ssh_login'], $ds['ssh_password']);
-
-				$stats_string['cpu_load'] = $this->ssh->command('top -b -n 1 | grep Cpu');
-				$stats_string['memory_usage'] = $this->ssh->command('free');
+			try {
+				$this->control->connect($ds['control_ip'], $ds['control_port']);
+				$this->control->auth($ds['control_login'], $ds['control_password']);
+				
+				$stats_string['cpu_load'] 		= $this->control->command('top -b -n 2 | grep Cpu');
+				$stats_string['memory_usage'] 	= $this->control->command('free');
+				
+			} catch (Exception $e) {
+				//~ $this->_errors = $e->getMessage();
+				return false;
 			}
-			
+
 			/* Использование процессора 
-			 * Cpu(s): 24.0%us, 10.2%sy,  0.0%ni, 61.9%id,  3.8%wa,  0.0%hi,  0.1%si,  0.0%st
+			 * 
+			 * Ubuntu/CentOS -- Cpu(s): 24.0%us, 10.2%sy,  0.0%ni, 61.9%id,  3.8%wa,  0.0%hi,  0.1%si,  0.0%st
+			 * Debian --		%Cpu(s):  1.5 us,  0.0 sy,  0.0 ni, 95.7 id,  0.0 wa,  0.0 hi,  0.0 si,  2.7 st
 			 */
+			 
 			$stats_explode = preg_replace('| +|', ' ', array_pop(explode("\n", trim($stats_string['cpu_load']))));
-			$stats_explode = explode(' ', trim($stats_explode));
+			$stats_explode = preg_replace('/[^0-9\s\.]/i', '', end(explode(':', $stats_explode)));
+			$stats_explode = explode(' ',  str_replace('  ', ' ', trim($stats_explode)));
 			
-			$stats['cpu_usage'] = (isset($stats_explode[1]) &&  isset($stats_explode[2])) 
-										? (int)$stats_explode[1] + (int)$stats_explode[2] 
+			$stats['cpu_usage'] = isset($stats_explode[3]) 
+										? 100-(int)$stats_explode[3] 
 										: false;
 
 			/* Использование памяти 
@@ -995,9 +966,9 @@ class Cron extends MX_Controller {
 				
 				// Данные лога установки
 				$log = '';
-
+				
 				/* Получение данных об игровой модификации */
-				$this->game_types->get_gametypes_list(array('id' => $this->servers_data[$server_id]['dir']));
+				$this->game_types->get_gametypes_list(array('id' => $this->servers_data[$server_id]['game_type']));
 
 				/*
 				 * Полю installed устанавливаем значение 2, что сервер начал устанавливаться
@@ -1082,15 +1053,21 @@ class Cron extends MX_Controller {
 						
 						if($content_dirs) {
 							foreach($content_dirs as $dir) {
-								$command[] = 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir']. '/' .  $dir['path'];
-								$log .= 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/'. $dir['path'] . "\n";
+								$command[] = 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
+								$log .= 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
+								
+								//~ $command[] = 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir']. '/' .  $dir['path'];
+								//~ $log .= 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/'. $dir['path'] . "\n";
 							}
 						}
 						
 						if($log_dirs) {
 							foreach($log_dirs as $dir) {
-								$command[] = 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'];
-								$log .= 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . "\n";
+								$command[] = 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
+								$log .= 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
+								
+								// $command[] = 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'];
+								// $log .= 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . "\n";
 							}
 						}
 						
@@ -1320,10 +1297,6 @@ class Cron extends MX_Controller {
 		if (!empty($this->dedicated_servers->ds_list)) {
 			foreach($this->dedicated_servers->ds_list as $ds) {
 				
-				if (!$ds['ssh_host'] && !$ds['telnet_host']) {
-					continue;
-				}
-				
 				$stats = $this->_stats_processing($ds);
 
 				if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
@@ -1353,30 +1326,30 @@ class Cron extends MX_Controller {
 		/* Статистика для локального сервера 
 		 * Для сбора статистики понадобится функция shell_exec, которую иногда отключают.
 		 */
-		$disable_functions = ini_get('disable_functions');
-		$disable_functions = explode(',', $disable_functions);
-		
-		if (!in_array('shell_exec', $disable_functions)) {
-			$ds = array('os' => $this->config->config['local_os'], 'control_protocol' => 'local'); 
-			$stats = $this->_stats_processing($ds);
-
-			if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
-
-				$stats_array = json_decode(@file_get_contents(APPPATH . 'cache/local_server_stats.json', true));
-				$stats_array = array_slice($stats_array, -20);
-				
-				$stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
-				$data['stats'] = json_encode($stats_array);
-				file_put_contents(APPPATH . 'cache/local_server_stats.json', $data['stats']);
-
-				$this->_cron_result .= 'Local server stats successful' . "\n";
-
-			} else {
-				$this->_cron_result .= 'Local server stats failed'. "\n";
-			}
-		} else {
-			$this->_cron_result .= 'Local server stats failed. Function shell_exec disabled'. "\n";
-		}
+		//~ $disable_functions = ini_get('disable_functions');
+		//~ $disable_functions = explode(',', $disable_functions);
+		//~ 
+		//~ if (!in_array('shell_exec', $disable_functions)) {
+			//~ $ds = array('os' => $this->config->config['local_os'], 'control_protocol' => 'local'); 
+			//~ $stats = $this->_stats_processing($ds);
+//~ 
+			//~ if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
+//~ 
+				//~ $stats_array = json_decode(@file_get_contents(APPPATH . 'cache/local_server_stats.json', true));
+				//~ $stats_array = array_slice($stats_array, -20);
+				//~ 
+				//~ $stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
+				//~ $data['stats'] = json_encode($stats_array);
+				//~ file_put_contents(APPPATH . 'cache/local_server_stats.json', $data['stats']);
+//~ 
+				//~ $this->_cron_result .= 'Local server stats successful' . "\n";
+//~ 
+			//~ } else {
+				//~ $this->_cron_result .= 'Local server stats failed'. "\n";
+			//~ }
+		//~ } else {
+			//~ $this->_cron_result .= 'Local server stats failed. Function shell_exec disabled'. "\n";
+		//~ }
 		
 		/*==================================================*/
 		/*    	ВЫПОЛНЕНИЕ CRON СКРИПТОВ ИЗ МОДУЛЕЙ			*/
