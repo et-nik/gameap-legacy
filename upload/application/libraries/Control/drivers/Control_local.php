@@ -32,7 +32,7 @@ class Control_local extends CI_Driver {
 	{
 		$disabled_functions = explode(',', ini_get('disable_functions'));
 		
-		if (in_array('exec', $this->disabled_functions)) {
+		if (in_array('exec', $disabled_functions)) {
 			throw new Exception('exec_disabled');
 		}
 	}
