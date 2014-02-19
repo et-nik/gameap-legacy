@@ -72,6 +72,58 @@ class Server_command extends CI_Controller {
 	// -----------------------------------------------------------------------
 	
 	/**
+	 * По ответу на команду, отправленную на физ. сервер получает
+	 * понятный пользователю ответ.
+	 * 
+	 * Можно было бы применить switch case, это было бы удобнее, 
+	 * но ответ может состоять более чем из одной строки
+	 * 
+	 */
+	private function _get_message($response = '')
+	{
+		if (strpos($response, 'Server is already running') !== false) {
+			/* Сервер запущен ранее */
+			$message = lang('server_command_server_is_already_running', site_url('server_command/restart/'. $server_id), site_url('server_command/stop/' . $server_id));
+			
+		} elseif(strpos($response, 'Server started') !== false) {
+			/* Сервер успешно запущен */
+			$message = lang('server_command_started');
+			
+		} elseif(strpos($response, 'Server not started') !== false) {
+			// Неудачный запуск
+			$message = lang('server_command_start_failed');
+			
+		} elseif(strpos($response, 'Coulnd\'t find a running server') !== false) {
+			// Не найден запущенный сервер
+			$message = lang('server_command_restart_running_server_not_found');
+			
+		} elseif(strpos($response, 'Server restarted') !== false) {
+			// Сервер перезапущен
+			$message = lang('server_command_restarted');
+			
+		} elseif(strpos($response, 'Server not restarted') !== false) {
+			// Сервер не перезапущен
+			$message = lang('server_command_restart_failed');
+			
+		} elseif(strpos($response, 'Server stopped') !== false) {
+			// Сервер остановлен
+			$message = lang('server_command_stopped');
+			
+		} elseif(strpos($response, 'Server not stopped') !== false) {
+			// Сервер не остановлен
+			$message = lang('server_command_stop_failed');
+
+		} else {
+			// Команда отправлена
+			$message = lang('server_command_cmd_sended');
+		}
+		
+		return $message;
+	}
+	
+	// -----------------------------------------------------------------------
+	
+	/**
 	 * Обрезка пустых строк консоли
 	*/
 	private function _crop_console($console_text)
@@ -605,17 +657,13 @@ class Server_command extends CI_Controller {
     {
 		$this->tpl_data['title'] 	= lang('server_command_title_console_view');
 		$this->tpl_data['heading'] 	= lang('server_command_header_console_view');
+		
+		$this->load->helper('ds');
 			
 		/* Получены ли необходимые данные о сервере */
 		if($this->servers->get_server_data($id)) {
 			
 			$local_tpl_data['server_id'] = $id;
-			
-			//~ if(strtolower($this->servers->server_data['os']) == 'windows') {
-				//~ /* Еще одна причина не использовать Windows */
-				//~ $this->_show_message(lang('server_command_not_available_for_windows'), site_url('admin/server_control/main/' . $id), lang('next'));
-				//~ return false;
-			//~ }
 			
 			// Получение прав на сервер
 			$this->users->get_server_privileges($this->servers->server_data['id']);
@@ -624,95 +672,33 @@ class Server_command extends CI_Controller {
 				$this->_show_message(lang('server_command_no_console_privileges'), site_url('admin/server_control/main/' . $id));
 				return false;
 			}
-			
-			/*
-			 * Список расширений php
-			 */
-			$ext_list = get_loaded_extensions();
-			
-			/* 
-			 * Заданы ли данные SSH у DS сервера 
-			 * 
-			 * Если сервер является удаленным, используется telnet
-			 * и заданы хост, логин и пароль то все впорядке,
-			 * иначе отправляем пользователю сообщение
-			 * 
-			*/
-			if($this->servers->server_data['ds_id'] 
-			&& $this->servers->server_data['control_protocol'] == 'ssh'
-			&& (!$this->servers->server_data['ssh_host']
-				OR !$this->servers->server_data['ssh_login']
-				OR !$this->servers->server_data['ssh_password']
-				)
-			){
-				$this->_show_message(lang('server_command_ssh_not_set'), site_url('admin/server_control/main/' . $id), lang('next'));
-				return false;	
-			}
-			
-			/*
-			 * Есть ли модуль SSH
-			 */
-			if($this->servers->server_data['ds_id'] 
-			&& $this->servers->server_data['control_protocol'] == 'ssh'
-			&& (!in_array('ssh2', $ext_list))
-			){
-				$this->_show_message(lang('server_command_ssh_not_module'), site_url('admin/server_control/main/' . $id), lang('next'));
-				return false;	
-			}
-			
-			
-			/* 
-			 * Заданы ли данные TELNET у DS сервера 
-			 * 
-			 * Если сервер является удаленным, используется telnet
-			 * и заданы хост, логин и пароль то все впорядке,
-			 * иначе отправляем пользователю сообщение
-			 * 
-			*/
-			
-			if($this->servers->server_data['ds_id'] 
-			&& $this->servers->server_data['control_protocol'] == 'telnet'
-			&& (!$this->servers->server_data['telnet_host']
-				OR !$this->servers->server_data['telnet_login']
-				OR !$this->servers->server_data['telnet_password']
-				)
-			){
-				$this->_show_message(lang('server_command_telnet_not_set'), site_url('admin/server_control/main/' . $id), lang('next'));
-				return false;	
-			}
-			
-			if(!$this->servers->server_data['script_get_console']) {
-				$this->_show_message(lang('server_command_console_not_param'), site_url('admin/server_control/main/' . $id));
-				return false;
-			}
-			
+
 			/* Директория в которой располагается сервер */
 			$dir = $this->servers->server_data['script_path'] . '/' . $this->servers->server_data['dir'];
 			
-			//if($response = $this->servers->command('screen -S ' . $this->servers->server_data['screen_name'] . ' -X hardcopy ' . $dir . '/console.txt && cat ' . $dir . '/console.txt', $this->servers->server_data)) {
-			
 			$command = $this->servers->command_generate($this->servers->server_data, 'get_console');
 			
-			if($response = $this->servers->command($command, $this->servers->server_data)) {
-
-				$response = $this->_crop_console($response);
-				$local_tpl_data['console_content_original'] = $response;
-				
-				$console_content = str_replace("\n", "<br />", htmlspecialchars($response));
-				$local_tpl_data['console_content'] = $console_content;
-				
-				$this->tpl_data['content'] = $this->parser->parse('servers/console_view.html', $local_tpl_data, true);
-
-			} else {
-				$message = lang('server_command_no_data');
+			try {
+				$response = send_command($command, $this->servers->server_data);
+			} catch (Exception $e) {
+				$message = lang('server_command_' . $e->getMessage());
 				
 				if($this->users->auth_data['is_admin']) {
-					$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
+					$message .= ' (' . strtoupper($this->servers->server_data['control_protocol']) . ')';
+					$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . get_last_command() . '</code></p>';
 				}
 				
 				$this->_show_message($message, site_url('admin/server_control/main/' . $id));
 				return false;
 			}
+			
+			$response = $this->_crop_console($response);
+			$local_tpl_data['console_content_original'] = $response;
+			
+			$console_content = str_replace("\n", "<br />", htmlspecialchars($response));
+			$local_tpl_data['console_content'] = $console_content;
+			
+			$this->tpl_data['content'] = $this->parser->parse('servers/console_view.html', $local_tpl_data, true);
 			
 		} else {
 			$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), lang('next'));
@@ -750,13 +736,6 @@ class Server_command extends CI_Controller {
 			if($this->users->auth_privileges['srv_start']			// Право на запуск серверов
 				&& $this->users->auth_servers_privileges['SERVER_START']	// Право на запуск этого сервера
 			) {
-				
-				/* Проверка SSH и Telnet */
-				//~ if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
-					//~ $this->_show_message();
-					//~ return false;
-				//~ }
-
 				/* Заданы ли параметры запуска */
 				if (!$this->servers->server_data['script_start']){
 					$this->_show_message(lang('server_command_start_not_param'));
@@ -767,58 +746,38 @@ class Server_command extends CI_Controller {
 				 * Чтобы избежать случаев случайного запуска сервера
 				*/
 				if($confirm == $this->security->get_csrf_hash()) {
-					if($response = $this->servers->start($this->servers->server_data)) {
-						/* 
-						 * В некоторых случаях (так обычно и бывает)
-						 * strpos($response, 'blablabla') может возвращать 0, 
-						 * а нам нужен именно false
-						 */
-						if (strpos($response, 'Server is already running') !== false) {
-							/* Сервер запущен ранее */
-							$message = lang('server_command_server_is_already_running', site_url('server_command/restart/'. $server_id), site_url('server_command/stop/' . $server_id));
-							$log_data['msg'] = 'Server is already running';		
-						} elseif($this->servers->server_status() OR strpos($response, 'Server started') !== false) {
-							/* Сервер успешно запущен */
-							$message = lang('server_command_started');
-							$log_data['msg'] = 'Start server success';
-						} elseif(strpos($response, 'file not found') !== false) {
-							/* Не найден исполняемый файл */
-							$message = lang('server_command_start_file_not_found');
-							$log_data['msg'] = 'Executable file not found';
-						} elseif(strpos($response, 'file not executable') !== false) {
-							/* Нет прав на запуск файла */
-							$message = lang('server_command_start_file_not_executable');
-							$log_data['msg'] = 'File not executable';
-						} elseif(strpos($response, 'Server not started') !== false) {
-							$message = lang('server_command_start_failed');
-							
-							if($this->users->auth_data['is_admin']) {
-								$message .= lang('server_command_start_adm_msg');
-								
-								$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
-							}
-							
-							$log_data['msg'] = 'Start server failed';
-						} else {
-							$message = lang('server_command_cmd_sended');
-							$log_data['msg'] = 'Command sended';
-						}
-						
-						// Сохраняем логи
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'start';
-						$log_data['user_name'] = $this->users->auth_login;
-						$log_data['server_id'] = $this->servers->server_data['id'];
-						$log_data['log_data'] = $response;
-						$this->panel_log->save_log($log_data);
 					
-					} else {
-						$message = lang('server_command_start_failed');
+					try {
+						$response = $this->servers->start($this->servers->server_data);
 						
-						if($this->users->auth_data['is_admin']) {
-							$message .= lang('server_command_start_adm_msg');
-							$message .= '<p>' . lang('server_command_sent_cmd') . '<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
+						$message = $this->_get_message($response);
+
+						// Сохраняем логи
+						$log_data['type'] 		= 'server_command';
+						$log_data['command'] 	= 'start';
+						$log_data['user_name'] 	= $this->users->auth_login;
+						$log_data['server_id'] 	= $this->servers->server_data['id'];
+						$log_data['msg'] 		= $message;
+						$log_data['log_data'] 	= $response;
+						$this->panel_log->save_log($log_data);
+						
+						// Оставлено, на всякий случай
+						//~ if($this->users->auth_data['is_admin']) {
+							//~ $message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . get_last_command() . '</code></p>';
+						//~ }
+						
+						$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
+						return true;
+						
+					} catch (Exception $e) {
+						$message = lang('server_command_' . $e->getMessage());
+				
+						if ($this->users->auth_data['is_admin']) {
+							$message .= ' (' . strtoupper($this->servers->server_data['control_protocol']) . ')';
+							$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . get_last_command() . '</code></p>';
 						}
+						
+						$this->_show_message($message, site_url('admin/server_control/main/' . $server_id));
 						
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
@@ -826,12 +785,12 @@ class Server_command extends CI_Controller {
 						$log_data['user_name'] = $this->users->auth_login;
 						$log_data['server_id'] = $this->servers->server_data['id'];
 						$log_data['msg'] = 'Start server Error';
-						$log_data['log_data'] = $this->servers->errors;
+						$log_data['log_data'] = lang('server_command_' . $e->getMessage()) . "\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
+						
+						return false;
 					}
-					
-					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
-					return true;
+
 					
 				} else {
 					/* Пользователь не подвердил намерения */
@@ -880,12 +839,6 @@ class Server_command extends CI_Controller {
 				&& $this->users->auth_servers_privileges['SERVER_STOP']	// Право на запуск этого сервера
 			) {
 				
-				//~ /* Проверка SSH и Telnet */
-				//~ if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
-					//~ $this->_show_message();
-					//~ return false;
-				//~ }
-
 				/* Заданы ли параметры запуска */
 				if (!$this->servers->server_data['script_stop']){
 					$this->_show_message(lang('server_command_stop_not_param'));
@@ -895,68 +848,51 @@ class Server_command extends CI_Controller {
 				/* Подтверждение 
 				 * Чтобы избежать случаев случайного запуска сервера
 				*/
-				if($confirm == $this->security->get_csrf_hash()){
-					if($response = $this->servers->stop($this->servers->server_data)){
+				if ($confirm == $this->security->get_csrf_hash()) {
+
+					try {
+						$response = $this->servers->stop($this->servers->server_data);
 						
-						/* 
-						 * В некоторых случаях (так обычно и бывает)
-						 * strpos($response, 'blablabla') может возвращать 0, 
-						 * а нам нужен именно false
-						 */
-						if(strpos($response, 'Coulnd\'t find a running server') !== false) {
-							$message = lang('server_command_running_server_not_found');
-							$log_data['msg'] = 'Coulnd\'t find a running server';
-						} elseif(strpos($response, 'Server stopped') !== false) {
-							$message = lang('server_command_stopped');
-							$log_data['msg'] = 'Stop server success';
-						} elseif(strpos($response, 'file not found') !== false) {
-							/* Не найден исполняемый файл */
-							$message = lang('server_command_start_file_not_found');
-							$log_data['msg'] = 'Executable file not found';
-						} elseif(strpos($response, 'file not executable') !== false) {
-							/* Нет прав на запуск файла */
-							$message = lang('server_command_start_file_not_executable');
-							$log_data['msg'] = 'File not executable';
-						} elseif(strpos($response, 'Server not stopped') !== false) {
-							$message = lang('server_command_stop_failed');
-							
-							if($this->users->auth_data['is_admin']) {
-								$message .= lang('server_command_start_adm_msg');
-								$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
-							}
-							
-							$log_data['msg'] = 'Stop server failure';
-						} else {
-							$message = lang('server_command_cmd_sended');
-							$log_data['msg'] = 'Command sended';
+						$message = $this->_get_message($response);
+
+						// Сохраняем логи
+						$log_data['type'] 		= 'server_command';
+						$log_data['command'] 	= 'stop';
+						$log_data['user_name'] 	= $this->users->auth_login;
+						$log_data['server_id'] 	= $this->servers->server_data['id'];
+						$log_data['msg'] 		= $message;
+						$log_data['log_data'] 	= $response;
+						$this->panel_log->save_log($log_data);
+						
+						// Оставлено, на всякий случай
+						//~ if($this->users->auth_data['is_admin']) {
+							//~ $message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . get_last_command() . '</code></p>';
+						//~ }
+						
+						$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
+						return true;
+						
+					} catch (Exception $e) {
+						$message = lang('server_command_' . $e->getMessage());
+				
+						if ($this->users->auth_data['is_admin']) {
+							$message .= ' (' . strtoupper($this->servers->server_data['control_protocol']) . ')';
+							$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . get_last_command() . '</code></p>';
 						}
+						
+						$this->_show_message($message, site_url('admin/server_control/main/' . $server_id));
 						
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
 						$log_data['command'] = 'stop';
 						$log_data['user_name'] = $this->users->auth_login;
 						$log_data['server_id'] = $this->servers->server_data['id'];
-						$log_data['log_data'] = $response;
+						$log_data['msg'] = 'Stop server Error';
+						$log_data['log_data'] = lang('server_command_' . $e->getMessage()) . "\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
-					} else {
-						$message = 'Ошибка остановки';
 						
-						if($this->users->auth_data['is_admin']) {
-							$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
-						}
-						
-						// Сохраняем логи
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'stop';
-						$log_data['user_name'] = $this->users->auth_login;
-						$log_data['server_id'] = $this->servers->server_data['id'];
-						$log_data['msg'] = 'Stop server error';
-						$log_data['log_data'] = $this->servers->errors;
-						$this->panel_log->save_log($log_data);
+						return false;
 					}
-					
-					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
-					return true;
 					
 				}else{
 					/* Пользователь не подвердил намерения */
@@ -1005,12 +941,6 @@ class Server_command extends CI_Controller {
 			if($this->users->auth_privileges['srv_restart']
 				&& $this->users->auth_servers_privileges['SERVER_RESTART']
 			) {
-				
-				/* Проверка SSH и Telnet */
-				//~ if (false == $this->_check_ssh() OR false == $this->_check_telnet()) {
-					//~ $this->_show_message();
-					//~ return false;
-				//~ }
 
 				/* Заданы ли параметры запуска */
 				if (!$this->servers->server_data['script_restart']){
@@ -1022,70 +952,51 @@ class Server_command extends CI_Controller {
 				 * Чтобы избежать случаев случайного запуска сервера
 				*/
 				if($confirm == $this->security->get_csrf_hash()){
-					if($response = $this->servers->restart($this->servers->server_data)){
-						
-						/* 
-						 * В некоторых случаях (так обычно и бывает)
-						 * strpos($response, 'blablabla') может возвращать 0, 
-						 * а нам нужен именно false
-						 */
-						if(strpos($response, 'Coulnd\'t find a running server') !== false) {
-							$message = lang('server_command_restart_running_server_not_found');
-							$log_data['msg'] = 'Coulnd\'t find a running server';
-						} elseif(strpos($response, 'Server restarted') !== false) {
-							$message = lang('server_command_restarted');
-							$log_data['msg'] = 'Server restarted';
-						} elseif(strpos($response, 'file not found') !== false) {
-							/* Не найден исполняемый файл */
-							$message = lang('server_command_start_file_not_found');
-							$log_data['msg'] = 'Executable file not found';
-						} elseif(strpos($response, 'file not executable') !== false) {
-							/* Нет прав на запуск файла */
-							$message = lang('server_command_start_file_not_executable');
-							$log_data['msg'] = 'File not executable';
-						} elseif(strpos($response, 'Server not restarted') !== false) {
-							$message = lang('server_command_restart_failed');
-							
-							if($this->users->auth_data['is_admin']) {
-								$message .= lang('server_command_start_adm_msg');
-								$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
-							}
-							
-							$log_data['msg'] = 'Server not restarted';
-						} else {
-							$message = lang('server_command_cmd_sended');
-							$log_data['msg'] = 'Command sended';
-						}
-						
-						// Сохраняем логи
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'restart';
-						$log_data['user_name'] = $this->users->auth_login;
-						$log_data['server_id'] = $this->servers->server_data['id'];
-						$log_data['msg'] = 'Restart server success';
-						$log_data['log_data'] = $response;
-						$this->panel_log->save_log($log_data);
 					
-					}else{
-						$message = lang('server_command_restart_failed');
+					try {
+						$response = $this->servers->restart($this->servers->server_data);
 						
-						if($this->users->auth_data['is_admin']) {
-							$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . $this->servers->get_sended_commands(true) . '</code></p>';
+						$message = $this->_get_message($response);
+
+						// Сохраняем логи
+						$log_data['type'] 		= 'server_command';
+						$log_data['command'] 	= 'restart';
+						$log_data['user_name'] 	= $this->users->auth_login;
+						$log_data['server_id'] 	= $this->servers->server_data['id'];
+						$log_data['msg'] 		= $message;
+						$log_data['log_data'] 	= $response;
+						$this->panel_log->save_log($log_data);
+						
+						// Оставлено, на всякий случай
+						//~ if($this->users->auth_data['is_admin']) {
+							//~ $message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . get_last_command() . '</code></p>';
+						//~ }
+						
+						$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
+						return true;
+						
+					} catch (Exception $e) {
+						$message = lang('server_command_' . $e->getMessage());
+				
+						if ($this->users->auth_data['is_admin']) {
+							$message .= ' (' . strtoupper($this->servers->server_data['control_protocol']) . ')';
+							$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . get_last_command() . '</code></p>';
 						}
+						
+						$this->_show_message($message, site_url('admin/server_control/main/' . $server_id));
 						
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
 						$log_data['command'] = 'restart';
 						$log_data['user_name'] = $this->users->auth_login;
 						$log_data['server_id'] = $this->servers->server_data['id'];
-						$log_data['msg'] = 'Restart server error';
-						$log_data['log_data'] = $this->servers->errors;
+						$log_data['msg'] = 'Restart server Error';
+						$log_data['log_data'] = lang('server_command_' . $e->getMessage()) . "\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
+						
+						return false;
 					}
-					
-					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
-					return true;
-					
+
 				}else{
 					/* Пользователь не подвердил намерения */
 					$confirm_tpl['message'] = lang('server_command_restart_confirm');
