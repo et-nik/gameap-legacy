@@ -128,46 +128,8 @@ class Servers extends CI_Model {
 	*/
 	private function _replace_shotcodes_in_string($command, $server_data)
 	{
-		/*-------------------*/
-		/* Шаблонная замена */
-		/*-------------------*/
-		
-		/* В случае использования Windows значение может быть пустым
-		 * и параметры собьются */
-		if(empty($server_data['screen_name'])) {
-			$server_data['screen_name'] = 'null';
-		}
-		
-		$command = str_replace('{command}', 	$this->_strip_quotes($server_data['start_command']) , $command);							// Команда запуска игрового сервера (напр. "hlds_run -game valve +ip 127.0.0.1 +port 27015 +map crossfire")
-		$command = str_replace('{id}', 			$this->_strip_quotes($server_data['id']) 			, $command);							// ID сервера
-		$command = str_replace('{script_path}', $this->_strip_quotes($server_data['script_path']) 	, $command);
-		$command = str_replace('{game_dir}', 	$this->_strip_quotes($server_data['dir'])  			, $command);							// Директория с игрой
-		$command = str_replace('{dir}', 		$this->_strip_quotes($server_data['script_path'] . '/' . $server_data['dir'])  , $command);	// Корневая директория (где скрипт запуска)
-		$command = str_replace('{name}', 		$this->_strip_quotes($server_data['screen_name']) 	, $command);							// Имя скрина
-		$command = str_replace('{ip}', 			$this->_strip_quotes($server_data['server_ip']) 	, $command);							// IP сервера для коннекта (может не совпадать с ip дедика)
-		$command = str_replace('{port}', 		$this->_strip_quotes($server_data['server_port']) 	, $command);							// Порт сервера для коннекта
-		$command = str_replace('{game}', 		$this->_strip_quotes($server_data['start_code']) 	, $command);							// Игра
-		$command = str_replace('{user}', 		$this->_strip_quotes($server_data['su_user']) 		, $command);							// Пользователь
-
-		/*-------------------*/
-		/* Замена по алиасам */
-		/*-------------------*/
-		
-		/* Допустимые алиасы */
-		$allowable_aliases = json_decode($server_data['aliases_list'], true);
-		/* Значения алиасов на сервере */
-		$server_aliases = json_decode($server_data['aliases'], true);
-		
-		/* Прогон по алиасам */
-		if($allowable_aliases && !empty($allowable_aliases)){
-			foreach ($allowable_aliases as $alias) {
-				if(isset($server_aliases[$alias['alias']]) && !empty($server_aliases[$alias['alias']])) {
-					$command = str_replace('{' . $alias['alias'] . '}', $server_aliases[$alias['alias']] , $command);	
-				}
-			}
-		}
-		
-		return $command;
+		$this->load->helper('ds');
+		return replace_shotcodes($command, $server_data);
 	}
 
 	//-----------------------------------------------------------
@@ -227,12 +189,12 @@ class Servers extends CI_Model {
 	/*
 	 * Функция отправляет команду на выделенный сервер
 	 * 
-	 * УСТАРЕЛА!
+	 * УСТАРЕЛА! В 1.0 версии будет удалена, используйте хелпер ds
 	*/
 	function command($command, $server_data, $path = false)
     {
-		$this->load->model('servers/dedicated_servers');
-		return $this->dedicated_servers->command($command, $server_data, $path);
+		$this->load->helper('ds');
+		return send_command($command, $server_data, $path);
 	}
 	
 	//-----------------------------------------------------------
@@ -240,14 +202,13 @@ class Servers extends CI_Model {
 	/**
      * Получение списка отправленных команд
      * 
-     * @param bool Если $last_command TRUE, то будет отправлена лишь последняя команда
-     * @return array
+     * УСТАРЕЛА! В 1.0 версии будет удалена, используйте хелпер ds
      *
     */
 	function get_sended_commands($last_command = false)
 	{
-		$this->load->model('servers/dedicated_servers');
-		return $this->dedicated_servers->get_sended_commands($last_command);
+		$this->load->helper('ds');
+		return get_sended_commands($last_command);
 	}
     
     
