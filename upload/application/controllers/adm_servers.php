@@ -895,20 +895,16 @@ class Adm_servers extends CI_Controller {
 						}
 						
 						/* Удаление директории на выделенном сервере */
-						if(isset($this->servers->server_data['dir'])
-							&& ($this->servers->server_data['ds_id'] && ($this->servers->server_data['ssh_host'] OR $this->servers->server_data['telnet_host']))
-						) {
-							switch(strtolower($this->servers->server_data['os'])) {
-								case 'windows':
-									$command = 'rmdir /S ' . $this->servers->server_data['dir'];
-									$result = $this->servers->command($command, $this->servers->server_data);
-									break;
-								default:
-									// Linux
-									$command = 'rm -rf ' . $this->servers->server_data['dir'];
-									$result = $this->servers->command($command, $this->servers->server_data);
-									break;
-							}
+						switch(strtolower($this->servers->server_data['os'])) {
+							case 'windows':
+								$command = 'rmdir /S ' . $this->servers->server_data['dir'];
+								$result = $this->servers->command($command, $this->servers->server_data);
+								break;
+							default:
+								// Linux
+								$command = 'rm -rf ' . $this->servers->server_data['dir'];
+								$result = $this->servers->command($command, $this->servers->server_data);
+								break;
 						}
 						
 						if($this->servers->delete_game_server($id)) {
@@ -1164,7 +1160,6 @@ class Adm_servers extends CI_Controller {
 				$local_tpl_data = $servers_list[0];
 				$local_tpl_data['information'] = array();
 
-				
 				// Для tpl
 				$local_tpl_data['screen_name'] 			= $this->servers->server_data['screen_name'];
 				$local_tpl_data['su_user'] 				= $this->servers->server_data['su_user'];
@@ -1178,24 +1173,8 @@ class Adm_servers extends CI_Controller {
 				$local_tpl_data['rcon_port'] 			= $this->servers->server_data['rcon_port'];
 				
 				/* Получаем абсолютный путь к корневой директории с сервером и к исполняемым файлам */
-				if ($this->servers->server_data['ds_id'] === '0') {
-					$local_tpl_data['full_server_path'] = $this->servers->server_data['local_path'] . '/' . $this->servers->server_data['dir'];
-					$local_tpl_data['script_path'] = $this->servers->server_data['local_path'];
-				} else {
-					if ($this->servers->server_data['control_protocol'] == 'ssh') {
-						$local_tpl_data['full_server_path'] = $this->dedicated_servers->ds_list[0]['ssh_path'] . '/' . $this->servers->server_data['dir'];
-						$local_tpl_data['script_path'] = $this->dedicated_servers->ds_list[0]['ssh_path'];
-					} elseif($this->servers->server_data['control_protocol'] == 'ssh') {
-						$local_tpl_data['full_server_path'] = $this->servers->server_data['telnet_path'] . '/' . $this->servers->server_data['dir'];
-						$local_tpl_data['script_path'] = $this->servers->server_data['telnet_path'];
-					} elseif($this->servers->server_data['os'] == 'Windows') {
-						$local_tpl_data['full_server_path'] = $this->servers->server_data['telnet_path'] . '/' . $this->servers->server_data['dir'];
-						$local_tpl_data['script_path'] = $this->servers->server_data['telnet_path'];
-					} else {
-						$local_tpl_data['full_server_path'] = $this->servers->server_data['ssh_path'] . '/' . $this->servers->server_data['dir'];
-						$local_tpl_data['script_path'] = $this->servers->server_data['ssh_path'];
-					}
-				}
+				$local_tpl_data['full_server_path'] = $this->servers->server_data['script_path'] . '/' . $this->servers->server_data['dir'];
+				$local_tpl_data['script_path'] = $this->servers->server_data['script_path'];
 				
 				// Модификация
 				$where = array('game_code' => $this->servers->server_data['game']);
