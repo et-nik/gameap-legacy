@@ -91,6 +91,10 @@ class Control_local extends CI_Driver {
 	*/
 	function command($command)
 	{
+		if (!$command) {
+			throw new Exception('empty_command');
+		}
+		
 		exec($command, $output);
 		return implode("\n", $output);
 	}

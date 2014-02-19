@@ -57,8 +57,8 @@ class Control_ssh extends CI_Driver {
 	*/
 	function connect($ip = false, $port = 22)
 	{
-		if (!$ip) {
-			return false;
+		if (!$ip OR !$port) {
+			throw new Exception('empty_connect_data');
 		}
 		
 		$this->_connection = ssh2_connect($ip, $port);
@@ -75,14 +75,15 @@ class Control_ssh extends CI_Driver {
 	function auth($login, $password)
 	{
 		if (!$this->_connection) {
-			return false;
+			throw new Exception('not_connected');
+		}
+		
+		if(!$login) {
+			throw new Exception('empty_auth_data');
 		}
 		
 		if (!ssh2_auth_password($this->_connection, $login, $password)) {
 			throw new Exception('login_failed');
-			$this->_auth = false;
-			
-			return;
 		}
 		
 		return true;
@@ -96,8 +97,12 @@ class Control_ssh extends CI_Driver {
 	*/
 	function command($command)
 	{
-		if (!$this->_connection) {
-			return false;
+		if (!$this->_connection OR !$this->_auth) {
+			throw new Exception('not_connected');
+		}
+		
+		if (!$command) {
+			throw new Exception('empty_command');
 		}
 		
 		$stream = ssh2_exec($this->_connection, $command);

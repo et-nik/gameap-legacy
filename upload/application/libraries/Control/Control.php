@@ -192,9 +192,7 @@ class Control extends CI_Driver_Library {
 		}
 		
 		// Проверка возможности работы с драйвером
-		if (!$this->{$this->driver}->check()) {
-			return false;
-		}
+		$this->{$this->driver}->check();
 
 		return $this->{$this->driver}->connect($ip, $port);
 	}
