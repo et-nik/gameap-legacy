@@ -33,7 +33,7 @@
  * php -f /path/to/adminpanel/index.php cron
  * 
  * Cron модуль необходим для работы многих функций АдминПанели.
- * Лучше всего поставить выполнение модуля каждый 5 минут, 
+ * Лучше всего поставить выполнение модуля каждые 5 минут, 
  * но не реже раза в 10 минут.
  * 
 */
@@ -425,29 +425,7 @@ class Cron extends MX_Controller {
     */
 	function _stats_processing($ds)
 	{
-		// Определение протокола управления
-		switch (strtolower($ds['control_protocol'])) {
-			case 'ssh':
-				$control_protocol = 'ssh';
-				break;
-
-			case 'telnet':
-				$control_protocol = 'telnet';
-				break;
-
-			case 'local':
-				$control_protocol = 'local';
-				break;
-
-			default:
-				if ($ds['os'] == 'windows') {
-					$control_protocol = 'telnet';
-				} else {
-					$control_protocol = 'ssh';
-				}
-				break;
-
-		}
+		$control_protocol =& $ds['control_protocol'];
 
 		if (strtolower($ds['os']) == 'windows') {
 			 /* Для Windows будут следующие команды:
@@ -538,14 +516,13 @@ class Cron extends MX_Controller {
 			*/
 			$this->control->set_data(array('os' => 'linux'));
 			$this->control->set_driver($control_protocol);
-
+			
 			try {
 				$this->control->connect($ds['control_ip'], $ds['control_port']);
 				$this->control->auth($ds['control_login'], $ds['control_password']);
 				
 				$stats_string['cpu_load'] 		= $this->control->command('top -b -n 2 | grep Cpu');
 				$stats_string['memory_usage'] 	= $this->control->command('free');
-				
 			} catch (Exception $e) {
 				//~ $this->_errors = $e->getMessage();
 				return false;
@@ -556,7 +533,7 @@ class Cron extends MX_Controller {
 			 * Ubuntu/CentOS -- Cpu(s): 24.0%us, 10.2%sy,  0.0%ni, 61.9%id,  3.8%wa,  0.0%hi,  0.1%si,  0.0%st
 			 * Debian --		%Cpu(s):  1.5 us,  0.0 sy,  0.0 ni, 95.7 id,  0.0 wa,  0.0 hi,  0.0 si,  2.7 st
 			 */
-			 
+
 			$stats_explode = preg_replace('| +|', ' ', array_pop(explode("\n", trim($stats_string['cpu_load']))));
 			$stats_explode = preg_replace('/[^0-9\s\.]/i', '', end(explode(':', $stats_explode)));
 			$stats_explode = explode(' ',  str_replace('  ', ' ', trim($stats_explode)));
@@ -943,7 +920,6 @@ class Cron extends MX_Controller {
 		$this->_cron_result .= "== Runner ==\n";
 
 		$this->servers->get_server_list(false, false, array('enabled' => '1'));
-		//~ $this->games->get_game_list();
 
 		$i = 0;
 		$count_i = count($this->servers->servers_list);
@@ -1323,34 +1299,6 @@ class Cron extends MX_Controller {
 			}
 		}
 
-		/* Статистика для локального сервера 
-		 * Для сбора статистики понадобится функция shell_exec, которую иногда отключают.
-		 */
-		//~ $disable_functions = ini_get('disable_functions');
-		//~ $disable_functions = explode(',', $disable_functions);
-		//~ 
-		//~ if (!in_array('shell_exec', $disable_functions)) {
-			//~ $ds = array('os' => $this->config->config['local_os'], 'control_protocol' => 'local'); 
-			//~ $stats = $this->_stats_processing($ds);
-//~ 
-			//~ if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
-//~ 
-				//~ $stats_array = json_decode(@file_get_contents(APPPATH . 'cache/local_server_stats.json', true));
-				//~ $stats_array = array_slice($stats_array, -20);
-				//~ 
-				//~ $stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
-				//~ $data['stats'] = json_encode($stats_array);
-				//~ file_put_contents(APPPATH . 'cache/local_server_stats.json', $data['stats']);
-//~ 
-				//~ $this->_cron_result .= 'Local server stats successful' . "\n";
-//~ 
-			//~ } else {
-				//~ $this->_cron_result .= 'Local server stats failed'. "\n";
-			//~ }
-		//~ } else {
-			//~ $this->_cron_result .= 'Local server stats failed. Function shell_exec disabled'. "\n";
-		//~ }
-		
 		/*==================================================*/
 		/*    	ВЫПОЛНЕНИЕ CRON СКРИПТОВ ИЗ МОДУЛЕЙ			*/
 		/*==================================================*/
