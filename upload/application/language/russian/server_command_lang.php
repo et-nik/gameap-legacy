@@ -63,3 +63,12 @@ $lang['server_command_start_file_not_executable'] 			= 'У исполняемо�
 
 // 0.8.10
 $lang['server_command_update_task_exists']					= 'Задание обновления уже имеется, установите для него новую дату.';
+
+// 0.9
+$lang['server_command_connection_failed']					= 'Соединение не удалось';
+$lang['server_command_empty_connect_data']					= 'Не заданы данные для соединения';
+$lang['server_command_empty_auth_data']						= 'Не заданы данные для авторизации';
+$lang['server_command_empty_command']						= 'Пустая команда';
+$lang['server_command_not_connected']						= 'Отсутствует соединение';
+$lang['server_command_login_failed']						= 'Авторизация не удалась';
+$lang['server_command_exec_disabled']						= 'Функция exec отключена в настройках PHP';

@@ -209,3 +209,4 @@ $lang['adm_servers_go_to_game']						= 'Перейти к игре';
 
 // 0.9
 $lang['adm_servers_ftp_path_not_found']				= 'На FTP сервере не найден путь к исполняемым файлам (server.sh или server.exe) ';
+$lang['adm_servers_modifications']					= 'Модификации';
