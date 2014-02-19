@@ -25,8 +25,10 @@
  
 class Control_ssh extends CI_Driver {
 	
-	var $_connection = false;
-	var $errors = '';
+	var $_connection 	= false;
+	var $errors 		= '';
+	
+	private $_auth		= false;
 	
 	// ---------------------------------------------------------------------
 	
@@ -61,12 +63,13 @@ class Control_ssh extends CI_Driver {
 			throw new Exception('empty_connect_data');
 		}
 		
+		$this->_auth = false;
 		$this->_connection = ssh2_connect($ip, $port);
 		
 		if (!$this->_connection) {
 			throw new Exception('connection_failed');
 		}
-		
+
 		return $this->_connection;
 	}
 	
@@ -81,11 +84,12 @@ class Control_ssh extends CI_Driver {
 		if(!$login) {
 			throw new Exception('empty_auth_data');
 		}
-		
+
 		if (!ssh2_auth_password($this->_connection, $login, $password)) {
 			throw new Exception('login_failed');
 		}
 		
+		$this->_auth = true;
 		return true;
 		
 	}
@@ -130,8 +134,8 @@ class Control_ssh extends CI_Driver {
 	*/
 	function disconnect()
 	{
-		if ($this->_connection) {
-			ssh2_exec($this->_connection, "exit");
+		if ($this->_connection && $this->_auth) {
+			$this->command('exit');
 		}
 	}
 	
