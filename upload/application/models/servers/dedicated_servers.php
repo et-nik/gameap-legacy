@@ -101,21 +101,12 @@ class Dedicated_servers extends CI_Model {
 	/**
      * Получение списка отправленных команд
      * 
-     * @param bool Если $last_command TRUE, то будет отправлена лишь последняя команда
-     * @return array
-     *
+     * УСТАРЕЛА! В 1.0 версии будет удалена, используйте хелпер ds
     */
 	function get_sended_commands($last_command = false)
 	{
-		if (count($this->_commands) <= 0) {
-			return;
-		}
-		
-		if(false == $last_command) {
-			return $this->_commands;
-		} else {
-			return $this->_commands[count($this->_commands)-1];
-		}
+		$this->load->helper('ds');
+		return get_sended_commands($last_command);
 	}
 	
 	
@@ -201,6 +192,18 @@ class Dedicated_servers extends CI_Model {
 				$this->ds_list[$i]['ftp_login']			= $this->encrypt->decode($this->ds_list[$i]['ftp_login']);
 				$this->ds_list[$i]['ftp_password']		= $this->encrypt->decode($this->ds_list[$i]['ftp_password']);
 				
+				if (!in_array(strtolower($this->ds_list[$i]['control_protocol']), array('ssh', 'telnet', 'local'))) {
+					switch($this->ds_list[$i]['os']) {
+						case 'windows':
+							$this->ds_list[$i]['control_protocol'] = 'telnet';
+							break;
+						
+						default:
+							$this->ds_list[$i]['control_protocol'] = 'ssh';
+							break;
+					}
+				}
+				
 				switch(strtolower($this->ds_list[$i]['control_protocol'])) {
 					case 'ssh':
 						$this->ds_list[$i]['local_server'] 	= false;
@@ -228,7 +231,7 @@ class Dedicated_servers extends CI_Model {
 
 						break;
 					
-					case 'local':
+					default:
 						$this->ds_list[$i]['local_server'] 	= true;
 						$this->ds_list[$i]['script_path'] 	= $this->ds_list[$i]['ssh_path'];
 						break;
@@ -414,28 +417,12 @@ class Dedicated_servers extends CI_Model {
 	/*
 	 * Функция отправляет команду на сервер
 	 * 
+	 * УСТАРЕЛА! В 1.0 версии будет удалена, используйте хелпер ds
 	*/
 	function command($command, $server_data = false, $path = false)
     {
-		$this->load->driver('control');
-		
-		$command = $this->servers->replace_shotcodes($command, $server_data);
-		
-		$path = $path ? $path : $server_data['script_path'];
-		$this->control->set_data(array('os' => $server_data['os'], 'path' => $path));
-		$this->control->set_driver($server_data['control_protocol']);
-
-		try {
-			$this->control->connect($server_data['control_ip'], $server_data['control_port']);
-			$this->control->auth($server_data['control_login'], $server_data['control_password']);
-			$result = $this->control->command($command, $path);
-		} catch (Exception $e) {
-			$result = '';
-			$this->_errors = $e->getMessage();
-		}
-		
-		$this->_commands = $this->control->get_sended_commands();
-		return $result;
+		$this->load->helper('ds');
+		return send_command($command, $server_data, $path);
 	}
 
 }
