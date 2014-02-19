@@ -203,6 +203,7 @@ class Dedicated_servers extends CI_Model {
 				
 				switch(strtolower($this->ds_list[$i]['control_protocol'])) {
 					case 'ssh':
+						$this->ds_list[$i]['local_server'] 	= false;
 						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
 						
 						$explode = explode(':', $this->ds_list[$i]['ssh_host']);
@@ -215,6 +216,7 @@ class Dedicated_servers extends CI_Model {
 						break;
 						
 					case 'telnet':
+						$this->ds_list[$i]['local_server'] 	= false;
 						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['telnet_path'];
 						
 						$explode = explode(':', $this->ds_list[$i]['telnet_host']);
@@ -226,8 +228,9 @@ class Dedicated_servers extends CI_Model {
 
 						break;
 					
-					case 'telnet':
-						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
+					case 'local':
+						$this->ds_list[$i]['local_server'] 	= true;
+						$this->ds_list[$i]['script_path'] 	= $this->ds_list[$i]['ssh_path'];
 						break;
 				}
 
