@@ -30,6 +30,15 @@ class Control_ssh extends CI_Driver {
 	
 	// ---------------------------------------------------------------------
 	
+	public function check()
+	{
+		if(!in_array('ssh2', get_loaded_extensions())){
+			throw new Exception('ssh_not_module');
+		}
+	}
+	
+	// ---------------------------------------------------------------------
+	
 	/**
 	 * Проверяет необходимые права на файл
 	 * 
@@ -55,7 +64,7 @@ class Control_ssh extends CI_Driver {
 		$this->_connection = ssh2_connect($ip, $port);
 		
 		if (!$this->_connection) {
-			return false;
+			throw new Exception('connection_failed');
 		}
 		
 		return $this->_connection;
@@ -70,9 +79,10 @@ class Control_ssh extends CI_Driver {
 		}
 		
 		if (!ssh2_auth_password($this->_connection, $login, $password)) {
-			$this->_connection = false;
-			$this->errors = 'Authorization failed';
-			return false;
+			throw new Exception('login_failed');
+			$this->_auth = false;
+			
+			return;
 		}
 		
 		return true;
@@ -94,8 +104,18 @@ class Control_ssh extends CI_Driver {
 
 		stream_set_blocking($stream, true);
 		$data = stream_get_contents($stream);	
-
+		
 		return $data;
+	}
+	
+	// ----------------------------------------------------------------
+
+	/**
+	 * Выполнение команды
+	*/
+	function exec($command) 
+	{
+		return $this->command($command);
 	}
 	
 	// ----------------------------------------------------------------
@@ -120,3 +140,7 @@ class Control_ssh extends CI_Driver {
 		$this->disconnect();
 	}
 }
+
+
+/* End of file Control_ssh.php */
+/* Location: ./application/libraries/Control/drivers/Control_ssh.php */

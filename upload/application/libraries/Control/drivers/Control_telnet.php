@@ -39,6 +39,11 @@ class Control_telnet extends CI_Driver {
 	
 	private $_prompt = ':> ';
 	
+	public function check()
+	{
+		return true;
+	}
+	
 	// ---------------------------------------------------------------------
 	
 	/**
@@ -75,8 +80,7 @@ class Control_telnet extends CI_Driver {
 		@socket_set_timeout($this->_connection, 5);
 
 		if (!$this->_connection) {
-			throw new Exception('Connection failed');
-			return false;
+			throw new Exception('connection_failed');
 		}
 		
 		$this->_auth = false;
@@ -104,7 +108,7 @@ class Control_telnet extends CI_Driver {
 		 * В Linux при неудачной попытке пишется "Login incorrect"
 		*/
 		if (strpos($auth_string, 'Login Failed') !== false OR strpos($auth_string, 'Login incorrect') !== false) {
-			throw new Exception('Login failed');
+			throw new Exception('auth_failed');
 			$this->_auth = false;
 			return false;
 		}
@@ -245,3 +249,8 @@ class Control_telnet extends CI_Driver {
 
 	}
 }
+
+
+
+/* End of file Control_telnet.php */
+/* Location: ./application/libraries/Control/drivers/Control_telnet.php */

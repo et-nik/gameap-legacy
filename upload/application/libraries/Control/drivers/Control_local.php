@@ -26,6 +26,16 @@
  
 class Control_local extends CI_Driver {
 	
+	// ---------------------------------------------------------------------
+	
+	public function check()
+	{
+		$disabled_functions = explode(',', ini_get('disable_functions'));
+		
+		if (in_array('exec', $this->disabled_functions)) {
+			throw new Exception('exec_disabled');
+		}
+	}
 	
 	// ---------------------------------------------------------------------
 	
@@ -38,25 +48,72 @@ class Control_local extends CI_Driver {
 	public function check_file($file, $privileges = '')
 	{
 		if (!file_exists($file)) {
-			throw new Exception('File not found');
+			throw new Exception('file_not_found');
 			return false;
 		}
 		
 		if (strpos($privileges, 'r') !== false && !is_readable($file)) {
-			throw new Exception('File not readable');
+			throw new Exception('file_not_readable');
 			return false;
 		}
 		
 		if (strpos($privileges, 'w') !== false && !is_writable($file)) {
-			throw new Exception('File not writable');
+			throw new Exception('file_not_writable');
 			return false;
 		}
 		
 		if (strpos($privileges, 'x') !== false && !is_executable($file)) {
-			throw new Exception('File not executable');
+			throw new Exception('file_not_executable');
 			return false;
 		}
 		
 		return true;
 	}
+	
+	// ---------------------------------------------------------------------
+	
+	function connect($ip = false, $port = 0)
+	{
+		return true;
+	}
+	
+	// ---------------------------------------------------------------------
+	
+	function auth($login, $password)
+	{
+		return true;
+	}
+	
+	// ---------------------------------------------------------------------
+	
+	/**
+	 * Выполнение команды
+	*/
+	function command($command)
+	{
+		exec($command, $output);
+		return implode("\n", $output);
+	}
+	
+	// ----------------------------------------------------------------
+
+	/**
+	 * Выполнение команды
+	*/
+	function exec($command) 
+	{
+		return $this->command($command);
+	}
+	
+	// ---------------------------------------------------------------------
+
+	function disconnect()
+	{
+		return;
+	}
+	
 }
+
+
+/* End of file Control_local.php */
+/* Location: ./application/libraries/Control/drivers/Control_local.php */

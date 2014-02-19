@@ -63,11 +63,37 @@ class Control extends CI_Driver_Library {
 	// ---------------------------------------------------------------------
     
     /*
-     * Добавляет sudo к команде
+     * Добавляет sudo 
+     * sudo добавляется только к файлам, к обычным командам не добавляется
+     * 
+     * Примеры:
+     * $this->_add_sudo('wget http://site.com/file.zip'); 						// wget http://site.com/file.zip
+     * $this->_add_sudo('./server.sh start'); 									// sudo ./server.sh start
+     * $this->_add_sudo('./server.sh start && ./server restart'); 				// sudo ./server.sh start && sudo ./server.sh restart
+     * $this->_add_sudo('wget http://site.com/file.zip && ./server.sh start');  // wget http://site.com/file.zip && sudo ./server.sh start
+     * 
     */
 	private function _add_sudo($command) 
 	{
-		switch($this->os){
+		$commands = explode('&&', $command);
+		
+		if (count($commands) > 1) {
+			foreach($commands as &$value) {
+				$return[] = $this->_add_sudo(trim($value));
+			}
+			return implode(' && ', $return);
+		} else {
+			$command = $commands[0];
+		}
+		
+		$explode = explode(' ', $command);
+		// Удаление пустых значение в массиве
+		// $explode = array_values(array_filter($explode,function($el){ return !empty($el);}));
+		if (strpos($explode[0], '.sh') === false) {
+			return $command;
+		}
+
+		switch($this->os) {
 			case 'ubuntu':
 				$command =  'sudo ' . $command;
 				break;
@@ -147,14 +173,14 @@ class Control extends CI_Driver_Library {
 			return false;
 		}
 
-		$cd 		= $path ? $this->_path_proccess($path) : '';
+		$cd 		= $path ? $this->_path_proccess($path) . ' && ' : '';
 		$command 	= $this->_add_sudo($command);
 
 		// Непосредственная отправка команд
-		$final_command = $cd . ' && ' . $command;
+		$final_command = $cd . $command;
 		$this->_sended_commands[] = $final_command;
 
-		return $this->{$this->driver}->command($command);
+		return $this->{$this->driver}->command($final_command);
 	}
 	
 	// ---------------------------------------------------------------------
@@ -165,6 +191,11 @@ class Control extends CI_Driver_Library {
 			return false;
 		}
 		
+		// Проверка возможности работы с драйвером
+		if (!$this->{$this->driver}->check()) {
+			return false;
+		}
+
 		return $this->{$this->driver}->connect($ip, $port);
 	}
 	
@@ -240,3 +271,6 @@ class Control extends CI_Driver_Library {
 		return end($this->_sended_commands);
 	}
 }
+
+/* End of file Control.php */
+/* Location: ./application/libraries/Control/Control.php */
