@@ -554,159 +554,149 @@ class Servers extends CI_Model {
 		$this->load->model('servers/game_types');
 		
 		$this->load->library('encrypt');
-		
-		$return_data = array(); // Возвращаемые данные о сервере
-		
+
 		$query = $this->db->get_where('servers', array('id' => $server_id), 1);
+
+		$this->server_data = $query->row_array();
 		
-		if($query->num_rows > 0) {
-			$this->server_data = $query->row_array();
-			
-			/* Записываем переменную в список */
-			$this->servers_list['0'] = $this->server_data;
-			
-			/* Расшифровываем RCON пароль */
-			$this->server_data['rcon'] = $this->encrypt->decode($this->server_data['rcon']);
-			
-			/* Получаем query и rcon порты */
-			if (!$this->server_data['query_port']) {
-				$this->server_data['query_port'] = $this->server_data['server_port'];
-			}
-			
-			if (!$this->server_data['rcon_port']) {
-				$this->server_data['rcon_port'] = $this->server_data['server_port'];
-			}
-			
-			/* 
-			 * Получение информации об удаленном сервере
-			 * 
-			 * Необходимо, чтобы был указан ds_id (ID выделенного сервере)
-			 * если он будет равен 0 или не будет указан, то сервер
-			 * принимается за локальный
-			 * 
-			*/
-			if (!$no_get_ds && $this->server_data['ds_id']) {
+		if($query->num_rows == 0) {
+			return false;
+		}
+		
+		/* Записываем переменную в список */
+		$this->servers_list['0'] = $this->server_data;
+		
+		/* Расшифровываем RCON пароль */
+		$this->server_data['rcon'] = $this->encrypt->decode($this->server_data['rcon']);
+		
+		/* Получаем query и rcon порты */
+		if (!$this->server_data['query_port']) {
+			$this->server_data['query_port'] = $this->server_data['server_port'];
+		}
+		
+		if (!$this->server_data['rcon_port']) {
+			$this->server_data['rcon_port'] = $this->server_data['server_port'];
+		}
 
-				$where = array('id' => $this->server_data['ds_id']);
-				$this->dedicated_servers->get_ds_list($where, 1);
-				
-				$this->server_ds_data = $this->dedicated_servers->ds_list['0'];
-				
-				// Данные для игрового сервера из машины
-				$this->server_data['os'] = strtolower($this->server_ds_data['os']);
-				
-				$this->server_data['local_server'] = 0;
-				
-				
-				if (!$this->server_ds_data['control_protocol']) {
-					if ($this->server_data['os'] == 'windows') {
-						$control_protocol = 'telnet';
-					} else {
-						$control_protocol = 'ssh';
-					}
-				} else {
-					$control_protocol = strtolower($this->server_ds_data['control_protocol']);
-				}
+		/* 
+		 * Получение информации об удаленном сервере
+		 * 
+		 * Необходимо, чтобы был указан ds_id (ID выделенного сервере)
+		 * если он будет равен 0 или не будет указан, то сервер
+		 * принимается за локальный
+		 * 
+		*/
+		if (!$no_get_ds && $this->server_data['ds_id']) {
 
-				$this->server_data['ftp_host'] = $this->server_ds_data['ftp_host'];
-				$this->server_data['ftp_login'] = $this->server_ds_data['ftp_login'];
-				$this->server_data['ftp_password'] = $this->server_ds_data['ftp_password'];
-				$this->server_data['ftp_passwd'] = $this->server_ds_data['ftp_password'];
-				$this->server_data['ftp_path'] = $this->server_ds_data['ftp_path'];
-				
-				/* Определение пути до скрипта и до steamcmd */
-				switch ($control_protocol) {
-					case 'local':
-						$this->server_data['script_path'] 	= $this->config->config['local_script_path'];
-						$this->server_data['steamcmd_path'] = ($this->config->config['local_steamcmd_path']) ? $this->config->config['local_steamcmd_path'] : $this->config->config['local_script_path'];
-						break;
-						
-					case 'telnet':
-						$this->server_data['script_path'] 	= $this->server_ds_data['telnet_path'];
-						$this->server_data['steamcmd_path'] = ($this->server_ds_data['steamcmd_path']) ? $this->server_ds_data['steamcmd_path'] : $this->server_ds_data['telnet_path'];
-						break;
-
-					default:
-						// По умолчанию SSH
-						$this->server_data['script_path'] 	= $this->server_ds_data['ssh_path'];
-						$this->server_data['steamcmd_path'] = ($this->server_ds_data['steamcmd_path']) ? $this->server_ds_data['steamcmd_path'] : $this->server_ds_data['ssh_path'];
-						break;
-				}
-				
-				//$this->server_data['control_protocol'] = $this->server_ds_data['control_protocol'];
-			} else {
-				$this->server_data['os'] 			= $this->config->config['local_os'];
-				$this->server_data['control_protocol'] = 'local';
-				$this->server_data['script_path'] 	= $this->config->config['local_script_path'];
-				$this->server_data['local_path'] 	= $this->config->config['local_script_path'];
-				$this->server_data['steamcmd_path'] = ($this->config->config['local_steamcmd_path']) ? $this->config->config['local_steamcmd_path'] : $this->config->config['local_script_path'];
-				$this->server_data['local_server'] 	= 1;
-			}
+			$where = array('id' => $this->server_data['ds_id']);
+			$this->dedicated_servers->get_ds_list($where, 1);
 			
-			if (!$no_get_game && $this->server_data['game']) {
-				$where = array('code' => $this->server_data['game']);
-				$this->games->get_games_list($where, 1);
-				
-				$this->server_game_data = $this->games->games_list['0'];
-				$this->server_data['start_code'] = $this->server_game_data['start_code'];
-				$this->server_data['game_name'] = $this->server_game_data['name'];
-				$this->server_data['engine'] = $this->server_game_data['engine'];
-				$this->server_data['engine_version'] = $this->server_game_data['engine_version'];
-				
-			} else {
-				/* Информация об игре не найдена */
-				
-			}
+			$this->server_ds_data =& $this->dedicated_servers->ds_list['0'];
 			
-			if (!$no_get_gt && $this->server_data['game_type']) {
-				$where = array('id' => $this->server_data['game_type']);
-				$this->game_types->get_gametypes_list($where, 1);
+			// Данные для игрового сервера из машины
+			$this->server_data['os'] 			= strtolower($this->server_ds_data['os']);
+			$this->server_data['local_server'] 	= $this->server_ds_data['local_server'];
 
-				$this->server_data['mod_name'] 		= $this->game_types->game_types_list['0']['name'];
-				$this->server_data['config_files'] 	= $this->game_types->game_types_list['0']['config_files'];
-				$this->server_data['content_dirs'] 	= $this->game_types->game_types_list['0']['content_dirs'];
-				$this->server_data['log_dirs'] 		= $this->game_types->game_types_list['0']['log_dirs'];
-				$this->server_data['fast_rcon']		= $this->game_types->game_types_list['0']['fast_rcon'];
-				$this->server_data['aliases_list'] 	= $this->game_types->game_types_list['0']['aliases'];
-				$this->server_data['disk_size'] 	= $this->game_types->game_types_list['0']['disk_size'];
-				
-				if(strtolower($this->server_data['os']) == 'windows') {
-					$execfile_upd = 'steamcmd.exe';
-					$execfile = $this->game_types->game_types_list['0']['execfile_windows'];
-				} else {
-					$execfile_upd = './steamcmd.sh';
-					$execfile = $this->game_types->game_types_list['0']['execfile_linux'];
+			$this->server_data['ftp_host']		= $this->server_ds_data['ftp_host'];
+			$this->server_data['ftp_login'] 	= $this->server_ds_data['ftp_login'];
+			$this->server_data['ftp_password'] 	= $this->server_ds_data['ftp_password'];
+			$this->server_data['ftp_passwd'] 	= $this->server_ds_data['ftp_password'];
+			$this->server_data['ftp_path'] 		= $this->server_ds_data['ftp_path'];
+			
+			$this->server_data['control_protocol'] 	= $this->server_ds_data['control_protocol'];
+			$this->server_data['control_ip'] 		= $this->server_ds_data['control_ip'];
+			$this->server_data['control_port'] 		= $this->server_ds_data['control_port'];
+			$this->server_data['control_login'] 	= $this->server_ds_data['control_login'];
+			$this->server_data['control_password'] 	= $this->server_ds_data['control_password'];
+			
+			/* Определение пути до скрипта и до steamcmd */
+			switch ($this->server_data['control_protocol']) {
+				case 'local':
+					$this->server_data['script_path'] 	= $this->config->config['local_script_path'];
+					$this->server_data['steamcmd_path'] = ($this->config->config['local_steamcmd_path']) ? $this->config->config['local_steamcmd_path'] : $this->config->config['local_script_path'];
+					break;
 					
-					/* Добавляем к линуксу ./ в случае необходимости */
-					if (stripos($execfile, './') === false) {
-						$execfile = './' . $execfile;
-					}
-				}
-				
-				$this->server_data['script_start'] 		= $execfile . ' ' . $this->game_types->game_types_list['0']['script_start'];
-				$this->server_data['script_stop'] 		= $execfile . ' ' . $this->game_types->game_types_list['0']['script_stop'];
-				$this->server_data['script_restart'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_restart'];
-				$this->server_data['script_status'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_status'];
-				$this->server_data['script_update'] 	= $execfile_upd . ' ' . $this->game_types->game_types_list['0']['script_update'];
-				$this->server_data['script_get_console'] = $execfile . ' ' . $this->game_types->game_types_list['0']['script_get_console'];
-				
-				$this->server_data['kick_cmd'] 		= $this->game_types->game_types_list['0']['kick_cmd'];
-				$this->server_data['ban_cmd'] 		= $this->game_types->game_types_list['0']['ban_cmd'];
-				$this->server_data['chname_cmd'] 	= $this->game_types->game_types_list['0']['chname_cmd'];
-				$this->server_data['srestart_cmd'] 	= $this->game_types->game_types_list['0']['srestart_cmd'];
-				$this->server_data['chmap_cmd'] 	= $this->game_types->game_types_list['0']['chmap_cmd'];
-				$this->server_data['sendmsg_cmd'] 	= $this->game_types->game_types_list['0']['sendmsg_cmd'];
-				$this->server_data['passwd_cmd'] 	= $this->game_types->game_types_list['0']['passwd_cmd'];
+				case 'telnet':
+					$this->server_data['script_path'] 	= $this->server_ds_data['telnet_path'];
+					$this->server_data['steamcmd_path'] = ($this->server_ds_data['steamcmd_path']) ? $this->server_ds_data['steamcmd_path'] : $this->server_ds_data['telnet_path'];
+					break;
 
-				
-			} else {
-				/* Информация о модификации игры не найдена */
-				
+				default:
+					// По умолчанию SSH
+					$this->server_data['script_path'] 	= $this->server_ds_data['ssh_path'];
+					$this->server_data['steamcmd_path'] = ($this->server_ds_data['steamcmd_path']) ? $this->server_ds_data['steamcmd_path'] : $this->server_ds_data['ssh_path'];
+					break;
 			}
+			
+		} else {
+			$this->server_data['control_protocol'] = 'local';
+			$this->server_data['os'] 			= $this->config->config['local_os'];
+			$this->server_data['script_path'] 	= $this->config->config['local_script_path'];
+			$this->server_data['local_path'] 	= $this->config->config['local_script_path'];
+			$this->server_data['steamcmd_path'] = ($this->config->config['local_steamcmd_path']) ? $this->config->config['local_steamcmd_path'] : $this->config->config['local_script_path'];
+			$this->server_data['local_server'] 	= true;
+		}
+		
+		// Получение сведений об игре
+		if (!$no_get_game && $this->server_data['game']) {
+			$where = array('code' => $this->server_data['game']);
+			$this->games->get_games_list($where, 1);
+			
+			$this->server_game_data = $this->games->games_list['0'];
+			$this->server_data['start_code'] = $this->server_game_data['start_code'];
+			$this->server_data['game_name'] = $this->server_game_data['name'];
+			$this->server_data['engine'] = $this->server_game_data['engine'];
+			$this->server_data['engine_version'] = $this->server_game_data['engine_version'];
+			
+		} else {
+			/* Информация об игре не найдена */
+			
+		}
+		
+		// Получение сведени о модификации
+		if (!$no_get_gt && $this->server_data['game_type']) {
+			$where = array('id' => $this->server_data['game_type']);
+			$this->game_types->get_gametypes_list($where, 1);
+
+			$this->server_data['mod_name'] 		= $this->game_types->game_types_list['0']['name'];
+			$this->server_data['config_files'] 	= $this->game_types->game_types_list['0']['config_files'];
+			$this->server_data['content_dirs'] 	= $this->game_types->game_types_list['0']['content_dirs'];
+			$this->server_data['log_dirs'] 		= $this->game_types->game_types_list['0']['log_dirs'];
+			$this->server_data['fast_rcon']		= $this->game_types->game_types_list['0']['fast_rcon'];
+			$this->server_data['aliases_list'] 	= $this->game_types->game_types_list['0']['aliases'];
+			$this->server_data['disk_size'] 	= $this->game_types->game_types_list['0']['disk_size'];
+			
+			if(strtolower($this->server_data['os']) == 'windows') {
+				$execfile_upd = 'steamcmd.exe';
+				$execfile = $this->game_types->game_types_list['0']['execfile_windows'];
+			} else {
+				$execfile_upd = './steamcmd.sh';
+				$execfile = $this->game_types->game_types_list['0']['execfile_linux'];
+				
+				/* Добавляем к линуксу ./ в случае необходимости */
+				if (stripos($execfile, './') === false) {
+					$execfile = './' . $execfile;
+				}
+			}
+			
+			$this->server_data['script_start'] 		= $execfile . ' ' . $this->game_types->game_types_list['0']['script_start'];
+			$this->server_data['script_stop'] 		= $execfile . ' ' . $this->game_types->game_types_list['0']['script_stop'];
+			$this->server_data['script_restart'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_restart'];
+			$this->server_data['script_status'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_status'];
+			$this->server_data['script_update'] 	= $execfile_upd . ' ' . $this->game_types->game_types_list['0']['script_update'];
+			$this->server_data['script_get_console'] = $execfile . ' ' . $this->game_types->game_types_list['0']['script_get_console'];
+			
+			$this->server_data['kick_cmd'] 		= $this->game_types->game_types_list['0']['kick_cmd'];
+			$this->server_data['ban_cmd'] 		= $this->game_types->game_types_list['0']['ban_cmd'];
+			$this->server_data['chname_cmd'] 	= $this->game_types->game_types_list['0']['chname_cmd'];
+			$this->server_data['srestart_cmd'] 	= $this->game_types->game_types_list['0']['srestart_cmd'];
+			$this->server_data['chmap_cmd'] 	= $this->game_types->game_types_list['0']['chmap_cmd'];
+			$this->server_data['sendmsg_cmd'] 	= $this->game_types->game_types_list['0']['sendmsg_cmd'];
+			$this->server_data['passwd_cmd'] 	= $this->game_types->game_types_list['0']['passwd_cmd'];
 
 			
 		} else {
-			return false;
+			/* Информация о модификации игры не найдена */
 		}
 
 		return $this->server_data;
