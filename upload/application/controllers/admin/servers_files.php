@@ -64,6 +64,50 @@ class Servers_files extends CI_Controller {
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
+    // ----------------------------------------------------------------
+
+    /**
+     * Получает путь
+     * 
+	 * Иногда запись файлов или чтение может завершаться ошибкой
+	 * причина чаще всего в путях
+	 * 
+	 * Путь для чтения/записи файла генерируется из базы данных
+	 * 
+	 * Локальный путь:
+	 * 	this->servers->server_data['local_path'] - путь к скрипту запуск серверов относительно корня сервера, либо домашней папки пользователя
+	 * 	this->servers->server_data['dir'] - директория игрового сервера относительно скрипта
+	 * 	$s_cfg_files[$cfg_id]['file'] - путь к файлу взятый из json
+	 * 
+	 * Удаленный ftp сервер
+	 * 	$this->servers->server_data['ftp_path'] - путь к скрипту запуск серверов относительно корня сервера, либо домашней папки пользователя
+	 * 	this->servers->server_data['dir'] - директория игрового сервера относительно скрипта
+	 * 	$s_cfg_files[$cfg_id]['file'] - путь к файлу взятый из json
+    */
+    private function _get_path(&$server_data)
+    {
+		$this->load->helper('string');
+		
+		switch(get_file_protocol($this->servers->server_data)) {
+			case 'ftp':
+				$dir = reduce_double_slashes($this->servers->server_data['ftp_path'] . '/' . $this->servers->server_data['dir'] . '/');
+				break;
+				
+			case 'sftp':
+				$dir = reduce_double_slashes($this->servers->server_data['ssh_path'] . '/' . $this->servers->server_data['dir'] . '/');
+				break;
+				
+			case 'local':
+				$dir = reduce_double_slashes($this->servers->server_data['script_path'] . '/' . $this->servers->server_data['dir'] . '/');
+				break;
+				
+			default:
+				$this->_show_message(lang('server_files_driver_not_set'));
+				return false;
+		}
+		
+		return $dir;
+	}
     
     // ----------------------------------------------------------------
 
@@ -125,13 +169,13 @@ class Servers_files extends CI_Controller {
 		$this->servers->get_server_data($server_id);
 		
 		/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
-		if ($this->servers->server_data['ds_id'] 
-			&& !$this->servers->server_data['ftp_host']
-			&& !$this->servers->server_data['ssh_host']
-			) {
-			$this->_show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_files'));
-			return false;
-		}
+		//~ if ($this->servers->server_data['ds_id'] 
+			//~ && !$this->servers->server_data['ftp_host']
+			//~ && !$this->servers->server_data['ssh_host']
+			//~ ) {
+			//~ $this->_show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_files'));
+			//~ return false;
+		//~ }
 		
 		/* Получение данных сервера для шаблона */
 		$local_tpl_data['server_id'] = $this->servers->server_data['id'];
@@ -202,6 +246,8 @@ class Servers_files extends CI_Controller {
     */
 	public function edit_config($server_id = false, $cfg_id = false)
     {
+		$this->load->helper('ds');
+
 		/* 
 		 * Если не указан id сервера, то перенаправляем на
 		 * страницу выбора 
@@ -238,27 +284,9 @@ class Servers_files extends CI_Controller {
 			$this->_show_message(lang('server_files_cfg_not_found'));
 			return false;
 		}
-		
-		$file = &$s_cfg_files[$cfg_id]['file'];
-		$dir = $this->servers->server_data['script_path'] . '/' . $this->servers->server_data['dir'] . '/';
-		
-		/*
-		 * Иногда запись файлов или чтение может завершаться ошибкой
-		 * причина чаще всего в путях
-		 * 
-		 * Путь для чтения/записи файла генерируется из базы данных
-		 * 
-		 * Локальный путь:
-		 * 	this->servers->server_data['local_path'] - путь к скрипту запуск серверов относительно корня сервера, либо домашней папки пользователя
-		 * 	this->servers->server_data['dir'] - директория игрового сервера относительно скрипта
-		 * 	$s_cfg_files[$cfg_id]['file'] - путь к файлу взятый из json
-		 * 
-		 * Удаленный ftp сервер
-		 * 	$this->servers->server_data['ftp_path'] - путь к скрипту запуск серверов относительно корня сервера, либо домашней папки пользователя
-		 * 	this->servers->server_data['dir'] - директория игрового сервера относительно скрипта
-		 * 	$s_cfg_files[$cfg_id]['file'] - путь к файлу взятый из json
-		 * 
-		*/
+
+		$file =& $s_cfg_files[$cfg_id]['file'];
+		$dir = $this->_get_path($this->servers->server_data);
 		
 		if(!$this->input->post('submit')) {
 			
@@ -267,17 +295,19 @@ class Servers_files extends CI_Controller {
 			 * в этом случае показываем содержимое конфигурационного файла
 			 * в textarea 
 			*/
-			$file_contents = $this->servers->read_file($s_cfg_files[$cfg_id]['file']);
-			
-			if($file_contents === false) {
-				$adm_message = '';
+			try {
+				$file_contents = read_ds_file($dir . $file, $this->servers->server_data);
 				
-				// Отображаем админу дополнительную информацию
-				if ($this->users->auth_data['is_admin']) {
-					$adm_message = '<p align="center">' . lang('file') . ': <strong>"' . $dir . $file . '"</strong></p>';
-				}
+				$local_tpl_data['file_contents'] 		= $file_contents;
+				$local_tpl_data['file_name'] 			= basename($file);
+				$local_tpl_data['id_cfg'] 				= (int)$cfg_id;
+				$local_tpl_data['cfg_id']				= (int)$cfg_id;
+				$local_tpl_data['server_id'] 			= $server_id;
 				
-				$this->_show_message($this->servers->errors . $adm_message);
+				$this->tpl_data['content'] .= $this->parser->parse('servers/edit_file.html', $local_tpl_data, true);
+				
+			} catch (Exception $e) {
+				$message = lang($e->getMessage());
 				
 				/* Сохраняем логи */
 				$log_data['type'] = 'server_files';
@@ -288,18 +318,14 @@ class Servers_files extends CI_Controller {
 				$log_data['log_data'] = 'File: ' . $dir . $file . "\n";
 				$this->panel_log->save_log($log_data);
 				
+				// Отображаем админу дополнительную информацию
+				if ($this->users->auth_data['is_admin']) {
+					$message .= '<p align="center">' . lang('file') . ': <strong>"' . $dir . $file . '"</strong></p>';
+				}
+				
+				$this->_show_message($message);
 				return false;
 			}
-			
-			// $file_contents = iconv('windows-1251', 'UTF-8', $file_contents);
-			
-			$local_tpl_data['file_contents'] 		= $file_contents;
-			$local_tpl_data['file_name'] 			= basename($s_cfg_files[$cfg_id]['file']);
-			$local_tpl_data['id_cfg'] 				= (int)$cfg_id;
-			$local_tpl_data['cfg_id']				= (int)$cfg_id;
-			$local_tpl_data['server_id'] 			= $server_id;
-			
-			$this->tpl_data['content'] .= $this->parser->parse('servers/edit_file.html', $local_tpl_data, true);
 			
 		} else {
 			/*
@@ -307,19 +333,33 @@ class Servers_files extends CI_Controller {
 			 * сохраняем содержимое конфига на сервере
 			*/
 			
-			$cfg_data = $this->input->post('file_contents');
-			$write_result = $this->servers->write_file($file, $cfg_data);
-			
-			if(!$write_result) {
+			$cfg_data = $this->input->post('file_contents', true);
+
+			try {
+				$file_contents = write_ds_file($dir . $file, $cfg_data, $this->servers->server_data);
 				
-				$adm_message = '';
+				$this->_show_message(lang('server_files_data_writed'), site_url('admin/servers_files/server/' . $server_id), lang('next'));
+				
+				$log_data['type'] = 'server_files';
+				$log_data['command'] = 'edit_config';
+				$log_data['user_name'] = $this->users->auth_login;
+				$log_data['server_id'] = $this->servers->server_data['id'];
+				$log_data['msg'] = 'Config edit success';
+				$log_data['log_data'] = 'Config file: ' . $dir . '/' . $file  . "\n";
+				$this->panel_log->save_log($log_data);
+				
+				return true;
+				
+			} catch (Exception $e) {
+				
+				$message = lang($e->getMessage());
 				
 				// Отображаем админу дополнительную информацию
-				if($this->users->auth_data['is_admin']) {
-					$adm_message = '<p align="center">' . lang('file') . ': <strong>"' . $dir . $file . '"</strong></p>';
+				if ($this->users->auth_data['is_admin']) {
+					$message .= '<p align="center">' . lang('file') . ': <strong>"' . $dir . $file . '"</strong></p>';
 				}
 				
-				$this->_show_message($this->servers->errors . $adm_message);
+				$this->_show_message($message);
 				
 				/* Сохраняем логи */
 				$log_data['type'] = 'server_files';
@@ -333,19 +373,6 @@ class Servers_files extends CI_Controller {
 				return false;
 			}
 			
-			$this->_show_message(lang('server_files_data_writed'), site_url('admin/servers_files/server/' . $server_id), lang('next'));
-			
-			// Пишем логи
-			
-			$log_data['type'] = 'server_files';
-			$log_data['command'] = 'edit_config';
-			$log_data['user_name'] = $this->users->auth_login;
-			$log_data['server_id'] = $this->servers->server_data['id'];
-			$log_data['msg'] = 'Config edit success';
-			$log_data['log_data'] = 'Config file: ' . $dir . '/' . $s_cfg_files[$cfg_id]['file']  . "\n";
-			$this->panel_log->save_log($log_data);
-			
-			return true;
 		}
 			
 		$this->parser->parse('main.html', $this->tpl_data);
@@ -362,6 +389,10 @@ class Servers_files extends CI_Controller {
     */
 	public function upload($server_id = false, $dir_id = false)
     {
+		$this->load->helper('ds');
+		$this->load->helper('string');
+		$this->load->driver('files');
+		
 		/* 
 		 * Если не указан id сервера, то перенаправляем на
 		 * страницу выбора 
@@ -390,12 +421,6 @@ class Servers_files extends CI_Controller {
 		/* Получение данных сервера */
 		$this->servers->get_server_data($server_id);
 		
-		/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
-		if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']){
-			$this->_show_message(lang('server_files_ftp_not_set'));
-			return false;
-		}
-		
 		$s_content_dirs = json_decode($this->servers->server_data['content_dirs'], true);
 		
 		/* Проверяем, правильно ли указан ID контент директории */
@@ -404,18 +429,12 @@ class Servers_files extends CI_Controller {
 			return false;
 		}
 		
-		$tmp_dir = set_realpath(sys_get_temp_dir());
-		
-		/* Определение, является сервер локальным или удаленным */
-		if($this->servers->server_data['local_server']) {
-			$dir = $this->servers->server_data['local_path'] . '/' . $this->servers->server_data['dir'] . '/' . $s_content_dirs[$dir_id]['path'];
-		}else{
-			$dir = sys_get_temp_dir();
-		}
-		
-		$upload_config['upload_path'] = $dir;
-		$upload_config['overwrite'] = true;
-		$upload_config['max_filename'] = 64;
+		$tmp_dir = sys_get_temp_dir();
+		$remdir = $this->_get_path($this->servers->server_data) . $s_content_dirs[$dir_id]['path'] . '/';
+
+		$upload_config['upload_path'] 	= $tmp_dir;
+		$upload_config['overwrite'] 	= true;
+		$upload_config['max_filename'] 	= 64;
 		$upload_config['allowed_types'] = $s_content_dirs[$dir_id]['allowed_types'];
 		
 		$this->load->library('upload', $upload_config);
@@ -427,58 +446,20 @@ class Servers_files extends CI_Controller {
 			
 			$file_data = $this->upload->data();
 			
-			/* Если сервер удаленный, то загружаем на фтп */
-			if(!$this->servers->server_data['local_server']) {
-				$remote_file = $this->servers->server_data['ftp_path'] . '/' . $this->servers->server_data['dir'] . '/' . $s_content_dirs[$dir_id]['path'] . '/' . $file_data['orig_name'];
+			$config = get_file_protocol_config($this->servers->server_data);
+			
+			try {
+				$this->files->set_driver($config['driver']);
+				$this->files->connect($config);
+				$this->files->upload($file_data['full_path'], $remdir . $file_data['orig_name']);
+				unlink($file_data['full_path']);
 				
-				/* 
-				 * $file_data['full_path'] - Абсолютный серверный путь к файлу, включая имя файла
-				 * смотри http://cidocs.ru/210/libraries/file_uploading.html 
-				*/
-
-				if(!$this->servers->upload_remote_file($file_data['full_path'], $remote_file)) {
-					unlink($file_data['full_path']);
-					
-					$this->_show_message($this->servers->errors);
-					
-					/* Сохраняем логи */
-					$log_data['type'] = 'server_files';
-					$log_data['type'] = 'upload_file';
-					$log_data['user_name'] = $this->users->auth_login;
-					$log_data['server_id'] = $this->servers->server_data['id'];
-					$log_data['msg'] = 'Upload file failed';
-					$log_data['log_data'] = 'Directory: ' . $this->servers->server_data['ftp_path'] . '/' . $this->servers->server_data['dir'] . '/' . $s_content_dirs[$dir_id]['path'] . ' File name: ' . $file_data['orig_name'] . "\n";
-					$this->panel_log->save_log($log_data);
-					
-					return false;
-				} else {
-					/* Удаление временного файла */
-					unlink($file_data['full_path']);
-					
-					/* Обнуляем список кешированных карт сервера */
-					$server_data['maps_list'] = '';
-					$this->servers->edit_game_server($this->servers->server_data['id'], $server_data);
-					
-					$message = lang('server_files_upload_successful', $file_data['orig_name'], $s_content_dirs[$dir_id]['path']);
-					$this->_show_message($message, site_url('admin/servers_files/server/' . $server_id), lang('server_files_upload_successful'));
-				
-					/* Сохраняем логи */
-					$log_data['type'] = 'server_files';
-					$log_data['command'] = 'upload_file';
-					$log_data['user_name'] = $this->users->auth_login;
-					$log_data['server_id'] = $this->servers->server_data['id'];
-					$log_data['msg'] = 'Upload file success';
-					$log_data['log_data'] = 'Directory: ' . $s_content_dirs[$dir_id]['path'] . ' File name: ' . $file_data['orig_name'] . "\n";
-					$this->panel_log->save_log($log_data);
-					
-					return true;
-				}
-				
-			} else {
-				// Файл был загружен на локальный сервер
+				/* Обнуляем список кешированных карт сервера */
+				$server_data['maps_list'] = '';
+				$this->servers->edit_game_server($this->servers->server_data['id'], $server_data);
 				
 				$message = lang('server_files_upload_successful', $file_data['orig_name'], $s_content_dirs[$dir_id]['path']);
-				$this->_show_message($message, site_url('admin/servers_files/server/' . $server_id), 'Далее');
+				$this->_show_message($message, site_url('admin/servers_files/server/' . $server_id), lang('server_files_upload_successful'));
 				
 				/* Сохраняем логи */
 				$log_data['type'] = 'server_files';
@@ -486,11 +467,26 @@ class Servers_files extends CI_Controller {
 				$log_data['user_name'] = $this->users->auth_login;
 				$log_data['server_id'] = $this->servers->server_data['id'];
 				$log_data['msg'] = 'Upload file success';
-				$log_data['log_data'] = 'Directory: ' . $s_content_dirs[$dir_id]['path'] . ' File name: ' . $file_data['orig_name'] . "\n";
+				$log_data['log_data'] = 'Directory: ' . $remdir . ' File name: ' . $file_data['orig_name'] . "\n";
 				$this->panel_log->save_log($log_data);
 				
-				return true;
+			} catch (Exception $e) {
 				
+				unlink($file_data['full_path']);
+				
+				$message = lang($e->getMessage());
+				
+				/* Сохраняем логи */
+				$log_data['type'] = 'server_files';
+				$log_data['command'] = 'upload_file';
+				$log_data['user_name'] = $this->users->auth_login;
+				$log_data['server_id'] = $this->servers->server_data['id'];
+				$log_data['msg'] = $message;
+				$log_data['log_data'] = 'Directory: ' . $remdir . ' File name: ' . $file_data['orig_name'] . "\n";
+				$this->panel_log->save_log($log_data);
+				
+				$this->_show_message($message);
+				return false;
 			}
 			
 		}
