@@ -29,6 +29,7 @@ class Files_sftp extends CI_Driver {
 	var $password	= '';
 	var $port		= 22;
 	var $debug		= FALSE;
+	var $conn		= FALSE;
 	var $conn_sftp	= FALSE;
         var $login_via_key = FALSE;
         var $public_key_url = '';
@@ -49,6 +50,13 @@ class Files_sftp extends CI_Driver {
 		}
 		
 		log_message('debug', "SFTP Class Initialized");
+	}
+	
+	// ---------------------------------------------------------------------
+	
+	public function check()
+	{
+		return true;
 	}
 
 	// --------------------------------------------------------------------
@@ -94,12 +102,9 @@ class Files_sftp extends CI_Driver {
 		$this->conn = ssh2_connect($this->hostname, $this->port);
 		
 		// Try and login...
-		if ( ! $this->_login())
+		if (!$this->_login())
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('sftp_unable_to_login_to_ssh');
-			}
+			$this->_error('sftp_unable_to_login_to_ssh');
 			return FALSE;
 		}
 		
@@ -107,10 +112,7 @@ class Files_sftp extends CI_Driver {
 		// If successful, set this resource as a global variable.
 		if (FALSE === ($this->conn_sftp = @ssh2_sftp($this->conn)))
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('sftp_unable_to_open_sftp_resource');
-			}
+			$this->_error('sftp_unable_to_open_sftp_resource');
 			return FALSE;
 		}
 		
@@ -131,10 +133,7 @@ class Files_sftp extends CI_Driver {
             if (@ssh2_auth_pubkey_file($this->conn, $this->username, $this->public_key_url, $this->private_key_url, $this->password)) {
                 return true;
             } else {
-				if ($this->debug == TRUE)
-				{
-					$this->_error('sftp_unable_to_connect_with_public_key');
-				}
+				$this->_error('sftp_unable_to_connect_with_public_key');
                 return false;
             }
         } else {
@@ -154,10 +153,7 @@ class Files_sftp extends CI_Driver {
 	{
 		if ( ! is_resource($this->conn_sftp))
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('sftp_no_connection');
-			}
+			$this->_error('sftp_no_connection');
 			return FALSE;
 		}
 		return TRUE;
@@ -176,14 +172,10 @@ class Files_sftp extends CI_Driver {
 	{		
 		$tempArray = array();
 
-		if (!is_readable($dir)) {
-			return array();
-		}
-
 		$handle = opendir($dir);
 
 		if (!$handle) {
-			return array();
+			return false;
 		}
 		
 		// List all the files
@@ -234,10 +226,7 @@ class Files_sftp extends CI_Driver {
 		
 		if ($result === FALSE)
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('sftp_unable_to_makdir');
-			}
+			$this->_error('sftp_unable_to_makdir');
 			return FALSE;
 		}
 		
@@ -263,10 +252,7 @@ class Files_sftp extends CI_Driver {
 		
 		if ( ! file_exists($locpath))
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('sftp_no_source_file');
-			}
+			$this->_error('sftp_no_source_file');
 			return FALSE;
 		}
 		
@@ -275,10 +261,7 @@ class Files_sftp extends CI_Driver {
 		
 		if ($stream === FALSE)
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('sftp_unable_to_upload');
-			}
+			$this->_error('sftp_unable_to_upload');
 			return FALSE;
 		}
 		
@@ -286,10 +269,7 @@ class Files_sftp extends CI_Driver {
 		
 		if (@fwrite($stream, $data_to_send) === false)
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('sftp_unable_to_send_data');
-			}
+			$this->_error('sftp_unable_to_send_data');
 			return FALSE;
 		}
 		
@@ -321,10 +301,7 @@ class Files_sftp extends CI_Driver {
 		
 		if ($stream === false)
 		{
-			if ($this->debug == true)
-			{
-				$this->_error('sftp_unable_to_download');
-			}
+			$this->_error('ftp_unable_to_download');
 			return FALSE;
 		}
 		
@@ -356,29 +333,11 @@ class Files_sftp extends CI_Driver {
 		
 		if ($result === FALSE)
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('ftp_unable_to_rename');
-			}
+			$this->_error('sftp_unable_to_rename');
 			return FALSE;
 		}
 		
 		return TRUE;
-	}
-	
-	// --------------------------------------------------------------------
-
-	/**
-	 * Move a file
-	 *
-	 * @access	public
-	 * @param	string
-	 * @param	string
-	 * @return	bool
-	 */
-	function move($old_file, $new_file)
-	{
-		return $this->rename($old_file, $new_file, TRUE);
 	}
 
 	// --------------------------------------------------------------------
@@ -402,10 +361,7 @@ class Files_sftp extends CI_Driver {
 		
 		if ($result === FALSE)
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('sftp_unable_to_delete');
-			}
+			$this->_error('sftp_unable_to_delete');
 			return FALSE;
 		}
 		
@@ -436,10 +392,7 @@ class Files_sftp extends CI_Driver {
 		
 		if ($result === FALSE)
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('sftp_unable_to_delete');
-			}
+			$this->_error('sftp_unable_to_delete');
 			return FALSE;
 		}
 		
@@ -501,19 +454,13 @@ class Files_sftp extends CI_Driver {
 		
 		if ($stream === FALSE)
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('sftp_unable_to_upload');
-			}
+			$this->_error('sftp_unable_to_upload');
 			return FALSE;
 		}
 		
 		if (@fwrite($stream, $data_to_send) === false)
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('sftp_unable_to_send_data');
-			}
+			$this->_error('sftp_unable_to_send_data');
 			return FALSE;
 		}
 		
@@ -525,17 +472,14 @@ class Files_sftp extends CI_Driver {
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Display error message
+	 * Выкидывание исключения
 	 *
 	 * @access	private
 	 * @param	string
-	 * @return	bool
 	 */
-	function _error($line)
+	function _error($msg)
 	{
-		$CI =& get_instance();
-		$CI->lang->load('sftp');
-		show_error($CI->lang->line($line));
+		throw new Exception($msg);
 	}
 	
 	// ------------------------------------------------------------------------
@@ -579,7 +523,7 @@ class Files_sftp extends CI_Driver {
 				}
 			}
 		} else {
-			if (in_array($file, $list_base_name)) {
+			if (in_array($sfile, $list_base_name)) {
 				return $dir;
 			}
 		}

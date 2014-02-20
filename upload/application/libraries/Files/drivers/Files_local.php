@@ -35,6 +35,13 @@ class Files_local extends CI_Driver {
 		return true;
 	}
 	
+	// ---------------------------------------------------------------------
+	
+	public function check()
+	{
+		return true;
+	}
+	
 	// --------------------------------------------------------------------
 	
 	/**
@@ -42,7 +49,17 @@ class Files_local extends CI_Driver {
 	 */
 	public function upload($locpath, $rempath, $mode = 'auto', $permissions = NULL)
 	{
-		return copy($locpath, $rempath);
+		if (!file_exists($locpath)) {
+			$this->_error('server_files_no_source_file');
+		}
+		
+		$result = @copy($locpath, $rempath);
+		
+		if (!$result) {
+			$this->_error('server_files_unable_to_upload');
+		}
+		
+		return true;
 	}
 	
 	// --------------------------------------------------------------------
@@ -102,7 +119,13 @@ class Files_local extends CI_Driver {
 	 */
 	public function delete_dir($filepath)
 	{
-		return rmdir($filepath);
+		$result = rmdir($filepath);
+		
+		if (!$result) {
+			$this->_error('server_files_unable_to_delete');
+		}
+		
+		return true;
 	}
 	
 	// --------------------------------------------------------------------
@@ -112,7 +135,13 @@ class Files_local extends CI_Driver {
 	 */
 	public function delete_file($filepath)
 	{
-		return unlink($filepath);
+		$result = unlink($filepath);
+		
+		if (!$result) {
+			$this->_error('server_files_unable_to_delete');
+		}
+		
+		return true;
 	}
 	
 	// --------------------------------------------------------------------
@@ -122,7 +151,11 @@ class Files_local extends CI_Driver {
 	 */
 	public function download($rempath, $locpath)
 	{
-		return copy($rempath, $locpath);
+		if (!copy($rempath, $locpath)) {
+			$this->_error('server_files_unable_to_download');
+		}
+
+		return true;
 	}
 	
 	// --------------------------------------------------------------------
@@ -188,7 +221,13 @@ class Files_local extends CI_Driver {
 	 */
 	public function mkdir($path = '', $permissions = NULL)
 	{
-		return mkdir($path, $permissions);
+		$result = mkdir($path, $permissions);
+		
+		if (!$result) {
+			$this->_error('server_files_unable_to_makdir');
+		}
+		
+		return true;
 	}
 	
 	// --------------------------------------------------------------------
@@ -199,10 +238,17 @@ class Files_local extends CI_Driver {
 	public function rename($old_file, $new_file)
 	{
 		if (!file_exists($old_file)) {
-			return false;
+			$this->_error('server_files_file_not_found');
 		}
 		
-		return rename($old_file, $new_file);
+		$result = rename($old_file, $new_file);
+		
+		if (!$result) {
+			$msg = ($move == FALSE) ? 'server_files_unable_to_rename' : 'server_files_unable_to_move';
+			$this->_error($msg);
+		}
+		
+		return true;
 	}
 	
 	// --------------------------------------------------------------------
@@ -213,5 +259,18 @@ class Files_local extends CI_Driver {
 	public function move($old_file, $new_file)
 	{
 		return $this->rename($old_file, $new_file);
+	}
+	
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Выкидывание исключения
+	 *
+	 * @access	private
+	 * @param	string
+	 */
+	function _error($msg)
+	{
+		throw new Exception($msg);
 	}
 }

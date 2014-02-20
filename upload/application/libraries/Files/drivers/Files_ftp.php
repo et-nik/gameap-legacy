@@ -50,6 +50,13 @@ class Files_ftp extends CI_Driver {
 
 		log_message('debug', "FTP Class Initialized");
 	}
+	
+	// ---------------------------------------------------------------------
+	
+	public function check()
+	{
+		return true;
+	}
 
 	// --------------------------------------------------------------------
 
@@ -92,19 +99,13 @@ class Files_ftp extends CI_Driver {
 
 		if (FALSE === ($this->conn_id = @ftp_connect($this->hostname, $this->port)))
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('ftp_unable_to_connect');
-			}
+			$this->_error('ftp_unable_to_connect');
 			return FALSE;
 		}
 
 		if ( ! $this->_login())
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('ftp_unable_to_login');
-			}
+			$this->_error('ftp_unable_to_login');
 			return FALSE;
 		}
 
@@ -142,10 +143,7 @@ class Files_ftp extends CI_Driver {
 	{
 		if ( ! is_resource($this->conn_id))
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('ftp_no_connection');
-			}
+			$this->_error('ftp_no_connection');
 			return FALSE;
 		}
 		return TRUE;
@@ -179,10 +177,7 @@ class Files_ftp extends CI_Driver {
 
 		if ($result === FALSE)
 		{
-			if ($this->debug == TRUE AND $supress_debug == FALSE)
-			{
-				$this->_error('ftp_unable_to_changedir');
-			}
+			$this->_error('ftp_unable_to_changedir');
 			return FALSE;
 		}
 
@@ -209,11 +204,7 @@ class Files_ftp extends CI_Driver {
 
 		if ($result === FALSE)
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('ftp_unable_to_makdir');
-			}
-			return FALSE;
+			$this->_error('ftp_unable_to_makdir');
 		}
 
 		// Set file permissions if needed
@@ -263,10 +254,7 @@ class Files_ftp extends CI_Driver {
 
 		if ($result === FALSE)
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('ftp_unable_to_upload');
-			}
+			$this->_error('ftp_unable_to_upload');
 			return FALSE;
 		}
 
@@ -311,10 +299,7 @@ class Files_ftp extends CI_Driver {
 
 		if ($result === FALSE)
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('ftp_unable_to_download');
-			}
+			$this->_error('ftp_unable_to_download');
 			return FALSE;
 		}
 
@@ -343,12 +328,8 @@ class Files_ftp extends CI_Driver {
 
 		if ($result === FALSE)
 		{
-			if ($this->debug == TRUE)
-			{
-				$msg = ($move == FALSE) ? 'ftp_unable_to_rename' : 'ftp_unable_to_move';
-
-				$this->_error($msg);
-			}
+			$msg = ($move == FALSE) ? 'ftp_unable_to_rename' : 'ftp_unable_to_move';
+			$this->_error($msg);
 			return FALSE;
 		}
 
@@ -390,10 +371,7 @@ class Files_ftp extends CI_Driver {
 
 		if ($result === FALSE)
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('ftp_unable_to_delete');
-			}
+			$this->_error('ftp_unable_to_delete');
 			return FALSE;
 		}
 
@@ -439,10 +417,7 @@ class Files_ftp extends CI_Driver {
 
 		if ($result === FALSE)
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('ftp_unable_to_delete');
-			}
+			$this->_error('ftp_unable_to_delete');
 			return FALSE;
 		}
 
@@ -469,10 +444,7 @@ class Files_ftp extends CI_Driver {
 		// Permissions can only be set when running PHP 5
 		if ( ! function_exists('ftp_chmod'))
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('ftp_unable_to_chmod');
-			}
+			$this->_error('ftp_unable_to_chmod');
 			return FALSE;
 		}
 
@@ -480,10 +452,7 @@ class Files_ftp extends CI_Driver {
 
 		if ($result === FALSE)
 		{
-			if ($this->debug == TRUE)
-			{
-				$this->_error('ftp_unable_to_chmod');
-			}
+			$this->_error('ftp_unable_to_chmod');
 			return FALSE;
 		}
 
@@ -700,17 +669,14 @@ class Files_ftp extends CI_Driver {
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Display error message
+	 * Выкидывание исключения
 	 *
 	 * @access	private
 	 * @param	string
-	 * @return	bool
 	 */
-	function _error($line)
+	function _error($msg)
 	{
-		$CI =& get_instance();
-		$CI->lang->load('ftp');
-		show_error($CI->lang->line($line));
+		throw new Exception($msg);
 	}
 
 
