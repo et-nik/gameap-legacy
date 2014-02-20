@@ -59,9 +59,11 @@ class Cron extends MX_Controller {
 		$this->load->model('servers/game_types');
 		
 		$this->load->driver('control');
+		$this->load->driver('files');
 		$this->load->driver('rcon');
 		$this->load->driver('installer');
 		
+		$this->load->helper('ds');
 		//~ $this->load->library('ssh');
 		//~ $this->load->library('telnet');
 		$this->load->library('query');
@@ -69,6 +71,58 @@ class Cron extends MX_Controller {
 		set_time_limit(0);
 		$this->load->database();
     }
+    
+    // -----------------------------------------------------------------------
+	
+	/**
+	 * По ответу на команду, отправленную на физ. сервер получает
+	 * понятный пользователю ответ.
+	 * 
+	 * Можно было бы применить switch case, это было бы удобнее, 
+	 * но ответ может состоять более чем из одной строки
+	 * 
+	 */
+	private function _get_message($response = '', $server_id = '')
+	{
+		if (strpos($response, 'Server is already running') !== false) {
+			/* Сервер запущен ранее */
+			$message = lang('server_command_server_is_already_running', site_url('server_command/restart/'. $server_id), site_url('server_command/stop/' . $server_id));
+			
+		} elseif(strpos($response, 'Server started') !== false) {
+			/* Сервер успешно запущен */
+			$message = lang('server_command_started');
+			
+		} elseif(strpos($response, 'Server not started') !== false) {
+			// Неудачный запуск
+			$message = lang('server_command_start_failed');
+			
+		} elseif(strpos($response, 'Coulnd\'t find a running server') !== false) {
+			// Не найден запущенный сервер
+			$message = lang('server_command_running_server_not_found');
+			
+		} elseif(strpos($response, 'Server restarted') !== false) {
+			// Сервер перезапущен
+			$message = lang('server_command_restarted');
+			
+		} elseif(strpos($response, 'Server not restarted') !== false) {
+			// Сервер не перезапущен
+			$message = lang('server_command_restart_failed');
+			
+		} elseif(strpos($response, 'Server stopped') !== false) {
+			// Сервер остановлен
+			$message = lang('server_command_stopped');
+			
+		} elseif(strpos($response, 'Server not stopped') !== false) {
+			// Сервер не остановлен
+			$message = lang('server_command_stop_failed');
+
+		} else {
+			// Команда отправлена
+			$message = lang('server_command_cmd_sended');
+		}
+		
+		return $message;
+	}
     
     // ----------------------------------------------------------------
     
@@ -190,10 +244,12 @@ class Cron extends MX_Controller {
 				
 				break;
 		}
-			
-		if ($this->servers->command($commands, $this->servers_data[$server_id])) {
-			return true;
-		} else {
+		
+		try { 
+			$result = send_command($commands, $this->servers_data[$server_id]);
+			return $result;
+		} catch (Exception $e) {
+			$this->_cron_result .= $e->getMessage() . "\n";
 			return false;
 		}
 	}
@@ -277,10 +333,20 @@ class Cron extends MX_Controller {
 				} 
 			}
 			
-			$this->_install_result .= $this->servers->command($commands, $this->servers_data[$server_id], $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']);
+			try { 
+				$this->_install_result = send_command(
+								$commands,
+								$this->servers_data[$server_id], 
+								$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+				);
+				
+				return true;
+				
+			} catch (Exception $e) {
+				$this->_cron_result .= $e->getMessage() . "\n";
+				return false;
+			}
 			
-			return true;
-
 		} elseif ($rep_type == 'remote') {
 			/* Удаленный репозиторий */
 			
@@ -294,17 +360,18 @@ class Cron extends MX_Controller {
 					break;
 			}
 			
-			$this->_install_result .= $this->servers->command(
-										$command,
-										$this->servers_data[$server_id], 
-										$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-			);
+			try { 
+				$this->_install_result = send_command(
+								$commands,
+								$this->servers_data[$server_id], 
+								$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+				);
+				return true;
+			} catch (Exception $e) {
+				$this->_cron_result .= $e->getMessage() . "\n";
+				return false;
+			}
 			
-			//~ if ($result) {
-				//~ return true;
-			//~ }
-			return true;
-
 		} else {
 			return false;
 		}
@@ -331,17 +398,20 @@ class Cron extends MX_Controller {
 				$commands[] = 'unzip -o ' . basename($pack_file) . ' && rm ' . basename($pack_file);
 				break;
 		}
-
-		$result = $this->servers->command(
-									$commands,
-									$this->servers_data[$server_id], 
-									$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-		);
 		
-		if ($result) {
-			$this->_install_result .= $result;
+		try { 
+			$this->_install_result .= send_command(
+							$commands,
+							$this->servers_data[$server_id], 
+							$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+			);
+			
 			return true;
+		} catch (Exception $e) {
+			$this->_cron_result .= $e->getMessage() . "\n";
+			return false;
 		}
+
 	}
 
 	// ----------------------------------------------------------------
@@ -375,9 +445,13 @@ class Cron extends MX_Controller {
 				break;
 		}
 		
-		$result = $this->servers->command($command, $this->servers_data[$server_id], $this->servers_data[$server_id]['steamcmd_path']);
-		
-		$this->_install_result .= $result;
+		try { 
+			$result = send_command($command, $this->servers_data[$server_id], $this->servers_data[$server_id]['steamcmd_path']);
+			$this->_install_result .= $result;
+		} catch (Exception $e) {
+			$this->_cron_result .= $e->getMessage() . "\n";
+			return false;
+		}
 
 		if(strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' fully installed.') !== false
 			OR strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' already up to date.') !== false
@@ -703,122 +777,138 @@ class Cron extends MX_Controller {
 			// Выполняем задание
 			switch($task_list[$i]['code']) {
 				case 'server_start':
-
-					if($response = $this->servers->start($this->servers_data[$server_id])) {
+				
+					try {
+						$response = $this->servers->start($this->servers_data[$server_id]);
+						$message = $this->_get_message($response);
+						
 						$cron_success = true;
 						$cron_stats['success'] ++;
 
 						$this->_cron_result .= 'Task: server #' . $server_id . '  start success' . "\n";
 
 						// Сохраняем логи
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'start';
-						$log_data['server_id'] = $server_id;
-						$log_data['msg'] = 'Start server success';
-						$log_data['log_data'] = $response;
+						$log_data['type'] 		= 'server_command';
+						$log_data['command'] 	= 'start';
+						$log_data['server_id'] 	= $server_id;
+						$log_data['msg'] 		= $message;
+						$log_data['log_data'] 	= $response;
 						$this->panel_log->save_log($log_data);
-
-					} else {
-
+						
+					} catch (Exception $e) {
 						$cron_stats['failed'] ++;
-						$this->_cron_result .= 'Task: server #' . $server_id . '  start failed' . "\n";
+						$message = lang($e->getMessage());
+						$this->_cron_result .= 'Task: server #' . $server_id . '  start failed. ' . $message . "\n";
 
 						// Сохраняем логи
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'start';
-						$log_data['server_id'] = $server_id;
-						$log_data['msg'] = 'Start server Error';
-						$log_data['log_data'] = $response;
+						$log_data['type'] 			= 'server_command';
+						$log_data['command'] 		= 'start';
+						$log_data['server_id'] 		= $server_id;
+						$log_data['msg'] 			= 'Start server Error';
+						$log_data['log_data'] 		= $message . "\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
 					}
+
 					break;
 					
 				case 'server_stop':
-					if ($response = $this->servers->stop($this->servers_data[$server_id])) {
+				
+					try {
+						$response = $this->servers->stop($this->servers_data[$server_id]);
+						$message = $this->_get_message($response);
+						
 						$cron_success = true;
 						$cron_stats['success'] ++;
 
 						$this->_cron_result .= 'Task: server #' . $server_id . '  stop success' . "\n";
 
 						// Сохраняем логи
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'stop';
-						$log_data['server_id'] = $server_id;
-						$log_data['msg'] = 'Stop server success';
-						$log_data['log_data'] = $response;
+						$log_data['type'] 		= 'server_command';
+						$log_data['command'] 	= 'stop';
+						$log_data['server_id'] 	= $server_id;
+						$log_data['msg'] 		= $message;
+						$log_data['log_data'] 	= $response;
 						$this->panel_log->save_log($log_data);
-
-					} else {
+						
+					} catch (Exception $e) {
 						$cron_stats['failed'] ++;
-
-						$this->_cron_result .= 'Task: server #' . $server_id . '  stop failed' . "\n";
+						$message = lang($e->getMessage());
+						$this->_cron_result .= 'Task: server #' . $server_id . '  stop failed. ' . $message . "\n";
 
 						// Сохраняем логи
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'stop';
-						$log_data['server_id'] = $server_id;
-						$log_data['msg'] = 'Sop server Error';
-						$log_data['log_data'] = $response;
+						$log_data['type'] 			= 'server_command';
+						$log_data['command'] 		= 'stop';
+						$log_data['server_id'] 		= $server_id;
+						$log_data['msg'] 			= 'Stop server Error';
+						$log_data['log_data'] 		= $message . "\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
 					}
+					
 					break;
 					
 				case 'server_restart':
-					if ($response = $this->servers->restart($this->servers_data[$server_id])) {
+					try {
+						$response = $this->servers->restart($this->servers_data[$server_id]);
+						$message = $this->_get_message($response);
+						
 						$cron_success = true;
 						$cron_stats['success'] ++;
 
 						$this->_cron_result .= 'Task: server #' . $server_id . '  restart success' . "\n";
 
 						// Сохраняем логи
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'restart';
-						$log_data['server_id'] = $server_id;
-						$log_data['msg'] = 'Restart server success';
-						$log_data['log_data'] = $response;
+						$log_data['type'] 		= 'server_command';
+						$log_data['command'] 	= 'restart';
+						$log_data['server_id'] 	= $server_id;
+						$log_data['msg'] 		= $message;
+						$log_data['log_data'] 	= $response;
 						$this->panel_log->save_log($log_data);
-
-					} else {
+						
+					} catch (Exception $e) {
 						$cron_stats['failed'] ++;
-
-						$this->_cron_result .= 'Task: server #' . $server_id . '  restart failed' . "\n";
+						$message = lang($e->getMessage());
+						$this->_cron_result .= 'Task: server #' . $server_id . '  restart failed. ' . $message . "\n";
 
 						// Сохраняем логи
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'restart';
-						$log_data['server_id'] = $server_id;
-						$log_data['msg'] = 'Restart server Error';
-						$log_data['log_data'] = $response;
+						$log_data['type'] 			= 'server_command';
+						$log_data['command'] 		= 'restart';
+						$log_data['server_id'] 		= $server_id;
+						$log_data['msg'] 			= 'Restart server Error';
+						$log_data['log_data'] 		= $message . "\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
 					}
+					
 					break;
 					
 				case 'server_update':
-					if($response = $this->servers->update($this->servers_data[$server_id])) {
+					try {
+						$response = $this->servers->update($this->servers_data[$server_id]);
+						$message = $this->_get_message($response);
+						
 						$cron_success = true;
 						$cron_stats['success'] ++;
 
 						$this->_cron_result .= 'Task: server #' . $server_id . '  update success' . "\n";
 
 						// Сохраняем логи
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'update';
-						$log_data['server_id'] = $server_id;
-						$log_data['msg'] = 'Update server success';
-						$log_data['log_data'] = 'Command: ' . $this->servers->get_sended_commands(true) . "\nResponse: \n" . $response;
+						$log_data['type'] 		= 'server_command';
+						$log_data['command'] 	= 'update';
+						$log_data['server_id'] 	= $server_id;
+						$log_data['msg'] 		= $message;
+						$log_data['log_data'] 	= $response;
 						$this->panel_log->save_log($log_data);
-
-					} else {
+						
+					} catch (Exception $e) {
 						$cron_stats['failed'] ++;
-
-						$this->_cron_result .= 'Task: server #' . $server_id . '  update failed' . "\n";
+						$message = lang($e->getMessage());
+						$this->_cron_result .= 'Task: server #' . $server_id . '  update failed. ' . $message . "\n";
 
 						// Сохраняем логи
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'update';
-						$log_data['server_id'] = $server_id;
-						$log_data['msg'] = 'Update server Error';
-						$log_data['log_data'] = $response;
+						$log_data['type'] 			= 'server_command';
+						$log_data['command'] 		= 'update';
+						$log_data['server_id'] 		= $server_id;
+						$log_data['msg'] 			= 'Update server Error';
+						$log_data['log_data'] 		= $message . "\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
 					}
 					break;
@@ -1052,7 +1142,7 @@ class Cron extends MX_Controller {
 							$log .= 'chown -R ' . $this->servers_data[$server_id]['su_user'] . ' ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . "\n";;
 						}
 						
-						$log .= "\n---\nCHMOD\n" . $log . "\n" .  $this->servers->command($command, $this->servers_data[$server_id]);
+						$log .= "\n---\nCHMOD\n" . $log . "\n" .  sent_command($command, $this->servers_data[$server_id]);
 					}
 
 
@@ -1157,11 +1247,16 @@ class Cron extends MX_Controller {
 
 						if(strpos($response, 'Server is already running') !== false) {
 							/* Сервер запущен, видимо завис */
-							$response = $this->servers->restart($this->servers_data[$server_id]);
-							$log_data['command'] = 'restart';
+							try {
+								$response = $this->servers->restart($this->servers_data[$server_id]);
+								$log_data['command'] = 'restart';
 
-							if(strpos($response, 'Server restarted') !== false) {
-								$log_data['msg'] = 'Restart server success';	
+								if(strpos($response, 'Server restarted') !== false) {
+									$log_data['msg'] = 'Restart server success';	
+								}
+							} catch (Exception $e) {
+								$response = false;
+								$this->_cron_result .= $e->getMessage();
 							}
 
 						}
@@ -1235,14 +1330,20 @@ class Cron extends MX_Controller {
 						$this->panel_log->save_log($log_data);
 
 						// Перезагружаем сервер
-						$response = $this->servers->restart($this->servers_data[$server_id]);
+						try {
+							$response = $this->servers->restart($this->servers_data[$server_id]);
+							$log_data['msg'] = 'Restart server success';
+							$log_data['log_data'] = $response;
+						} catch (Exception $e) {
+							$log_data['msg'] = 'Restart server failed';
+							$log_data['log_data'] = $e->getMessage();
+							$this->_cron_result .= $log_data['log_data'];
+						}
 
 						// Сохраняем логи
 						$log_data['type'] = 'server_command';
 						$log_data['command'] = 'restart';
 						$log_data['server_id'] = $server_id;
-						$log_data['msg'] = 'Restart server success';
-						$log_data['log_data'] = $response;
 						$this->panel_log->save_log($log_data);
 
 						$cron_stats['success'] ++;	
