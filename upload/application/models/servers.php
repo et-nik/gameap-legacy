@@ -194,7 +194,11 @@ class Servers extends CI_Model {
 	function command($command, $server_data, $path = false)
     {
 		$this->load->helper('ds');
-		return send_command($command, $server_data, $path);
+		try {
+			send_command($command, $server_data, $path);
+		} catch (Exception $e) {
+			return false;
+		}
 	}
 	
 	//-----------------------------------------------------------
@@ -220,15 +224,15 @@ class Servers extends CI_Model {
     */
     function start($server_data)
     {
+		$this->load->helper('ds');
+		
 		if(!is_array($server_data)) {
 			// был передан id, получаем данные сервера
 			$server_data = $this->get_server_data($server_data, false, true, true);
 		}
 		
 		$command = $this->command_generate($server_data, 'start');
-		$result = $this->command($command, $server_data);
-
-		return $result;
+		return send_command($command, $server_data);
 	}
 	
 	
@@ -241,15 +245,15 @@ class Servers extends CI_Model {
     */
     function stop($server_data)
     {
+		$this->load->helper('ds');
+		
 		if(!is_array($server_data)) {
 			// был передан id, получаем данные сервера
 			$server_data = $this->get_server_data($server_data, false, true, true);
 		}
 		
 		$command = $this->command_generate($server_data, 'stop');
-		$result = $this->command($command, $server_data);
-		
-		return $result;
+		return send_command($command, $server_data);
 	}
 	
 	
@@ -262,15 +266,15 @@ class Servers extends CI_Model {
     */
     function restart($server_data)
     {
+		$this->load->helper('ds');
+		
 		if(!is_array($server_data)) {
 			// был передан id, получаем данные сервера
 			$server_data = $this->get_server_data($server_data, false, true, true);
 		}
 		
 		$command = $this->command_generate($server_data, 'restart');
-		$result = $this->command($command, $server_data);
-		
-		return $result;
+		return send_command($command, $server_data);
 	}
 	
 	//-----------------------------------------------------------	
@@ -282,6 +286,8 @@ class Servers extends CI_Model {
     */
     function update($server_data)
     {
+		$this->load->helper('ds');
+		
 		if(!is_array($server_data)) {
 			// был передан id, получаем данные сервера
 			$server_data = $this->get_server_data($server_data);
@@ -296,9 +302,7 @@ class Servers extends CI_Model {
 			$steamcmd_path = false;
 		}
 		
-		$result = $this->command($command, $server_data, $steamcmd_path);
-		
-		return $result;
+		return send_command($command, $server_data, $steamcmd_path);
 	}
 	
 	//-----------------------------------------------------------	
@@ -564,6 +568,18 @@ class Servers extends CI_Model {
 			$this->server_data['ftp_passwd'] 	= $this->server_ds_data['ftp_password'];
 			$this->server_data['ftp_path'] 		= $this->server_ds_data['ftp_path'];
 			
+			$this->server_data['ssh_host']		= $this->server_ds_data['ssh_host'];
+			$this->server_data['ssh_login'] 	= $this->server_ds_data['ssh_login'];
+			$this->server_data['ssh_password'] 	= $this->server_ds_data['ssh_password'];
+			$this->server_data['ssh_passwd'] 	= $this->server_ds_data['ssh_password'];
+			$this->server_data['ssh_path'] 		= $this->server_ds_data['ssh_path'];
+			
+			$this->server_data['telnet_host']		= $this->server_ds_data['telnet_host'];
+			$this->server_data['telnet_login'] 		= $this->server_ds_data['telnet_login'];
+			$this->server_data['telnet_password'] 	= $this->server_ds_data['telnet_password'];
+			$this->server_data['telnet_passwd'] 	= $this->server_ds_data['telnet_password'];
+			$this->server_data['telnet_path'] 		= $this->server_ds_data['telnet_path'];
+
 			$this->server_data['control_protocol'] 	= $this->server_ds_data['control_protocol'];
 			$this->server_data['control_ip'] 		= $this->server_ds_data['control_ip'];
 			$this->server_data['control_port'] 		= $this->server_ds_data['control_port'];
@@ -1108,31 +1124,9 @@ class Servers extends CI_Model {
     */
 	function read_local_file($file)
 	{
-		/* Проверяем директорию, в которой находится файл */
-		if (!file_exists(dirname($file))) {
-			$this->errors = 'Директория с файлом не найдена';
-			return false;
-		}
-		
-		if (!is_readable(dirname($file))) {
-			$this->errors = 'Отсутствуют права на чтение директории, в которой находится файл';
-			return false;
-		}
-
-		if(file_exists($file)) {
-			if(is_readable($file)) {
-				$file_contents = file_get_contents($file);
-			} else {
-				$this->errors = 'Отсутствуют права на чтение файла';
-				return false;
-			}
-			
-		} else {
-			$this->errors = 'Файл не найден';
-			return false;
-		}
-		
-		return $file_contents;
+		$server_data = empty($server_data) ? $this->server_data : $server_data;
+		$this->load->helper('ds');
+		return read_ds_file($file, $server_data);
 	}
 	
 	// ----------------------------------------------------------------
@@ -1147,19 +1141,8 @@ class Servers extends CI_Model {
 	public function read_file($file, $server_data = array()) 
 	{
 		$server_data = empty($server_data) ? $this->server_data : $server_data;
-		$file_contents = '';
-		
-		if ($server_data['ds_id'] == 0) {
-			$file = $server_data['script_path'] . '/' . $server_data['dir'] . '/' . $file;
-			$file_contents = $this->servers->read_local_file($file);
-		} else {
-			$base_path = ($server_data['ftp_host']) ? $server_data['ftp_path'] : $server_data['ssh_path'];
-			
-			$file = $base_path . '/' . $server_data['dir'] . '/' . $file;
-			$file_contents = $this->servers->read_remote_file($file, $server_data);
-		}
-		
-		return $file_contents;
+		$this->load->helper('ds');
+		return read_ds_file($file, $server_data);
 	}
 	
 	// ----------------------------------------------------------------
@@ -1170,19 +1153,18 @@ class Servers extends CI_Model {
      * @param string 	$file расположение файла без script_path и dir
      * @param array		$server_data массив с данными сервера
      * @return bool
+     * 
+     * УСТАРЕЛА! В 1.0 версии будет удалена!
+     * Оставлена для обратной совместимости!
     */
 	public function write_file($file, $file_contents = '', $server_data = array()) 
 	{
-		$server_data = empty($server_data) ? $this->server_data : $server_data;
-		
-		if ($server_data['ds_id'] == 0) {
-			$file = $server_data['script_path'] . '/' . $server_data['dir'] . '/' . $file;
-			return $this->servers->write_local_file($file, $file_contents);
-		} else {
-			$base_path = ($server_data['ftp_host']) ? $server_data['ftp_path'] : $server_data['ssh_path'];
-
-			$file = $base_path . '/' . $server_data['dir'] . '/' . $file;
-			return $this->servers->write_remote_file($file, $file_contents, $server_data);
+		try {
+			$server_data = empty($server_data) ? $this->server_data : $server_data;
+			$this->load->helper('ds');
+			return write_ds_file($file, $file_contents, $server_data);
+		} catch (Exception $e) {
+			return false;
 		}
 	}
 	
@@ -1197,89 +1179,9 @@ class Servers extends CI_Model {
     */
 	function read_remote_file($file, $server_data = array())
 	{
-		$this->load->helper('string');
-		
 		$server_data = empty($server_data) ? $this->server_data : $server_data;
-		
-		$file = reduce_double_slashes($file);
-		
-		if(!$server_data['ftp_host']) {
-			/* Работа с sFTP */
-			$this->load->library('sftp');
-			
-			if (!$server_data['ssh_host']) {
-				/* А SSH не настроен =( */
-				$this->errors = 'SSH не настроен';
-				return false;
-			}
-			
-			$explode = explode(':', $server_data['ssh_host']);
-			$sftp_config['hostname'] = $explode[0];
-			$sftp_config['port'] = (isset($explode[1])) ? $explode[1] : '22';
-			
-			$sftp_config['username'] = $server_data['ssh_login'];
-			$sftp_config['password'] = $server_data['ssh_password'];
-			$sftp_config['debug'] = false;
-			
-			if (false == $this->sftp->connect($sftp_config)) {
-				$this->errors = 'Ошибка соединения с sftp сервером';
-				return false;
-			}
-
-			if (!$this->sftp->file_exists($file)) {
-				$this->errors = 'File not found';
-				return false;
-			}
-			
-			// Определяем временный файл
-			$temp_file = tempnam(sys_get_temp_dir(), basename($file));
-			
-			$handle = fopen($temp_file, 'r+');
-			
-			if (false == $this->sftp->download($file, $temp_file)) {
-				$this->errors = 'File not found';
-				return false;
-			}
-			
-			
-			$file_contents = file_get_contents($temp_file);
-			
-			return $file_contents;
-			
-			//~ 
-			//~ if (false == $this->sftp->upload($file, $remote_file)) {
-				//~ $this->errors = 'Ошибка записи файла';
-				//~ return false;
-			//~ } else {
-				//~ return true;
-			//~ }
-			
-		} else {
-			$connection = ftp_connect($server_data['ftp_host']);
-			
-			if (ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])) {
-				
-				// Определяем временный файл
-				$temp_file = tempnam(sys_get_temp_dir(), basename($file));
-				
-				$handle = fopen($temp_file, 'r+');
-				
-				// Производим скачивание файла
-				if (@!ftp_fget($connection, $handle, $file, FTP_ASCII, 0)) {
-					$this->errors = 'Файл не найден';
-					return false;
-				}
-
-				$file_contents = file_get_contents($temp_file);
-				
-				fclose($handle);
-				unlink($temp_file);
-				
-				return $file_contents;
-			} else {
-				return false;
-			}
-		}
+		$this->load->helper('ds');
+		return read_ds_file($file, $server_data);
 	}
 	
 	
@@ -1291,34 +1193,19 @@ class Servers extends CI_Model {
      * 
      * @param str
      * @return str
+     * 
+     * УСТАРЕЛА! В 1.0 версии будет удалена!
+     * Оставлена для обратной совместимости!
     */
-	function write_local_file($file, $data = false) {
-		
-		if(!$data) {
+	function write_local_file($file, $data = false) 
+	{
+		try {
+			$server_data = empty($server_data) ? $this->server_data : $server_data;
+			$this->load->helper('ds');
+			return write_ds_file($file, $file_contents, $server_data);
+		} catch (Exception $e) {
 			return false;
 		}
-		
-		if(file_exists($file)) {
-			
-			if(is_writable($file)) {
-				
-				if(file_put_contents($file, $data)) {
-					return true;
-				}else{
-					$this->errors = 'Неизвестная ошибка';
-					return false;
-				}
-				
-			} else {
-				$this->errors = 'Отсутствуют права на запись файла';
-				return false;
-			}
-
-		} else {
-			$this->errors = 'Файл не найден';
-			return false;
-		}
-
 	}
 	
 	// ----------------------------------------------------------------
@@ -1330,68 +1217,26 @@ class Servers extends CI_Model {
      * @param str
      * @return bool
      * 
+     * УСТАРЕЛА! В 1.0 версии будет удалена!
+     * Оставлена для обратной совместимости!
+     * 
     */
 	function upload_remote_file($file, $remote_file, $mode = 0666)
 	{
-		$server_data = &$this->server_data;
+		try {
+			$server_data = &$this->server_data;
 		
-		if(!$server_data['ftp_host']) {
-			/* Работа с sFTP */
-			$this->load->library('sftp');
+			$this->load->driver('files');
+			$this->load->helper('ds');
 			
-			if (!$server_data['ssh_host']) {
-				/* А SSH не настроен =( */
-				$this->errors = 'SSH не настроен';
-				return false;
-			}
+			$config = get_file_protocol_config($server_data);
+			$this->files->set_driver($config['driver']);
+			$this->files->connect($config);
 			
-			$explode = explode(':', $server_data['ssh_host']);
-			$sftp_config['hostname'] = $explode[0];
-			$sftp_config['port'] = (isset($explode[1])) ? $explode[1] : '22';
-			
-			$sftp_config['username'] = $server_data['ssh_login'];
-			$sftp_config['password'] = $server_data['ssh_password'];
-			$sftp_config['debug'] = true;
-			
-			if (false == $this->sftp->connect($sftp_config)) {
-				$this->errors = 'Ошибка соединения с sftp сервером';
-			}
-			
-			if (false == $this->sftp->upload($file, $remote_file)) {
-				$this->errors = 'Ошибка записи файла';
-				return false;
-			} else {
-				return true;
-			}
-
-		} else {
-			/* Работа с FTP */
-			$connection = ftp_connect($server_data['ftp_host']);
-		
-			if(!$connection) {
-				$this->errors = 'Ошибка соединения с ftp сервером';
-				return false;
-			}
-			
-			if(ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])) {
-				
-				if (!ftp_put($connection, $remote_file, $file, FTP_BINARY)) {
-					$this->errors = 'Ошибка записи файла';
-					ftp_close($connection);
-					return false;
-				} else {
-					@ftp_chmod($connection, $mode, $remote_file);
-					ftp_close($connection);
-					return true;
-				}
-			
-			} else {
-				$this->errors = 'Ошибка авторизации FTP';
-				return false;
-			}
+			$this->files->upload($file, $remote_file);
+		} catch (Exception $e) {
+			return false;
 		}
-		
-		return false;
 	}
 	
 	// ----------------------------------------------------------------
@@ -1402,22 +1247,17 @@ class Servers extends CI_Model {
      * @param str
      * @return str
      * 
+     * УСТАРЕЛА! В 1.0 версии будет удалена!
+     * Оставлена для обратной совместимости!
+     * 
     */
 	function write_remote_file($file, $data, $server_data = array()) 
 	{
-		$server_data = empty($server_data) ? $this->server_data : $server_data;
-		
-		// Определяем временный файл
-		$temp_file = tempnam(sys_get_temp_dir(), basename($file));
-
-		if (file_put_contents($temp_file, $data) === false) {
-			$this->errors = 'Ошибка записи временного файла';
-			return false;
-		}
-		
-		if($this->upload_remote_file($temp_file, $file)){
-			return true;
-		}else{
+		try {
+			$server_data = empty($server_data) ? $this->server_data : $server_data;
+			$this->load->helper('ds');
+			return write_ds_file($file, $file_contents, $server_data);
+		} catch (Exception $e) {
 			return false;
 		}
 	}
