@@ -33,6 +33,8 @@ class Control extends CI_Driver_Library {
 	private $_sended_commands 	= array();		// Отправленные команды
 	private $_commands_result 	= array();		// Результаты отправленных команд
 	
+	private $_no_sudo			= false;		// Не добавлять sudo
+	
 	public function __construct()
 	{
 		$this->CI =& get_instance();
@@ -75,6 +77,10 @@ class Control extends CI_Driver_Library {
     */
 	private function _add_sudo($command) 
 	{
+		if ($this->_no_sudo) {
+			return $command;
+		}
+		
 		$commands = explode('&&', $command);
 		
 		if (count($commands) > 1) {
@@ -203,6 +209,11 @@ class Control extends CI_Driver_Library {
 	{
 		if (!isset($this->driver)) {
 			return false;
+		}
+		
+		if ($login == 'root') {
+			// Зачем от root'а использовать sudo? =)
+			$this->_no_sudo = true;
 		}
 		
 		return $this->{$this->driver}->auth($login, $password);
