@@ -590,7 +590,18 @@ class Servers extends CI_Model {
 			}
 			
 		} else {
+			/* TODO. ID локального сервера (ds_id == 0) будет заменяться на найденный local в базе данных */
+			
 			$this->server_data['control_protocol'] = 'local';
+			
+			// Сервер локальный, но данные заполняем пустыми значениями,
+			// т.к. к ним бывают обращения
+			$this->server_data['control_protocol'] 	= '';
+			$this->server_data['control_ip'] 		= '';
+			$this->server_data['control_port'] 		= '';
+			$this->server_data['control_login'] 	= '';
+			$this->server_data['control_password'] 	= '';
+			
 			$this->server_data['os'] 			= $this->config->config['local_os'];
 			$this->server_data['script_path'] 	= $this->config->config['local_script_path'];
 			$this->server_data['local_path'] 	= $this->config->config['local_script_path'];
