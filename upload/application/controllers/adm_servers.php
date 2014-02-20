@@ -129,11 +129,10 @@ class Adm_servers extends CI_Controller {
 		try {
 			$this->control->connect($telnet_host[0], $telnet_host[1]);
 			$this->control->auth($telnet_login, $telnet_password);
+			return true;
 		} catch (Exception $e) {
 			return false;
 		}
-		
-		return true;
 	}
     
     // -----------------------------------------------------------
@@ -159,11 +158,10 @@ class Adm_servers extends CI_Controller {
 		try {
 			$this->control->connect($ssh_host[0], $ssh_host[1]);
 			$this->control->auth($ssh_login, $ssh_password);
+			return true;
 		} catch (Exception $e) {
 			return false;
 		}
-		
-		return true;
 	}
 
 	// -----------------------------------------------------------------

@@ -91,7 +91,7 @@ if ( ! function_exists('send_command'))
 		$path = $path ? $path : $server_data['script_path'];
 		$CI->control->set_data(array('os' => $server_data['os'], 'path' => $path));
 		$CI->control->set_driver($server_data['control_protocol']);
-
+		
 		$CI->control->connect($server_data['control_ip'], $server_data['control_port']);
 		$CI->control->auth($server_data['control_login'], $server_data['control_password']);
 		$result = $CI->control->command($command, $path);

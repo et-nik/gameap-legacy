@@ -95,7 +95,7 @@ class Server_command extends CI_Controller {
 			
 		} elseif(strpos($response, 'Coulnd\'t find a running server') !== false) {
 			// Не найден запущенный сервер
-			$message = lang('server_command_restart_running_server_not_found');
+			$message = lang('server_command_running_server_not_found');
 			
 		} elseif(strpos($response, 'Server restarted') !== false) {
 			// Сервер перезапущен

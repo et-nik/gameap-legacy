@@ -6,7 +6,7 @@
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
+ * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
  * @license		http://gameap.ru/license.html
  * @link		http://gameap.ru
  * @filesource
@@ -136,6 +136,34 @@ class Adm_servers extends CI_Controller {
 		
 		if (!$this->dedicated_servers->check_ports($ds_id, $port)) {
 			$this->output->append_output('<img src="' . base_url('themes/system/images/warning.png') . '" />' . lang('adm_servers_port_exists'));
+		}
+	}
+	
+	// ----------------------------------------------------------------
+    
+	/**
+	 * Поиск server.sh/server.exe на ftp сервере
+	 * 
+	 * @param integer
+	*/
+	public function found_ftp_path($server_id = false)
+	{
+		if(!$server_data){
+			show_404();
+		}
+	}
+	
+	// ----------------------------------------------------------------
+    
+	/**
+	 * Поиск server.sh/server.exe на ftp сервере
+	 * 
+	 * @param integer
+	*/
+	public function found_sftp_path($server_id = false)
+	{
+		if(!$server_data){
+			show_404();
 		}
 	}
 }
