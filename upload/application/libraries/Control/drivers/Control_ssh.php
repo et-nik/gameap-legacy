@@ -35,7 +35,7 @@ class Control_ssh extends CI_Driver {
 	public function check()
 	{
 		if(!in_array('ssh2', get_loaded_extensions())){
-			throw new Exception('ssh_not_module');
+			throw new Exception('server_command_ssh_not_module');
 		}
 	}
 	
@@ -60,14 +60,14 @@ class Control_ssh extends CI_Driver {
 	function connect($ip = false, $port = 22)
 	{
 		if (!$ip OR !$port) {
-			throw new Exception('empty_connect_data');
+			throw new Exception('server_command_empty_connect_data');
 		}
 		
 		$this->_auth = false;
 		@$this->_connection = ssh2_connect($ip, $port);
 		
 		if (!$this->_connection) {
-			throw new Exception('connection_failed');
+			throw new Exception('server_command_connection_failed');
 		}
 
 		return $this->_connection;
@@ -78,15 +78,15 @@ class Control_ssh extends CI_Driver {
 	function auth($login, $password)
 	{
 		if (!$this->_connection) {
-			throw new Exception('not_connected');
+			throw new Exception('server_command_not_connected');
 		}
 		
 		if(!$login) {
-			throw new Exception('empty_auth_data');
+			throw new Exception('server_command_empty_auth_data');
 		}
 
 		if (!@ssh2_auth_password($this->_connection, $login, $password)) {
-			throw new Exception('login_failed');
+			throw new Exception('server_command_login_failed');
 		}
 		
 		$this->_auth = true;
@@ -102,11 +102,11 @@ class Control_ssh extends CI_Driver {
 	function command($command)
 	{
 		if (!$this->_connection OR !$this->_auth) {
-			throw new Exception('not_connected');
+			throw new Exception('server_command_not_connected');
 		}
 		
 		if (!$command) {
-			throw new Exception('empty_command');
+			throw new Exception('server_command_empty_command');
 		}
 		
 		$stream = ssh2_exec($this->_connection, $command);

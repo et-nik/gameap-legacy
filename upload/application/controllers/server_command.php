@@ -770,7 +770,7 @@ class Server_command extends CI_Controller {
 						return true;
 						
 					} catch (Exception $e) {
-						$message = lang('server_command_' . $e->getMessage());
+						$message = lang($e->getMessage());
 				
 						if ($this->users->auth_data['is_admin']) {
 							$message .= ' (' . strtoupper($this->servers->server_data['control_protocol']) . ')';
@@ -873,7 +873,7 @@ class Server_command extends CI_Controller {
 						return true;
 						
 					} catch (Exception $e) {
-						$message = lang('server_command_' . $e->getMessage());
+						$message = lang($e->getMessage());
 				
 						if ($this->users->auth_data['is_admin']) {
 							$message .= ' (' . strtoupper($this->servers->server_data['control_protocol']) . ')';
@@ -976,7 +976,7 @@ class Server_command extends CI_Controller {
 						return true;
 						
 					} catch (Exception $e) {
-						$message = lang('server_command_' . $e->getMessage());
+						$message = lang($e->getMessage());
 				
 						if ($this->users->auth_data['is_admin']) {
 							$message .= ' (' . strtoupper($this->servers->server_data['control_protocol']) . ')';

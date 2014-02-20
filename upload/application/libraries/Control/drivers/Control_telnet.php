@@ -70,7 +70,7 @@ class Control_telnet extends CI_Driver {
 		}
 
 		if (!$ip OR !$port) {
-			throw new Exception('empty_connect_data');
+			throw new Exception('server_command_empty_connect_data');
 		}
 		
 		$this->ip = $ip;
@@ -80,7 +80,7 @@ class Control_telnet extends CI_Driver {
 		@socket_set_timeout($this->_connection, 5);
 
 		if (!$this->_connection) {
-			throw new Exception('connection_failed');
+			throw new Exception('server_command_connection_failed');
 		}
 		
 		$this->_auth = false;
@@ -99,7 +99,7 @@ class Control_telnet extends CI_Driver {
 		}
 		
 		if(!$login OR !$password) {
-			throw new Exception('empty_auth_data');
+			throw new Exception('server_command_empty_auth_data');
 		}
 
 		$this->_read_till("ogin: ");
@@ -112,7 +112,7 @@ class Control_telnet extends CI_Driver {
 		 * В Linux при неудачной попытке пишется "Login incorrect"
 		*/
 		if (strpos($auth_string, 'Login Failed') !== false OR strpos($auth_string, 'Login incorrect') !== false) {
-			throw new Exception('auth_failed');
+			throw new Exception('server_command_auth_failed');
 		}
 
 		$this->_write("\r\n");
@@ -130,11 +130,11 @@ class Control_telnet extends CI_Driver {
 	function command($command)
 	{
 		if (!$this->_connection OR !$this->_auth) {
-			throw new Exception('not_connected');
+			throw new Exception('server_command_not_connected');
 		}
 		
 		if (!$command) {
-			throw new Exception('empty_command');
+			throw new Exception('server_command_empty_command');
 		}
 		
 		$this->_write($command . "\r\n");
