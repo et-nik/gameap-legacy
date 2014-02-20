@@ -64,7 +64,7 @@ class Control_ssh extends CI_Driver {
 		}
 		
 		$this->_auth = false;
-		$this->_connection = ssh2_connect($ip, $port);
+		@$this->_connection = ssh2_connect($ip, $port);
 		
 		if (!$this->_connection) {
 			throw new Exception('connection_failed');
@@ -85,7 +85,7 @@ class Control_ssh extends CI_Driver {
 			throw new Exception('empty_auth_data');
 		}
 
-		if (!ssh2_auth_password($this->_connection, $login, $password)) {
+		if (!@ssh2_auth_password($this->_connection, $login, $password)) {
 			throw new Exception('login_failed');
 		}
 		
