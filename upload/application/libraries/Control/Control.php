@@ -39,6 +39,7 @@ class Control extends CI_Driver_Library {
 	{
 		$this->CI =& get_instance();
 		$this->CI->load->helper('string');
+		$this->CI->lang->load('server_command');
 		
 		$this->valid_drivers = array('control_ssh', 'control_telnet', 'control_local');
 	}
