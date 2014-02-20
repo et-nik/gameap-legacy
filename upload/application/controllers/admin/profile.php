@@ -211,9 +211,9 @@ class Profile extends CI_Controller {
 		{
 			$num++;
 			if($privilege_value == 1){
-				$local_tpl_data['privilege_list'][$num]['privilege_value'] = '<img src="' . site_url('themes/' . $this->config->config['template'] . '/' . $this->config->config['style']) . '/images/yes.png">';
+				$local_tpl_data['privilege_list'][$num]['privilege_value'] = '<img src="' . base_url('themes/' . $this->config->config['template'] . '/' . $this->config->config['style'] . '/images/yes.png') . '">';
 			}else{
-				$local_tpl_data['privilege_list'][$num]['privilege_value'] = '<img src="' . site_url('themes/' . $this->config->config['template'] . '/' . $this->config->config['style']) . '/images/no.png">';
+				$local_tpl_data['privilege_list'][$num]['privilege_value'] = '<img src="' . base_url('themes/' . $this->config->config['template'] . '/' . $this->config->config['style'] . '/images/yes.png') . '">';
 			}
 			
 			$local_tpl_data['privilege_list'][$num]['human_name'] = $this->users->all_privileges[$privilege_name];
