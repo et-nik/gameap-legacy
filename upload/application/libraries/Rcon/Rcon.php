@@ -6,7 +6,7 @@
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
+ * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
  * @license		http://www.gameap.ru/license.html
  * @link		http://www.gameap.ru
  * @filesource
@@ -50,7 +50,7 @@ class Rcon extends CI_Driver_Library {
 		$this->port 			= $port;
 		$this->password 		= $password;
 		$this->engine 			= strtolower($engine);
-		$this->engine_version 	= strtolower($engine_version);
+		$this->engine_version 	= $engine_version;
 	}
 	
 	// ----------------------------------------------------------------
