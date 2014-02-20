@@ -79,7 +79,7 @@ class Server_command extends CI_Controller {
 	 * но ответ может состоять более чем из одной строки
 	 * 
 	 */
-	private function _get_message($response = '')
+	private function _get_message($response = '', $server_id = '')
 	{
 		if (strpos($response, 'Server is already running') !== false) {
 			/* Сервер запущен ранее */
@@ -750,7 +750,7 @@ class Server_command extends CI_Controller {
 					try {
 						$response = $this->servers->start($this->servers->server_data);
 						
-						$message = $this->_get_message($response);
+						$message = $this->_get_message($response, $server_id);
 
 						// Сохраняем логи
 						$log_data['type'] 		= 'server_command';
@@ -785,7 +785,7 @@ class Server_command extends CI_Controller {
 						$log_data['user_name'] = $this->users->auth_login;
 						$log_data['server_id'] = $this->servers->server_data['id'];
 						$log_data['msg'] = 'Start server Error';
-						$log_data['log_data'] = lang('server_command_' . $e->getMessage()) . "\n" . get_last_command();
+						$log_data['log_data'] = lang($e->getMessage()) . "\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
 						
 						return false;
@@ -853,7 +853,7 @@ class Server_command extends CI_Controller {
 					try {
 						$response = $this->servers->stop($this->servers->server_data);
 						
-						$message = $this->_get_message($response);
+						$message = $this->_get_message($response, $server_id);
 
 						// Сохраняем логи
 						$log_data['type'] 		= 'server_command';
@@ -888,7 +888,7 @@ class Server_command extends CI_Controller {
 						$log_data['user_name'] = $this->users->auth_login;
 						$log_data['server_id'] = $this->servers->server_data['id'];
 						$log_data['msg'] = 'Stop server Error';
-						$log_data['log_data'] = lang('server_command_' . $e->getMessage()) . "\n" . get_last_command();
+						$log_data['log_data'] = lang($e->getMessage()) . "\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
 						
 						return false;
@@ -956,7 +956,7 @@ class Server_command extends CI_Controller {
 					try {
 						$response = $this->servers->restart($this->servers->server_data);
 						
-						$message = $this->_get_message($response);
+						$message = $this->_get_message($response, $server_id);
 
 						// Сохраняем логи
 						$log_data['type'] 		= 'server_command';
@@ -991,7 +991,7 @@ class Server_command extends CI_Controller {
 						$log_data['user_name'] = $this->users->auth_login;
 						$log_data['server_id'] = $this->servers->server_data['id'];
 						$log_data['msg'] = 'Restart server Error';
-						$log_data['log_data'] = lang('server_command_' . $e->getMessage()) . "\n" . get_last_command();
+						$log_data['log_data'] = lang($e->getMessage()) . "\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
 						
 						return false;
