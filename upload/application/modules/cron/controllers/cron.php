@@ -193,11 +193,12 @@ class Cron extends MX_Controller {
 
 		$command = $this->servers->command_generate($this->servers_data[$server_id], 'get_console');
 		
-		if($response = $this->servers->command($command, $this->servers->server_data)) {
-			return $response;
+		try {
+			$console = send_command($command, $this->servers->server_data);
+			return $console;
+		} catch (Exception $e) {
+			return;
 		}
-		
-		return;
 	}
     
     // ----------------------------------------------------------------
@@ -245,13 +246,7 @@ class Cron extends MX_Controller {
 				break;
 		}
 		
-		try { 
-			$result = send_command($commands, $this->servers_data[$server_id]);
-			return $result;
-		} catch (Exception $e) {
-			$this->_cron_result .= $e->getMessage() . "\n";
-			return false;
-		}
+		return send_command($commands, $this->servers_data[$server_id]);
 	}
 	
 	// ----------------------------------------------------------------
@@ -332,20 +327,14 @@ class Cron extends MX_Controller {
 						break;
 				} 
 			}
+
+			$this->_install_result = send_command(
+							$commands,
+							$this->servers_data[$server_id], 
+							$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+			);
 			
-			try { 
-				$this->_install_result = send_command(
-								$commands,
-								$this->servers_data[$server_id], 
-								$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-				);
-				
-				return true;
-				
-			} catch (Exception $e) {
-				$this->_cron_result .= $e->getMessage() . "\n";
-				return false;
-			}
+			return true;
 			
 		} elseif ($rep_type == 'remote') {
 			/* Удаленный репозиторий */
@@ -360,17 +349,12 @@ class Cron extends MX_Controller {
 					break;
 			}
 			
-			try { 
-				$this->_install_result = send_command(
-								$commands,
-								$this->servers_data[$server_id], 
-								$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-				);
-				return true;
-			} catch (Exception $e) {
-				$this->_cron_result .= $e->getMessage() . "\n";
-				return false;
-			}
+			$this->_install_result = send_command(
+							$commands,
+							$this->servers_data[$server_id], 
+							$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+			);
+			return true;
 			
 		} else {
 			return false;
@@ -399,18 +383,13 @@ class Cron extends MX_Controller {
 				break;
 		}
 		
-		try { 
-			$this->_install_result .= send_command(
-							$commands,
-							$this->servers_data[$server_id], 
-							$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
-			);
+		$this->_install_result .= send_command(
+			$commands,
+			$this->servers_data[$server_id], 
+			$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+		);
 			
-			return true;
-		} catch (Exception $e) {
-			$this->_cron_result .= $e->getMessage() . "\n";
-			return false;
-		}
+		return true;
 
 	}
 
@@ -445,13 +424,8 @@ class Cron extends MX_Controller {
 				break;
 		}
 		
-		try { 
-			$result = send_command($command, $this->servers_data[$server_id], $this->servers_data[$server_id]['steamcmd_path']);
-			$this->_install_result .= $result;
-		} catch (Exception $e) {
-			$this->_cron_result .= $e->getMessage() . "\n";
-			return false;
-		}
+		$result = send_command($command, $this->servers_data[$server_id], $this->servers_data[$server_id]['steamcmd_path']);
+		$this->_install_result .= $result;
 
 		if(strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' fully installed.') !== false
 			OR strpos($result, 'Success! App \'' . $this->servers_data[$server_id]['app_id'] . '\' already up to date.') !== false
@@ -485,7 +459,6 @@ class Cron extends MX_Controller {
 			$server_data = array('installed' => '1');
 
 			$log_data['msg'] = 'Unknown error';
-			$command = $this->dedicated_servers->get_sended_commands(true);
 			$this->_cron_result .= "Install server failure\n";
 			
 			return false;
@@ -797,7 +770,7 @@ class Cron extends MX_Controller {
 						
 					} catch (Exception $e) {
 						$cron_stats['failed'] ++;
-						$message = lang($e->getMessage());
+						$message = $e->getMessage();
 						$this->_cron_result .= 'Task: server #' . $server_id . '  start failed. ' . $message . "\n";
 
 						// Сохраняем логи
@@ -832,7 +805,7 @@ class Cron extends MX_Controller {
 						
 					} catch (Exception $e) {
 						$cron_stats['failed'] ++;
-						$message = lang($e->getMessage());
+						$message = $e->getMessage();
 						$this->_cron_result .= 'Task: server #' . $server_id . '  stop failed. ' . $message . "\n";
 
 						// Сохраняем логи
@@ -866,7 +839,7 @@ class Cron extends MX_Controller {
 						
 					} catch (Exception $e) {
 						$cron_stats['failed'] ++;
-						$message = lang($e->getMessage());
+						$message = $e->getMessage();
 						$this->_cron_result .= 'Task: server #' . $server_id . '  restart failed. ' . $message . "\n";
 
 						// Сохраняем логи
@@ -900,7 +873,7 @@ class Cron extends MX_Controller {
 						
 					} catch (Exception $e) {
 						$cron_stats['failed'] ++;
-						$message = lang($e->getMessage());
+						$message = $e->getMessage();
 						$this->_cron_result .= 'Task: server #' . $server_id . '  update failed. ' . $message . "\n";
 
 						// Сохраняем логи
@@ -1042,16 +1015,25 @@ class Cron extends MX_Controller {
 
 				$this->servers->edit_game_server($server_id, array('installed' => '2'));
 				
-				$this->_mkdir($server_id);
+				try {
+					$this->_mkdir($server_id);
+				} catch (Exception $e) {
+					$this->_cron_result .= $e->getMessage() . "\n";
+					$server_installed = false;
+				}
 				
 				if ($this->games->games_list[0]['local_repository']) {
 					/* Установка из локального репозитория */
 					
 					$log .= "Install from local repository \n";
 					
-					if ($this->_wget_files($server_id, $this->games->games_list[0]['local_repository'], 'local')) {
+					try {
+						$this->_wget_files($server_id, $this->games->games_list[0]['local_repository'], 'local');
 						$this->_unpack_files($server_id, $this->games->games_list[0]['local_repository']);
 						$server_installed = true;
+					} catch (Exception $e) {
+						$this->_cron_result .= $e->getMessage() . "\n";
+						$server_installed = false;
 					}
 					
 				} elseif ($this->games->games_list[0]['remote_repository']) {
@@ -1059,17 +1041,26 @@ class Cron extends MX_Controller {
 					
 					$log .= "Install from remote repository \n";
 					
-					if ($this->_wget_files($server_id, $this->games->games_list[0]['remote_repository'], 'remote')) {
+					try {
+						$this->_wget_files($server_id, $this->games->games_list[0]['remote_repository'], 'remote');
 						$this->_unpack_files($server_id, $this->games->games_list[0]['remote_repository']);
 						$server_installed = true;
+					} catch (Exception $e) {
+						$this->_cron_result .= $e->getMessage() . "\n";
+						$server_installed = false;
 					}
+
 				} elseif ($this->games->games_list[0]['app_id']) {
 					/* Установка через SteamCMD */
 					
 					$log .= "Install from SteamCMD \n";
 					
-					if ($this->_install_from_steamcmd($server_id)) {
+					try {
+						$this->_install_from_steamcmd($server_id);
 						$server_installed = true;
+					} catch (Exception $e) {
+						$this->_cron_result .= $e->getMessage() . "\n";
+						$server_installed = false;
 					}
 					
 				} else {
@@ -1091,14 +1082,23 @@ class Cron extends MX_Controller {
 					if (isset($this->game_types->game_types_list[0]['local_repository'])
 						&& $this->game_types->game_types_list[0]['local_repository']
 					) {
-						if ($this->_wget_files($server_id, $this->game_types->game_types_list[0]['local_repository'], 'local')) {
+						
+						try {
+							$this->_wget_files($server_id, $this->game_types->game_types_list[0]['local_repository'], 'local');
 							$this->_unpack_files($server_id, $this->game_types->game_types_list[0]['local_repository']);
+						} catch (Exception $e) {
+							$this->_cron_result .= $e->getMessage() . "\n";
 						}
+						
 					} elseif (isset($this->game_types->game_types_list[0]['remote_repository'])
 								&& $this->game_types->game_types_list[0]['remote_repository']
 					) {
-						if ($this->_wget_files($server_id, $this->game_types->game_types_list[0]['remote_repository'], 'remote')) {
+						
+						try {
+							$this->_wget_files($server_id, $this->game_types->game_types_list[0]['remote_repository'], 'remote');
 							$this->_unpack_files($server_id, $this->game_types->game_types_list[0]['remote_repository']);
+						} catch (Exception $e) {
+							$this->_cron_result .= $e->getMessage() . "\n";
 						}
 					}
 					
@@ -1121,9 +1121,6 @@ class Cron extends MX_Controller {
 							foreach($content_dirs as $dir) {
 								$command[] = 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
 								$log .= 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
-								
-								//~ $command[] = 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir']. '/' .  $dir['path'];
-								//~ $log .= 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/'. $dir['path'] . "\n";
 							}
 						}
 						
@@ -1131,9 +1128,6 @@ class Cron extends MX_Controller {
 							foreach($log_dirs as $dir) {
 								$command[] = 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
 								$log .= 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
-								
-								// $command[] = 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'];
-								// $log .= 'chmod 777 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . "\n";
 							}
 						}
 						
@@ -1142,14 +1136,24 @@ class Cron extends MX_Controller {
 							$log .= 'chown -R ' . $this->servers_data[$server_id]['su_user'] . ' ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . "\n";;
 						}
 						
-						$log .= "\n---\nCHMOD\n" . $log . "\n" .  sent_command($command, $this->servers_data[$server_id]);
+						try {
+							$log .= "\n---\nCHMOD\n" . $log . "\n" .  send_command($command, $this->servers_data[$server_id]);
+						} catch (Exception $e) {
+							$this->_cron_result .= $e->getMessage() . "\n";
+							$log .= $e->getMessage() . "\n";;
+						}
 					}
 
 
 					/* Устанавливаем серверу rcon пароль */
 					$this->load->helper('safety');
 					$new_rcon = generate_code(8);
-					$this->servers->change_rcon($new_rcon, $this->servers_data[$server_id]);
+					
+					try {
+						$this->servers->change_rcon($new_rcon, $this->servers_data[$server_id]);
+					} catch (Exception $e) {
+						$this->_cron_result .= $e->getMessage() . "\n";
+					}
 					
 					/* Конфигурирование сервера */
 					$this->installer->set_game_variables($this->servers_data[$server_id]['start_code'], 
@@ -1180,7 +1184,7 @@ class Cron extends MX_Controller {
 					$log_data['command'] = 'install';
 					$log_data['server_id'] = $server_id;
 					$log_data['msg'] = 'Server install successful';
-					$log_data['log_data'] = "Commands: \n" . var_export($this->dedicated_servers->get_sended_commands(), true) . "\n\nResults: \n" . $this->_install_result . "\n";
+					$log_data['log_data'] = "Commands: \n" . var_export($this->control->get_sended_commands(), true) . "\n\nResults: \n" . $this->_install_result . "\n";
 					$this->panel_log->save_log($log_data);
 
 				} else {
@@ -1192,7 +1196,7 @@ class Cron extends MX_Controller {
 					$log_data['command'] = 'install';
 					$log_data['server_id'] = $server_id;
 					$log_data['msg'] = 'Server install failed';
-					$log_data['log_data'] = "Commands: \n" . var_export($this->dedicated_servers->get_sended_commands(), true) . "\n\nResults: \n" . $this->_install_result . "\n";
+					$log_data['log_data'] = "Commands: \n" . var_export($this->control->get_sended_commands(), true) . "\n\nResults: \n" . $this->_install_result . "\n";
 					$this->panel_log->save_log($log_data);
 					
 					$this->_cron_result .= 'Server install #' . $server_id . ' failed' . "\n";
