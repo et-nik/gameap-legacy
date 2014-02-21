@@ -915,7 +915,7 @@ class Adm_servers extends CI_Controller {
 						
 						try {
 							$result = send_command($command, $this->servers->server_data);
-						} catch {
+						} catch (Exception $e) {
 							// Директория не удалена
 						}
 						
