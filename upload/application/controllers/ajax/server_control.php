@@ -45,6 +45,7 @@ class Server_control extends CI_Controller {
 
 			$this->load->library('form_validation');
 			$this->load->helper('form');
+			$this->load->helper('ds');
 			
 			$this->load->model('servers');
 			$this->load->model('servers/dedicated_servers');
@@ -235,11 +236,12 @@ class Server_control extends CI_Controller {
 		
 		$command = $this->servers->command_generate($this->servers->server_data, 'get_console');
 		
-		if($response = $this->servers->command($command, $this->servers->server_data)) {
+		try {
+			$response = send_command($command, $this->servers->server_data);
 			$response = $this->_crop_console($response);
 			$console_content = str_replace("\n", "<br />", htmlspecialchars($response));
 			$this->output->append_output($console_content);
-		} else {
+		} catch (Exception $e) {
 			show_404();
 		}
 

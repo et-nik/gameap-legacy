@@ -49,6 +49,7 @@ class Adm_servers extends CI_Controller {
 		$this->load->model('servers/game_types');
 		
 		$this->load->helper('string');
+		$this->load->helper('ds');
 
         if ($this->users->check_user()) {
 			
@@ -176,7 +177,7 @@ class Adm_servers extends CI_Controller {
 	*/
 	private function _check_ftp($ftp_host, $ftp_login, $ftp_password) 
 	{
-		$this->load->library('ftp');
+		$this->load->driver('files');
 
 		// Разделяем на Host:Port
 		$ftp_host = explode(':', $ftp_host);
@@ -188,9 +189,11 @@ class Adm_servers extends CI_Controller {
 		$ftp_config['password'] 	= $ftp_password;
 		$ftp_config['passive']  	= false;
 		
-		if ($this->ftp->connect($ftp_config)) {
+		try {
+			$this->files->set_driver('ftp');
+			$this->ftp->connect($ftp_config);
 			return true;
-		} else {
+		} catch (Exception $e) {
 			return false;
 		}
 	}
@@ -203,7 +206,11 @@ class Adm_servers extends CI_Controller {
 	*/
 	private function _found_ftp_path($ftp_path = false)
 	{
-		return $this->ftp->search(array('server.sh', 'server.exe'), $ftp_path);
+		try {
+			return $this->files->search(array('server.sh', 'server.exe'), $ftp_path);
+		} catch (Exception $e) {
+			return false;
+		}
 	}
 	
 	// -----------------------------------------------------------------
@@ -214,19 +221,22 @@ class Adm_servers extends CI_Controller {
 	*/
 	private function _found_sftp_path($sftp_path = false, $sftp_config)
 	{
-		$this->load->library('sftp');
+		$this->load->driver('files');
 		
 		// Исключаемые директории. В них поиск не ведется
 		$exclude_dirs = array('bin', 'boot', 'cdrom', 'dev', 'etc', 'lib',
 								'lib32', 'lib64', 'proc', 'media', 'mnt', 'run', 'sbin',
 								'selinux', 'sys', 'tmp',
 							);
-
-		if (false == $this->sftp->connect($sftp_config)) {
+		
+		$this->files->set_driver('sftp');
+		
+		try {
+			$this->files->connect($sftp_config);
+			return $this->sftp->search(array('server.sh', 'server.exe'), $sftp_path, $exclude_dirs, 4);
+		} catch (Exception $e) {
 			return false;
 		}
-		
-		return $this->sftp->search(array('server.sh', 'server.exe'), $sftp_path, $exclude_dirs, 4);
 	}
 	
 	// -----------------------------------------------------------------
@@ -896,18 +906,22 @@ class Adm_servers extends CI_Controller {
 						switch(strtolower($this->servers->server_data['os'])) {
 							case 'windows':
 								$command = 'rmdir /S ' . $this->servers->server_data['dir'];
-								$result = $this->servers->command($command, $this->servers->server_data);
 								break;
 							default:
 								// Linux
 								$command = 'rm -rf ' . $this->servers->server_data['dir'];
-								$result = $this->servers->command($command, $this->servers->server_data);
 								break;
 						}
 						
-						if($this->servers->delete_game_server($id)) {
+						try {
+							$result = send_command($command, $this->servers->server_data);
+						} catch {
+							// Директория не удалена
+						}
+						
+						if ($this->servers->delete_game_server($id)) {
 							$local_tpl_data['message'] = lang('adm_servers_delete_server_successful');
-						}else{
+						} else {
 							$local_tpl_data['message'] = lang('adm_servers_delete_server_failed');
 						}
 							
@@ -2159,7 +2173,6 @@ class Adm_servers extends CI_Controller {
 				return false;
 			}
 			
-
 			if ($this->games->get_games_list(array('code'=> $new_gs['game']), 1)) {
 
 				if(!$this->games->games_list[0]['app_id'] && !$this->games->games_list[0]['local_repository'] && !$this->games->games_list[0]['remote_repository']) {
@@ -2220,35 +2233,23 @@ class Adm_servers extends CI_Controller {
 				//~ switch($this->servers->server_data['os']) {
 				//~ case 'Windows':
 					//~ $command = 'rmdir /S ' . $this->servers->server_data['dir'];
-					//~ $result = $this->servers->command_windows($command, $this->servers->server_data);
 					//~ break;
 				//~ default:
 					//~ // Linux
 					//~ $command = 'rm -rf ' . $this->servers->server_data['dir'];
-					//~ $result = $this->servers->command($command, $this->servers->server_data);
 					//~ break;
 				//~ }
+			//~ }
+			//~ 
+			//~ try {
+				//~ $result = send_command($command, $this->servers->server_data);
+			//~ } catch (Exception $e) {
+				//~ // Директория не удалена
 			//~ }
 			
 			$sql_data['installed'] = 0;
 			
 			if ($this->servers->edit_game_server($id, $sql_data)) {
-				
-				//~ /* Удаление директории на выделенном сервере */
-				//~ if(isset($this->servers->server_data['dir'])) {
-					//~ switch($this->servers->server_data['os']) {
-					//~ case 'Windows':
-						//~ $command = 'rmdir /S ' . $this->servers->server_data['dir'];
-						//~ $result = $this->servers->command_windows($command, $this->servers->server_data);
-						//~ break;
-					//~ default:
-						//~ // Linux
-						//~ $command = 'rm -rf ' . $this->servers->server_data['dir'];
-						//~ $result = $this->servers->command($command, $this->servers->server_data);
-						//~ break;
-					//~ }
-				//~ }
-				
 				$this->_show_message(lang('adm_servers_server_will_be_reinstalled'), site_url('adm_servers/edit/game_servers/' . $id), lang('next'));
 				return true;
 			} else {
