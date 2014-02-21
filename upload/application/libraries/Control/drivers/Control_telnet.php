@@ -54,6 +54,74 @@ class Control_telnet extends CI_Driver {
 	 */
 	public function check_file($file, $privileges = '')
 	{
+		$file_perm['exists'] 		= false;
+		$file_perm['readable'] 		= false;
+		$file_perm['writable'] 		= false;
+		$file_perm['executable'] 	= false;
+		
+		$file_name 	= basename($file);
+		$file_dir 	= dirname($file);
+		
+		switch ($this->os) {
+			case 'windows':
+				$file_dir = str_replace('/', '\\', $file_dir);
+			
+				$result = $this->command('dir ' . $file_dir . ' /a:-d /b');
+				$result = explode("\n", $result);
+				
+				if (in_array($file_name, $result)) {
+					$file_perm['exists'] 		= true;
+					$file_perm['readable'] 		= true;
+					$file_perm['writable'] 		= true;
+					$file_perm['executable'] 	= true;
+				}
+			
+				break;
+			
+			default:
+				$result = $this->command('ls ' . $file_dir . ' --color=none -l | grep ^- | grep ' . $file_name . ' --color=none');
+				$result = explode("\n", $result);
+				
+				foreach($result as &$values) {
+					if ($values == '') {
+						continue;
+					}
+					
+					$values_exp = explode(" ", $values);
+					// Удаление пустых значений
+					$values_exp = array_values(array_filter($values_exp,function($el){ return ($el !== '');}));
+					
+					if ($values_exp[8] != $file_name) {
+						continue;
+					}
+					
+					/* С побитовыми операциями не дружу, поэтому способ извращенский =) */
+					$file_perm['exists'] 		= true;
+					$file_perm['readable'] 		= preg_match('/^\-r..r..r..$/i', $values_exp[0]);
+					$file_perm['writable'] 		= preg_match('/^\-.w..w..w.$/i', $values_exp[0]);
+					$file_perm['executable'] 	= preg_match('/^\-..x..x..x$/i', $values_exp[0]);
+					break;
+				}
+				
+				break;
+		}
+
+		if (!$file_perm['exists']) {
+			throw new Exception(lang('server_command_file_not_found', $file_name));
+		}
+		
+		if (strpos($privileges, 'r') !== false && !$file_perm['readable']) {
+			throw new Exception(lang('server_command_file_not_readable', $file_name));
+		}
+		
+		if (strpos($privileges, 'w') !== false && !$file_perm['writable']) {
+			throw new Exception(lang('server_command_file_not_writable', $file_name));
+		}
+		
+		if (strpos($privileges, 'x') !== false && !$file_perm['executable']) {
+			throw new Exception(lang('server_command_file_not_executable', $file_name));
+		}
+
 		return true;
 	}
 
