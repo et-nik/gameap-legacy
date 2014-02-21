@@ -72,3 +72,8 @@ $lang['server_command_empty_command']						= 'Пустая команда';
 $lang['server_command_not_connected']						= 'Отсутствует соединение';
 $lang['server_command_login_failed']						= 'Авторизация не удалась';
 $lang['server_command_exec_disabled']						= 'Функция exec отключена в настройках PHP';
+
+$lang['server_command_file_not_found']						= 'Файл %s не найден';
+$lang['server_command_file_not_readable']					= 'Нет прав на чтение файла %s';
+$lang['server_command_file_not_writable']					= 'Нет прав на запись файла %s';
+$lang['server_command_file_not_executable']					= 'Нет прав на выполнение файла %s';
