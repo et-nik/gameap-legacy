@@ -52,44 +52,60 @@ class Control_ssh extends CI_Driver {
 	 */
 	public function check_file($file, $privileges = '')
 	{
-		if ($this->os == 'windows') {
-			// Не проверяется
-			return true;
-		}
-		
 		$file_perm['exists'] 		= false;
 		$file_perm['readable'] 		= false;
 		$file_perm['writable'] 		= false;
 		$file_perm['executable'] 	= false;
 		
-		$file_name = basename($file);
-		$result = $this->command('ls ' . dirname($file) . ' --color=none -l | grep ^- | grep ' . $file_name);
+		$file_name 	= basename($file);
+		$file_dir 	= dirname($file);
 		
-		$result = explode("\n", $result);
-		
-		foreach($result as &$values) {
-			if ($values == '') {
-				continue;
-			}
+		switch ($this->os) {
+			case 'windows':
+				$file_dir = str_replace('/', '\\', $file_dir);
 			
-			$values_exp = explode(" ", $values);
-			// Удаление пустых значений
-			$values_exp = array_values(array_filter($values_exp,function($el){ return ($el !== '');}));
+				$result = $this->command('dir ' . $file_dir . ' /a:-d /b');
+				$result = explode("\n", $result);
+				
+				if (in_array($file_name, $result)) {
+					$file_perm['exists'] 		= true;
+					$file_perm['readable'] 		= true;
+					$file_perm['writable'] 		= true;
+					$file_perm['executable'] 	= true;
+				}
 			
-			if ($values_exp[8] != $file_name) {
-				continue;
-			}
+				break;
 			
-			/* С побитовыми операциями не дружу, поэтому способ извращенский =) */
-			$file_perm['exists'] 		= true;
-			$file_perm['readable'] 		= preg_match('/^\-r..r..r..$/i', $values_exp[0]);
-			$file_perm['writable'] 		= preg_match('/^\-.w..w..w.$/i', $values_exp[0]);
-			$file_perm['executable'] 	= preg_match('/^\-..x..x..x$/i', $values_exp[0]);
-			break;
+			default:
+				$result = $this->command('ls ' . $file_dir . ' --color=none -l | grep ^- | grep ' . $file_name . ' --color=none');
+				$result = explode("\n", $result);
+				
+				foreach($result as &$values) {
+					if ($values == '') {
+						continue;
+					}
+					
+					$values_exp = explode(" ", $values);
+					// Удаление пустых значений
+					$values_exp = array_values(array_filter($values_exp,function($el){ return ($el !== '');}));
+					
+					if ($values_exp[8] != $file_name) {
+						continue;
+					}
+					
+					/* С побитовыми операциями не дружу, поэтому способ извращенский =) */
+					$file_perm['exists'] 		= true;
+					$file_perm['readable'] 		= preg_match('/^\-r..r..r..$/i', $values_exp[0]);
+					$file_perm['writable'] 		= preg_match('/^\-.w..w..w.$/i', $values_exp[0]);
+					$file_perm['executable'] 	= preg_match('/^\-..x..x..x$/i', $values_exp[0]);
+					break;
+				}
+				
+				break;
 		}
-		
+
 		if (!$file_perm['exists']) {
-			throw new Exception(lang('server_command_file_not_found'), $file_name);
+			throw new Exception(lang('server_command_file_not_found', $file_name));
 		}
 		
 		if (strpos($privileges, 'r') !== false && !$file_perm['readable']) {
