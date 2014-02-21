@@ -25,8 +25,8 @@ class Control extends CI_Driver_Library {
 	
 	protected $CI;
 	
-	protected $path;
-	protected $os;
+	public $path;
+	public $os;
 
 	protected $driver 			= false;
 	
