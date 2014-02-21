@@ -28,7 +28,7 @@ class Control extends CI_Driver_Library {
 	protected $path;
 	protected $os;
 
-	protected $driver 			= 'local';
+	protected $driver 			= false;
 	
 	private $_sended_commands 	= array();		// Отправленные команды
 	private $_commands_result 	= array();		// Результаты отправленных команд
@@ -162,22 +162,17 @@ class Control extends CI_Driver_Library {
 	
 	private function _single_command($command = '', $path = false) 
 	{
-		if (!isset($this->driver)) {
-			return false;
+		if (!$this->driver) {
+			throw new Exception('Driver no set');
 		}
-
+		
 		// Проверяем, существует ли файл в команде. 
 		// Проверяются файлы .sh и .exe, если это команда, например wget, то проверки не будет
-		try {
-			$explode = explode(' ', $command);
-			$file = $path . '/' . $explode[0];
-			
-			if (strpos($file, '.sh') !== false OR strpos($file, '.exe') !== false) {
-				$this->_check_file($file, 'x');
-			}
-		} catch (Exception $e) {
-			throw new Exception($e->getMessage());
-			return false;
+		$explode = explode(' ', $command);
+		$file = $path . '/' . $explode[0];
+		
+		if (strpos($file, '.sh') !== false OR strpos($file, '.exe') !== false) {
+			$this->_check_file($file, 'x');
 		}
 
 		$cd 		= $path ? $this->_path_proccess($path) . ' && ' : '';
@@ -194,8 +189,8 @@ class Control extends CI_Driver_Library {
 	
 	public function connect($ip, $port) 
 	{
-		if (!isset($this->driver)) {
-			return false;
+		if (!$this->driver) {
+			throw new Exception('Driver no set');
 		}
 		
 		// Проверка возможности работы с драйвером
@@ -208,8 +203,8 @@ class Control extends CI_Driver_Library {
 	
 	public function auth($login, $password) 
 	{
-		if (!isset($this->driver)) {
-			return false;
+		if (!$this->driver) {
+			throw new Exception('Driver no set');
 		}
 		
 		if ($login == 'root') {

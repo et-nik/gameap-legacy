@@ -69,7 +69,7 @@ class Files extends CI_Driver_Library {
 	public function set_driver($driver) 
 	{
 		if (!in_array('files_' . $driver, $this->valid_drivers)) {
-			throw new Exception('server_files_driver_not_set');
+			throw new Exception(lang('server_files_driver_not_set'));
 		}
 		
 		$this->driver = $driver;
@@ -84,7 +84,7 @@ class Files extends CI_Driver_Library {
 	public function connect($config = array())
 	{
 		if (!$this->driver) {
-			throw new Exception('server_files_driver_not_set');
+			throw new Exception(lang('server_files_driver_not_set'));
 		}
 		
 		return $this->{$this->driver}->connect($config);
@@ -98,7 +98,7 @@ class Files extends CI_Driver_Library {
 	public function upload($locpath, $rempath, $mode = 'auto', $permissions = NULL)
 	{
 		if (!$this->driver) {
-			throw new Exception('server_files_driver_not_set');
+			throw new Exception(lang('server_files_driver_not_set'));
 		}
 		
 		return $this->{$this->driver}->upload($locpath, $rempath, $mode, $permissions);
@@ -112,7 +112,7 @@ class Files extends CI_Driver_Library {
 	public function search($file, $dir = '/', $exclude_dirs = array(), $depth = 4)
 	{
 		if (!$this->driver) {
-			throw new Exception('server_files_driver_not_set');
+			throw new Exception(lang('server_files_driver_not_set'));
 		}
 		
 		return $this->{$this->driver}->search($file, $dir, $exclude_dirs, $depth);
@@ -126,7 +126,7 @@ class Files extends CI_Driver_Library {
 	public function delete_dir($filepath)
 	{
 		if (!$this->driver) {
-			throw new Exception('server_files_driver_not_set');
+			throw new Exception(lang('server_files_driver_not_set'));
 		}
 		
 		return $this->{$this->driver}->delete_dir($filepath);
@@ -140,7 +140,7 @@ class Files extends CI_Driver_Library {
 	public function delete_file($filepath)
 	{
 		if (!$this->driver) {
-			throw new Exception('server_files_driver_not_set');
+			throw new Exception(lang('server_files_driver_not_set'));
 		}
 		
 		return $this->{$this->driver}->delete_file($filepath);
@@ -154,7 +154,7 @@ class Files extends CI_Driver_Library {
 	public function download($rempath, $locpath, $mode = 'auto')
 	{
 		if (!$this->driver) {
-			throw new Exception('server_files_driver_not_set');
+			throw new Exception(lang('server_files_driver_not_set'));
 		}
 		
 		return $this->{$this->driver}->download($rempath, $locpath, $mode);
@@ -168,7 +168,7 @@ class Files extends CI_Driver_Library {
 	public function list_files($path = '.', $recursive = false)
 	{
 		if (!$this->driver) {
-			throw new Exception('server_files_driver_not_set');
+			throw new Exception(lang('server_files_driver_not_set'));
 		}
 		
 		return $this->{$this->driver}->list_files($path, $recursive);
@@ -182,7 +182,7 @@ class Files extends CI_Driver_Library {
 	public function mkdir($path = '', $permissions = NULL)
 	{
 		if (!$this->driver) {
-			throw new Exception('server_files_driver_not_set');
+			throw new Exception(lang('server_files_driver_not_set'));
 		}
 		
 		return $this->{$this->driver}->mkdir($path, $permissions);
@@ -196,7 +196,7 @@ class Files extends CI_Driver_Library {
 	public function rename($old_file, $new_file, $move = FALSE)
 	{
 		if (!$this->driver) {
-			throw new Exception('server_files_driver_not_set');
+			throw new Exception(lang('server_files_driver_not_set'));
 		}
 		
 		return $this->{$this->driver}->rename($old_file, $new_file, $move);
@@ -210,7 +210,7 @@ class Files extends CI_Driver_Library {
 	public function move($old_file, $new_file)
 	{
 		if (!$this->driver) {
-			throw new Exception('server_files_driver_not_set');
+			throw new Exception(lang('server_files_driver_not_set'));
 		}
 		
 		return $this->{$this->driver}->move($old_file, $new_file);

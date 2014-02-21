@@ -271,6 +271,6 @@ class Files_local extends CI_Driver {
 	 */
 	function _error($msg)
 	{
-		throw new Exception($msg);
+		throw new Exception(lang($msg));
 	}
 }
