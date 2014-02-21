@@ -773,7 +773,6 @@ class Server_command extends CI_Controller {
 						$message = $e->getMessage();
 				
 						if ($this->users->auth_data['is_admin']) {
-							$message .= ' (' . strtoupper($this->servers->server_data['control_protocol']) . ')';
 							$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . get_last_command() . '</code></p>';
 						}
 						
@@ -876,7 +875,6 @@ class Server_command extends CI_Controller {
 						$message = $e->getMessage();
 				
 						if ($this->users->auth_data['is_admin']) {
-							$message .= ' (' . strtoupper($this->servers->server_data['control_protocol']) . ')';
 							$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . get_last_command() . '</code></p>';
 						}
 						
@@ -979,7 +977,6 @@ class Server_command extends CI_Controller {
 						$message = $e->getMessage();
 				
 						if ($this->users->auth_data['is_admin']) {
-							$message .= ' (' . strtoupper($this->servers->server_data['control_protocol']) . ')';
 							$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . get_last_command() . '</code></p>';
 						}
 						
