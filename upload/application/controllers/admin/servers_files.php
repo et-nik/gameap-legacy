@@ -307,7 +307,7 @@ class Servers_files extends CI_Controller {
 				$this->tpl_data['content'] .= $this->parser->parse('servers/edit_file.html', $local_tpl_data, true);
 				
 			} catch (Exception $e) {
-				$message = lang($e->getMessage());
+				$message = $e->getMessage();
 				
 				/* Сохраняем логи */
 				$log_data['type'] = 'server_files';
@@ -352,7 +352,7 @@ class Servers_files extends CI_Controller {
 				
 			} catch (Exception $e) {
 				
-				$message = lang($e->getMessage());
+				$message = $e->getMessage();
 				
 				// Отображаем админу дополнительную информацию
 				if ($this->users->auth_data['is_admin']) {
@@ -474,7 +474,7 @@ class Servers_files extends CI_Controller {
 				
 				unlink($file_data['full_path']);
 				
-				$message = lang($e->getMessage());
+				$message = $e->getMessage();
 				
 				/* Сохраняем логи */
 				$log_data['type'] = 'server_files';
