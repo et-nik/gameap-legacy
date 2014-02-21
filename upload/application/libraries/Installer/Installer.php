@@ -48,6 +48,8 @@ class Installer extends CI_Driver_Library {
         
         $this->_CI->config->load('drivers');
         $this->_CI->load->helper('patterns_helper');
+        $this->_CI->load->helper('string');
+        $this->_CI->load->helper('ds');
         $this->valid_drivers = array('installer_goldsource', 'installer_source', 'installer_minecraft', 'installer_samp',
 										'installer_cod4',
 									);
@@ -92,14 +94,12 @@ class Installer extends CI_Driver_Library {
 	*/
 	public function get_start_command()
 	{
-		$engine = $this->_engine;
-		
-		if (false == in_array('installer_' . $engine, $this->valid_drivers)) {
-			$this->errors = 'Driver' . $this->engine . ' not found';
+		if (false == in_array('installer_' . $this->_engine, $this->valid_drivers)) {
+			$this->errors = 'Driver' . $this->_engine . ' not found';
 			return '';
 		}
 		
-		return $this->{$engine}->get_start_command($this->_game_code, $this->_os);
+		return $this->{$this->_engine}->get_start_command($this->_game_code, $this->_os);
 	}
 	
 	// ------------------------------------------------------------------------
@@ -109,14 +109,12 @@ class Installer extends CI_Driver_Library {
 	*/
 	public function get_default_parameters($aliases_values = array())
 	{
-		$engine = $this->_engine;
-		
-		if (false == in_array('installer_' . $engine, $this->valid_drivers)) {
-			$this->errors = 'Driver' . $this->engine . ' not found';
+		if (false == in_array('installer_' . $this->_engine, $this->valid_drivers)) {
+			$this->errors = 'Driver' . $this->_engine . ' not found';
 			return '';
 		}
 		
-		return $this->{$engine}->get_default_parameters($this->_game_code, $this->_os, $aliases_values);
+		return $this->{$this->_engine}->get_default_parameters($this->_game_code, $this->_os, $aliases_values);
 	}
 	
 	// ------------------------------------------------------------------------
@@ -126,13 +124,11 @@ class Installer extends CI_Driver_Library {
 	*/
 	public function change_config()
 	{
-		$engine = $this->_engine;
-		
-		if (false == in_array('installer_' . $engine, $this->valid_drivers)) {
-			$this->errors = 'Driver' . $this->engine . ' not found';
+		if (false == in_array('installer_' . $this->_engine, $this->valid_drivers)) {
+			$this->errors = 'Driver' . $this->_engine . ' not found';
 			return false;
 		}
-
-		return $this->{$engine}->change_config();
+		
+		return $this->{$this->_engine}->change_config();
 	}
 }
