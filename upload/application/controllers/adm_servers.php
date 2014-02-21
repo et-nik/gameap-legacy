@@ -191,7 +191,7 @@ class Adm_servers extends CI_Controller {
 		
 		try {
 			$this->files->set_driver('ftp');
-			$this->ftp->connect($ftp_config);
+			$this->files->connect($ftp_config);
 			return true;
 		} catch (Exception $e) {
 			return false;
