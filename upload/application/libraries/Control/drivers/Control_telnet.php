@@ -107,19 +107,19 @@ class Control_telnet extends CI_Driver {
 		}
 
 		if (!$file_perm['exists']) {
-			throw new Exception(lang('server_command_file_not_found', $file_name));
+			throw new Exception(lang('server_command_file_not_found', $file_name) . ' (Telnet)');
 		}
 		
 		if (strpos($privileges, 'r') !== false && !$file_perm['readable']) {
-			throw new Exception(lang('server_command_file_not_readable', $file_name));
+			throw new Exception(lang('server_command_file_not_readable', $file_name) . ' (Telnet)');
 		}
 		
 		if (strpos($privileges, 'w') !== false && !$file_perm['writable']) {
-			throw new Exception(lang('server_command_file_not_writable', $file_name));
+			throw new Exception(lang('server_command_file_not_writable', $file_name) . ' (Telnet)');
 		}
 		
 		if (strpos($privileges, 'x') !== false && !$file_perm['executable']) {
-			throw new Exception(lang('server_command_file_not_executable', $file_name));
+			throw new Exception(lang('server_command_file_not_executable', $file_name) . ' (Telnet)');
 		}
 
 		return true;
@@ -141,7 +141,7 @@ class Control_telnet extends CI_Driver {
 		}
 
 		if (!$ip OR !$port) {
-			throw new Exception(lang('server_command_empty_connect_data'));
+			throw new Exception(lang('server_command_empty_connect_data') . ' (Telnet)');
 		}
 		
 		$this->ip = $ip;
@@ -151,7 +151,7 @@ class Control_telnet extends CI_Driver {
 		@socket_set_timeout($this->_connection, 5);
 
 		if (!$this->_connection) {
-			throw new Exception(lang('server_command_connection_failed'));
+			throw new Exception(lang('server_command_connection_failed') . ' (Telnet)');
 		}
 		
 		$this->_auth = false;
@@ -170,7 +170,7 @@ class Control_telnet extends CI_Driver {
 		}
 		
 		if(!$login OR !$password) {
-			throw new Exception(lang('server_command_empty_auth_data'));
+			throw new Exception(lang('server_command_empty_auth_data') . ' (Telnet)');
 		}
 
 		$this->_read_till("ogin: ");
@@ -183,7 +183,7 @@ class Control_telnet extends CI_Driver {
 		 * В Linux при неудачной попытке пишется "Login incorrect"
 		*/
 		if (strpos($auth_string, 'Login Failed') !== false OR strpos($auth_string, 'Login incorrect') !== false) {
-			throw new Exception(lang('server_command_auth_failed'));
+			throw new Exception(lang('server_command_auth_failed') . ' (Telnet)');
 		}
 
 		$this->_write("\r\n");
@@ -201,11 +201,11 @@ class Control_telnet extends CI_Driver {
 	function command($command)
 	{
 		if (!$this->_connection OR !$this->_auth) {
-			throw new Exception(lang('server_command_not_connected'));
+			throw new Exception(lang('server_command_not_connected') . ' (Telnet)');
 		}
 		
 		if (!$command) {
-			throw new Exception(lang('server_command_empty_command'));
+			throw new Exception(lang('server_command_empty_command') . ' (Telnet)');
 		}
 		
 		$this->_write($command . "\r\n");

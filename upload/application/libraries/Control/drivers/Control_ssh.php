@@ -105,19 +105,19 @@ class Control_ssh extends CI_Driver {
 		}
 
 		if (!$file_perm['exists']) {
-			throw new Exception(lang('server_command_file_not_found', $file_name));
+			throw new Exception(lang('server_command_file_not_found', $file_name) . ' (SSH)');
 		}
 		
 		if (strpos($privileges, 'r') !== false && !$file_perm['readable']) {
-			throw new Exception(lang('server_command_file_not_readable', $file_name));
+			throw new Exception(lang('server_command_file_not_readable', $file_name) . ' (SSH)');
 		}
 		
 		if (strpos($privileges, 'w') !== false && !$file_perm['writable']) {
-			throw new Exception(lang('server_command_file_not_writable', $file_name));
+			throw new Exception(lang('server_command_file_not_writable', $file_name) . ' (SSH)');
 		}
 		
 		if (strpos($privileges, 'x') !== false && !$file_perm['executable']) {
-			throw new Exception(lang('server_command_file_not_executable', $file_name));
+			throw new Exception(lang('server_command_file_not_executable', $file_name) . ' (SSH)');
 		}
 
 		return true;
@@ -139,7 +139,7 @@ class Control_ssh extends CI_Driver {
 		}
 		
 		if (!$ip OR !$port) {
-			throw new Exception(lang('server_command_empty_connect_data'));
+			throw new Exception(lang('server_command_empty_connect_data') . ' (SSH)');
 		}
 		
 		$this->ip 	= $ip;
@@ -148,7 +148,7 @@ class Control_ssh extends CI_Driver {
 		@$this->_connection = ssh2_connect($ip, $port);
 		
 		if (!$this->_connection) {
-			throw new Exception(lang('server_command_connection_failed'));
+			throw new Exception(lang('server_command_connection_failed') . ' (SSH)');
 		}
 
 		return $this->_connection;
@@ -163,15 +163,15 @@ class Control_ssh extends CI_Driver {
 		}
 		
 		if (!$this->_connection) {
-			throw new Exception(lang('server_command_not_connected'));
+			throw new Exception(lang('server_command_not_connected') . ' (SSH)');
 		}
 		
 		if(!$login) {
-			throw new Exception(lang('server_command_empty_auth_data'));
+			throw new Exception(lang('server_command_empty_auth_data') . ' (SSH)');
 		}
 
 		if (!@ssh2_auth_password($this->_connection, $login, $password)) {
-			throw new Exception(lang('server_command_login_failed'));
+			throw new Exception(lang('server_command_login_failed') . ' (SSH)');
 		}
 		
 		$this->_auth = true;
@@ -187,11 +187,11 @@ class Control_ssh extends CI_Driver {
 	function command($command)
 	{
 		if (!$this->_connection OR !$this->_auth) {
-			throw new Exception(lang('server_command_not_connected'));
+			throw new Exception(lang('server_command_not_connected') . ' (SSH)');
 		}
 		
 		if (!$command) {
-			throw new Exception(lang('server_command_empty_command'));
+			throw new Exception(lang('server_command_empty_command') . ' (SSH)');
 		}
 		
 		$stream = ssh2_exec($this->_connection, $command);

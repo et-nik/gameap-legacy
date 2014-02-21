@@ -677,7 +677,7 @@ class Files_ftp extends CI_Driver {
 	 */
 	function _error($msg)
 	{
-		throw new Exception(lang($msg));
+		throw new Exception(lang($msg) . ' (FTP)');
 	}
 
 

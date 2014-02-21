@@ -33,7 +33,7 @@ class Control_local extends CI_Driver {
 		$disabled_functions = explode(',', ini_get('disable_functions'));
 		
 		if (in_array('exec', $disabled_functions)) {
-			throw new Exception(lang('server_command_exec_disabled'));
+			throw new Exception(lang('server_command_exec_disabled') . ' (Local)');
 		}
 	}
 	
@@ -50,19 +50,19 @@ class Control_local extends CI_Driver {
 		$file_name = basename($file);
 		
 		if (!file_exists($file)) {
-			throw new Exception(lang('server_command_file_not_found', $file_name));
+			throw new Exception(lang('server_command_file_not_found', $file_name) . ' (Local)');
 		}
 		
 		if (strpos($privileges, 'r') !== false && !is_readable($file)) {
-			throw new Exception(lang('server_command_file_not_readable', $file_name));
+			throw new Exception(lang('server_command_file_not_readable', $file_name) . ' (Local)');
 		}
 		
 		if (strpos($privileges, 'w') !== false && !is_writable($file)) {
-			throw new Exception(lang('server_command_file_not_writable', $file_name));
+			throw new Exception(lang('server_command_file_not_writable', $file_name) . ' (Local)');
 		}
 		
 		if (strpos($privileges, 'x') !== false && !is_executable($file)) {
-			throw new Exception(lang('server_command_file_not_executable', $file_name));
+			throw new Exception(lang('server_command_file_not_executable', $file_name) . ' (Local)');
 		}
 		
 		return true;
@@ -90,7 +90,7 @@ class Control_local extends CI_Driver {
 	function command($command)
 	{
 		if (!$command) {
-			throw new Exception(lang('server_command_empty_command'));
+			throw new Exception(lang('server_command_empty_command') . ' (Local)');
 		}
 		
 		exec($command, $output);
