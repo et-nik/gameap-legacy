@@ -233,7 +233,7 @@ class Adm_servers extends CI_Controller {
 		
 		try {
 			$this->files->connect($sftp_config);
-			return $this->sftp->search(array('server.sh', 'server.exe'), $sftp_path, $exclude_dirs, 4);
+			return $this->files->search(array('server.sh', 'server.exe'), $sftp_path, $exclude_dirs, 4);
 		} catch (Exception $e) {
 			return false;
 		}
