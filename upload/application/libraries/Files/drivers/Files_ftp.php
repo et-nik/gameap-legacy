@@ -92,26 +92,27 @@ class Files_ftp extends CI_Driver {
 	 */
 	function connect($config = array())
 	{
-		if (count($config) > 0)
-		{
+		if ($this->conn_id && $config['hostname'] == $this->hostname) {
+			// Уже соединен с этим сервером, повторно соединяться не требуется
+			return;
+		}
+		
+		if (count($config) > 0) {
 			$this->initialize($config);
 		}
 
-		if (FALSE === ($this->conn_id = @ftp_connect($this->hostname, $this->port)))
-		{
+		if (FALSE === ($this->conn_id = @ftp_connect($this->hostname, $this->port))) {
 			$this->_error('ftp_unable_to_connect');
 			return FALSE;
 		}
 
-		if ( ! $this->_login())
-		{
+		if ( ! $this->_login()) {
 			$this->_error('ftp_unable_to_login');
 			return FALSE;
 		}
 
 		// Set passive mode if needed
-		if ($this->passive == TRUE)
-		{
+		if ($this->passive == TRUE) {
 			ftp_pasv($this->conn_id, TRUE);
 		}
 

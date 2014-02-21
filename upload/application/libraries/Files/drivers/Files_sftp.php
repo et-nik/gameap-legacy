@@ -93,8 +93,12 @@ class Files_sftp extends CI_Driver {
 	 */
 	function connect($config = array())
 	{
-		if (count($config) > 0)
-		{
+		if ($this->conn && $config['hostname'] == $this->hostname) {
+			// Уже соединен с этим сервером, повторно соединяться не требуется
+			return;
+		}
+		
+		if (count($config) > 0) {
 			$this->initialize($config);
 		}
 		
@@ -102,16 +106,14 @@ class Files_sftp extends CI_Driver {
 		$this->conn = ssh2_connect($this->hostname, $this->port);
 		
 		// Try and login...
-		if (!$this->_login())
-		{
+		if (!$this->_login()) {
 			$this->_error('sftp_unable_to_login_to_ssh');
 			return FALSE;
 		}
 		
 		// Once logged in successfully, try to open SFTP resource on remote system.
 		// If successful, set this resource as a global variable.
-		if (FALSE === ($this->conn_sftp = @ssh2_sftp($this->conn)))
-		{
+		if (FALSE === ($this->conn_sftp = @ssh2_sftp($this->conn))) {
 			$this->_error('sftp_unable_to_open_sftp_resource');
 			return FALSE;
 		}

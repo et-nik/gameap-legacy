@@ -25,6 +25,9 @@
  
 class Control_ssh extends CI_Driver {
 	
+	var $ip				= false;
+	var $port 			= 22;
+	
 	var $_connection 	= false;
 	var $errors 		= '';
 	
@@ -59,10 +62,17 @@ class Control_ssh extends CI_Driver {
 	*/
 	function connect($ip = false, $port = 22)
 	{
+		if ($this->_connection && $this->ip == $ip) {
+			/* Уже соединен с этим сервером, экономим электроэнергию */
+			return;
+		}
+		
 		if (!$ip OR !$port) {
 			throw new Exception(lang('server_command_empty_connect_data'));
 		}
 		
+		$this->ip 	= $ip;
+		$this->port = $port;
 		$this->_auth = false;
 		@$this->_connection = ssh2_connect($ip, $port);
 		
@@ -77,6 +87,10 @@ class Control_ssh extends CI_Driver {
 	
 	function auth($login, $password)
 	{
+		if ($this->auth) {
+			return true;
+		}
+		
 		if (!$this->_connection) {
 			throw new Exception(lang('server_command_not_connected'));
 		}
