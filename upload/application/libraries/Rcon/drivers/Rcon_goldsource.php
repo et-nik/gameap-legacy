@@ -177,7 +177,28 @@ class Rcon_goldsource extends CI_Driver {
 	*/
 	function change_rcon($rcon_password = '')
 	{
-		$file = $this->CI->servers->server_data['start_code'] . '/server.cfg'; // Конфиг файл
+		$this->CI->load->helper('ds');
+		$this->CI->load->helper('string');
+		
+		switch(get_file_protocol($this->CI->servers->server_data)) {
+			case 'ftp':
+				$dir = reduce_double_slashes($this->CI->servers->server_data['ftp_path'] . '/' . $this->CI->servers->server_data['dir'] . '/');
+				break;
+				
+			case 'sftp':
+				$dir = reduce_double_slashes($this->CI->servers->server_data['ssh_path'] . '/' . $this->CI->servers->server_data['dir'] . '/');
+				break;
+				
+			case 'local':
+				$dir = reduce_double_slashes($this->CI->servers->server_data['script_path'] . '/' . $this->CI->servers->server_data['dir'] . '/');
+				break;
+				
+			default:
+				$this->_show_message(lang('server_files_driver_not_set'));
+				return false;
+		}
+		
+		$file = $dir. $this->CI->servers->server_data['start_code'] . '/server.cfg'; // Конфиг файл
 		$file_contents = $this->CI->servers->read_file($file);
 		
 		/* Ошибка чтения, либо файл не найден */
@@ -194,10 +215,6 @@ class Rcon_goldsource extends CI_Driver {
 			$this->command('rcon_password ' . $rcon_password);
 		}
 		
-		if ($write_result) {
-			return true;
-		} else {
-			return false;
-		}
+		return $write_result;
 	}
 }
