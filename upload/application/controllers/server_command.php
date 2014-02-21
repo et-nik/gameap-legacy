@@ -770,7 +770,7 @@ class Server_command extends CI_Controller {
 						return true;
 						
 					} catch (Exception $e) {
-						$message = lang($e->getMessage());
+						$message = $e->getMessage();
 				
 						if ($this->users->auth_data['is_admin']) {
 							$message .= ' (' . strtoupper($this->servers->server_data['control_protocol']) . ')';
@@ -785,7 +785,7 @@ class Server_command extends CI_Controller {
 						$log_data['user_name'] = $this->users->auth_login;
 						$log_data['server_id'] = $this->servers->server_data['id'];
 						$log_data['msg'] = 'Start server Error';
-						$log_data['log_data'] = lang($e->getMessage()) . "\n" . get_last_command();
+						$log_data['log_data'] = $e->getMessage() . "\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
 						
 						return false;
@@ -873,7 +873,7 @@ class Server_command extends CI_Controller {
 						return true;
 						
 					} catch (Exception $e) {
-						$message = lang($e->getMessage());
+						$message = $e->getMessage();
 				
 						if ($this->users->auth_data['is_admin']) {
 							$message .= ' (' . strtoupper($this->servers->server_data['control_protocol']) . ')';
@@ -888,7 +888,7 @@ class Server_command extends CI_Controller {
 						$log_data['user_name'] = $this->users->auth_login;
 						$log_data['server_id'] = $this->servers->server_data['id'];
 						$log_data['msg'] = 'Stop server Error';
-						$log_data['log_data'] = lang($e->getMessage()) . "\n" . get_last_command();
+						$log_data['log_data'] = $e->getMessage() . "\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
 						
 						return false;
@@ -976,7 +976,7 @@ class Server_command extends CI_Controller {
 						return true;
 						
 					} catch (Exception $e) {
-						$message = lang($e->getMessage());
+						$message = $e->getMessage();
 				
 						if ($this->users->auth_data['is_admin']) {
 							$message .= ' (' . strtoupper($this->servers->server_data['control_protocol']) . ')';
@@ -991,7 +991,7 @@ class Server_command extends CI_Controller {
 						$log_data['user_name'] = $this->users->auth_login;
 						$log_data['server_id'] = $this->servers->server_data['id'];
 						$log_data['msg'] = 'Restart server Error';
-						$log_data['log_data'] = lang($e->getMessage()) . "\n" . get_last_command();
+						$log_data['log_data'] = $e->getMessage() . "\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
 						
 						return false;
