@@ -47,24 +47,22 @@ class Control_local extends CI_Driver {
 	 */
 	public function check_file($file, $privileges = '')
 	{
+		$file_name = basename($file);
+		
 		if (!file_exists($file)) {
-			throw new Exception(lang('server_command_file_not_found'));
-			return false;
+			throw new Exception(lang('server_command_file_not_found', $file_name));
 		}
 		
 		if (strpos($privileges, 'r') !== false && !is_readable($file)) {
-			throw new Exception(lang('server_command_file_not_readable'));
-			return false;
+			throw new Exception(lang('server_command_file_not_readable', $file_name));
 		}
 		
 		if (strpos($privileges, 'w') !== false && !is_writable($file)) {
-			throw new Exception(lang('server_command_file_not_writable'));
-			return false;
+			throw new Exception(lang('server_command_file_not_writable', $file_name));
 		}
 		
 		if (strpos($privileges, 'x') !== false && !is_executable($file)) {
-			throw new Exception(lang('server_command_file_not_executable'));
-			return false;
+			throw new Exception(lang('server_command_file_not_executable', $file_name));
 		}
 		
 		return true;
