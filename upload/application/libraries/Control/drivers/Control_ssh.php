@@ -65,6 +65,9 @@ class Control_ssh extends CI_Driver {
 		if ($this->_connection && $this->ip == $ip) {
 			/* Уже соединен с этим сервером, экономим электроэнергию */
 			return;
+		} elseif ($this->_connection) {
+			// Разрываем соединение со старым сервером
+			$this->disconnect();
 		}
 		
 		if (!$ip OR !$port) {

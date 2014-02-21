@@ -67,6 +67,9 @@ class Control_telnet extends CI_Driver {
 		if ($this->ip && $this->ip == $ip && $this->_connection) {
 			/* Уже соединен с этим сервером */
 			return true;
+		} elseif ($this->_connection) {
+			// Разрываем соединение со старым сервером
+			$this->disconnect();
 		}
 
 		if (!$ip OR !$port) {
