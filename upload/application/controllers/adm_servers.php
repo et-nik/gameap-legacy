@@ -665,11 +665,11 @@ class Adm_servers extends CI_Controller {
 						/* 				Выделенные серверы 				*/
 						/* --------------------------------------------	*/
 					
-						$sql_data['name'] = $this->input->post('name');
-						$sql_data['os'] = $this->input->post('os');
-						$sql_data['control_protocol'] = $this->input->post('control_protocol');
-						$sql_data['location'] = $this->input->post('location');
-						$sql_data['provider'] = $this->input->post('provider');
+						$sql_data['name'] 				= $this->input->post('name');
+						$sql_data['os'] 				= strtolower($this->input->post('os'));
+						$sql_data['control_protocol'] 	= strtolower($this->input->post('control_protocol'));
+						$sql_data['location'] 			= $this->input->post('location');
+						$sql_data['provider'] 			= $this->input->post('provider');
 						
 						/* Обработка списка IP адресов */
 						$ip_list = explode(',', str_replace(' ', '', $this->input->post('ip')));
@@ -741,6 +741,21 @@ class Adm_servers extends CI_Controller {
 						if (!empty($sql_data['telnet_host'])) {
 							if (false == $this->_check_telnet($sql_data['telnet_host'], $sql_data['telnet_login'], $sql_data['telnet_password'])) {
 								$this->_show_message(lang('adm_servers_telnet_data_unavailable'), 'javascript:history.back()');
+								return false;
+							}
+						}
+						
+						// Определение протокола управления
+						if (!$sql_data['control_protocol'] && $sql_data['os'] != 'windows') {
+							$sql_data['control_protocol'] = 'ssh';
+						} elseif (!$sql_data['control_protocol']) {
+							$sql_data['control_protocol'] = 'telnet';
+						}
+						
+						// Локальный сервер должен быть один
+						if ($sql_data['control_protocol'] == 'local') {
+							if (!$this->dedicated_servers->ds_live(array('control_protocol' => 'local'))) {
+								$this->_show_message('adm_servers_must_be_one');
 								return false;
 							}
 						}
@@ -1080,6 +1095,13 @@ class Adm_servers extends CI_Controller {
 				//if(in_array('ssh2', get_loaded_extensions()));
 				$options = array('ssh' => 'SSH', 'telnet' => 'Telnet');
 				
+				if ($this->dedicated_servers->ds_list['0']['control_protocol'] == 'local') {
+					// Поле Local отображается лишь для локального сервера
+					// Однако можно вручную подменить значения в html коде,
+					// но в этом нет ничего страшного
+					$options['local'] = 'Local';
+				}
+				
 				$local_tpl_data['control_protocol'] = form_dropdown('control_protocol', $options, $this->dedicated_servers->ds_list['0']['control_protocol']);
 				
 				$local_tpl_data['steamcmd_path'] 	= $this->dedicated_servers->ds_list['0']['steamcmd_path'];
@@ -1100,47 +1122,41 @@ class Adm_servers extends CI_Controller {
 				
 				$local_tpl_data['servers_list'] = $this->servers->tpl_data();
 					
-				// Редактирование основных параметров
-				if ($this->input->post('edit_ds')) {
-						
-					/* 
-					 * Правила для формы
-					 * 
-					 * Документация:
-					 * http://cidocs.ru/213/libraries/form_validation.html
-					 * 
-					*/
-					$this->form_validation->set_rules('name', 'название', 'trim|required|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('os', 'операционная система', 'trim|required|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('location', 'расположение', 'trim|required|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('provider', 'провайдер', 'trim|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('ip', 'IP', 'trim|required|xss_clean');
-					$this->form_validation->set_rules('ram', 'RAM', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('cpu', 'CPU', 'trim|max_length[64]|xss_clean');
-				}
-					
-					// Редактирование данных доступа к серверу (пароли ftp, ssh)
-				if ($this->input->post('edit_access_ds')) {
-					$this->form_validation->set_rules('steamcmd_path', 'путь к SteamCMD', 'trim|max_length[256]|xss_clean');
-					
-					$this->form_validation->set_rules('ssh_host', 'SSH хост', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('ssh_login', 'SSH логин', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('ssh_password', 'SSH пароль', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('ssh_path', 'Путь SSH', 'trim|max_length[256]|xss_clean');
-						
-					$this->form_validation->set_rules('telnet_host', 'Telnet хост', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('telnet_login', 'Telnet логин', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('telnet_password', 'Telnet пароль', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('telnet_path', 'Путь Telnet', 'trim|max_length[256]|xss_clean');
-						
-					$this->form_validation->set_rules('ftp_host', 'FTP хост', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('ftp_login', 'FTP логин', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('ftp_password', 'FTP пароль', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('ftp_path', 'Путь FTP', 'trim|max_length[256]|xss_clean');
-						
-					$this->form_validation->set_rules('control_protocol', 'Протокол управления', 'trim|min_length[3]|max_length[16]|xss_clean');
-				}
+				/* 
+				 * Правила для формы
+				 * 
+				 * Документация:
+				 * http://cidocs.ru/213/libraries/form_validation.html
+				 * 
+				*/
+				$this->form_validation->set_rules('name', 'название', 'trim|required|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('os', 'операционная система', 'trim|required|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('location', 'расположение', 'trim|required|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('provider', 'провайдер', 'trim|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('ip', 'IP', 'trim|required|xss_clean');
+				$this->form_validation->set_rules('ram', 'RAM', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('cpu', 'CPU', 'trim|max_length[64]|xss_clean');
+
+				// Редактирование данных доступа к серверу (пароли ftp, ssh)
+				$this->form_validation->set_rules('steamcmd_path', 'путь к SteamCMD', 'trim|max_length[256]|xss_clean');
 				
+				$this->form_validation->set_rules('ssh_host', 'SSH хост', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('ssh_login', 'SSH логин', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('ssh_password', 'SSH пароль', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('ssh_path', 'Путь SSH', 'trim|max_length[256]|xss_clean');
+					
+				$this->form_validation->set_rules('telnet_host', 'Telnet хост', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('telnet_login', 'Telnet логин', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('telnet_password', 'Telnet пароль', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('telnet_path', 'Путь Telnet', 'trim|max_length[256]|xss_clean');
+					
+				$this->form_validation->set_rules('ftp_host', 'FTP хост', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('ftp_login', 'FTP логин', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('ftp_password', 'FTP пароль', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('ftp_path', 'Путь FTP', 'trim|max_length[256]|xss_clean');
+					
+				$this->form_validation->set_rules('control_protocol', 'Протокол управления', 'trim|min_length[3]|max_length[16]|xss_clean');
+					
 				break;
 				
 			case 'game_servers':
@@ -1597,41 +1613,35 @@ class Adm_servers extends CI_Controller {
 					/* 				Выделенные серверы 				*/
 					/* --------------------------------------------	*/
 					
-					if($this->input->post('edit_ds')){
-						
-							// Форма проверена, все хорошо, добавляем сервер
-							$sql_data['name'] = $this->input->post('name');
-							$sql_data['os'] = $this->input->post('os');
-							$sql_data['location'] = $this->input->post('location');
-							$sql_data['provider'] = $this->input->post('provider');
-							$sql_data['ram'] = (int)$this->input->post('ram');
-							$sql_data['cpu'] = (int)$this->input->post('cpu');
-							
-							/* Обработка списка IP адресов */
-							$ip_list = explode(',', str_replace(' ', '', $this->input->post('ip')));
-							$sql_data['ip'] = json_encode($ip_list);
-					}
+					// Форма проверена, все хорошо, добавляем сервер
+					$sql_data['name'] = $this->input->post('name');
+					$sql_data['os'] = $this->input->post('os');
+					$sql_data['location'] = $this->input->post('location');
+					$sql_data['provider'] = $this->input->post('provider');
+					$sql_data['ram'] = (int)$this->input->post('ram');
+					$sql_data['cpu'] = (int)$this->input->post('cpu');
+					
+					/* Обработка списка IP адресов */
+					$ip_list = explode(',', str_replace(' ', '', $this->input->post('ip')));
+					$sql_data['ip'] = json_encode($ip_list);
 					
 					// Редактирование данных доступа к серверу (пароли ftp, ssh)
-					if($this->input->post('edit_access_ds')) {
-							$sql_data['steamcmd_path'] 		= $this->input->post('steamcmd_path');
-							$sql_data['control_protocol'] 	= $this->input->post('control_protocol');
-							$sql_data['ssh_host'] 			= $this->input->post('ssh_host');
-							$sql_data['ssh_login'] 			= $this->input->post('ssh_login');
-							$sql_data['ssh_password'] 		= $this->input->post('ssh_password');
-							$sql_data['ssh_path'] 			= $this->input->post('ssh_path');
-							
-							$sql_data['telnet_host'] 		= $this->input->post('telnet_host');
-							$sql_data['telnet_login']		= $this->input->post('telnet_login');
-							$sql_data['telnet_password'] 	= $this->input->post('telnet_password');
-							$sql_data['telnet_path']		= $this->input->post('telnet_path');
-							
-							$sql_data['ftp_host'] 			= $this->input->post('ftp_host');
-							$sql_data['ftp_login'] 			= $this->input->post('ftp_login');
-							$sql_data['ftp_password'] 		= $this->input->post('ftp_password');
-							$sql_data['ftp_path'] 			= $this->input->post('ftp_path');	
-					}
+					$sql_data['steamcmd_path'] 		= $this->input->post('steamcmd_path');
+					$sql_data['control_protocol'] 	= $this->input->post('control_protocol');
+					$sql_data['ssh_host'] 			= $this->input->post('ssh_host');
+					$sql_data['ssh_login'] 			= $this->input->post('ssh_login');
+					$sql_data['ssh_password'] 		= $this->input->post('ssh_password');
+					$sql_data['ssh_path'] 			= $this->input->post('ssh_path');
 					
+					$sql_data['telnet_host'] 		= $this->input->post('telnet_host');
+					$sql_data['telnet_login']		= $this->input->post('telnet_login');
+					$sql_data['telnet_password'] 	= $this->input->post('telnet_password');
+					$sql_data['telnet_path']		= $this->input->post('telnet_path');
+					
+					$sql_data['ftp_host'] 			= $this->input->post('ftp_host');
+					$sql_data['ftp_login'] 			= $this->input->post('ftp_login');
+					$sql_data['ftp_password'] 		= $this->input->post('ftp_password');
+					$sql_data['ftp_path'] 			= $this->input->post('ftp_path');	
 					/* 
 					 * Проверка указандых данных ssh, telnet, ftp
 					 * чтобы пароль подходил
