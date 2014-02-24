@@ -211,3 +211,4 @@ $lang['adm_servers_go_to_game']						= 'Перейти к игре';
 $lang['adm_servers_sftp_path_not_found']			= 'Исполняемый файл на сервере SSH по указанному пути не найден (server.sh или server.exe).';
 $lang['adm_servers_ftp_path_not_found']				= 'На FTP сервере не найден путь к исполняемым файлам (server.sh или server.exe).';
 $lang['adm_servers_modifications']					= 'Модификации';
+$lang['adm_servers_must_be_one']					= 'Локальный сервер должен быть только один.';
