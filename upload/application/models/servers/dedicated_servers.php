@@ -139,7 +139,7 @@ class Dedicated_servers extends CI_Model {
      * @return array
      *
     */
-    function get_ds_list($where = false, $limit = 1)
+    function get_ds_list($where = false, $limit = 99999)
     {
 		$this->load->library('encrypt');
 
@@ -251,13 +251,20 @@ class Dedicated_servers extends CI_Model {
     
     /**
      * Проверяет, существует ли выделенный сервер с данным id
+     * Параметру id может быть передан id сервера, либо массив where
      * 
      * @return bool
     */  
-    function ds_live($id = false) {
-		
+    function ds_live($id = false) 
+    {
 		if (false == $id) {
 			return false;
+		}
+		
+		if (!is_array()) {
+			$this->db->where($id);
+		} else {
+			$this->db->where(array('id' => $id));
 		}
 
         if ($this->db->count_all_results('dedicated_servers') > 0) {
