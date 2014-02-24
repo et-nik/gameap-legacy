@@ -373,13 +373,33 @@ class Cron extends MX_Controller {
     */
 	function _unpack_files($server_id, $pack_file)
 	{
+		$pathinfo = pathinfo($pack_file);
+		
 		switch (strtolower($this->servers_data[$server_id]['os'])) {
 			case 'windows':
 				$commands[] = '"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($pack_file) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($pack_file);
 				break;
 
 			default:
-				$commands[] = 'unzip -o ' . basename($pack_file) . ' && rm ' . basename($pack_file);
+			
+				switch (strtolower($pathinfo['extension'])) {
+					case 'gz':
+						$commands[] = 'tar -xvfz ' . basename($pack_file) . ' && rm ' . basename($pack_file);;
+						break;
+					
+					case 'bz2':
+						$commands[] = 'tar -xvf ' . basename($pack_file) . ' && rm ' . basename($pack_file);;
+						break;
+						
+					case 'tar':
+						$commands[] = 'tar -xvf ' . basename($pack_file) . ' && rm ' . basename($pack_file);;
+						break;
+						
+					default:
+						$commands[] = 'unzip -o ' . basename($pack_file) . ' && rm ' . basename($pack_file);
+						break;
+				}
+			
 				break;
 		}
 		
