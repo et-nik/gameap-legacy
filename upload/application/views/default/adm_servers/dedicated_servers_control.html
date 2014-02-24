@@ -7,86 +7,82 @@
 <p>{lang_adm_servers_ds_documentation}</p>
 
 <form action="{site_url}adm_servers/edit/dedicated_servers/{ds_id}" method="post" accept-charset="utf-8">
-<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
-<table width="50%" class="zebra">
-<tr>
-	<td>{lang_name}:</td>
-	<td><input type="text" name="name" value="{ds_name}" /></td>
-</tr>
-
-<tr>
-	<td>{lang_operationg_system}:</td>
-	<td><input type="text" name="os" value="{ds_os}" /></td>
-</tr>
-
-<tr>
-	<td>{lang_adm_servers_location}:</td>
-	<td><input type="text" name="location" value="{ds_location}" /></td>
-</tr>
-
-<tr>
-	<td>{lang_adm_servers_provider}:</td>
-	<td><input type="text" name="provider" value="{ds_provider}" /></td>
-</tr>
-
-<tr>
-	<td>{lang_ip}:<br /><span class="description">{lang_adm_servers_ip_description}</span></td>
-	<td><input type="text" name="ip" value="{ds_ip}" /></td>
-</tr>
-
-<tr>
-	<td>{lang_adm_servers_ram}:</td>
-	<td><input type="text" name="ram" value="{ds_ram}" /></td>
-</tr>
-
-<tr>
-	<td>{lang_adm_servers_cpu}:</td>
-	<td><input type="text" name="cpu" value="{ds_cpu}" /></td>
-</tr>
-
-<tr>
-<tr>
-	<td></td>
-	<td><input class="button" type="submit" name="edit_ds" value="{lang_save}" /></td>
-</tr>
-</table>
-
-</form>
-
-<div style="display: none;">
-    <div class="box-modal" id="popup">
-        <div class="box-modal_close arcticmodal-close">close</div>
-		<table class="zebra" width="100%">
-		<tr>
-			<tbody>
-				<tr>
-					<td colspan="4"><p class="hr">{lang_adm_servers_game_servers_on_this_ds}</p></td>
-				</tr>
-			</tbody>
-			<tr>
-				<td><strong>{lang_adm_servers_game_server_name}</strong></td>
-				<td><strong>{lang_adm_servers_game}</strong></td>
-				<td><strong>{lang_adm_servers_game_server_ip}</strong></td>
-				<td><strong>{lang_commands}</strong></td>
-			</tr>
-			{servers_list}
-			<tr>
-				<td>{server_name}</td>
-				<td>{server_game}</td>
-				<td>{server_ip}:{server_port}</td>
-				<td><a class="small awesome" href="{site_url}adm_servers/edit/game_servers/{server_id}">{lang_control}</a>&nbsp;<a class="red small awesome" href="/adm_servers/delete/game_servers/{server_id}">X</a></td>
-			</tr>
-			{/servers_list}
-
-		</table>
-	</div>
-</div>
-
-<br />
-
-<form action="{site_url}adm_servers/edit/dedicated_servers/{ds_id}" method="post" accept-charset="utf-8">
 	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
 	
+	<table width="50%" class="zebra">
+		<tr>
+			<td>{lang_name}:</td>
+			<td><input type="text" name="name" value="{ds_name}" /></td>
+		</tr>
+
+		<tr>
+			<td>{lang_operationg_system}:</td>
+			<td><input type="text" name="os" value="{ds_os}" /></td>
+		</tr>
+
+		<tr>
+			<td>{lang_adm_servers_location}:</td>
+			<td><input type="text" name="location" value="{ds_location}" /></td>
+		</tr>
+
+		<tr>
+			<td>{lang_adm_servers_provider}:</td>
+			<td><input type="text" name="provider" value="{ds_provider}" /></td>
+		</tr>
+
+		<tr>
+			<td>{lang_ip}:<br /><span class="description">{lang_adm_servers_ip_description}</span></td>
+			<td><input type="text" name="ip" value="{ds_ip}" /></td>
+		</tr>
+
+		<tr>
+			<td>{lang_adm_servers_ram}:</td>
+			<td><input type="text" name="ram" value="{ds_ram}" /></td>
+		</tr>
+
+		<tr>
+			<td>{lang_adm_servers_cpu}:</td>
+			<td><input type="text" name="cpu" value="{ds_cpu}" /></td>
+		</tr>
+
+		<tr>
+		<tr>
+			<td></td>
+			<td><input class="button" type="submit" name="edit_ds" value="{lang_save}" /></td>
+		</tr>
+	</table>
+
+	<div style="display: none;">
+		<div class="box-modal" id="popup">
+			<div class="box-modal_close arcticmodal-close">close</div>
+			<table class="zebra" width="100%">
+			<tr>
+				<tbody>
+					<tr>
+						<td colspan="4"><p class="hr">{lang_adm_servers_game_servers_on_this_ds}</p></td>
+					</tr>
+				</tbody>
+				<tr>
+					<td><strong>{lang_adm_servers_game_server_name}</strong></td>
+					<td><strong>{lang_adm_servers_game}</strong></td>
+					<td><strong>{lang_adm_servers_game_server_ip}</strong></td>
+					<td><strong>{lang_commands}</strong></td>
+				</tr>
+				{servers_list}
+				<tr>
+					<td>{server_name}</td>
+					<td>{server_game}</td>
+					<td>{server_ip}:{server_port}</td>
+					<td><a class="small awesome" href="{site_url}adm_servers/edit/game_servers/{server_id}">{lang_control}</a>&nbsp;<a class="red small awesome" href="/adm_servers/delete/game_servers/{server_id}">X</a></td>
+				</tr>
+				{/servers_list}
+
+			</table>
+		</div>
+	</div>
+
+	<br />
+
 	<ul class="tabs">
 		<li><a href="#access_data">{lang_adm_servers_ds_access}</a></li>
 		<li><a href="#ftp_data">{lang_adm_servers_ftp_data}</a></li>
