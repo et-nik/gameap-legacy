@@ -2337,7 +2337,7 @@ class Adm_servers extends CI_Controller {
 				$local_tpl_data['message'] = lang('adm_servers_add_game_type_failed');
 			}
 			
-			$this->_show_message($local_tpl_data['message'], site_url('adm_servers/edit/game_types/' . mysql_insert_id()), lang('next')); 
+			$this->_show_message($local_tpl_data['message'], site_url('adm_servers/edit/game_types/' . $this->db->insert_id()), lang('next')); 
 			return true;
 		}
 		
