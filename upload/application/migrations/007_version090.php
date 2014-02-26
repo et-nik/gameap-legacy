@@ -39,6 +39,26 @@ class Migration_Version090 extends CI_Migration {
 			/* Вставка данных всем скопом */
 			$this->db->insert_batch('servers_privileges', $sql_data);
 		}
+		
+		// Конвертируем данные локального сервера
+		$this->load->model('servers/dedicated_servers');
+		
+		$sql_data['name'] 				= 'Local server';
+		$sql_data['os'] 				= $this->config->config['local_os'];
+		$sql_data['control_protocol'] 	= 'local';
+		$sql_data['location'] 			= 'Russia';
+		$sql_data['ip'] 				= '["localhost"]';
+		$sql_data['steamcmd_path'] 		= $this->config->config['local_steamcmd_path'];
+		$sql_data['ssh_path'] 			= $this->config->config['local_script_path'];
+		$sql_data['telnet_path'] 		= $this->config->config['local_script_path'];
+
+		$this->dedicated_servers->add_dedicated_server($sql_data);
+		$ds_id = $this->db->insert_id();
+		
+		$new_servers_data['ds_id'] = $ds_id;
+		
+		$this->db->where('ds_id', 0);
+		$this->db->update('servers', $new_servers_data);
 
 	}
 	
