@@ -260,8 +260,8 @@ class Dedicated_servers extends CI_Model {
 		if (false == $id) {
 			return false;
 		}
-		
-		if (!is_array()) {
+
+		if (is_array($id)) {
 			$this->db->where($id);
 		} else {
 			$this->db->where(array('id' => $id));
