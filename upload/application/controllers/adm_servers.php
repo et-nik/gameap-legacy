@@ -2397,28 +2397,7 @@ class Adm_servers extends CI_Controller {
 			}
 			
 		}
-		
-		// Для локального сервера
-		if ($stats = json_decode(@file_get_contents(APPPATH . 'cache/local_server_stats.json'), true)) {
-			
-			if ($stats = $this->_stats_processing($stats)) {
-				$this->highcharts->set_serie($stats['cpu_graph_data'], 'CPU');
-				$this->highcharts->set_serie($stats['memory_graph_data'], 'RAM');
-				
-				$this->highcharts->push_xAxis($stats['data']['axis']);
-				$this->highcharts->set_type('spline');
-				$this->highcharts->set_dimensions('', 200);
-				$this->highcharts->set_title('Local server stats');
-				
-				$credits->href = 'http://www.gameap.ru';
-				$credits->text = "GameAP";
-				$this->highcharts->set_credits($credits);
-				
-				$local_tpl_data['ds_stats'][$i]['graph'] = $this->highcharts->render();
-				$local_tpl_data['ds_stats'][$i]['ds_name'] = 'Local';
-			}
-		}
-		
+
 		$this->tpl_data['content'] = $this->parser->parse('adm_servers/dedicated_servers_stats.html', $local_tpl_data, true);
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
