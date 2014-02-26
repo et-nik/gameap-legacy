@@ -2177,7 +2177,7 @@ class Adm_servers extends CI_Controller {
 			$game_data = $this->games->get_games_list(array('code' => $new_gs['game']), 1);
 			
 			/* Чтобы выделенный сервер существовал */
-			if (!$this->dedicated_servers->ds_live($sql_data['ds_id'])) {
+			if (!$this->dedicated_servers->ds_live($new_gs['ds_id'])) {
 				$this->_show_message(lang('adm_servers_selected_ds_unavailable'));
 				return false;
 			}
