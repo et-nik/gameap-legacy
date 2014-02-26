@@ -172,6 +172,7 @@ $fields = array(
 		
 		'stats' => array(
 							 'type' => 'TEXT',
+							 'default' => '',
 		),
 		
 		'steamcmd_path' => array(
@@ -674,15 +675,9 @@ $fields = array(
 							'constraint' 	=> 16, 
 		),
 		
-		'privilege_name' => array(
-							'type' 			=> 'CHAR',
-							'constraint' 	=> 32, 
-		),
-		
-		'privilege_value' => array(
-							'type' 			=> 'CHAR',
-							'constraint' 	=> 3, 
-		),
+		'privileges' => array(
+								 'type' => 'TEXT',
+						  ),
 		
 
 );
