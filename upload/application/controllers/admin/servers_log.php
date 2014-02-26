@@ -192,7 +192,7 @@ class Servers_log extends CI_Controller {
 			$log_data['user_name'] = $this->users->auth_login;
 			$log_data['server_id'] = $this->servers->server_data['id'];
 			$log_data['msg'] = $e->getMessage();
-			$log_data['log_data'] = '';
+			$log_data['log_data'] = "Directory: {$dir}";
 			$this->panel_log->save_log($log_data);
 			
 			return false;
@@ -277,7 +277,7 @@ class Servers_log extends CI_Controller {
 			$log_data['command'] = 'read_log';
 			$log_data['user_name'] = $this->users->auth_login;
 			$log_data['server_id'] = $this->servers->server_data['id'];
-			$log_data['msg'] = 'Read file error';
+			$log_data['msg'] = $e->getMessage();
 			$log_data['log_data'] = 'File: ' . $file_log . ' Dir: ' . $dir . "\n";
 			$this->panel_log->save_log($log_data);
 			
