@@ -461,7 +461,7 @@ class Servers_files extends CI_Controller {
 				$this->servers->edit_game_server($this->servers->server_data['id'], $server_data);
 				
 				$message = lang('server_files_upload_successful', $file_data['orig_name'], $s_content_dirs[$dir_id]['path']);
-				$this->_show_message($message, site_url('admin/servers_files/server/' . $server_id), lang('server_files_upload_successful'));
+				$this->_show_message($message, site_url('admin/servers_files/server/' . $server_id), lang('next'));
 				
 				/* Сохраняем логи */
 				$log_data['type'] = 'server_files';
