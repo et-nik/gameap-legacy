@@ -477,6 +477,40 @@ class Files_ftp extends CI_Driver {
 
 		return ftp_nlist($this->conn_id, $path);
 	}
+	
+	// --------------------------------------------------------------------
+
+	/**
+	 * Список файлов с информацией о размере, последнем изменении.
+	 */
+	function list_files_full_info($path = '.', $extensions = array()) 
+	{
+		if (!ftp_chdir($this->conn_id, $path)) {
+			$this->_error('server_files_directory_not_found');
+			return false;
+		}
+		
+		$list_files = $this->list_files($path);
+		$return_list = array();
+
+		foreach($list_files as &$file) {
+			
+			$pathinfo = pathinfo($file);
+			
+			/* Если заданы расширения $extensions и в массиве нет расширения,
+			 * то такой файл пропускаем */
+			if (!empty($extensions) && !in_array($pathinfo['extension'], $extensions)) {
+				continue;
+			}
+
+			$return_list[] = array('file_name' => basename($file),
+									'file_time' => ftp_mdtm($this->conn_id, $path . '/' . $file),
+									'file_size' => ftp_size($this->conn_id, $path . '/' . $file),
+			);
+		}
+
+		return $return_list;
+	}
 
 	// ------------------------------------------------------------------------
 

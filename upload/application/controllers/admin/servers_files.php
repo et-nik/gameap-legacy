@@ -86,27 +86,8 @@ class Servers_files extends CI_Controller {
     */
     private function _get_path(&$server_data)
     {
-		$this->load->helper('string');
-		
-		switch(get_file_protocol($this->servers->server_data)) {
-			case 'ftp':
-				$dir = reduce_double_slashes($this->servers->server_data['ftp_path'] . '/' . $this->servers->server_data['dir'] . '/');
-				break;
-				
-			case 'sftp':
-				$dir = reduce_double_slashes($this->servers->server_data['ssh_path'] . '/' . $this->servers->server_data['dir'] . '/');
-				break;
-				
-			case 'local':
-				$dir = reduce_double_slashes($this->servers->server_data['script_path'] . '/' . $this->servers->server_data['dir'] . '/');
-				break;
-				
-			default:
-				$this->_show_message(lang('server_files_driver_not_set'));
-				return false;
-		}
-		
-		return $dir;
+		$this->load->helper('ds');
+		return get_ds_file_path($server_data);
 	}
     
     // ----------------------------------------------------------------

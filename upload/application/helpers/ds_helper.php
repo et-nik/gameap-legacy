@@ -245,3 +245,82 @@ if ( ! function_exists('write_ds_file'))
 		return $CI->files->write_file($file, $contents);
 	}
 }
+
+// ---------------------------------------------------------------------
+
+/**
+ * Получает путь к файлу
+ * 
+ * Иногда запись файлов или чтение может завершаться ошибкой
+ * причина чаще всего в путях
+ * 
+ * Путь для чтения/записи файла генерируется из базы данных
+ * 
+ * Локальный путь:
+ * 	this->servers->server_data['local_path'] - путь к скрипту запуск серверов относительно корня сервера, либо домашней папки пользователя
+ * 	this->servers->server_data['dir'] - директория игрового сервера относительно скрипта
+ * 	$s_cfg_files[$cfg_id]['file'] - путь к файлу взятый из json
+ * 
+ * Удаленный ftp сервер
+ * 	$this->servers->server_data['ftp_path'] - путь к скрипту запуск серверов относительно корня сервера, либо домашней папки пользователя
+ * 	this->servers->server_data['dir'] - директория игрового сервера относительно скрипта
+ * 	$s_cfg_files[$cfg_id]['file'] - путь к файлу взятый из json
+*/
+if ( ! function_exists('get_ds_file_path'))
+{
+	function get_ds_file_path(&$server_data)
+    {
+		$CI =& get_instance();
+		$CI->load->helper('string');
+		
+		switch(get_file_protocol($server_data)) {
+			case 'ftp':
+				$dir = reduce_double_slashes($server_data['ftp_path'] . '/' . $server_data['dir'] . '/');
+				break;
+				
+			case 'sftp':
+				$dir = reduce_double_slashes($server_data['ssh_path'] . '/' . $server_data['dir'] . '/');
+				break;
+				
+			case 'local':
+				$dir = reduce_double_slashes($server_data['script_path'] . '/' . $server_data['dir'] . '/');
+				break;
+				
+			default:
+				$dir = '/';
+				break;
+		}
+		
+		return $dir;
+	}
+}
+
+// ---------------------------------------------------------------------
+
+/**
+ * Список файлов
+*/
+if ( ! function_exists('list_ds_files'))
+{
+	function list_ds_files($dir, &$server_data, $full_info = false, $extension = array())
+    {
+		$CI =& get_instance();
+		$CI->load->helper('string');
+		$CI->load->driver('files');
+		
+		$dir = reduce_double_slashes($dir);
+		
+		// Данные для соединения
+		$config = get_file_protocol_config($server_data);
+		
+		$CI->files->set_driver($config['driver']);
+		
+		$CI->files->connect($config);
+		
+		if ($full_info) {
+			return $CI->files->list_files_full_info($dir, $extension);
+		} else {
+			return $CI->files->list_files($dir);
+		}
+	}
+}

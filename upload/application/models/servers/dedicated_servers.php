@@ -284,7 +284,6 @@ class Dedicated_servers extends CI_Model {
     */  
     function get_ds_data($id = false) 
     {
-		
 		if (false == $id) {
 			return false;
 		}

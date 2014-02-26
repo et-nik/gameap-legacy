@@ -605,25 +605,27 @@ class Servers extends CI_Model {
 					break;
 			}
 			
-		} else {
-			/* TODO. ID локального сервера (ds_id == 0) будет заменяться на найденный local в базе данных */
-			
-			$this->server_data['control_protocol'] = 'local';
-			
-			// Сервер локальный, но данные заполняем пустыми значениями,
-			// т.к. к ним бывают обращения
-			$this->server_data['control_protocol'] 	= '';
-			$this->server_data['control_ip'] 		= '';
-			$this->server_data['control_port'] 		= '';
-			$this->server_data['control_login'] 	= '';
-			$this->server_data['control_password'] 	= '';
-			
-			$this->server_data['os'] 			= $this->config->config['local_os'];
-			$this->server_data['script_path'] 	= $this->config->config['local_script_path'];
-			$this->server_data['local_path'] 	= $this->config->config['local_script_path'];
-			$this->server_data['steamcmd_path'] = ($this->config->config['local_steamcmd_path']) ? $this->config->config['local_steamcmd_path'] : $this->config->config['local_script_path'];
-			$this->server_data['local_server'] 	= true;
-		}
+		} 
+		/* Закоментировано, т.к. с версии 0.9 локальный сервер находится в списке выделенных */
+		//~ else {
+			//~ /* TODO. ID локального сервера (ds_id == 0) будет заменяться на найденный local в базе данных */
+			//~ 
+			//~ $this->server_data['control_protocol'] = 'local';
+			//~ 
+			//~ // Сервер локальный, но данные заполняем пустыми значениями,
+			//~ // т.к. к ним бывают обращения
+			//~ $this->server_data['control_protocol'] 	= '';
+			//~ $this->server_data['control_ip'] 		= '';
+			//~ $this->server_data['control_port'] 		= '';
+			//~ $this->server_data['control_login'] 	= '';
+			//~ $this->server_data['control_password'] 	= '';
+			//~ 
+			//~ $this->server_data['os'] 			= $this->config->config['local_os'];
+			//~ $this->server_data['script_path'] 	= $this->config->config['local_script_path'];
+			//~ $this->server_data['local_path'] 	= $this->config->config['local_script_path'];
+			//~ $this->server_data['steamcmd_path'] = ($this->config->config['local_steamcmd_path']) ? $this->config->config['local_steamcmd_path'] : $this->config->config['local_script_path'];
+			//~ $this->server_data['local_server'] 	= true;
+		//~ }
 		
 		// Получение сведений об игре
 		if (!$no_get_game && $this->server_data['game']) {
@@ -945,79 +947,8 @@ class Servers extends CI_Model {
     */
 	function get_remote_files($server_data, $dir, $file_time = false, $file_size = false)
 	{
-		if (!$server_data['ftp_host']) {
-			
-			/* Работа с sFTP 
-			 * Требует доработки
-			*/
-			$this->load->library('sftp');
-			
-			if (!$server_data['ssh_host']) {
-				/* SSH не настроен =( */
-				$this->errors = 'SSH не настроен';
-				return false;
-			}
-			
-			$explode = explode(':', $server_data['ssh_host']);
-			$sftp_config['hostname'] = $explode[0];
-			$sftp_config['port'] = (isset($explode[1])) ? $explode[1] : '22';
-			
-			$sftp_config['username'] = $server_data['ssh_login'];
-			$sftp_config['password'] = $server_data['ssh_password'];
-			$sftp_config['debug'] = false;
-			
-			if (false == $this->sftp->connect($sftp_config)) {
-				$this->errors = 'Ошибка соединения с sftp сервером';
-				return false;
-			}
-			
-			if (!$this->sftp->file_exists(dirname($dir))) {
-				$this->errors = 'Directory ' . dirname($dir) .' not found';
-				return false;
-			}
-			
-			return $this->sftp->list_files($dir);
-
-		} else {
-			$explode = explode(':', $server_data['ftp_host']);
-			$ftp_host = $explode[0];
-			$ftp_port = (isset($explode[1])) ? $explode[1] : 21;
-			
-			$connection = ftp_connect($ftp_host, $ftp_port, 20);
-			
-			if(ftp_login($connection, $server_data['ftp_login'], $server_data['ftp_passwd'])) {
-				
-				$files_list = ftp_nlist($connection, $dir);
-				
-				$num = -1;
-				$maps = array();
-				
-				
-				/* Перебор файлов, и удаление расширения файла */	
-				if($files_list){
-					foreach ($files_list as $file) {
-						$num++;	
-						$files[$num]['file_name'] = $file;
-						
-						if($file_time){
-							$files[$num]['file_time'] = ftp_mdtm($connection, $file);
-						}
-						
-						if($file_size){
-							$files[$num]['file_size'] = ftp_size($connection, $file);
-						}
-					}
-				}else{
-					return false;
-				}
-				
-				return $files;
-
-			}else{
-				return false;
-			}
-		}
-
+		$this->load->helper('ds');
+		return list_ds_files($dir, $server_data, true);
 	}
 
 

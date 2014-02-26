@@ -198,20 +198,52 @@ class Files_local extends CI_Driver {
 	}
 	
 	// --------------------------------------------------------------------
-	
+
 	/**
-	 * Список файлов
+	 * Список файлов с информацией о размере, последнем изменении.
+	 * 
+	 * @param string
+	 * @param array  список расширений файлов
 	 */
-	public function list_files($path = '.', $recursive = false)
+	function list_files_full_info($path = '.', $extensions = array()) 
 	{
-		if (!is_dir($path)) {
-			return false;
+		if (!file_exists($dir)) {
+			$this->_error('server_files_directory_not_found');
+			return FALSE;
 		}
 		
-		$directory = $this->_scan_directory($path, $recursive);
-		sort($directory);
-		
-		return $directory;
+		$list_files = $this->list_files($path);
+		$return_list = array();
+
+		foreach($list_files as &$file) {
+			
+			$pathinfo = pathinfo($file);
+			
+			/* Если заданы расширения $extensions и в массиве нет расширения,
+			 * то такой файл пропускаем */
+			if (!empty($extensions) && !in_array($pathinfo['extension'], $extensions)) {
+				continue;
+			}
+			
+			$file_stat = stat($path . '/' . $file);
+			
+			$return_list[] = array('file_name' => basename($file),
+									'file_time' => $file_stat['mtime'],
+									'file_size' => $file_stat['size'],
+			);
+		}
+
+		return $return_list;
+	}
+	
+	// --------------------------------------------------------------------
+
+	/**
+	 * Список файлов с информацией о размере, последнем изменении.
+	 */
+	function list_files_full_info($path = '.') 
+	{
+		print_r($this->list_files($path));
 	}
 	
 	// --------------------------------------------------------------------

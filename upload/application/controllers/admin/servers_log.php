@@ -104,6 +104,7 @@ class Servers_log extends CI_Controller {
 	public function list_logs($server_id = false, $id_dir = false)
 	{
 		$this->load->model('servers');
+		$this->load->helper('ds');
 		
 		if(!$server_id){
 			// Отображение списка серверов, доступных пользователю
@@ -117,13 +118,7 @@ class Servers_log extends CI_Controller {
 		}
 		
 		$this->servers->get_server_data($server_id);
-		
-		/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
-		//~ if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']) {
-			//~ $this->_show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_log'));
-			//~ return false;
-		//~ }
-		
+				
 		/* Проверка привилегий на сервер */
 		$this->users->get_server_privileges($server_id);
 		
@@ -186,32 +181,21 @@ class Servers_log extends CI_Controller {
 		$allowed_types = explode('|', $ldir_list[$id_dir]['allowed_types']);
 		$count_allowed_types = count($allowed_types);
 		
-		$i = 0;
-		while($i < $count_allowed_types){
-			/* Прогоняем по каждому расширению */
+		try {
+			$this->logs->list_server_log($file_name, $allowed_types, $dir, $log_limit, $log_date);
+		} catch (Exception $e) {
+			$this->_show_message($e->getMessage(), site_url('admin/servers_log'));
 			
-			$file_ext = $allowed_types[$i];
-			$this->logs->list_server_log($file_name, $file_ext, $dir, $log_limit, $log_date);
+			// Сохраняем логи ошибок
+			$log_data['type'] = 'server_log';
+			$log_data['command'] = 'list_log';
+			$log_data['user_name'] = $this->users->auth_login;
+			$log_data['server_id'] = $this->servers->server_data['id'];
+			$log_data['msg'] = $e->getMessage();
+			$log_data['log_data'] = '';
+			$this->panel_log->save_log($log_data);
 			
-			/* Небыло ли ошибок */
-			if($this->logs->errors) {
-				// Ошибки были, выводим их
-				$this->_show_message($this->logs->errors, site_url('admin/servers_log'));
-				
-				// Сохраняем логи ошибок
-				
-				$log_data['type'] = 'server_log';
-				$log_data['command'] = 'list_log';
-				$log_data['user_name'] = $this->users->user_login;
-				$log_data['server_id'] = $this->servers->server_data['id'];
-				$log_data['msg'] = $this->logs->errors;
-				$log_data['log_data'] = $this->logs->errors;
-				$this->panel_log->save_log($log_data);
-
-				return false;
-			}
-			
-			$i ++;
+			return false;
 		}
 		
 		$local_tpl_data['log_list'] 	= $this->logs->filter_logs($log_sort, $log_limit, $log_date);
@@ -234,8 +218,7 @@ class Servers_log extends CI_Controller {
     */
 	public function view($server_id = false, $id_dir = false, $file_log = false)
     {
-		$this->tpl_data['content'] .= $this->parser->parse('servers/servers_log.html', $this->tpl_data, true);
-		
+		$this->load->helper('ds');
 		$this->load->model('servers');
 		
 		if(!$server_id){
@@ -248,23 +231,9 @@ class Servers_log extends CI_Controller {
 			$this->parser->parse('main.html', $this->tpl_data);
 			return false;
 		}
-		
-		/*
-		if(!in_array($param, $this->allow_param)){
-			$this->tpl_data['content'] .= '<p>Неправильный параметр view</p>';
-			$this->parser->parse('main.html', $this->tpl_data);
-			return false;
-		}
-		*/
-		
+
 		$this->servers->get_server_data($server_id);
-		
-		/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
-		if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']){
-			$this->_show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_log'));
-			return false;
-		}
-		
+
 		/* Проверка привилегий на сервер */
 		$this->users->get_server_privileges($server_id);
 		
@@ -295,11 +264,13 @@ class Servers_log extends CI_Controller {
 			return false;
 		}
 		
-		
-		$log_content = $this->logs->get_log($dir, $file_log);
-		
-		if(!$log_content) {
-			$this->_show_message($this->servers->errors);
+		// Получение директории
+		$dir = get_ds_file_path($this->servers->server_data) . $dir;
+
+		try {
+			$log_content = read_ds_file($dir . '/' . $file_log, $this->servers->server_data);
+		} catch (Exception $e) {
+			$this->_show_message($e->getMessage());
 			
 			/* Сохраняем логи */
 			$log_data['type'] = 'server_files';

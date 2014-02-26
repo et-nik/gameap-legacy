@@ -158,7 +158,7 @@ class Control_ssh extends CI_Driver {
 	
 	function auth($login, $password)
 	{
-		if ($this->auth) {
+		if ($this->_auth) {
 			return true;
 		}
 		
@@ -176,7 +176,6 @@ class Control_ssh extends CI_Driver {
 		
 		$this->_auth = true;
 		return true;
-		
 	}
 	
 	// ----------------------------------------------------------------

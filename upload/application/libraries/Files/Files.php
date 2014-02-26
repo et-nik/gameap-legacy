@@ -177,6 +177,20 @@ class Files extends CI_Driver_Library {
 	// --------------------------------------------------------------------
 	
 	/**
+	 * Список файлов с информацией о размере и последнем изменении
+	 */
+	public function list_files_full_info($path = '.', $extensions = array())
+	{
+		if (!$this->driver) {
+			throw new Exception(lang('server_files_driver_not_set'));
+		}
+		
+		return $this->{$this->driver}->list_files_full_info($path, $extensions);
+	}
+	
+	// --------------------------------------------------------------------
+	
+	/**
 	 * Создание директории
 	 */
 	public function mkdir($path = '', $permissions = NULL)

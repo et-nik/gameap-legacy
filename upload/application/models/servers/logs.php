@@ -127,8 +127,9 @@ class Logs extends Servers {
      * @param int - лимит
      * @param int - время
     */
-	function list_server_log($file_name = '', $file_ext = 'log',  $dir = FALSE, $limit = 100, $allow_time = 0) {
-		
+	function list_server_log($file_name = '', $file_ext = array(),  $dir = FALSE, $limit = 100, $allow_time = 0) 
+	{
+		$this->load->helper('ds');
 		$this->load->helper('path');
 		$this->load->helper('date');
 		$this->load->helper('file');
@@ -139,106 +140,42 @@ class Logs extends Servers {
 		$file_name = str_replace('..', '', $file_name);
 		$file_name = str_replace('/', '', $file_name);
 		$file_name = str_replace('\\', '', $file_name);
-		
-		/* Определение имени файла для glob */
-		if (preg_match('/^([0-9a-zA-Z\-\_]{1,32})$/si', $file_name)) {  
-			$file_name = '*' . $file_name . '*.' . $file_ext; 
-		}else{
-			$file_name = '*.' . $file_ext;
-		}
-		
-		/* Определение, является сервер локальным или удаленным */
-		if(!$this->servers->server_data['ds_id']){
-			// Сервер локальный, получаем данные для него
-			$dir = $this->servers->server_data['local_path'] . '/' . $this->servers->server_data['dir'] . '/' . $dir;
-		}else{
-			// Сервер удаленный
-			$base_path = ($this->servers->server_data['ftp_host']) ? $this->servers->server_data['ftp_path'] : $this->servers->server_data['ssh_path'];
-			$dir = $base_path . '/' . $this->servers->server_data['dir'] . '/' . $dir;
-		}
 
-		if ($dir) {
+		$log_files = array();
+		
+		$dir = get_ds_file_path($this->servers->server_data) . '/' . $dir;
+		$files_list = list_ds_files($dir, $this->servers->server_data, true, $file_ext);
+
+		if ($files_list) {
+			
+			$files_list = array_reverse($files_list);
 			$num = -1;
-			$log_files = array();
-			
-			/* Определение, является сервер локальным или удаленным */
-			if(!$this->servers->server_data['ds_id']) {
-				// Сервер локальный
+			foreach ($files_list as $file) {
 				
-				/* 
-				 * Определение привилегий на директорию
-				 * в случае, если у директории отсутствуют права на выполнение, не будет известно некоторых необходимых данных
-				 * 
-				 * Подробнее обо все, что написано ниже - http://php.net/manual/ru/function.fileperms.php
-				*/
-				if(!is_dir($dir)) {
-					$this->errors = 'Директория не найдена';
-					return FALSE;
+				if (!fnmatch("*{$file_name}*", $file['file_name'])) {
+					continue;
 				}
 				
-				if(!is_readable($dir)) {
-					$this->errors = 'Отсутствуют права на чтение директории';
-					return FALSE;
+				/* Достижение лимита */
+				if($num == $limit){
+					break;
 				}
 
-				/*
-				$perms = fileperms($dir);
-				
-				$dir_perms = array('r' => '', 'x' => '');
-				$dir_perms['r'] .= (($perms & 0x0100) ? 'r' : '-');
-				$dir_perms['r'] .= (($perms & 0x0020) ? 'r' : '-');
-				$dir_perms['r'] .= (($perms & 0x0004) ? 'r' : '-');
-				
-				$dir_perms['x'] .= (($perms & 0x0040) ?(($perms & 0x0800) ? 's' : 'x' ) : (($perms & 0x0800) ? 'S' : '-'));
-				$dir_perms['x'] .= (($perms & 0x0008) ?(($perms & 0x0400) ? 's' : 'x' ) : (($perms & 0x0400) ? 'S' : '-'));
-				$dir_perms['x'] .= (($perms & 0x0001) ?(($perms & 0x0200) ? 't' : 'x' ) : (($perms & 0x0200) ? 'T' : '-'));
-
-				if($dir_perms['r'] != 'rrr') {
-					$this->errors = 'No permission for read';
-					//$this->err_desc = 'Отсутствуют права на чтение директории';
-					return FALSE;
-				} elseif($dir_perms['x'] != 'xxx') {
-					$this->errors = 'No permission for execute';
-					//$this->err_desc = 'Отсутствуют права на выполнение директории';
-					return FALSE;
+				if($allow_time != 0 && $file['file_time'] < $this->time - $allow_time){
+					continue;
 				}
-				*/
-
-				$files_list = $this->get_local_files($this->servers->server_data, $dir . '/' . $file_name, TRUE, TRUE);
-			}else{
-				// Сервер удаленный
-				$files_list = $this->get_remote_files($this->servers->server_data, $dir . '/' . $file_name, TRUE, TRUE);
+				
+				$num++;
+				
+				$log_files[$num]['file_time'] = $file['file_time'];
+					
+				$log_files[$num]['file_name'] = basename($file['file_name']);
+				$log_files[$num]['file_path'] = $file['file_name'];
+				$log_files[$num]['file_size'] = human_size($file['file_size']);
+				$log_files[$num]['file_human_time'] = unix_to_human($log_files[$num]['file_time'], true, 'ru');
 			}
 			
-			if($files_list){	
-				
-				$files_list = array_reverse($files_list);
-				
-				foreach ($files_list as $file) {
-					/* Достижение лимита */
-					if($num == $limit){
-						break;
-					}
-
-					if($allow_time != 0 && $file['file_time'] < $this->time - $allow_time){
-						continue;
-					}
-					
-					$num++;
-					
-					$log_files[$num]['file_time'] = $file['file_time'];
-						
-					$log_files[$num]['file_name'] = basename($file['file_name']);
-					$log_files[$num]['file_path'] = $file['file_name'];
-					$log_files[$num]['file_size'] = human_size($file['file_size']);
-					$log_files[$num]['file_human_time'] = unix_to_human($log_files[$num]['file_time'], TRUE, 'eu');
-				}
-			}else{
-				/* Файлы не найдены */
-				return FALSE;
-			}
-			
-		}else{
+		} else {
 			return FALSE;
 		}
 		
@@ -257,7 +194,6 @@ class Logs extends Servers {
     */
 	function get_log($log_path, $file_name)
     {
-		
 		$this->load->helper('path');
 
 		/* Определение, является сервер локальным или удаленным */
