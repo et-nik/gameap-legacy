@@ -149,7 +149,7 @@ class Server_control extends CI_Controller {
 		if (!$this->servers->server_data['ds_id'] OR $this->servers->server_data['ftp_host']) {
 			$tpl_list = $this->servers->get_server_maps();
 		} else {
-			$this->tpl_data['content'] .= '<p>' . lang('server_control_no_ftp') . '</p>';
+			//~ $this->tpl_data['content'] .= '<p>' . lang('server_control_no_ftp') . '</p>';
 			$tpl_list = $this->rcon->get_maps();
 		}
 		

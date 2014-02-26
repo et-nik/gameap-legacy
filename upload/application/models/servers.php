@@ -874,15 +874,10 @@ class Servers extends CI_Model {
 	*/
 	public function get_files_list($server_data = false, $dir = '', $file_time = false, $file_size = false)
 	{
-		$server_data = empty($server_data) ? $this->server_data : $server_data;
+		$this->load->helper('ds');
 		
-		if ($server_data['ds_id'] == 0) {
-			$dir = $server_data['script_path'] . '/' . $server_data['dir'] . '/' . $dir;
-			return $this->get_local_files($server_data, $dir, $file_time, $file_size);
-		} else {
-			$dir = $server_data['ftp_path'] . '/' . $server_data['dir'] . '/' . $dir;
-			return $this->get_remote_files($server_data, $dir, $file_time, $file_size);
-		}
+		$dir = get_ds_file_path($this->servers->server_data) . '/' . $dir;
+		$files_list = list_ds_files($dir, $this->servers->server_data);
 	}
 
 	// ----------------------------------------------------------------
@@ -900,35 +895,8 @@ class Servers extends CI_Model {
     */
 	function get_local_files($server_data, $dir, $file_time = false, $file_size = false)
 	{
-		if($dir) {
-			$files_list = glob($dir);
-			
-			$num = -1;
-			$files = array();
-			
-			/* Перебор файлов */	
-			if(!empty($files_list)) {
-				foreach ($files_list as $file) {
-					$num ++;	
-					$files[$num]['file_name'] = $file;
-					
-					if(($file_time OR $file_size) && $file_stat = stat($file)) {
-					
-						if($file_time){
-							$files[$num]['file_time'] = $file_stat['mtime'];
-						}
-						
-						if($file_size){
-							$files[$num]['file_size'] = $file_stat['size'];
-						}
-					}
-				}
-			}
-			
-			return $files;
-		}else{
-			return false;
-		}
+		$this->load->helper('ds');
+		return list_ds_files($dir, $server_data, true);
 	}
 	
 	
@@ -976,11 +944,11 @@ class Servers extends CI_Model {
 		if($this->server_data['local_server']){
 			// Сервер локальный, получаем данные для него
 			$dir = set_realpath($this->server_data['local_path'] . '/' . $this->server_data['dir'] . '/' . $this->server_data['maps_path']);
-			$files_list = $this->get_local_files($this->server_data, $dir . "*.bsp");
+			$files_list = $this->get_local_files($this->server_data, $dir);
 		}else{
 			// Сервер удаленный
 			$dir = set_realpath($this->server_data['ftp_path'] . '/' . $this->server_data['dir'] . '/' . $this->server_data['maps_path']);
-			$files_list = $this->get_remote_files($this->server_data, $dir . "*.bsp", true);
+			$files_list = $this->get_remote_files($this->server_data, $dir, true);
 		}
 		
 		/* Сортировка массива с файлами по возрастанию
@@ -998,7 +966,14 @@ class Servers extends CI_Model {
 			
 			/* Перебор карт, и удаление расширения файла */	
 			foreach ($files_list as $file) {
-				$num++;	
+				$num++;
+				
+				$extension = pathinfo($file['file_name'], PATHINFO_EXTENSION);
+				
+				if ($extension != 'bsp') {
+					continue;
+				}
+				
 				$maps[$num]['map_name'] = str_replace('.bsp', '', basename($file['file_name']));
 			}
 			
