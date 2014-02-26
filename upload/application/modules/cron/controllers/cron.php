@@ -1264,10 +1264,17 @@ class Cron extends MX_Controller {
 						$console_data = $this->_get_console($server_id);
 						
 						/* При последней проверке сервер был оффлайн, запускаем его*/
-						$response = $this->servers->start($this->servers_data[$server_id]);
+						try {
+							$response = $this->servers->start($this->servers_data[$server_id]);
 
-						$log_data['command'] = 'start';
-						$log_data['msg'] = 'Start server success';
+							$log_data['command'] = 'start';
+							$log_data['msg'] = 'Start server success';
+						} catch (Exception $e) {
+							$response = false;
+							$this->_cron_result .= $e->getMessage();
+							$log_data['command'] = 'start';
+							$log_data['msg'] = 'Start server failed';
+						}
 
 						if(strpos($response, 'Server is already running') !== false) {
 							/* Сервер запущен, видимо завис */
