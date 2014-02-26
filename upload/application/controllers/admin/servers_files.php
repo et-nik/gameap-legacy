@@ -453,6 +453,8 @@ class Servers_files extends CI_Controller {
 				$log_data['log_data'] = 'Directory: ' . $remdir . ' File name: ' . $file_data['orig_name'] . "\n";
 				$this->panel_log->save_log($log_data);
 				
+				return true;
+				
 			} catch (Exception $e) {
 				
 				unlink($file_data['full_path']);
