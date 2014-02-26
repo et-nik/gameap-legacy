@@ -263,7 +263,7 @@ class Cron extends MX_Controller {
 	function _wget_files($server_id, $link, $rep_type = 'local')
 	{
 		$commands = array();
-
+		
 		if ($rep_type == 'local') {
 			/* Локальный репозиторий */
 			
@@ -341,11 +341,11 @@ class Cron extends MX_Controller {
 			
 			switch (strtolower($this->servers_data[$server_id]['os'])) {
 				case 'windows':
-					$command = 'wget ' . $link;
+					$commands[] = 'wget ' . $link;
 					break;
 
 				default:
-					$command = 'wget -c ' . $link . ' -o /tmp/wget.log ';
+					$commands[] = 'wget -c ' . $link . ' -o /tmp/wget.log ';
 					break;
 			}
 			
@@ -357,7 +357,7 @@ class Cron extends MX_Controller {
 			return true;
 			
 		} else {
-			return false;
+			$this->_cron_result .= 'Unknown repository type' . "\n";
 		}
 
 	}
@@ -1045,7 +1045,7 @@ class Cron extends MX_Controller {
 				if ($this->games->games_list[0]['local_repository']) {
 					/* Установка из локального репозитория */
 					
-					$log .= "Install from local repository \n";
+					$this->_cron_result .= "Install from local repository \n";
 					
 					try {
 						$this->_wget_files($server_id, $this->games->games_list[0]['local_repository'], 'local');
@@ -1059,7 +1059,7 @@ class Cron extends MX_Controller {
 				} elseif ($this->games->games_list[0]['remote_repository']) {
 					/* Установка из удаленного репозитория */
 					
-					$log .= "Install from remote repository \n";
+					$this->_cron_result .= "Install from remote repository \n";
 					
 					try {
 						$this->_wget_files($server_id, $this->games->games_list[0]['remote_repository'], 'remote');
@@ -1073,7 +1073,7 @@ class Cron extends MX_Controller {
 				} elseif ($this->games->games_list[0]['app_id']) {
 					/* Установка через SteamCMD */
 					
-					$log .= "Install from SteamCMD \n";
+					$this->_cron_result .= "Install from SteamCMD \n";
 					
 					try {
 						$this->_install_from_steamcmd($server_id);
