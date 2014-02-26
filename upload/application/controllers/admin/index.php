@@ -30,7 +30,7 @@ class Index extends CI_Controller {
 		$this->load->database();
 		$this->load->model('users');
 		$this->lang->load('main');
-
+		
 		if($this->users->check_user()) {
 			//Base Template
 			$this->tpl_data['title'] 	= lang('ap_title');
@@ -48,7 +48,8 @@ class Index extends CI_Controller {
 	//Главная
 	public function index()
 	{
-		$this->tpl_data['content'] .= '<p><strong>' . lang('ap_wellcome') . '</strong></p>';
+		//~ $this->tpl_data['content'] .= '<p><strong>' . lang('ap_wellcome') . '</strong></p>';
+		
 		/*
 		 * Отправка команд, на которые есть права у пользователя
 		*/
@@ -57,7 +58,7 @@ class Index extends CI_Controller {
 		$this->load->model('servers');
 
 		/* Если количество серверов больше 0 */
-		if($this->servers->get_server_list($this->users->auth_id)) {
+		if ($this->servers->get_server_list($this->users->auth_id)) {
 				
 			$this->load->helper('games');
 			$this->load->model('servers/games');
@@ -119,7 +120,7 @@ class Index extends CI_Controller {
 
 					$this->server_data['expires'] = (int)$this->server_data['expires'];
 
-					$gs_data = $data_slist['servers_list'][] = array('server_id' => $this->server_data['id'],
+					$gs_data =  array('server_id' => $this->server_data['id'],
 																'server_name' => $this->server_data['name'],
 																'server_game' => $this->server_data['game'],
 																'server_ip' => $this->server_data['server_ip'] . ':' . $this->server_data['server_port'],
@@ -134,8 +135,8 @@ class Index extends CI_Controller {
 				
 			$local_tpl_data['games_list'] = clean_games_list($local_tpl_data['games_list']);
 				
-			if($num){
-				$this->tpl_data['content'] .= $this->parser->parse('servers/servers_list.html', $local_tpl_data, true);
+			if ($num) {
+				$this->tpl_data['content'] = $this->parser->parse('servers/servers_list_main.html', $local_tpl_data, true);
 			}
 		}
 			

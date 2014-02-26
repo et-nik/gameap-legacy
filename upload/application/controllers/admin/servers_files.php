@@ -119,11 +119,13 @@ class Servers_files extends CI_Controller {
     {
 		/* Загружаем модель */
 		$this->load->model('servers');
+		$this->load->model('servers/games');
+		$this->load->helper('games');
 		
 		$this->servers->get_servers_list($this->users->auth_id);
 		
-		$local_tpl_data['servers_list'] = $this->servers->tpl_data();
 		$local_tpl_data['url'] 			= site_url('admin/servers_files/server');
+		$local_tpl_data['games_list'] = servers_list_to_games_list($this->servers->servers_list);
 			
 		$this->tpl_data['content'] .= $this->parser->parse('servers/select_server.html', $local_tpl_data, true);
 			

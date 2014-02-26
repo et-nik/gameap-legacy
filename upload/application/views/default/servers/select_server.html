@@ -1,18 +1,25 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
 <p class="hr">{lang_select_server}</p>
-<table width="75%" class="zebra">
+<table width="100%" class="zebra">
 	<thead>
-	<tr>
-		<td><strong>{lang_name}</strong></td>
-		<td><strong>{lang_ip}</strong></td>
-		<td><strong>&nbsp;</strong></td>
-	</tr>
+		<tr>
+			<th>{lang_name}</th>
+			<th>{lang_ip}</th>
+			<th>&nbsp;</th>
+		</tr>
 	</thead>
-{servers_list}
-	<tr>
-		<td>{server_name}</td>
-		<td>{server_ip}:{server_port}</td>
-		<td><a class="small awesome" href="{url}/{server_id}">{lang_select}</a></td>
-	</tr>
-{/servers_list}
+{games_list}
+	<tbody>
+		<tr>
+			<td colspan="5"><p class="hr"><strong>{game_name}</strong></p></td>
+		</tr>
+	</tbody>
+	{servers_list}
+		<tr>
+			<td>{server_name}</td>
+			<td>{server_ip}:{server_port}</td>
+			<td><a class="small awesome" href="{url}/{server_id}">{lang_select}</a></td>
+		</tr>
+	{/servers_list}
+{/games_list}
 </table>

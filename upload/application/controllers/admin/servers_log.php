@@ -81,13 +81,14 @@ class Servers_log extends CI_Controller {
     */
     public function index()
     {
-		/* Загружаем модель */
 		$this->load->model('servers');
+		$this->load->model('servers/games');
+		$this->load->helper('games');
 		
-		$this->servers->get_server_list($this->users->auth_id);
+		$this->servers->get_servers_list($this->users->auth_id);
 		
-		$local_tpl_data['servers_list'] = $this->servers->tpl_data();
-		$local_tpl_data['url'] = site_url('/admin/servers_log/list_logs');
+		$local_tpl_data['url'] 			= site_url('/admin/servers_log/list_logs');
+		$local_tpl_data['games_list'] = servers_list_to_games_list($this->servers->servers_list);
 			
 		$this->tpl_data['content'] .= $this->parser->parse('servers/select_server.html', $local_tpl_data, true);
 			
@@ -104,8 +105,6 @@ class Servers_log extends CI_Controller {
 	{
 		$this->load->model('servers');
 		
-		$this->tpl_data['content'] .= $this->parser->parse('servers/servers_log.html', $this->tpl_data, true);
-		
 		if(!$server_id){
 			// Отображение списка серверов, доступных пользователю
 			
@@ -120,10 +119,10 @@ class Servers_log extends CI_Controller {
 		$this->servers->get_server_data($server_id);
 		
 		/* Если сервер не локальный и не настроен FTP, то выдаем ошибку */
-		if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']) {
-			$this->_show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_log'));
-			return false;
-		}
+		//~ if($this->servers->server_data['ds_id'] && !$this->servers->server_data['ftp_host']) {
+			//~ $this->_show_message(lang('server_files_ftp_not_set'), site_url('admin/servers_log'));
+			//~ return false;
+		//~ }
 		
 		/* Проверка привилегий на сервер */
 		$this->users->get_server_privileges($server_id);

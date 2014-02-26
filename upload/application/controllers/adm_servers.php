@@ -408,14 +408,17 @@ class Adm_servers extends CI_Controller {
 					break;
 					
 				case 'game_servers':
-					//$this->load->model('servers/game_servers');
+					$this->load->helper('games');
 					
 					$this->tpl_data['title'] 	= lang('adm_servers_title_gs');
 					$this->tpl_data['heading'] 	= lang('adm_servers_heading_gs');
 					
 					$parse_list_file = 'adm_servers/game_servers_list.html';	// Шаблон списка
 					$this->servers->get_server_list(false, false, array());
-					$local_tpl_data['servers_list'] = $this->servers->tpl_data();
+					
+					$local_tpl_data['games_list'] = servers_list_to_games_list($this->servers->servers_list);
+					
+					//~ $local_tpl_data['servers_list'] = $this->servers->tpl_data();
 
 					break;
 					
@@ -826,7 +829,7 @@ class Adm_servers extends CI_Controller {
 							$local_tpl_data['message'] = lang('adm_servers_add_game_type_failed');
 						}
 
-						$local_tpl_data['link'] = site_url('adm_servers/edit/game_types/' . mysql_insert_id());
+						$local_tpl_data['link'] = site_url('adm_servers/edit/game_types/' . $this->db->insert_id());
 						$local_tpl_data['back_link_txt'] = 'Далее';
 						
 						break;
@@ -1418,7 +1421,7 @@ class Adm_servers extends CI_Controller {
 				$this->form_validation->set_rules('start_code', lang('adm_servers_game_start_code'), 'trim|required|max_length[64]|min_length[2]|xss_clean');
 					
 				$this->form_validation->set_rules('engine', lang('adm_servers_engine'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('engine_version', lang('adm_servers_engine_version'), 'trim|required|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('engine_version', lang('adm_servers_engine_version'), 'trim|max_length[64]|xss_clean');
 				
 				$this->form_validation->set_rules('app_id', 'app_id', 'trim|integer|max_length[32]|xss_clean');
 				$this->form_validation->set_rules('app_set_config', 'app_set_config', 'trim|max_length[32]|xss_clean');
