@@ -198,6 +198,23 @@ class Files_local extends CI_Driver {
 	}
 	
 	// --------------------------------------------------------------------
+	
+	/**
+	 * Список файлов
+	 */
+	public function list_files($path = '.', $recursive = false)
+	{
+		if (!is_dir($path)) {
+			return false;
+		}
+		
+		$directory = $this->_scan_directory($path, $recursive);
+		sort($directory);
+		
+		return $directory;
+	}
+	
+		// --------------------------------------------------------------------
 
 	/**
 	 * Список файлов с информацией о размере, последнем изменении.
@@ -234,16 +251,6 @@ class Files_local extends CI_Driver {
 		}
 
 		return $return_list;
-	}
-	
-	// --------------------------------------------------------------------
-
-	/**
-	 * Список файлов с информацией о размере, последнем изменении.
-	 */
-	function list_files_full_info($path = '.') 
-	{
-		print_r($this->list_files($path));
 	}
 	
 	// --------------------------------------------------------------------
