@@ -35,7 +35,7 @@ class Panel_log extends CI_Model {
 			return false;
 		}
 		
-		$data['log_data'] = $data['log_data'] ? $data['log_data'] : '';
+		$data['log_data'] = isset($data['log_data']) ? $data['log_data'] : '';
 		
 		/* Если подробные данные являются массивом */
 		if (isset($data['log_data'])) {
