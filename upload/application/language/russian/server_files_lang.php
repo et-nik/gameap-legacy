@@ -36,3 +36,4 @@ $lang['server_files_no_source_file']							= 'Невозможно найти и
 $lang['server_files_unable_to_rename']							= 'Невозможно переименовать файл.';
 $lang['server_files_unable_to_delete']							= 'Невозможно удалить файл.';
 $lang['server_files_unable_to_move']							= 'Невозможно переместить файл. Пожалуйста, убедитесь что каталог назначения существует.';
+$lang['server_files_directory_not_found']						= 'Директория не найдена.';

@@ -291,7 +291,11 @@ class Dedicated_servers extends CI_Model {
 		$where = array('id' => $id);
 		$this->get_ds_list($where, 1);
 		
-		return $this->ds_list[0];
+		if (isset($this->ds_list[0])) {
+			return $this->ds_list[0];
+		} else {
+			return false;
+		}
 	}
 	
 	//-----------------------------------------------------------

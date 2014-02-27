@@ -2109,13 +2109,17 @@ class Adm_servers extends CI_Controller {
 		$this->load->helper('string');
 
 		$local_tpl_data = array();
-		$this->dedicated_servers->get_ds_list();
+
+		if($this->dedicated_servers->get_ds_list()) {
+			$this->_show_message(lang('adm_servers_empty_ds_list', site_url('adm_servers/add/dedicated_servers')));
+			return false;
+		}
 		
 		// Получаем данные игр для шаблона
 		$local_tpl_data['games_list'] = $this->games->tpl_data_games();
 		
 		if(empty($this->games->games_list)) {
-			$this->_show_message(lang('adm_servers_empty_games_list', base_url() . 'adm_servers/add/games'));
+			$this->_show_message(lang('adm_servers_empty_games_list', site_url('adm_servers/add/games')));
 			return false;
 		}
 		

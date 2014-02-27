@@ -108,20 +108,16 @@ class Adm_servers extends CI_Controller {
 		
 		$ds_id = (int)$this->input->post('ds_id');
 		
-		if(!$ds_id) {
-			$this->output->append_output($this->config->config['local_script_path']);
+		$this->dedicated_servers->get_ds_list(array('id' => $ds_id), 1);
+		
+		if(strtolower($this->dedicated_servers->ds_list[0]['control_protocol']) == 'ssh') {
+			$this->output->append_output($this->dedicated_servers->ds_list[0]['ssh_path']);
+		} elseif(strtolower($this->dedicated_servers->ds_list[0]['control_protocol']) == 'telnet') {
+			$this->output->append_output($this->dedicated_servers->ds_list[0]['telnet_path']);
+		} elseif(strtolower($this->dedicated_servers->ds_list[0]['os']) == 'windows') {
+			$this->output->append_output($this->dedicated_servers->ds_list[0]['telnet_path']);
 		} else {
-			$this->dedicated_servers->get_ds_list(array('id' => $ds_id), 1);
-			
-			if(strtolower($this->dedicated_servers->ds_list[0]['control_protocol']) == 'ssh') {
-				$this->output->append_output($this->dedicated_servers->ds_list[0]['ssh_path']);
-			} elseif(strtolower($this->dedicated_servers->ds_list[0]['control_protocol']) == 'telnet') {
-				$this->output->append_output($this->dedicated_servers->ds_list[0]['telnet_path']);
-			} elseif(strtolower($this->dedicated_servers->ds_list[0]['os']) == 'windows') {
-				$this->output->append_output($this->dedicated_servers->ds_list[0]['telnet_path']);
-			} else {
-				$this->output->append_output($this->dedicated_servers->ds_list[0]['ssh_path']);
-			}
+			$this->output->append_output($this->dedicated_servers->ds_list[0]['ssh_path']);
 		}
 	}
 	
@@ -136,6 +132,36 @@ class Adm_servers extends CI_Controller {
 		
 		if (!$this->dedicated_servers->check_ports($ds_id, $port)) {
 			$this->output->append_output('<img src="' . base_url('themes/system/images/warning.png') . '" />' . lang('adm_servers_port_exists'));
+		}
+	}
+	
+		// -----------------------------------------------------------------
+	
+	/**
+	 * Получение формы со списком ip выделенного сервера
+	*/
+	function get_ip($ds_id = false) 
+	{
+		$this->load->model('servers');
+		$this->load->model('servers/dedicated_servers');
+		
+		if (!$ds_id OR is_int($ds_id)) {
+			show_404();
+		}
+
+		if (false == $this->dedicated_servers->get_ds_data($ds_id)) {
+			show_404();
+		}
+
+		foreach($this->dedicated_servers->ds_list[0]['server_ip'] as $ip) {
+			$ip_list[ $ip ] = $ip;
+		}
+
+		if (empty($ip_list)) {
+			$this->output->append_output('Select other location');
+		} else {
+			$ip_list_dropdown = form_dropdown('ip', $ip_list);
+			$this->output->append_output($ip_list_dropdown);
 		}
 	}
 	
