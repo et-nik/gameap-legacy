@@ -153,14 +153,14 @@ class Adm_servers extends CI_Controller {
 			show_404();
 		}
 
-		foreach($this->dedicated_servers->ds_list[0]['server_ip'] as $ip) {
+		foreach($this->dedicated_servers->ds_list[0]['ip'] as $ip) {
 			$ip_list[ $ip ] = $ip;
 		}
 
 		if (empty($ip_list)) {
 			$this->output->append_output('Select other location');
 		} else {
-			$ip_list_dropdown = form_dropdown('ip', $ip_list);
+			$ip_list_dropdown = form_dropdown('server_ip', $ip_list);
 			$this->output->append_output($ip_list_dropdown);
 		}
 	}
