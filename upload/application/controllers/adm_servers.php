@@ -2110,7 +2110,7 @@ class Adm_servers extends CI_Controller {
 
 		$local_tpl_data = array();
 
-		if($this->dedicated_servers->get_ds_list()) {
+		if(false == $this->dedicated_servers->get_ds_list()) {
 			$this->_show_message(lang('adm_servers_empty_ds_list', site_url('adm_servers/add/dedicated_servers')));
 			return false;
 		}
