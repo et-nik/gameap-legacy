@@ -528,8 +528,12 @@ class Servers extends CI_Model {
 			return false;
 		}
 		
+		if (!$this->server_data['ds_id']) {
+			return false;
+		}
+		
 		/* Записываем переменную в список */
-		$this->servers_list['0'] = $this->server_data;
+		//~ $this->servers_list['0'] = $this->server_data;
 		
 		/* Расшифровываем RCON пароль */
 		$this->server_data['rcon'] = $this->encrypt->decode($this->server_data['rcon']);
@@ -604,43 +608,24 @@ class Servers extends CI_Model {
 					$this->server_data['steamcmd_path'] = ($this->server_ds_data['steamcmd_path']) ? $this->server_ds_data['steamcmd_path'] : $this->server_ds_data['ssh_path'];
 					break;
 			}
-			
-		} 
-		/* Закоментировано, т.к. с версии 0.9 локальный сервер находится в списке выделенных */
-		//~ else {
-			//~ /* TODO. ID локального сервера (ds_id == 0) будет заменяться на найденный local в базе данных */
-			//~ 
-			//~ $this->server_data['control_protocol'] = 'local';
-			//~ 
-			//~ // Сервер локальный, но данные заполняем пустыми значениями,
-			//~ // т.к. к ним бывают обращения
-			//~ $this->server_data['control_protocol'] 	= '';
-			//~ $this->server_data['control_ip'] 		= '';
-			//~ $this->server_data['control_port'] 		= '';
-			//~ $this->server_data['control_login'] 	= '';
-			//~ $this->server_data['control_password'] 	= '';
-			//~ 
-			//~ $this->server_data['os'] 			= $this->config->config['local_os'];
-			//~ $this->server_data['script_path'] 	= $this->config->config['local_script_path'];
-			//~ $this->server_data['local_path'] 	= $this->config->config['local_script_path'];
-			//~ $this->server_data['steamcmd_path'] = ($this->config->config['local_steamcmd_path']) ? $this->config->config['local_steamcmd_path'] : $this->config->config['local_script_path'];
-			//~ $this->server_data['local_server'] 	= true;
-		//~ }
+		}
 		
 		// Получение сведений об игре
 		if (!$no_get_game && $this->server_data['game']) {
 			$where = array('code' => $this->server_data['game']);
 			$this->games->get_games_list($where, 1);
 			
-			$this->server_game_data = $this->games->games_list['0'];
-			$this->server_data['start_code'] = $this->server_game_data['start_code'];
-			$this->server_data['game_name'] = $this->server_game_data['name'];
-			$this->server_data['engine'] = $this->server_game_data['engine'];
-			$this->server_data['engine_version'] = $this->server_game_data['engine_version'];
+			$this->server_game_data 				= $this->games->games_list['0'];
+			$this->server_data['start_code'] 		= $this->server_game_data['start_code'];
+			$this->server_data['game_name'] 		= $this->server_game_data['name'];
+			$this->server_data['engine'] 			= $this->server_game_data['engine'];
+			$this->server_data['engine_version'] 	= $this->server_game_data['engine_version'];
+			
+			$this->server_data['app_id'] 			= $this->server_game_data['app_id'];
+			$this->server_data['app_set_config'] 	= $this->server_game_data['app_set_config'];
 			
 		} else {
 			/* Информация об игре не найдена */
-			
 		}
 		
 		// Получение сведени о модификации

@@ -211,9 +211,6 @@ class Cron extends MX_Controller {
     {
 		if(!array_key_exists($server_id, $this->servers_data)) {
 			$this->servers_data[$server_id] = $this->servers->get_server_data($server_id);
-
-			$this->servers_data[$server_id]['app_id'] = $this->games->games_list[0]['app_id'];
-			$this->servers_data[$server_id]['app_set_config'] = $this->games->games_list[0]['app_set_config'];
 		}
 
 		return $this->servers_data[$server_id];
@@ -328,7 +325,7 @@ class Cron extends MX_Controller {
 				} 
 			}
 
-			$this->_install_result = send_command(
+			$this->_install_result .= send_command(
 							$commands,
 							$this->servers_data[$server_id], 
 							$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
@@ -349,7 +346,7 @@ class Cron extends MX_Controller {
 					break;
 			}
 			
-			$this->_install_result = send_command(
+			$this->_install_result .= send_command(
 							$commands,
 							$this->servers_data[$server_id], 
 							$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
@@ -545,10 +542,13 @@ class Cron extends MX_Controller {
 				$arr = (int)$arr;
 				$value = $value + $arr;
 				$a ++;
-				
+			}
+			
+			if (!$a) {
+				return false;
 			}
 
-			$stats['cpu_usage'] = (int)round($value/$a);
+			$stats['cpu_usage'] = (int) round($value/$a);
 
 			/* Свободно памяти */
 			$explode = explode("\n", $stats_string['free_memory']);
@@ -1022,9 +1022,10 @@ class Cron extends MX_Controller {
 				// Сервер не установлен
 				$this->_cron_result .= "Server #" . $server_id . " not installed\n";
 				$server_installed = false;
-				
+
 				// Данные лога установки
 				$log = '';
+				$this->_install_result = '';
 				
 				/* Получение данных об игровой модификации */
 				$this->game_types->get_gametypes_list(array('id' => $this->servers_data[$server_id]['game_type']));
@@ -1404,9 +1405,12 @@ class Cron extends MX_Controller {
 		
 		if (!empty($this->dedicated_servers->ds_list)) {
 			foreach($this->dedicated_servers->ds_list as $ds) {
-				
-				$stats = $this->_stats_processing($ds);
 
+				if (!$stats = $this->_stats_processing($ds)) {
+					$this->_cron_result .= 'Stats server #' . $ds['id'] . ' failed'. "\n";
+					continue;
+				}
+				
 				if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
 					$this->_cron_result .= 'Stats server #' . $ds['id'] . ' successful' . "\n";
 				} else {
@@ -1430,7 +1434,7 @@ class Cron extends MX_Controller {
 				$this->dedicated_servers->edit_dedicated_server($ds['id'], $data);
 			}
 		}
-
+		
 		/*==================================================*/
 		/*    	ВЫПОЛНЕНИЕ CRON СКРИПТОВ ИЗ МОДУЛЕЙ			*/
 		/*==================================================*/
