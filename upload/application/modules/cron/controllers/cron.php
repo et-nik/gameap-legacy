@@ -338,7 +338,7 @@ class Cron extends MX_Controller {
 			
 			switch (strtolower($this->servers_data[$server_id]['os'])) {
 				case 'windows':
-					$commands[] = 'wget ' . $link;
+					$commands[] = 'wget -c ' . $link;
 					break;
 
 				default:
@@ -374,7 +374,7 @@ class Cron extends MX_Controller {
 		
 		switch (strtolower($this->servers_data[$server_id]['os'])) {
 			case 'windows':
-				$commands[] = '"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($pack_file) . ' -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($pack_file);
+				$commands[] = '"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($pack_file) . ' -aoa -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($pack_file);
 				break;
 
 			default:
@@ -1026,6 +1026,7 @@ class Cron extends MX_Controller {
 				// Данные лога установки
 				$log = '';
 				$this->_install_result = '';
+				$this->control->clear_commands();
 				
 				/* Получение данных об игровой модификации */
 				$this->game_types->get_gametypes_list(array('id' => $this->servers_data[$server_id]['game_type']));
@@ -1205,7 +1206,7 @@ class Cron extends MX_Controller {
 					$log_data['command'] = 'install';
 					$log_data['server_id'] = $server_id;
 					$log_data['msg'] = 'Server install successful';
-					$log_data['log_data'] = "Commands: \n" . var_export($this->control->get_sended_commands(), true) . "\n\nResults: \n" . $this->_install_result . "\n";
+					$log_data['log_data'] = "Results:" . PHP_EOL . var_export($this->control->get_commands_result(), true) . PHP_EOL;
 					$this->panel_log->save_log($log_data);
 
 				} else {
@@ -1217,7 +1218,7 @@ class Cron extends MX_Controller {
 					$log_data['command'] = 'install';
 					$log_data['server_id'] = $server_id;
 					$log_data['msg'] = 'Server install failed';
-					$log_data['log_data'] = "Commands: \n" . var_export($this->control->get_sended_commands(), true) . "\n\nResults: \n" . $this->_install_result . "\n";
+					$log_data['log_data'] = "Results:" . PHP_EOL . var_export($this->control->get_commands_result(), true) . PHP_EOL;
 					$this->panel_log->save_log($log_data);
 					
 					$this->_cron_result .= 'Server install #' . $server_id . ' failed' . "\n";
