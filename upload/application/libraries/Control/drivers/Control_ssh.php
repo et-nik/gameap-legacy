@@ -62,10 +62,32 @@ class Control_ssh extends CI_Driver {
 		
 		switch ($this->os) {
 			case 'windows':
+				
+				/* Бывает, что требуется обратиться к программе, например
+				 * %PROGRAMFILES%\7-Zip\7z.exe
+				 * тогда нужно определить, имеется ли указание переменной среды
+				 * */
+				if (preg_match('/\"\%[A-Z]*\%.*$/s', $file, $matches)) {
+					$matches[0] = str_replace('"', '', $matches[0]);
+					
+					/* Для виндовых слешей \ */
+					//~ $explode = explode('\\', $matches[0]);
+					//~ $file_name = array_pop($explode);
+					//~ $file_dir = '"' . implode('\\', $explode) . '"';
+					
+					/* Для обычных слешей */
+					$file_name = basename($matches[0]);
+					$file_dir = '"' . dirname($matches[0]) . '"';
+				}
+				
 				$file_dir = str_replace('/', '\\', $file_dir);
-			
+
 				$result = $this->command('dir ' . $file_dir . ' /a:-d /b');
 				$result = explode("\n", $result);
+				
+				foreach($result as &$value) {
+					$value = trim($value);
+				}
 				
 				if (in_array($file_name, $result)) {
 					$file_perm['exists'] 		= true;

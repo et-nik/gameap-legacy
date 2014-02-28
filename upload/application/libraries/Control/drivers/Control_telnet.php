@@ -37,8 +37,8 @@ class Control_telnet extends CI_Driver {
 	private $ip;
 	private $port;
 	
-	private $_prompt = ':> ';
-	
+	private $_prompt = '>';
+
 	public function check()
 	{
 		return true;
@@ -64,10 +64,32 @@ class Control_telnet extends CI_Driver {
 		
 		switch ($this->os) {
 			case 'windows':
+				
+				/* Бывает, что требуется обратиться к программе, например
+				 * %PROGRAMFILES%\7-Zip\7z.exe
+				 * тогда нужно определить, имеется ли указание переменной среды
+				 * */
+				if (preg_match('/\"\%[A-Z]*\%.*$/s', $file, $matches)) {
+					$matches[0] = str_replace('"', '', $matches[0]);
+					
+					/* Для виндовых слешей \ */
+					//~ $explode = explode('\\', $matches[0]);
+					//~ $file_name = array_pop($explode);
+					//~ $file_dir = '"' . implode('\\', $explode) . '"';
+					
+					/* Для обычных слешей */
+					$file_name = basename($matches[0]);
+					$file_dir = '"' . dirname($matches[0]) . '"';
+				}
+				
 				$file_dir = str_replace('/', '\\', $file_dir);
-			
+
 				$result = $this->command('dir ' . $file_dir . ' /a:-d /b');
 				$result = explode("\n", $result);
+				
+				foreach($result as &$value) {
+					$value = trim($value);
+				}
 				
 				if (in_array($file_name, $result)) {
 					$file_perm['exists'] 		= true;
@@ -147,8 +169,20 @@ class Control_telnet extends CI_Driver {
 		$this->ip = $ip;
 		$this->port = $port;
 		
+		switch ($this->os) {
+			case 'windows':
+				$this->_prompt = '>';
+				break;
+			
+			default:
+				// linux
+				//~ echo PHP_EOL . PHP_EOL . PHP_EOL . PHP_EOL . 'LINUX' . PHP_EOL . PHP_EOL . PHP_EOL . PHP_EOL;
+				$this->_prompt = '$';
+				break;
+		}
+		
 		$this->_connection = @fsockopen($this->ip, $this->port);
-		@socket_set_timeout($this->_connection, 5);
+		//~ @socket_set_timeout($this->_connection, 5);
 
 		if (!$this->_connection) {
 			throw new Exception(lang('server_command_connection_failed') . ' (Telnet)');
@@ -209,9 +243,8 @@ class Control_telnet extends CI_Driver {
 		}
 		
 		$this->_write($command . "\r\n");
-
 		$result = explode("\n", $this->_read_till($this->_prompt));
-
+		
 		$last_element = count($result)-1;
 		unset($result[0]);
 		if (strpos($result[$last_element], '>') !== false) {
@@ -219,8 +252,14 @@ class Control_telnet extends CI_Driver {
 		} elseif (strpos($result[$last_element], '~$') !== false) {
 			unset($result[$last_element]);
 		}
+		
+		$result = trim(implode("\n", $result));
+		
+		if ($this->os == 'windows') {
+			$result = iconv('CP866', 'UTF-8//TRANSLIT', $result);
+		}
 
-		return trim(implode("\n", $result));
+		return $result;
 	}
 	
 	// ----------------------------------------------------------------
@@ -270,6 +309,7 @@ class Control_telnet extends CI_Driver {
 	function _read_till($what) 
 	{
 		$buf = '';
+		$time = 0;
 
 		while (1) {
 			$IAC = chr(255);
@@ -284,9 +324,20 @@ class Control_telnet extends CI_Driver {
 
 			$c = $this->_getc();
 
-			if ($c === false){
+			if ($c === false) {
 				return $buf;
+				//~ sleep(1);
+				//~ $time ++;
+				//~ 
+				//~ if ($time > 60) {
+					//~ // 60 секунд без ответа
+					//~ return $buf;
+				//~ } else {
+					//~ continue;
+				//~ }
 			}
+			
+			$time = 0;
 
 			if ($c == $theNULL) {
 				continue;
@@ -299,16 +350,14 @@ class Control_telnet extends CI_Driver {
 			if ($c != $IAC) {
 				$buf .= $c;
 
-				if ($what ==(substr($buf,strlen($buf)-strlen($what)))) {
+				if ($what == (substr($buf,strlen($buf)-strlen($what)))) {
 					return $buf;
                 } else {
 					continue;
                 }
             }
 
-
 			$c = $this->_getc();
-
 
 			if ($c == $IAC) {
 				$buf .= $c;

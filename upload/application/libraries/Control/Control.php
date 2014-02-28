@@ -27,6 +27,9 @@ class Control extends CI_Driver_Library {
 	
 	public $path;
 	public $os;
+	
+	public $ip;
+	public $port;
 
 	protected $driver 			= false;
 	
@@ -170,17 +173,17 @@ class Control extends CI_Driver_Library {
 		// Проверяются файлы .sh и .exe, если это команда, например wget, то проверки не будет
 		$explode = explode(' ', $command);
 		$file = $path . '/' . $explode[0];
-		
-		if (strpos($file, '.sh') !== false OR strpos($file, '.exe') !== false) {
-			$this->_check_file($file, 'x');
-		}
 
 		$cd 		= $path ? $this->_path_proccess($path) . ' && ' : '';
 		$command 	= $this->_add_sudo($command);
 
-		// Непосредственная отправка команд
+		// Подготовка полной команды
 		$final_command = $cd . $command;
 		$this->_sended_commands[] = $final_command;
+		
+		if (strpos($file, '.sh') !== false OR strpos($file, '.exe') !== false) {
+			$this->_check_file($file, 'x');
+		}
 
 		return $this->{$this->driver}->command($final_command);
 	}
@@ -193,10 +196,25 @@ class Control extends CI_Driver_Library {
 			throw new Exception('Driver no set');
 		}
 		
+		if ($this->ip != $ip && $this->port != $port) {
+			$this->clear_commands();
+		}
+		
+		$this->ip 	= $ip;
+		$this->port = $port;
+		
 		// Проверка возможности работы с драйвером
 		$this->{$this->driver}->check();
 
 		return $this->{$this->driver}->connect($ip, $port);
+	}
+	
+	// ---------------------------------------------------------------------
+	
+	public function clear_commands() 
+	{
+		$this->_sended_commands = array();
+		$this->_commands_result = array();
 	}
 	
 	// ---------------------------------------------------------------------
@@ -240,15 +258,7 @@ class Control extends CI_Driver_Library {
 				$this->_commands_result[] = $cmd_result;
 			}
 			
-			$result = '';
-			$i 		= 0;
-			$count = count($this->_sended_commands);
-			while($this->_sended_commands < $count) {
-				$result .= repeater('-', 50);
-				$result .= $this->_sended_commands[$i] . "\n" . $this->_commands_result[$i] . "\n\n";
-				$i ++;
-			}
-			
+			return;
 		} else {
 			$this->_commands_result[] = $this->_single_command($command, $path);
 			return end($this->_commands_result);
@@ -274,6 +284,22 @@ class Control extends CI_Driver_Library {
 	public function get_last_command()
 	{
 		return end($this->_sended_commands);
+	}
+	
+	// ---------------------------------------------------------------------
+	
+	public function get_commands_result()
+	{
+		$results = array();
+		
+		$i = 0;
+		$count = count($this->_sended_commands);
+		while($i < $count) {
+			$results[] = $this->_sended_commands[$i] . PHP_EOL . $this->_commands_result[$i];
+			$i ++;
+		}
+
+		return $results;
 	}
 }
 
