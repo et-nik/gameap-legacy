@@ -341,6 +341,35 @@ class Adm_servers extends CI_Controller {
 		
 		return $data;
 	}
+	
+		// -----------------------------------------------------------------
+	
+	/**
+	 * Получение данных фильтра для вставки в шаблон
+	 */
+	private function _get_gservers_tpl_filter($filter = false)
+	{
+		if (!$filter) {
+			$filter = $this->users->get_filter('servers_list');
+		}
+		
+		if (empty($this->games->games_list)) {
+			$this->games->get_games_list();
+		}
+		
+		$games_option[0] = '---';
+		foreach($this->games->games_list as &$game) {
+			$games_option[ $game['code'] ] = $game['name'];
+		}
+		
+		$tpl_data['filter_name']			= isset($filter['name']) ? $filter['name'] : '';
+		$tpl_data['filter_ip']				= isset($filter['ip']) ? $filter['ip'] : '';
+		
+		$default = isset($filter['game']) ? $filter['game'] : null;
+		$tpl_data['filter_games_dropdown'] 	= form_dropdown('filter_game', $games_option, $default);
+		
+		return $tpl_data;
+	}
 
 	// -----------------------------------------------------------------
 	
@@ -415,6 +444,11 @@ class Adm_servers extends CI_Controller {
 					$this->tpl_data['heading'] 	= lang('adm_servers_heading_gs');
 					
 					$parse_list_file = 'adm_servers/game_servers_list.html';	// Шаблон списка
+					
+					$filter = $this->users->get_filter('servers_list');
+					$local_tpl_data = $this->_get_gservers_tpl_filter();
+					
+					$this->servers->set_filter($filter);
 					$this->servers->get_server_list(false, false, array());
 					
 					$local_tpl_data['games_list'] = servers_list_to_games_list($this->servers->servers_list);
