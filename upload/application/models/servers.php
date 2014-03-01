@@ -1175,14 +1175,17 @@ class Servers extends CI_Model {
 								$this->servers->server_data['engine_version']
 		);
 		
-		$this->rcon->change_rcon($new_rcon);
+		try {
+			$this->rcon->change_rcon($new_rcon);
 
-		if ($update_db) {
-			$sql_data = array('rcon' => $new_rcon);
-			$this->edit_game_server($this->server_data['id'], $sql_data);
+			if ($update_db) {
+				$sql_data = array('rcon' => $new_rcon);
+				$this->edit_game_server($this->server_data['id'], $sql_data);
+			}
+			return true;
+		} catch (Exception $e) {
+			return false;
 		}
-		
-		return true;
 	}
 	
 	// ----------------------------------------------------------------

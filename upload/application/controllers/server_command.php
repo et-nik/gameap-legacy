@@ -636,8 +636,6 @@ class Server_command extends CI_Controller {
 				// Смена rcon пароля, правка конфиг файлов и тп.
 				if(isset($this->servers->server_data['id']) && isset($rcon_command['1'])) {
 					$this->servers->change_rcon($rcon_command['1']);
-					$sql_data['rcon'] = $rcon_command['1'];
-					$this->servers->edit_game_server($this->servers->server_data['id'], $sql_data);
 				}
 				
 				break;
