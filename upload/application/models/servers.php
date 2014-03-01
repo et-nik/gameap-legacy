@@ -14,7 +14,10 @@
 class Servers extends CI_Model {
 
     public $server_id   		= 0;			// ИД сервера
-	public $servers_list 		= array();		// Список игровых серверов
+    
+	private $_filter_servers_list	= array('name' => false, 'ip' => false, 'game' => false);		// Фильтр списка серверов
+	public $servers_list 			= array();		// Список игровых серверов
+	
     public $server_data 		= array();		// Данные сервера
     public $server_query_data 	= array();		// query данные сервера
     public $server_ds_data 	= array();		// Данные DS игрового сервера
@@ -393,9 +396,9 @@ class Servers extends CI_Model {
 	function set_filter($filter)
 	{
 		if (is_array($filter)) {
-			(isset($filter['name']) && $filter['name']) ? $this->db->like('name', $filter['name']) : null;
-			(isset($filter['ip']) && $filter['ip']) ? $this->db->like('server_ip', $filter['ip']): null;
-			(isset($filter['game']) && $filter['game']) ? $this->db->where('game', $filter['game']): null;
+			$this->_filter_servers_list['name'] = (isset($filter['name']) && $filter['name']) ? $filter['name'] : null;
+			$this->_filter_servers_list['ip'] 	= (isset($filter['ip']) && $filter['ip']) ? $filter['ip'] : null;
+			$this->_filter_servers_list['game'] = (isset($filter['game']) && $filter['game']) ? $filter['game'] : null;
 		}
 	}
 
@@ -436,6 +439,11 @@ class Servers extends CI_Model {
 		if (!$user_id OR ($privilege_name == 'VIEW' && $this->users->auth_data['is_admin'])) {
 			if (!empty($games)) { $this->db->where_in('game', $games); }
 			$this->db->where($where);
+			
+			!$this->_filter_servers_list['name'] OR $this->db->like('name', $this->_filter_servers_list['name']);
+			!$this->_filter_servers_list['ip'] OR $this->db->like('server_ip', $this->_filter_servers_list['ip']);
+			!$this->_filter_servers_list['game'] OR $this->db->where('game', $this->_filter_servers_list['game']);
+			
 			$query = $this->db->get('servers');
 		} else {
 			
@@ -474,7 +482,11 @@ class Servers extends CI_Model {
 					$this->servers_list = array();
 					return NULL;
 				}
-
+				
+				!$this->_filter_servers_list['name'] OR $this->db->like('name', $this->_filter_servers_list['name']);
+				!$this->_filter_servers_list['ip'] OR $this->db->like('server_ip', $this->_filter_servers_list['ip']);
+				!$this->_filter_servers_list['game'] OR $this->db->where('game', $this->_filter_servers_list['game']);
+			
 				$query = $this->db->get('servers');
 			}
 			
