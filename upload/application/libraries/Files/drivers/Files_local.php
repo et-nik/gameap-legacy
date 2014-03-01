@@ -224,7 +224,7 @@ class Files_local extends CI_Driver {
 	 */
 	function list_files_full_info($path = '.', $extensions = array()) 
 	{
-		if (!file_exists($dir)) {
+		if (!file_exists($path)) {
 			$this->_error('server_files_directory_not_found');
 			return FALSE;
 		}
