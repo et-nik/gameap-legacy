@@ -37,7 +37,8 @@ class Control_telnet extends CI_Driver {
 	private $ip;
 	private $port;
 	
-	private $_prompt = '>';
+	private $_prompt 	= '>';
+	private $_timeout 	= 30;
 
 	public function check()
 	{
@@ -176,13 +177,12 @@ class Control_telnet extends CI_Driver {
 			
 			default:
 				// linux
-				//~ echo PHP_EOL . PHP_EOL . PHP_EOL . PHP_EOL . 'LINUX' . PHP_EOL . PHP_EOL . PHP_EOL . PHP_EOL;
-				$this->_prompt = '$';
+				$this->_prompt = '~$';
 				break;
 		}
 		
 		$this->_connection = @fsockopen($this->ip, $this->port);
-		//~ @socket_set_timeout($this->_connection, 5);
+		//~ @stream_set_timeout($this->_connection, 30);
 
 		if (!$this->_connection) {
 			throw new Exception(lang('server_command_connection_failed') . ' (Telnet)');
@@ -207,11 +207,11 @@ class Control_telnet extends CI_Driver {
 			throw new Exception(lang('server_command_empty_auth_data') . ' (Telnet)');
 		}
 
-		$this->_read_till("ogin: ");
+		$this->_read_till("in:");
 		$this->_write( $login . "\r\n");
-		$this->_read_till("word: ");
+		$this->_read_till("rd:");
 		$this->_write( $password . "\r\n");
-		$auth_string = $this->_read_till($this->_prompt);
+		$auth_string = $this->_read_till(array($this->_prompt, ':>', 'ailed', 'incorrect'));
 		
 		/* В Windows при неудачной попытке пишется "Login Failed"
 		 * В Linux при неудачной попытке пишется "Login incorrect"
@@ -286,30 +286,41 @@ class Control_telnet extends CI_Driver {
         $this->_connection = NULL;
 	}
 
-	function __destruct() 
-	{
-		$this->disconnect();
-	}
+	// ----------------------------------------------------------------
 
-	function _write($buffer) {
+	private function _write($buffer) 
+	{
 		if(!$this->_connection) { return false;}
 		
 		$buffer = str_replace(chr(255),chr(255).chr(255),$buffer);
         fwrite($this->_connection,$buffer);
     }
+	
+	// ----------------------------------------------------------------
 
-
-	function _getc() 
+	private function _getc() 
 	{
 		if(!$this->_connection) { return false;}
 		return fgetc($this->_connection);
 	}
+	
+	// ----------------------------------------------------------------
 
-
-	function _read_till($what) 
+	/**
+	 * Получает ответ сервера после нахождения стоп слов $what
+	 * $what может быть как строкой, так и массивом
+	 * 
+	 * @param string or array
+	*/
+	private function _read_till($what) 
 	{
 		$buf = '';
 		$time = 0;
+		
+		if (is_string($what)) {
+			$symbols[] = $what;
+			$what = $symbols;
+		}
 
 		while (1) {
 			$IAC = chr(255);
@@ -326,19 +337,8 @@ class Control_telnet extends CI_Driver {
 
 			if ($c === false) {
 				return $buf;
-				//~ sleep(1);
-				//~ $time ++;
-				//~ 
-				//~ if ($time > 60) {
-					//~ // 60 секунд без ответа
-					//~ return $buf;
-				//~ } else {
-					//~ continue;
-				//~ }
 			}
 			
-			$time = 0;
-
 			if ($c == $theNULL) {
 				continue;
 			}
@@ -350,11 +350,13 @@ class Control_telnet extends CI_Driver {
 			if ($c != $IAC) {
 				$buf .= $c;
 
-				if ($what == (substr($buf,strlen($buf)-strlen($what)))) {
-					return $buf;
-                } else {
-					continue;
-                }
+				foreach($what as &$stop_symbols) {
+					if ($stop_symbols == substr($buf,strlen($buf)-strlen($stop_symbols))) {
+						return $buf;
+					}
+				}
+
+				continue;
             }
 
 			$c = $this->_getc();
@@ -376,9 +378,14 @@ class Control_telnet extends CI_Driver {
 		}
 
 	}
+	
+	// ----------------------------------------------------------------
+
+	function __destruct() 
+	{
+		$this->disconnect();
+	}
 }
-
-
 
 /* End of file Control_telnet.php */
 /* Location: ./application/libraries/Control/drivers/Control_telnet.php */
