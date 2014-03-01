@@ -112,7 +112,7 @@ class Adm_servers extends CI_Controller {
 	 * @param string
 	 * @return bool
 	*/
-	private function _check_telnet($telnet_host, $telnet_login, $telnet_password)
+	private function _check_telnet($telnet_host, $telnet_login, $telnet_password, $os = 'windows')
 	{
 		$this->load->driver('control');
 
@@ -126,6 +126,7 @@ class Adm_servers extends CI_Controller {
 		$telnet_host[1] = (isset($telnet_host[1])) ? (int)$telnet_host[1] : 23;
 		
 		$this->control->set_driver('telnet');
+		$this->control->set_data(array('os' => $os));
 		
 		try {
 			$this->control->connect($telnet_host[0], $telnet_host[1]);
@@ -1718,7 +1719,7 @@ class Adm_servers extends CI_Controller {
 							$telnet_password = $sql_data['telnet_password'];
 						}
 						
-						if (false == $this->_check_telnet($sql_data['telnet_host'], $sql_data['telnet_login'], $telnet_password)) {
+						if (false == $this->_check_telnet($sql_data['telnet_host'], $sql_data['telnet_login'], $telnet_password, strtolower($sql_data['os']))) {
 							$this->_show_message(lang('adm_servers_telnet_data_unavailable'), 'javascript:history.back()');
 							return false;
 						}
