@@ -635,7 +635,7 @@ class Server_command extends CI_Controller {
 			case 'rcon_password':
 				// Смена rcon пароля, правка конфиг файлов и тп.
 				if(isset($this->servers->server_data['id']) && isset($rcon_command['1'])) {
-					$this->servers->change_rcon($rcon_command['1']);
+					$this->servers->change_rcon($rcon_command['1'], $this->servers->server_data, true);
 				}
 				
 				break;
