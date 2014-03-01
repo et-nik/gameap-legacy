@@ -40,6 +40,7 @@
 class Cron extends MX_Controller {
 
 	var $servers_data = array();
+	
 	var $_cron_result = '';
 	private $_commands_result = array();
 	private $_install_result = '';
@@ -207,7 +208,7 @@ class Cron extends MX_Controller {
      * Получает информацию о сервере информации о котором 
      * еще нет в массиве $this->server_data
     */
-    function _get_server_data($server_id)
+    private function _get_server_data($server_id)
     {
 		if(!array_key_exists($server_id, $this->servers_data)) {
 			$this->servers_data[$server_id] = $this->servers->get_server_data($server_id);
@@ -227,7 +228,7 @@ class Cron extends MX_Controller {
      * @param string
      * @return bool
     */
-	function _mkdir($server_id)
+	private function _mkdir($server_id)
 	{
 		$commands = array();
 		
@@ -249,6 +250,19 @@ class Cron extends MX_Controller {
 	// ----------------------------------------------------------------
     
     /**
+     * Отправляет сообщение в командную строку
+     * 
+     * @param string
+    */
+	private function _cmd_output($msg = '')
+	{
+		$this->_cron_result .= $msg . PHP_EOL;
+		echo $msg . PHP_EOL;
+	}
+	
+	// ----------------------------------------------------------------
+    
+    /**
      * Загружает файлы на удаленный сервер
      * 
      * @param string
@@ -257,7 +271,7 @@ class Cron extends MX_Controller {
      * @param string
      * @return bool
     */
-	function _wget_files($server_id, $link, $rep_type = 'local')
+	private function _wget_files($server_id, $link, $rep_type = 'local')
 	{
 		$commands = array();
 		
@@ -354,7 +368,7 @@ class Cron extends MX_Controller {
 			return true;
 			
 		} else {
-			$this->_cron_result .= 'Unknown repository type' . "\n";
+			$this->_cmd_output('Unknown repository type: ' . $rep_type);
 		}
 
 	}
@@ -368,7 +382,7 @@ class Cron extends MX_Controller {
      * @param string
      * @return bool
     */
-	function _unpack_files($server_id, $pack_file)
+	private function _unpack_files($server_id, $pack_file)
 	{
 		$pathinfo = pathinfo($pack_file);
 		
@@ -415,7 +429,7 @@ class Cron extends MX_Controller {
     /**
      * Установка игрового сервера с помощью SteamCMD
     */
-	function _install_from_steamcmd($server_id)
+	private function _install_from_steamcmd($server_id)
 	{
 		/* Установка через SteamCMD */
 
@@ -451,7 +465,7 @@ class Cron extends MX_Controller {
 			$server_installed = true;
 
 			$log_data['msg'] = 'Update server success';
-			$this->_cron_result .= "Install server success\n";
+			$this->_cmd_output("Install server success");
 			
 			return true;
 			
@@ -460,7 +474,7 @@ class Cron extends MX_Controller {
 			$server_data = array('installed' => '0');
 
 			$log_data['msg'] = 'Update server failed';
-			$this->_cron_result .= "Install server failure\n";
+			$this->_cmd_output("Install server failure");
 			
 			return false;
 		} elseif(strpos($result, 'Error! App \'' . $this->games->games_list[0]['app_id'] . '\' state is') !== false) {
@@ -468,7 +482,7 @@ class Cron extends MX_Controller {
 			$server_data = array('installed' => '0');
 
 			$log_data['msg'] = 'Error. App state after update job';
-			$this->_cron_result .= "Install server failure\n";
+			$this->_cmd_output("Install server failure");
 			
 			return false;
 		} else {
@@ -476,7 +490,7 @@ class Cron extends MX_Controller {
 			$server_data = array('installed' => '1');
 
 			$log_data['msg'] = 'Unknown error';
-			$this->_cron_result .= "Install server failure\n";
+			$this->_cmd_output("Install server failure");
 			
 			return false;
 		}
@@ -487,7 +501,7 @@ class Cron extends MX_Controller {
     /**
      * Обрабатывает полученные данные статистики
     */
-	function _stats_processing($ds)
+	private function _stats_processing($ds)
 	{
 		$control_protocol =& $ds['control_protocol'];
 
@@ -636,7 +650,7 @@ class Cron extends MX_Controller {
     /**
      * Выполняет cron скрипты модулей
     */
-	function _modules_cron()
+	private function _modules_cron()
 	{
 		/* Массив с именами cron скриптов 
 		 * нужен для записи выполненных скриптов
@@ -664,27 +678,28 @@ class Cron extends MX_Controller {
 			
 			if ($value['cron_script'] == 'cron') {
 				/* Нельзя запускать скрипты с именем cron */
-				$this->_cron_result .= "Script {$value['cron_script']} on module {$value['short_name']} omitted\n";
+				$this->_cmd_output("Script {$value['cron_script']} on module {$value['short_name']} omitted");
 				continue;
 			}
 			
 			if (in_array($value['cron_script'], $array_scripts)) {
 				/* Нельзя запускать скрипты с именем cron */
-				$this->_cron_result .= "Script {$value['cron_script']} on module {$value['short_name']} omitted\n";
+				$this->_cmd_output("Script {$value['cron_script']} on module {$value['short_name']} omitted");
 				continue;
 			}
 			
 			if (!file_exists(APPPATH . 'modules/' . $value['short_name'] . '/controllers/' . $value['cron_script'] . '.php')) {
 				/* Скрипт отсутствует */
-				$this->_cron_result .= "Script not found on {$value['short_name']} module\n";
+				$this->_cmd_output("Script not found on {$value['short_name']} module");
 				continue;
 			}
 			
 			$array_scripts[] = $value['cron_script'];
 			
 			/* Выполняем cron скрипт из модуля */
-			$this->_cron_result .= "Start {$value['short_name']}\n";
-			$this->_cron_result .= modules::run($value['short_name'] . '/' . $value['cron_script'] . '/index');
+			$this->_cmd_output("Start {$value['short_name']}");
+			$result = modules::run($value['short_name'] . '/' . $value['cron_script'] . '/index');
+			//~ $this->_cmd_output($result);
 		}
 	}
 
@@ -697,7 +712,6 @@ class Cron extends MX_Controller {
     public function index()
     {
 		$time = time();
-		$this->_cron_result = '';
 		$cron_stats = array(
 			'success' => 0,
 			'failed' => 0,
@@ -720,7 +734,7 @@ class Cron extends MX_Controller {
 		/*     Выполняем задания                            */
 		/*==================================================*/
 
-		$this->_cron_result .= "== Task manager ==\n";
+		$this->_cmd_output("== Task manager ==");
 
 		$i = 0;
 		$a = 0;
@@ -778,7 +792,7 @@ class Cron extends MX_Controller {
 						$cron_success = true;
 						$cron_stats['success'] ++;
 
-						$this->_cron_result .= 'Task: server #' . $server_id . '  start success' . "\n";
+						$this->_cmd_output('Task: server #' . $server_id . '  start success');
 
 						// Сохраняем логи
 						$log_data['type'] 		= 'server_command';
@@ -791,7 +805,7 @@ class Cron extends MX_Controller {
 					} catch (Exception $e) {
 						$cron_stats['failed'] ++;
 						$message = $e->getMessage();
-						$this->_cron_result .= 'Task: server #' . $server_id . '  start failed. ' . $message . "\n";
+						$this->_cmd_output('Task: server #' . $server_id . '  start failed. ' . $message);
 
 						// Сохраняем логи
 						$log_data['type'] 			= 'server_command';
@@ -813,7 +827,7 @@ class Cron extends MX_Controller {
 						$cron_success = true;
 						$cron_stats['success'] ++;
 
-						$this->_cron_result .= 'Task: server #' . $server_id . '  stop success' . "\n";
+						$this->_cmd_output('Task: server #' . $server_id . '  stop success');
 
 						// Сохраняем логи
 						$log_data['type'] 		= 'server_command';
@@ -826,7 +840,7 @@ class Cron extends MX_Controller {
 					} catch (Exception $e) {
 						$cron_stats['failed'] ++;
 						$message = $e->getMessage();
-						$this->_cron_result .= 'Task: server #' . $server_id . '  stop failed. ' . $message . "\n";
+						$this->_cmd_output('Task: server #' . $server_id . '  stop failed. ' . $message);
 
 						// Сохраняем логи
 						$log_data['type'] 			= 'server_command';
@@ -847,7 +861,7 @@ class Cron extends MX_Controller {
 						$cron_success = true;
 						$cron_stats['success'] ++;
 
-						$this->_cron_result .= 'Task: server #' . $server_id . '  restart success' . "\n";
+						$this->_cmd_output('Task: server #' . $server_id . '  restart success');
 
 						// Сохраняем логи
 						$log_data['type'] 		= 'server_command';
@@ -860,7 +874,7 @@ class Cron extends MX_Controller {
 					} catch (Exception $e) {
 						$cron_stats['failed'] ++;
 						$message = $e->getMessage();
-						$this->_cron_result .= 'Task: server #' . $server_id . '  restart failed. ' . $message . "\n";
+						$this->_cmd_output('Task: server #' . $server_id . '  restart failed. ' . $message);
 
 						// Сохраняем логи
 						$log_data['type'] 			= 'server_command';
@@ -881,7 +895,7 @@ class Cron extends MX_Controller {
 						$cron_success = true;
 						$cron_stats['success'] ++;
 
-						$this->_cron_result .= 'Task: server #' . $server_id . '  update success' . "\n";
+						$this->_cmd_output('Task: server #' . $server_id . '  update success');
 
 						// Сохраняем логи
 						$log_data['type'] 		= 'server_command';
@@ -894,7 +908,7 @@ class Cron extends MX_Controller {
 					} catch (Exception $e) {
 						$cron_stats['failed'] ++;
 						$message = $e->getMessage();
-						$this->_cron_result .= 'Task: server #' . $server_id . '  update failed. ' . $message . "\n";
+						$this->_cmd_output('Task: server #' . $server_id . '  update failed. ' . $message);
 
 						// Сохраняем логи
 						$log_data['type'] 			= 'server_command';
@@ -925,7 +939,7 @@ class Cron extends MX_Controller {
 							$cron_success = true;
 							$cron_stats['success'] ++;
 
-							$this->_cron_result .= 'Task: server #' . $server_id . '  rcon send success' . "\n";
+							$this->_cmd_output('Task: server #' . $server_id . '  rcon send success');
 
 							// Сохраняем логи
 							$log_data['type'] = 'server_rcon';
@@ -937,7 +951,7 @@ class Cron extends MX_Controller {
 						} else {
 							$cron_stats['failed'] ++;
 
-							$this->_cron_result .= 'Task: server #' . $server_id . '  rcon send failed' . "\n";
+							$this->_cmd_output('Task: server #' . $server_id . '  rcon send failed');
 
 							// Сохраняем логи
 							$log_data['type'] = 'server_rcon';
@@ -950,7 +964,7 @@ class Cron extends MX_Controller {
 					} else {
 						$cron_stats['failed'] ++;
 
-						$this->_cron_result .= 'Task: server #' . $server_id . '  rcon send failed' . "\n";
+						$this->_cmd_output('Task: server #' . $server_id . '  rcon send failed');
 
 						// Сохраняем логи
 						$log_data['type'] = 'server_rcon';
@@ -993,14 +1007,14 @@ class Cron extends MX_Controller {
 		}
 
 		// Отображаем статистику заданий
-		$this->_cron_result .= "Success: $cron_stats[success] Failed: $cron_stats[failed] Skipped: $cron_stats[skipped]\n";
+		$this->_cmd_output("Success: {$cron_stats['success']} Failed: {$cron_stats['failed']} Skipped: {$cron_stats['skipped']}");
 
 		/*==================================================*/
 		/*    				БЕГУН					        */
 		/*    Пробегаем по каждому серверу			        */
 		/*==================================================*/
 
-		$this->_cron_result .= "== Runner ==\n";
+		$this->_cmd_output("== Runner ==");
 
 		$this->servers->get_server_list(false, false, array('enabled' => '1'));
 
@@ -1020,7 +1034,7 @@ class Cron extends MX_Controller {
 				OR $this->servers_data[$server_id]['installed'] == '3'
 			) {
 				// Сервер не установлен
-				$this->_cron_result .= "Server #" . $server_id . " not installed\n";
+				$this->_cmd_output("Server #" . $server_id . " not installed");
 				$server_installed = false;
 
 				// Данные лога установки
@@ -1040,48 +1054,47 @@ class Cron extends MX_Controller {
 				try {
 					$this->_mkdir($server_id);
 				} catch (Exception $e) {
-					$this->_cron_result .= $e->getMessage() . "\n";
+					$this->_cmd_output('Mkdir failed: '. $e->getMessage());
 					$server_installed = false;
 				}
 				
 				if ($this->games->games_list[0]['local_repository']) {
 					/* Установка из локального репозитория */
 					
-					$this->_cron_result .= "Install from local repository \n";
+					$this->_cmd_output("Install from local repository");
 					
 					try {
 						$this->_wget_files($server_id, $this->games->games_list[0]['local_repository'], 'local');
 						$this->_unpack_files($server_id, $this->games->games_list[0]['local_repository']);
 						$server_installed = true;
 					} catch (Exception $e) {
-						$this->_cron_result .= $e->getMessage() . "\n";
+						$this->_cmd_output("Install from local repository failed. Message: " . $e->getMessage());
 						$server_installed = false;
 					}
 					
 				} elseif ($this->games->games_list[0]['remote_repository']) {
 					/* Установка из удаленного репозитория */
 					
-					$this->_cron_result .= "Install from remote repository \n";
+					$this->_cmd_output("Install from remote repository");
 					
 					try {
 						$this->_wget_files($server_id, $this->games->games_list[0]['remote_repository'], 'remote');
 						$this->_unpack_files($server_id, $this->games->games_list[0]['remote_repository']);
 						$server_installed = true;
 					} catch (Exception $e) {
-						$this->_cron_result .= $e->getMessage() . "\n";
+						$this->_cmd_output("Install from remote repository failed. Message: " . $e->getMessage());
 						$server_installed = false;
 					}
 
 				} elseif ($this->games->games_list[0]['app_id']) {
 					/* Установка через SteamCMD */
 					
-					$this->_cron_result .= "Install from SteamCMD \n";
+					$this->_cmd_output("Install from SteamCMD");
 					
 					try {
-						$this->_install_from_steamcmd($server_id);
-						$server_installed = true;
+						$server_installed = $this->_install_from_steamcmd($server_id);
 					} catch (Exception $e) {
-						$this->_cron_result .= $e->getMessage() . "\n";
+						$this->_cmd_output("Install from steamcmd failed. Message: " . $e->getMessage());
 						$server_installed = false;
 					}
 					
@@ -1091,7 +1104,7 @@ class Cron extends MX_Controller {
 					 * отсутствуют данные локального репозитория, удаленного репозитория и steamcmd
 					 */
 					$log .= "App_id and Repository data not specified \n";
-					$this->_cron_result .= "Server #" . $server_id . " install failed. App_id and Repository data not specified\n";
+					$this->_cmd_output("Server #" . $server_id . " install failed. App_id and Repository data not specified");
 					$server_installed = false;
 				}
 				
@@ -1109,7 +1122,7 @@ class Cron extends MX_Controller {
 							$this->_wget_files($server_id, $this->game_types->game_types_list[0]['local_repository'], 'local');
 							$this->_unpack_files($server_id, $this->game_types->game_types_list[0]['local_repository']);
 						} catch (Exception $e) {
-							$this->_cron_result .= $e->getMessage() . "\n";
+							$this->_cmd_output('Install modification from local repository failed. Message: ' . $e->getMessage());
 						}
 						
 					} elseif (isset($this->game_types->game_types_list[0]['remote_repository'])
@@ -1120,7 +1133,7 @@ class Cron extends MX_Controller {
 							$this->_wget_files($server_id, $this->game_types->game_types_list[0]['remote_repository'], 'remote');
 							$this->_unpack_files($server_id, $this->game_types->game_types_list[0]['remote_repository']);
 						} catch (Exception $e) {
-							$this->_cron_result .= $e->getMessage() . "\n";
+							$this->_cmd_output('Install modification from remote repository failed. Message: ' . $e->getMessage());
 						}
 					}
 					
@@ -1161,7 +1174,7 @@ class Cron extends MX_Controller {
 						try {
 							$log .= "\n---\nCHMOD\n" . $log . "\n" .  send_command($command, $this->servers_data[$server_id]);
 						} catch (Exception $e) {
-							$this->_cron_result .= $e->getMessage() . "\n";
+							$this->_cmd_output('CHMOD failed. Message: ' . $e->getMessage());
 							$log .= $e->getMessage() . "\n";;
 						}
 					}
@@ -1174,7 +1187,7 @@ class Cron extends MX_Controller {
 					try {
 						$this->servers->change_rcon($new_rcon, $this->servers_data[$server_id]);
 					} catch (Exception $e) {
-						$this->_cron_result .= $e->getMessage() . "\n";
+						$this->_cmd_output('Rcon set failed. Message: ' . $e->getMessage());
 					}
 					
 					/* Конфигурирование сервера */
@@ -1187,7 +1200,11 @@ class Cron extends MX_Controller {
 					$this->installer->server_data = $this->servers_data[$server_id];
 					
 					// Правка конфигов
-					$this->installer->change_config();
+					try {
+						$this->installer->change_config();
+					} catch (Exception $e) {
+						$this->_cmd_output('Change config failed. Message: ' . $e->getMessage());
+					}
 					
 					$aliases_values = array();
 					$aliases_values = json_decode($this->servers_data[$server_id]['aliases'], true);
@@ -1208,6 +1225,8 @@ class Cron extends MX_Controller {
 					$log_data['msg'] = 'Server install successful';
 					$log_data['log_data'] = "Results:" . PHP_EOL . var_export($this->control->get_commands_result(), true) . PHP_EOL;
 					$this->panel_log->save_log($log_data);
+					
+					$this->_cmd_output('Server install #' . $server_id . ' success');
 
 				} else {
 					
@@ -1221,7 +1240,7 @@ class Cron extends MX_Controller {
 					$log_data['log_data'] = "Results:" . PHP_EOL . var_export($this->control->get_commands_result(), true) . PHP_EOL;
 					$this->panel_log->save_log($log_data);
 					
-					$this->_cron_result .= 'Server install #' . $server_id . ' failed' . "\n";
+					$this->_cmd_output('Server install #' . $server_id . ' failed');
 				}
 
 				$i ++;
@@ -1273,7 +1292,7 @@ class Cron extends MX_Controller {
 							$log_data['msg'] = 'Start server success';
 						} catch (Exception $e) {
 							$response = false;
-							$this->_cron_result .= $e->getMessage();
+							$this->_cmd_output('Start server #' . $server_id . ' failed. Message: ' . $e->getMessage());
 							$log_data['command'] = 'start';
 							$log_data['msg'] = 'Start server failed';
 						}
@@ -1289,7 +1308,7 @@ class Cron extends MX_Controller {
 								}
 							} catch (Exception $e) {
 								$response = false;
-								$this->_cron_result .= $e->getMessage();
+								$this->_cmd_output('Restart server #' . $server_id . ' failed. Message: ' . $e->getMessage());
 							}
 
 						}
@@ -1346,21 +1365,27 @@ class Cron extends MX_Controller {
 						$this->load->helper('safety');
 
 						$new_rcon = generate_code(8);
-
+						
 						$this->servers->server_data = $this->servers_data[$server_id];
-						$this->servers->change_rcon($new_rcon, $this->servers_data[$server_id]);
-
-						// Меняем пароль в базе
-						$sql_data['rcon'] = $new_rcon;
-						$this->servers->edit_game_server($server_id, $sql_data);
-
-						// Сохраняем логи
-						$log_data['type'] = 'server_rcon';
-						$log_data['command'] = 'rcon_password';
-						$log_data['server_id'] = $server_id;
-						$log_data['msg'] = 'Change rcon password';
-						$log_data['log_data'] = 'Rcon command: rcon_password ' . $new_rcon . "\n";
-						$this->panel_log->save_log($log_data);
+						
+						try {
+							$this->servers->change_rcon($new_rcon, $this->servers_data[$server_id]);
+							
+							// Меняем пароль в базе
+							$sql_data['rcon'] = $new_rcon;
+							$this->servers->edit_game_server($server_id, $sql_data);
+							
+							// Сохраняем логи
+							$log_data['type'] = 'server_rcon';
+							$log_data['command'] = 'rcon_password';
+							$log_data['server_id'] = $server_id;
+							$log_data['msg'] = 'Change rcon password';
+							$log_data['log_data'] = 'Rcon command: rcon_password ' . $new_rcon . "\n";
+							$this->panel_log->save_log($log_data);
+							
+						} catch (Exception $e) {
+							$this->_cmd_output('Rcon change on server #' . $server_id . ' failed. Message: ' . $e->getMessage());
+						}
 
 						// Перезагружаем сервер
 						try {
@@ -1369,8 +1394,7 @@ class Cron extends MX_Controller {
 							$log_data['log_data'] = $response;
 						} catch (Exception $e) {
 							$log_data['msg'] = 'Restart server failed';
-							$log_data['log_data'] = $e->getMessage();
-							$this->_cron_result .= $log_data['log_data'];
+							$this->_cmd_output('Restart server #' . $server_id . ' failed. Message: ' . $e->getMessage());
 						}
 
 						// Сохраняем логи
@@ -1401,21 +1425,21 @@ class Cron extends MX_Controller {
 		/*    	СТАТИСТИКА ВЫДЕЛЕННОГО СЕРВЕРА  			*/
 		/*==================================================*/
 
-		$this->_cron_result .= "== DS Stats ==\n";
+		$this->_cmd_output("== DS Stats ==");
 		$this->dedicated_servers->get_ds_list();
 		
 		if (!empty($this->dedicated_servers->ds_list)) {
 			foreach($this->dedicated_servers->ds_list as $ds) {
 
 				if (!$stats = $this->_stats_processing($ds)) {
-					$this->_cron_result .= 'Stats server #' . $ds['id'] . ' failed'. "\n";
+					$this->_cmd_output('Stats server #' . $ds['id'] . ' failed');
 					continue;
 				}
 				
 				if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
-					$this->_cron_result .= 'Stats server #' . $ds['id'] . ' successful' . "\n";
+					$this->_cmd_output('Stats server #' . $ds['id'] . ' successful');
 				} else {
-					$this->_cron_result .= 'Stats server #' . $ds['id'] . ' failed'. "\n";
+					$this->_cmd_output('Stats server #' . $ds['id'] . ' failed');
 					continue;
 				}
 
@@ -1440,18 +1464,15 @@ class Cron extends MX_Controller {
 		/*    	ВЫПОЛНЕНИЕ CRON СКРИПТОВ ИЗ МОДУЛЕЙ			*/
 		/*==================================================*/
 		
-		$this->_cron_result .= "== Modules cron ==\n";
+		$this->_cmd_output("== Modules cron ==");
 		
 		/* Чтобы данные выполнения пользовательского крона выводились правильно
 		 * и на своем месте, то записываем весь вывод предыдущих задач 
 		 * а после этого запускаем пользовательский крон
 		*/
-		$this->output->append_output($this->_cron_result);
-		$this->_cron_result = '';
 		$this->_modules_cron();
 		
-		$this->_cron_result .= "Cron end\n";
-		$this->output->append_output($this->_cron_result);
+		$this->_cmd_output("Cron end");
 
 		$log_data['type'] = 'cron';
 		$log_data['command'] = 'cron work';
