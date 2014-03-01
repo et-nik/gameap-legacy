@@ -141,16 +141,12 @@ class Server_control extends CI_Controller {
 	{
 		$tpl_list = array();
 		
-		/* 
-		/* Если FTP настроен или сервер локальный, то получаем список карт
-		 * напрямую из списка сервера
-		 * иначе берем через ркон
-		*/
-		if (!$this->servers->server_data['ds_id'] OR $this->servers->server_data['ftp_host']) {
-			$tpl_list = $this->servers->get_server_maps();
-		} else {
-			//~ $this->tpl_data['content'] .= '<p>' . lang('server_control_no_ftp') . '</p>';
-			$tpl_list = $this->rcon->get_maps();
+		try {
+			if (!$tpl_list = $this->servers->get_server_maps()) {
+				$tpl_list = $this->rcon->get_maps();
+			}
+		} catch(Exception $e) {
+			// Что-то с ftp или sftp
 		}
 		
 		return $tpl_list;

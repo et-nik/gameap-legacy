@@ -533,7 +533,7 @@ class Servers extends CI_Model {
 		}
 		
 		/* Записываем переменную в список */
-		//~ $this->servers_list['0'] = $this->server_data;
+		$this->servers_list['0'] = $this->server_data;
 		
 		/* Расшифровываем RCON пароль */
 		$this->server_data['rcon'] = $this->encrypt->decode($this->server_data['rcon']);
@@ -914,6 +914,8 @@ class Servers extends CI_Model {
 	function get_server_maps()
     {
 		$this->load->helper('path');
+		$this->load->helper('ds');
+		
 		$time = time();
 
 		/* Получаем список карт из базы (своеобразный кеш)*/
@@ -925,17 +927,9 @@ class Servers extends CI_Model {
 			return $maps_cache;
 		}
 		
-		/* Определение, является сервер локальным или удаленным */
-		if($this->server_data['local_server']){
-			// Сервер локальный, получаем данные для него
-			$dir = set_realpath($this->server_data['local_path'] . '/' . $this->server_data['dir'] . '/' . $this->server_data['maps_path']);
-			$files_list = $this->get_local_files($this->server_data, $dir);
-		}else{
-			// Сервер удаленный
-			$dir = set_realpath($this->server_data['ftp_path'] . '/' . $this->server_data['dir'] . '/' . $this->server_data['maps_path']);
-			$files_list = $this->get_remote_files($this->server_data, $dir, true);
-		}
-		
+		$file_path = get_ds_file_path($this->server_data);
+		$files_list = list_ds_files($file_path. '/' . $this->server_data['maps_path'], $this->server_data);
+
 		/* Сортировка массива с файлами по возрастанию
 		 * 
 		 * Применена пользовательская сортировка по функции uasort_asc
@@ -943,7 +937,7 @@ class Servers extends CI_Model {
 		 * в массиве
 		*/
 		
-		if($files_list){
+		if ($files_list) {
 			uasort($files_list, array('Servers','uasort_asc'));
 			
 			$num = -1;
@@ -953,13 +947,13 @@ class Servers extends CI_Model {
 			foreach ($files_list as $file) {
 				$num++;
 				
-				$extension = pathinfo($file['file_name'], PATHINFO_EXTENSION);
+				$extension = pathinfo($file, PATHINFO_EXTENSION);
 				
 				if ($extension != 'bsp') {
 					continue;
 				}
 				
-				$maps[$num]['map_name'] = str_replace('.bsp', '', basename($file['file_name']));
+				$maps[$num]['map_name'] = str_replace('.bsp', '', basename($file));
 			}
 			
 			/* 
@@ -976,7 +970,7 @@ class Servers extends CI_Model {
 			
 			return $maps;
 			
-		}else{
+		} else {
 			return NULL;
 		}
 
