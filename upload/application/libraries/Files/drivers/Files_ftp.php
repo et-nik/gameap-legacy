@@ -504,8 +504,8 @@ class Files_ftp extends CI_Driver {
 			}
 
 			$return_list[] = array('file_name' => basename($file),
-									'file_time' => ftp_mdtm($this->conn_id, $path . '/' . $file),
-									'file_size' => ftp_size($this->conn_id, $path . '/' . $file),
+									'file_time' => ftp_mdtm($this->conn_id, $file),
+									'file_size' => ftp_size($this->conn_id, $file),
 			);
 		}
 
