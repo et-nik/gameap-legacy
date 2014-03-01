@@ -169,7 +169,7 @@ if ( ! function_exists('get_file_protocol_config'))
 			/* Работа с FTP */
 			$config['driver'] = 'ftp';
 
-			$explode = explode(':', $server_data['ssh_host']);
+			$explode = explode(':', $server_data['ftp_host']);
 			$config['hostname'] = $explode[0];
 			$config['port'] = isset($explode[1]) ? $explode[1] : '21';
 			
