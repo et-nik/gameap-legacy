@@ -163,3 +163,5 @@ $lang['modules']								= 'Модули';
 $lang['set']									= 'Задан';
 $lang['no_set']									= 'Не задан';
 
+$lang['filter']									= 'Фильтр';
+$lang['reset']									= 'Сброс';

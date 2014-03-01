@@ -1,4 +1,16 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+/**
+ * Game AdminPanel (АдминПанель)
+ *
+ * 
+ *
+ * @package		Game AdminPanel
+ * @author		Nikita Kuznetsov (ET-NiK)
+ * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
+ * @license		http://www.gameap.ru/license.html
+ * @link		http://www.gameap.ru
+ * @filesource	
+ */
 
 class Settings extends CI_Controller {
 	
@@ -34,7 +46,9 @@ class Settings extends CI_Controller {
         }
     }
     
-    // Отображение информационного сообщения
+	//--------------------------------------------------------------------------
+    
+	// Отображение информационного сообщения
     function _show_message($message = false, $link = false, $link_text = false)
     {
         
@@ -56,20 +70,6 @@ class Settings extends CI_Controller {
         $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
-    
-    // ----------------------------------------------------------------
-
-    /**
-     * Главная страница
-    */
-    public function index()
-    {
-		
-		$this->tpl_data['content'] = 'Функция в разработке';
-		
-		$this->parser->parse('main.html', $this->tpl_data);
-	}
-	
 	
 	// ----------------------------------------------------------------
 
@@ -215,19 +215,36 @@ class Settings extends CI_Controller {
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 	
-	
 	// ----------------------------------------------------------------
 
     /**
-     * Персональные настройки
+     * Задает пользовательский фильтр на серверы
     */
-	public function personal()
+    public function set_filter()
     {
+		$this->form_validation->set_rules('filter_name', lang('name'), 'trim|xss_clean');
+		$this->form_validation->set_rules('filter_ip', lang('ip'), 'trim|xss_clean');
+		$this->form_validation->set_rules('filter_game', lang('game'), 'trim|xss_clean');
 		
-		$this->tpl_data['content'] = 'Функция в разработке';
-		
-		
-		$this->parser->parse('main.html', $this->tpl_data);
+		if($this->form_validation->run() == false) {
+			
+			if (validation_errors()) {
+				$this->_show_message(validation_errors());
+				return false;
+			}
+
+		} else {
+			$reset = (bool) $this->input->post('reset');
+			
+			$filter['name'] = $reset ? '' : $this->input->post('filter_name');
+			$filter['ip'] 	= $reset ? '' : $this->input->post('filter_ip');
+			$filter['game'] = $reset ? '' : $this->input->post('filter_game');
+			
+			$this->users->update_filter('servers_list', $filter);
+			redirect($_SERVER['HTTP_REFERER']);
+		}
 	}
+	
+	
     
 }

@@ -1,4 +1,44 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="awesome" onclick="anichange('#filter'); return false" href="#">{lang_filter}</a>
+<script>
+function anichange (objName) {
+  if ( $(objName).css('display') == 'none' ) {
+    $(objName).animate({height: 'show'}, 400);
+  } else {
+    $(objName).animate({height: 'hide'}, 200);
+  }
+}
+</script>
+
+<div id="filter" style="display: none">
+	<br />
+	<form action="{site_url}admin/settings/set_filter" method="post" accept-charset="utf-8">
+		<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+		
+		<table class="zebra" width="100%">
+			<tr>
+				<td width="30%">{lang_name}:</td>
+				<td><input type="text" name="filter_name" value="{filter_name}"/></td>
+			</tr>
+			
+			<tr>
+				<td width="30%">{lang_ip}:</td>
+				<td><input type="text" name="filter_ip" value="{filter_ip}"/></td>
+			</tr>
+			
+			<tr>
+				<td width="30%">{lang_game}:</td>
+				<td>{filter_games_dropdown}</td>
+			</tr>
+
+		</table>
+			<p align="center">
+				<input class="button" type="submit" name="submit_filter" value="{lang_apply}" />
+				<input class="button" type="submit" name="reset" value="{lang_reset}" />
+			</p>
+	</form>
+</div>
+
 <p align="center" class="hr"><strong>{lang_main_you_servers}</strong></p>
 
 <table class="zebra" width="100%">
@@ -69,7 +109,9 @@
 		<tr>
 			<td>{server_name}</td>
 			<td>{server_ip}</td>
-			<?php if(in_array('commercial', $this->gameap_modules->modules_list)): ?><td>{server_expires}</td><?php endif; ?>
+<!--
+			<?php /* if(in_array('commercial', $this->gameap_modules->modules_list)): */ ?><td>{server_expires}</td><?php /* endif; */ ?>
+-->
 			<td><div id="status_{server_id}"><img src="{base_url}themes/system/images/bullet_grey.png"/></div></td>
 			<td><div id="commands_{server_id}"></div></td>
 		</tr>

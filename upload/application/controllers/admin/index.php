@@ -23,6 +23,8 @@ class Index extends CI_Controller {
 	// Количество игроков на сервере
 	var $players = 0;
 	
+	// -----------------------------------------------------------------
+	
 	public function __construct()
 	{
 		parent::__construct();
@@ -45,29 +47,60 @@ class Index extends CI_Controller {
 		}
 	}
 	
-	//Главная
+	// -----------------------------------------------------------------
+	
+	/**
+	 * Получение данных фильтра для вставки в шаблон
+	 */
+	private function _get_tpl_filter($filter = false)
+	{
+		if (!$filter) {
+			$filter = $this->users->get_filter('servers_list');
+		}
+		
+		if (empty($this->games->games_list)) {
+			$this->games->get_games_list();
+		}
+		
+		$games_option[0] = '---';
+		foreach($this->games->games_list as &$game) {
+			$games_option[ $game['code'] ] = $game['name'];
+		}
+		
+		$tpl_data['filter_name']			= isset($filter['name']) ? $filter['name'] : '';
+		$tpl_data['filter_ip']				= isset($filter['ip']) ? $filter['ip'] : '';
+		
+		$default = isset($filter['game']) ? $filter['game'] : null;
+		$tpl_data['filter_games_dropdown'] 	= form_dropdown('filter_game', $games_option, $default);
+		
+		return $tpl_data;
+	}
+	
+	// -----------------------------------------------------------------
+	
 	public function index()
 	{
-		//~ $this->tpl_data['content'] .= '<p><strong>' . lang('ap_wellcome') . '</strong></p>';
-		
-		/*
-		 * Отправка команд, на которые есть права у пользователя
-		*/
-			
+		$this->load->helper('form');
+
 		/* Загрузка модели управления игровыми серверами*/
 		$this->load->model('servers');
+		
+		$this->load->helper('games');
+		$this->load->model('servers/games');
+		
+		$this->db->select('code, start_code, name, engine, engine_version');
+		$this->games->get_games_list();
+		
+		$filter = $this->users->get_filter('servers_list');
+		$local_tpl_data = $this->_get_tpl_filter($filter);
+
+		$this->servers->set_filter($filter);
 
 		/* Если количество серверов больше 0 */
 		if ($this->servers->get_server_list($this->users->auth_id)) {
-				
-			$this->load->helper('games');
-			$this->load->model('servers/games');
-				
+
 			$num = 0;
-			
-			$this->db->select('code, start_code, name, engine, engine_version');
-			$this->games->get_games_list();
-			
+
 			$local_tpl_data['games_list'] = $this->games->tpl_data_games();
 				
 			foreach ($this->servers->servers_list as $this->server_data) {
@@ -134,12 +167,11 @@ class Index extends CI_Controller {
 			}
 				
 			$local_tpl_data['games_list'] = clean_games_list($local_tpl_data['games_list']);
-				
-			if ($num) {
-				$this->tpl_data['content'] = $this->parser->parse('servers/servers_list_main.html', $local_tpl_data, true);
-			}
+		} else {
+			$local_tpl_data['games_list'] = array();
 		}
-			
+		
+		$this->tpl_data['content'] = $this->parser->parse('servers/servers_list_main.html', $local_tpl_data, true);	
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 }

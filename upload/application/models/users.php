@@ -253,7 +253,7 @@ class Users extends CI_Model {
 		$user_data['balance'] 				= (int)$this->encrypt->decode($user_data['balance']);
 		$user_data['modules_data'] 			= ($user_data['modules_data'] != '') ? json_decode($user_data['modules_data'], true) : array();
 		$user_data['privileges'] 			= $this->_decode_base_privileges($user_data['privileges']);
-		//~ $user_data['servers_privileges'] 	= $this->_decode_servers_privileges($user_data['servers_privileges']);
+		//~ $user_data['filters']				= json_decode($user_data['filters']);
 
 		$this->user_data 			= $user_data;
 		$this->user_privileges 		= &$user_data['privileges'];
@@ -339,9 +339,9 @@ class Users extends CI_Model {
      * @return bool
      *
     */
-	public function update_modules_data($id, $data, $module_name)
+	public function update_modules_data($user_id, $data, $module_name)
 	{
-		$user_data = $this->get_user_data($id);
+		$user_data = $this->get_user_data($user_id);
 		
 		$modules_data_array = json_decode($user_data['modules_data'], true);
 		$modules_data_array[$module_name] = $data;
@@ -349,10 +349,51 @@ class Users extends CI_Model {
 		
 		$sql_data['modules_data'] = $modules_data_json;
 		
-		if ($this->update_user($sql_data, $id)) {
-			return true;
+		return (bool) $this->update_user($sql_data, $user_id);
+	}
+	
+	//-----------------------------------------------------------
+	
+	/**
+     * Обновляет пользовательские фильтры
+     *
+    */
+	public function update_filter($filter_name, $data, $user_id = false)
+	{
+		if (!$user_id) {
+			$user_data =& $this->auth_data;
 		} else {
-			return false;
+			$this->get_user_data($user_id);
+			$user_data =& $this->user_data;
+		}
+		
+		$filters = json_decode($user_data['filters'], true);
+		$filters[ $filter_name ] = $data;
+		$sql_data['filters'] = json_encode($filters);
+		
+		return (bool) $this->update_user($sql_data, $user_id);
+	}
+	
+	//-----------------------------------------------------------
+	
+	/**
+     * Обновляет пользовательские фильтры
+     *
+    */
+	public function get_filter($filter_name, $user_id = false) 
+	{
+		if (!$user_id) {
+			$user_data =& $this->auth_data;
+		} else {
+			$this->get_user_data($user_id);
+			$user_data =& $this->user_data;
+		}
+		
+		$filters = json_decode($user_data['filters'], true);
+		if (is_array($filters) && array_key_exists($filter_name, $filters)) {
+			return $filters[ $filter_name ];
+		} else {
+			return array();
 		}
 	}
 

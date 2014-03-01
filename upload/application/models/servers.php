@@ -384,6 +384,20 @@ class Servers extends CI_Model {
 	{
 		return $this->get_servers_list($user_id, $privilege_name, $where);
 	}
+	
+	//-----------------------------------------------------------
+	
+	/**
+     * Задает фильтры для получения серверов с определенными данными
+    */
+	function set_filter($filter)
+	{
+		if (is_array($filter)) {
+			(isset($filter['name']) && $filter['name']) ? $this->db->like('name', $filter['name']) : null;
+			(isset($filter['ip']) && $filter['ip']) ? $this->db->like('server_ip', $filter['ip']): null;
+			(isset($filter['game']) && $filter['game']) ? $this->db->where('game', $filter['game']): null;
+		}
+	}
 
 	//-----------------------------------------------------------
 	

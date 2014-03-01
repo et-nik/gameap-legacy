@@ -5,40 +5,40 @@
 
 <form action="{site_url}admin/servers_log/list_logs/{server_id}/{id_dir}" method="post" accept-charset="utf-8">
 	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
-<table class="zebra" width="50%">
-	<tr>
-		<td>{lang_file_name}:</td>
-		<td><input type="text" name="file_name" value="{file_name}"/></td>
-	</tr>
-	<tr>
-		<td>{lang_servers_log_limit}:</td>
-		<td><input type="text" name="limit" value="{log_limit}" /></td>
-	</tr>
-	<tr>
-		<td>{lang_servers_log_show_last}</td>
-		<td>
-			<select name="date">
-				<option value="86400">{lang_servers_log_day}</option>
-				<option value="604800" selected="selected">{lang_servers_log_week}</option>
-				<option value="2629743">{lang_servers_log_month}</option>
-				<option value="31556926">{lang_servers_log_year}</option>
-				<option value="0">{lang_servers_log_all_time}</option>
-			 </select><br />
-		</td>
-	</tr>
-	<tr>
-	<td>Сортировка:</td>
-	<td>
-		<select name="sort">
-			<option value="DESC" selected="selected">{lang_sort_desc}</option>
-			<option value="ASC">{lang_sort_asc}</option>
-		 </select><br /></td>
-	</tr>
-	<tr>
-		<td><input class="button" type="submit" name="submit_filter" value="{lang_apply}" /></td>
-		<td>&nbsp;</td>
-	</tr>
-</table>
+		<table class="zebra" width="50%">
+			<tr>
+				<td>{lang_file_name}:</td>
+				<td><input type="text" name="file_name" value="{file_name}"/></td>
+			</tr>
+			<tr>
+				<td>{lang_servers_log_limit}:</td>
+				<td><input type="text" name="limit" value="{log_limit}" /></td>
+			</tr>
+			<tr>
+				<td>{lang_servers_log_show_last}</td>
+				<td>
+					<select name="date">
+						<option value="86400">{lang_servers_log_day}</option>
+						<option value="604800" selected="selected">{lang_servers_log_week}</option>
+						<option value="2629743">{lang_servers_log_month}</option>
+						<option value="31556926">{lang_servers_log_year}</option>
+						<option value="0">{lang_servers_log_all_time}</option>
+					 </select><br />
+				</td>
+			</tr>
+			<tr>
+			<td>Сортировка:</td>
+			<td>
+				<select name="sort">
+					<option value="DESC" selected="selected">{lang_sort_desc}</option>
+					<option value="ASC">{lang_sort_asc}</option>
+				 </select><br /></td>
+			</tr>
+			<tr>
+				<td><input class="button" type="submit" name="submit_filter" value="{lang_apply}" /></td>
+				<td>&nbsp;</td>
+			</tr>
+		</table>
 
 <p class="hr">{lang_servers_log_files}</p>
 <table class="zebra" width="50%">

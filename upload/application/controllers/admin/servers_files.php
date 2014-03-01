@@ -89,6 +89,35 @@ class Servers_files extends CI_Controller {
 		$this->load->helper('ds');
 		return get_ds_file_path($server_data);
 	}
+	
+	// -----------------------------------------------------------------
+	
+	/**
+	 * Получение данных фильтра для вставки в шаблон
+	 */
+	private function _get_tpl_filter($filter = false)
+	{
+		if (!$filter) {
+			$filter = $this->users->get_filter('servers_list');
+		}
+		
+		if (empty($this->games->games_list)) {
+			$this->games->get_games_list();
+		}
+		
+		$games_option[0] = '---';
+		foreach($this->games->games_list as &$game) {
+			$games_option[ $game['code'] ] = $game['name'];
+		}
+		
+		$tpl_data['filter_name']			= isset($filter['name']) ? $filter['name'] : '';
+		$tpl_data['filter_ip']				= isset($filter['ip']) ? $filter['ip'] : '';
+		
+		$default = isset($filter['game']) ? $filter['game'] : null;
+		$tpl_data['filter_games_dropdown'] 	= form_dropdown('filter_game', $games_option, $default);
+		
+		return $tpl_data;
+	}
     
     // ----------------------------------------------------------------
 
@@ -103,6 +132,10 @@ class Servers_files extends CI_Controller {
 		$this->load->model('servers/games');
 		$this->load->helper('games');
 		
+		$filter = $this->users->get_filter('servers_list');
+		$local_tpl_data = $this->_get_tpl_filter($filter);
+		
+		$this->servers->set_filter($filter);
 		$this->servers->get_servers_list($this->users->auth_id);
 		
 		$local_tpl_data['url'] 			= site_url('admin/servers_files/server');
