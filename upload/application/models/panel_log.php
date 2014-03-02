@@ -12,6 +12,24 @@
  * @filesource
 */
 class Panel_log extends CI_Model {
+	
+	private $_filter = array('type' => null, 'command' => null, 'user_name' => null, 'contents' => null);
+	
+	
+	//-----------------------------------------------------------
+	
+	/**
+     * Задать фильтр списка логов
+    */
+	public function set_filter($filter)
+	{
+		if (is_array($filter)) {
+			$this->_filter['type'] 		= (isset($filter['type']) && $filter['type']) ? $filter['type'] : null;
+			$this->_filter['command'] 	= (isset($filter['command']) && $filter['command']) ? $filter['command'] : null;
+			$this->_filter['user_name'] = (isset($filter['user_name']) && $filter['user_name']) ? $filter['user_name'] : null;
+			$this->_filter['contents'] 	= (isset($filter['contents']) && $filter['contents']) ? $filter['contents'] : null;
+		}
+	}
 
 	//-----------------------------------------------------------
 	
@@ -29,7 +47,7 @@ class Panel_log extends CI_Model {
      * 
      *
     */
-	function save_log($data = false)
+	public function save_log($data = false)
     {
 		if(!isset($data['type'])){
 			return false;
@@ -61,17 +79,20 @@ class Panel_log extends CI_Model {
 	//-----------------------------------------------------------
 	
 	/**
-     * Получение содержимое логов
+     * Получение содержимого логов
      * 
      * @param array
      * @return array
-     * 
-     *
     */
-	function get_log($where = array(), $limit = 10, $offset = false)
+	public function get_log($where = array(), $limit = 10, $offset = false)
 	{
 		$this->db->order_by('date', 'desc'); 
 		
+		!$this->_filter['type'] 		OR $this->db->where('type', $this->_filter['type']);
+		!$this->_filter['command'] 		OR $this->db->where('command', $this->_filter['command']);
+		!$this->_filter['user_name'] 	OR $this->db->like('user_name', $this->_filter['user_name']);
+		!$this->_filter['contents'] 	OR $this->db->like('log_data', $this->_filter['contents']);
+	
 		if(is_array($where)){
 			$query = $this->db->get_where('logs', $where, $limit, $offset);
 		}else{
@@ -93,8 +114,14 @@ class Panel_log extends CI_Model {
 	/**
      * Получает количество логов в базе
     */
-	function get_count_all_log() {
-		return $this->db->count_all('logs');
+	public function get_count_all_log() 
+	{
+		!$this->_filter['type'] 		OR $this->db->where('type', $this->_filter['type']);
+		!$this->_filter['command'] 		OR $this->db->where('command', $this->_filter['command']);
+		!$this->_filter['user_name'] 	OR $this->db->like('user_name', $this->_filter['user_name']);
+		!$this->_filter['contents'] 	OR $this->db->like('log_data', $this->_filter['contents']);
+		
+		return $this->db->count_all_results('logs');
 	}
 	
 }

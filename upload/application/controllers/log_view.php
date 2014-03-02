@@ -111,6 +111,38 @@ class Log_view extends CI_Controller {
 	// -----------------------------------------------------------------
 	
 	/**
+	 * Получение данных фильтра для вставки в шаблон
+	 */
+	private function _get_tpl_filter($filter = false)
+	{
+		if (!$filter) {
+			$filter = $this->users->get_filter('panel_log');
+		}
+		
+		$actions = array(
+			'0' => '---',
+			'cron' => 'Cron',
+			'auth' => 'Auth',
+			'server_command' => 'Server command',
+		);
+
+		foreach($actions as $key => $value) {
+			$action_options[ $key ] = $value;
+		}
+		
+		$tpl_data['filter_command']			= isset($filter['command']) ? $filter['command'] : '';
+		$tpl_data['filter_user']			= isset($filter['user_name']) ? $filter['user_name'] : '';
+		$tpl_data['filter_contents']		= isset($filter['contents']) ? $filter['contents'] : '';
+		
+		$default = isset($filter['type']) ? $filter['type'] : null;
+		$tpl_data['filter_action_dropdown'] 	= form_dropdown('filter_action', $action_options, $default);
+		
+		return $tpl_data;
+	}
+	
+	// -----------------------------------------------------------------
+	
+	/**
 	 * Отображение списка логов
 	*/
 	function index($offset = 0) 
@@ -119,6 +151,11 @@ class Log_view extends CI_Controller {
 		if (false == $this->users->auth_data['is_admin']) {
 			show_404();
 		}
+		
+		$filter = $this->users->get_filter('panel_log');
+		$this->panel_log->set_filter($filter);
+		
+		$local_tpl_data = $this->_get_tpl_filter($filter);
 		
 		/* Постраничная навигация */
 		$config['base_url'] = site_url('log_view/page');

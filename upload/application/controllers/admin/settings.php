@@ -220,11 +220,28 @@ class Settings extends CI_Controller {
     /**
      * Задает пользовательский фильтр на серверы
     */
-    public function set_filter()
+    public function set_filter($filter_name = 'servers_list')
     {
-		$this->form_validation->set_rules('filter_name', lang('name'), 'trim|xss_clean');
-		$this->form_validation->set_rules('filter_ip', lang('ip'), 'trim|xss_clean');
-		$this->form_validation->set_rules('filter_game', lang('game'), 'trim|xss_clean');
+		
+		switch($filter_name) {
+			case 'servers_list':
+				$this->form_validation->set_rules('filter_name', lang('name'), 'trim|xss_clean');
+				$this->form_validation->set_rules('filter_ip', lang('ip'), 'trim|xss_clean');
+				$this->form_validation->set_rules('filter_game', lang('game'), 'trim|xss_clean');
+				break;
+			
+			case 'panel_log';
+				$this->form_validation->set_rules('filter_type', lang('action'), 'trim|xss_clean');
+				$this->form_validation->set_rules('filter_command', lang('command'), 'trim|xss_clean');
+				$this->form_validation->set_rules('filter_user', lang('user'), 'trim|xss_clean');
+				$this->form_validation->set_rules('filter_contents', lang('contents'), 'trim|xss_clean');
+				break;
+				
+			default:
+				redirect($_SERVER['HTTP_REFERER']);
+				break;
+			
+		}
 		
 		if($this->form_validation->run() == false) {
 			
@@ -235,12 +252,23 @@ class Settings extends CI_Controller {
 
 		} else {
 			$reset = (bool) $this->input->post('reset');
+
+			switch($filter_name) {
+				case 'servers_list':
+					$filter['name'] = $reset ? '' : $this->input->post('filter_name');
+					$filter['ip'] 	= $reset ? '' : $this->input->post('filter_ip');
+					$filter['game'] = $reset ? '' : $this->input->post('filter_game');
+					break;
+				
+				case 'panel_log';
+					$filter['type'] 	= $reset ? '' : $this->input->post('filter_action');
+					$filter['command'] 	= $reset ? '' : $this->input->post('filter_command');
+					$filter['user_name']= $reset ? '' : $this->input->post('filter_user');
+					$filter['contents'] = $reset ? '' : $this->input->post('filter_contents');
+					break;
+			}
 			
-			$filter['name'] = $reset ? '' : $this->input->post('filter_name');
-			$filter['ip'] 	= $reset ? '' : $this->input->post('filter_ip');
-			$filter['game'] = $reset ? '' : $this->input->post('filter_game');
-			
-			$this->users->update_filter('servers_list', $filter);
+			$this->users->update_filter($filter_name, $filter);
 			redirect($_SERVER['HTTP_REFERER']);
 		}
 	}
