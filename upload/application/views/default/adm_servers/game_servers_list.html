@@ -1,5 +1,45 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
 <a class="awesome" href="{site_url}adm_servers/install_game_server">{lang_adm_servers_add_game_server}</a>
+<a class="awesome" onclick="anichange('#filter'); return false" href="#">{lang_filter}</a>
+<script>
+function anichange (objName) {
+  if ( $(objName).css('display') == 'none' ) {
+    $(objName).animate({height: 'show'}, 400);
+  } else {
+    $(objName).animate({height: 'hide'}, 200);
+  }
+}
+</script>
+
+<div id="filter" style="display: none">
+	<br />
+	<form action="{site_url}admin/settings/set_filter" method="post" accept-charset="utf-8">
+		<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+		
+		<table class="zebra" width="100%">
+			<tr>
+				<td width="30%">{lang_name}:</td>
+				<td><input type="text" name="filter_name" value="{filter_name}"/></td>
+			</tr>
+			
+			<tr>
+				<td width="30%">{lang_ip}:</td>
+				<td><input type="text" name="filter_ip" value="{filter_ip}"/></td>
+			</tr>
+			
+			<tr>
+				<td width="30%">{lang_game}:</td>
+				<td>{filter_games_dropdown}</td>
+			</tr>
+
+		</table>
+			<p align="center">
+				<input class="button" type="submit" name="submit_filter" value="{lang_apply}" />
+				<input class="button" type="submit" name="reset" value="{lang_reset}" />
+			</p>
+	</form>
+</div>
+
 <p class="hr">{lang_adm_servers_game_servers}</p>
 <table class="zebra" width="100%">
 
