@@ -478,6 +478,15 @@ class Server_control extends CI_Controller {
 					$this->_show_message(lang('server_command_update_task_exists'), site_url('admin/server_control/' . $server_id));
 					return false;
 				}
+			} elseif ($sql_data['code'] == 'server_start' OR $sql_data['code'] == 'server_stop' OR $sql_data['code'] == 'server_restart') {
+				
+				$where = array('code' => $sql_data['code'], 'server_id' => $server_id);
+				$query = $this->db->get_where('cron', $where, 1);
+				
+				if ($query->num_rows >= 3) {
+					$this->_show_message(lang('server_command_max_tasks'), site_url('admin/server_control/' . $server_id));
+					return false;
+				}
 			}
 
 			
@@ -647,7 +656,10 @@ class Server_control extends CI_Controller {
 		
 		/* Правила для формы */
 		$this->form_validation->set_rules('name', 'имя', 'trim|required|max_length[64]|xss_clean');
-		$this->form_validation->set_rules('code', 'команда', 'trim|required|max_length[32]|xss_clean');
+		
+		// Код больше не редактируется
+		//~ $this->form_validation->set_rules('code', 'команда', 'trim|required|max_length[32]|xss_clean');
+		
 		$this->form_validation->set_rules('command', 'параметры команды', 'trim|max_length[128]|xss_clean');
 		
 		$this->form_validation->set_rules('date_perform', 'дата выполнения', 'trim|required|max_length[19]|xss_clean');
@@ -676,8 +688,10 @@ class Server_control extends CI_Controller {
 				'2592000' => lang('server_control_month'),
 			);
 			
+			$local_tpl_data['human_code'] = $options['code'][ $task_list[0]['code'] ];
+			
 			/* Создание форм */
-			$local_tpl_data['input_code'] = form_dropdown('code', $options['code'], $task_list[0]['code']);
+
 			$local_tpl_data['input_time_add'] = form_dropdown('time_add', $options['time_add'], $task_list[0]['time_add']);
 
 			$local_tpl_data['code'] = $task_list[0]['code'];	
@@ -689,7 +703,10 @@ class Server_control extends CI_Controller {
 			$this->tpl_data['content'] .= $this->parser->parse('servers/task_edit.html', $local_tpl_data, true);
 		} else {
 			$sql_data['name'] = $this->input->post('name');
-			$sql_data['code'] = $this->input->post('code');
+			
+			// Код больше не редактируется
+			//~ $sql_data['code'] = $this->input->post('code');
+			
 			$sql_data['command'] = $this->input->post('command');
 			$sql_data['time_add'] = $this->input->post('time_add');
 			
