@@ -233,7 +233,10 @@ class Dedicated_servers extends CI_Model {
 					
 					default:
 						$this->ds_list[$i]['local_server'] 	= true;
-						$this->ds_list[$i]['script_path'] 	= $this->ds_list[$i]['ssh_path'];
+						
+						$this->ds_list[$i]['script_path'] = $this->config->config['local_script_path'] OR 
+							$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
+							
 						break;
 				}
 
