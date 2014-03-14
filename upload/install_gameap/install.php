@@ -281,7 +281,7 @@ switch($page) {
 						<td>' . lang('install_steamcmd_path') . ':</td>
 						<td><input type="text" name="local_steamcmd_path" /></td>
 					</tr>
-					';	
+					';
 							
 		$content .= '</table>';
 		
@@ -433,6 +433,25 @@ switch($page) {
 		}
 		
 		$this->db->insert('migrations', array('version' => $m_version));
+		
+		/*-------------------------------*/
+		/* Создание выделенного сервера  */
+		/*-------------------------------*/
+		$this->load->model('servers/dedicated_servers');
+		
+		$ds_data['name'] 				= 'Local server';
+		$ds_data['os'] 					= $this->input->post('local_os');
+		$ds_data['control_protocol'] 	= 'local';
+		$ds_data['location'] 			= 'GameAP';
+		$ds_data['provider'] 			= 'GameAP';
+		
+		$ds_data['ip'] = json_encode(array('127.0.0.1'));
+		
+		$ds_data['steamcmd_path'] = $this->input->post('local_steamcmd_path');
+		$sql_data['ssh_path'] = $this->input->post('local_script_path');
+		$sql_data['telnet_path'] = $this->input->post('telnet_path');
+
+		$this->dedicated_servers->add_dedicated_server($ds_data)
 		
 		/*------------*/
 		/* ADMIN ADD  */
