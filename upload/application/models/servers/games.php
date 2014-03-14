@@ -24,11 +24,7 @@ class Games extends CI_Model {
     */
     function add_game($data)
     {
-		if($this->db->insert('games', $data)){
-			return TRUE;
-		}else{
-			return FALSE;
-		}
+		return (bool)$this->db->insert('games', $data);
 	}
 	
 	//-----------------------------------------------------------	
@@ -39,11 +35,7 @@ class Games extends CI_Model {
     */
     function delete_game($code)
     {
-		if($this->db->delete('games', array('code' => $code))){
-			return TRUE;
-		}else{
-			return FALSE;
-		}
+		return (bool)$this->db->delete('games', array('code' => $code));
 	}
 	
 	//-----------------------------------------------------------	
@@ -56,11 +48,7 @@ class Games extends CI_Model {
     {
 		$this->db->where('code', $code);
 		
-		if($this->db->update('games', $data)){
-			return TRUE;
-		}else{
-			return FALSE;
-		}
+		return (bool)$this->db->update('games', $data);
 	}
 	
 	//-----------------------------------------------------------
