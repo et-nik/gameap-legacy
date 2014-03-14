@@ -448,10 +448,10 @@ switch($page) {
 		$ds_data['ip'] = json_encode(array('127.0.0.1'));
 		
 		$ds_data['steamcmd_path'] = $this->input->post('local_steamcmd_path');
-		$sql_data['ssh_path'] = $this->input->post('local_script_path');
-		$sql_data['telnet_path'] = $this->input->post('telnet_path');
+		$ds_data['ssh_path'] 	= $this->input->post('local_script_path');
+		$ds_data['telnet_path'] = $this->input->post('local_script_path');
 
-		$this->dedicated_servers->add_dedicated_server($ds_data)
+		$this->dedicated_servers->add_dedicated_server($ds_data);
 		
 		/*------------*/
 		/* ADMIN ADD  */
