@@ -784,6 +784,10 @@ $fields = array(
 		'modules_data' => array(
 							'type' => 'TINYTEXT',
 		),
+		
+		'filters' => array(
+							'type' => 'TINYTEXT',
+		),
 );
 
 $this->dbforge->add_field($fields);
