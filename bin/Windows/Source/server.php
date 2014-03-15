@@ -88,9 +88,9 @@ function get_lowload_cpu()
 }
 
 if(file_exists('psexec.exe')) {
-	$psexec = 'psexec.exe -s -i -d '.$useCpu[0].' -w "' . $dir . '"';
+	$psexec = 'psexec.exe -s -i -d '.$useCpu[0].' -w "' . $dir . '" ';
 } elseif(file_exists('paexec.exe')) {
-	$psexec = 'paexec.exe \\\\localhost -s -d -w "' . $dir . '"';
+	$psexec = 'paexec.exe \\\\localhost -s -d -w "' . $dir . '" ';
 } else {
 	echo "psexec.exe and paexec.exe not found\n";
 	$psexec = 'start /D "' . $dir . '" /I ';
