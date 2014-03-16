@@ -66,3 +66,8 @@ $lang['server_control_repeat_period'] 					= 'Repeat frequency';
 
 // 0.7.2
 $lang['server_control_command_not_set'] 				= 'Control command not set';
+
+/* -- 0.9 -- */
+$lang['cvarname_hostname']								= 'Server';
+$lang['cvarname_map']									= 'Map';
+$lang['cvarname_players']								= 'Players';

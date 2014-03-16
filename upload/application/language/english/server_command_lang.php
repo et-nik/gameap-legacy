@@ -60,3 +60,20 @@ $lang['server_command_restart_failed'] 						= 'Restart server failed';
 $lang['server_command_update_failed'] 						= 'Server update failed';
 $lang['server_command_start_file_not_found'] 				= 'Executable file not found';
 $lang['server_command_start_file_not_executable'] 			= 'Executable file has no right for run';
+
+// 0.8.10
+$lang['server_command_update_task_exists']					= 'Update task is already set.';
+
+// 0.9
+$lang['server_command_connection_failed']					= 'Connection failed';
+$lang['server_command_empty_connect_data']					= 'Connection details is empty';
+$lang['server_command_empty_auth_data']						= 'Authorization data is empty';
+$lang['server_command_empty_command']						= 'Empty command';
+$lang['server_command_not_connected']						= 'Not connected';
+$lang['server_command_login_failed']						= 'Authorization failure';
+$lang['server_command_exec_disabled']						= 'The exec function is disabled in your PHP settings';
+
+$lang['server_command_file_not_found']						= 'File %s not found';
+$lang['server_command_file_not_readable']					= 'No read rights for %s';
+$lang['server_command_file_not_writable']					= 'No write rights for %s';
+$lang['server_command_file_not_executable']					= 'No execute rights for %s';

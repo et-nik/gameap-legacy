@@ -21,7 +21,7 @@ $lang['ap_help_msg']					= '<p align="center">If You are not indifferent to the 
  * 
  */
 $lang['ap_help_translator']					= '<p align="center">English translation made by <strong>serfreeman1337</strong><br><br>
-												I\'m not good with English but if you see some mistakes in translation or you just want help developers with GameAP with translation<br>
+												I\'m not good with English but if you see some mistakes in translation or you just want help GameAP developers with translation<br>
 												You can contact me via <a href="mailto:serfreeman1337@yandex.com">email</a> or <a href="http://steamcommunity.com/id/serfreeman1337/">steam</a></p>';
 
 $lang['ap_you_version_actual']					= 'Your GameAP version is up to date';

@@ -155,3 +155,9 @@ $lang['menu_files_config']						= 'Server configuration';
 
 $lang['modules']								= 'Modules';
 
+$lang['set']									= 'Set';
+$lang['no_set']									= 'Not set';
+
+$lang['contents']								= 'Contents';
+$lang['filter']									= 'Filter';
+$lang['reset']									= 'Reset';
