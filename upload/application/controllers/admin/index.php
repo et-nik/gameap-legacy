@@ -97,7 +97,7 @@ class Index extends CI_Controller {
 		$this->servers->set_filter($filter);
 
 		/* Если количество серверов больше 0 */
-		if ($this->servers->get_server_list($this->users->auth_id)) {
+		if ($this->servers->get_servers_list($this->users->auth_id)) {
 
 			$num = 0;
 
