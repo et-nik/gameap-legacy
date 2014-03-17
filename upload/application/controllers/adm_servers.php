@@ -342,7 +342,7 @@ class Adm_servers extends CI_Controller {
 		return $data;
 	}
 	
-		// -----------------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Получение данных фильтра для вставки в шаблон
@@ -1892,6 +1892,8 @@ class Adm_servers extends CI_Controller {
 					$cfg_list['file'] 			= $this->input->post('cfg_file');
 					$cfg_list['delete'] 		= $this->input->post('cfg_delete');
 					
+					$config_files 				= array();
+					
 					if(!empty($cfg_list['file'])) {
 						$i = -1;
 						foreach($cfg_list['file'] as $file) {
@@ -1915,7 +1917,7 @@ class Adm_servers extends CI_Controller {
 							$config_files[$i]['desc'] = $cfg_list['desc'][$i];
 							$config_files[$i]['file'] = str_replace('..' , '', $file); // Двойные точки заменяем для безопасности (чтобы не перебраться в директорию выше)
 						}
-						
+
 						if(isset($config_files)) {
 							$sql_data['config_files'] = json_encode($config_files);
 						}
