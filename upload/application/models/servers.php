@@ -486,6 +486,10 @@ class Servers extends CI_Model {
 				!$this->_filter_servers_list['name'] OR $this->db->like('name', $this->_filter_servers_list['name']);
 				!$this->_filter_servers_list['ip'] OR $this->db->like('server_ip', $this->_filter_servers_list['ip']);
 				!$this->_filter_servers_list['game'] OR $this->db->where('game', $this->_filter_servers_list['game']);
+				
+				if (is_array($where) && !empty($where)) { 
+					$this->db->where($where);
+				}
 			
 				$query = $this->db->get('servers');
 			}
