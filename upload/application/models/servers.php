@@ -456,6 +456,8 @@ class Servers extends CI_Model {
 				$query = $this->db->get_where('servers_privileges', array('user_id' => $user_id));
 				
 				if ($query->num_rows > 0) {
+					
+					$servers = array();
 
 					//~ $this->db->where($where);
 					foreach ($query->result_array() as $privileges) {
@@ -467,6 +469,11 @@ class Servers extends CI_Model {
 								$servers[] = $privileges['server_id'];
 							}
 						}
+					}
+					
+					if (empty($servers)) {
+						$this->servers_list = array();
+						return NULL;
 					}
 					
 					$this->db->where_in('id', $servers);
