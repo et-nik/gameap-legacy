@@ -25,7 +25,7 @@
  * @sinse		0.9
 */
 
-class Installer_samp extends CI_Driver {
+class Installer_mta extends CI_Driver {
 	
 	// ------------------------------------------------------------------------
 	
