@@ -64,7 +64,7 @@ class Installer_samp extends CI_Driver {
 	*/
 	public function get_default_parameters($game_code = 'samp', $os = 'linux', $parameters = array())
 	{
-		//~ $parameters['maxplayers'] 	= isset($this->_parameters['maxplayers']) ? $this->_parameters['maxplayers'] : 32;
+		$parameters['maxplayers'] 	= isset($this->_parameters['maxplayers']) ? $this->_parameters['maxplayers'] : 32;
 		
 		return array();
 	}
@@ -79,7 +79,9 @@ class Installer_samp extends CI_Driver {
 		$CI =& get_instance();
 		
 		$file = 'server.cfg';
-		$file_contents = read_ds_file($file, $this->server_data);
+		$dir = get_ds_file_path($this->server_data);
+		
+		$file_contents = read_ds_file($dir . $file, $this->server_data);
 		
 		// Костыль. Меняет права файла на 666
 		send_command('chmod 666 {dir}/server.cfg', $this->server_data);
@@ -88,7 +90,7 @@ class Installer_samp extends CI_Driver {
 		$file_contents = change_value_on_file($file_contents, 'port', $this->server_data['server_port']);
 		$file_contents = change_value_on_file($file_contents, 'rcon_password', random_string('alnum', 8));
 		
-		$write_result = write_ds_file($file, $file_contents, $this->server_data);
+		$write_result = write_ds_file($dir . $file, $file_contents, $this->server_data);
 		
 		return true;
 	}
