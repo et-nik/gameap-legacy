@@ -49,6 +49,10 @@ class Control_local extends CI_Driver {
 	{
 		$file_name = basename($file);
 		
+		if ($this->os == 'windows' && preg_match('/\"\%[A-Z]*\%.*$/s', $file, $matches)) {
+			return $this->_check_file_windows($file, $matches, $privileges = '');
+		}
+		
 		if (!file_exists($file)) {
 			throw new Exception(lang('server_command_file_not_found', $file_name) . ' (Local)');
 		}
@@ -62,6 +66,60 @@ class Control_local extends CI_Driver {
 		}
 		
 		if (strpos($privileges, 'x') !== false && !is_executable($file)) {
+			throw new Exception(lang('server_command_file_not_executable', $file_name) . ' (Local)');
+		}
+		
+		return true;
+	}
+	
+	// ---------------------------------------------------------------------
+	
+	/**
+	 * Проверяет необходимые права на файл
+	 * 
+	 */
+	private function _check_file_windows($file, $matches, $privileges = '')
+	{
+		$matches[0] = str_replace('"', '', $matches[0]);
+					
+		/* Для виндовых слешей \ */
+		//~ $explode = explode('\\', $matches[0]);
+		//~ $file_name = array_pop($explode);
+		//~ $file_dir = '"' . implode('\\', $explode) . '"';
+		
+		/* Для обычных слешей */
+		$file_name = basename($matches[0]);
+		$file_dir = '"' . dirname($matches[0]) . '"';
+		
+		$file_dir = str_replace('/', '\\', $file_dir);
+
+		$result = $this->command('dir ' . $file_dir . ' /a:-d /b');
+		$result = explode("\n", $result);
+		
+		foreach($result as &$value) {
+			$value = trim($value);
+		}
+		
+		if (in_array($file_name, $result)) {
+			$file_perm['exists'] 		= true;
+			$file_perm['readable'] 		= true;
+			$file_perm['writable'] 		= true;
+			$file_perm['executable'] 	= true;
+		}
+		
+		if (!$file_perm['exists']) {
+			throw new Exception(lang('server_command_file_not_found', $file_name) . ' (Local)');
+		}
+		
+		if (strpos($privileges, 'r') !== false && !$file_perm['readable']) {
+			throw new Exception(lang('server_command_file_not_readable', $file_name) . ' (Local)');
+		}
+		
+		if (strpos($privileges, 'w') !== false && !$file_perm['writable']) {
+			throw new Exception(lang('server_command_file_not_writable', $file_name) . ' (Local)');
+		}
+		
+		if (strpos($privileges, 'x') !== false && !$file_perm['executable']) {
 			throw new Exception(lang('server_command_file_not_executable', $file_name) . ' (Local)');
 		}
 		
