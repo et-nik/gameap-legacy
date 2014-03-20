@@ -219,16 +219,23 @@ class Rcon_source extends CI_Driver {
 	*/
 	function change_rcon($rcon_password = '')
 	{
-		$file = $this->CI->servers->server_data['start_code'] . '/cfg/server.cfg'; // Конфиг файл
-		$file_contents = $this->CI->servers->read_file($file);
+		$this->CI->load->helper('ds');
+		$this->CI->load->helper('string');
+		
+		$server_data =& $this->CI->servers->server_data;
+
+		$dir = get_ds_file_path($server_data);
+		
+		$file = $dir. $this->CI->servers->server_data['start_code'] . '/cfg/server.cfg'; // Конфиг файл
+		$file_contents = read_ds_file($file, $server_data);
 		
 		/* Ошибка чтения, либо файл не найден */
 		if(!$file_contents) {
 			return false;
 		}
-
-		$file_contents = change_value_on_file($file_contents, 'rcon_password', $rcon_password);
-		$write_result = $this->CI->servers->write_file($file, $file_contents, $this->CI->servers->server_data);
+		
+		$file_contents 	= change_value_on_file($file_contents, 'rcon_password', $rcon_password);
+		$write_result 	= write_ds_file($file, $file_contents, $server_data);
 		
 		/* Отправляем новый rcon пароль в консоль сервера*/
 		if($write_result && $this->CI->servers->server_status($this->CI->servers->server_data['server_ip'], $this->CI->servers->server_data['server_port'])) {
@@ -236,11 +243,7 @@ class Rcon_source extends CI_Driver {
 			$this->command('rcon_password ' . $rcon_password);
 		}
 		
-		if ($write_result) {
-			return true;
-		} else {
-			return false;
-		}
+		return $write_result;
 	}
 	
 }
