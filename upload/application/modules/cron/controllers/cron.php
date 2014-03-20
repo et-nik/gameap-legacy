@@ -394,6 +394,10 @@ class Cron extends MX_Controller {
 			default:
 			
 				switch (strtolower($pathinfo['extension'])) {
+					case 'xz':
+						$commands[] = 'tar -xpvJf ' . basename($pack_file) . ' && rm ' . basename($pack_file);;
+						break;
+						
 					case 'gz':
 						$commands[] = 'tar -xvfz ' . basename($pack_file) . ' && rm ' . basename($pack_file);;
 						break;
@@ -1477,7 +1481,7 @@ class Cron extends MX_Controller {
 		$log_data['type'] = 'cron';
 		$log_data['command'] = 'cron work';
 		$log_data['msg'] = 'Cron end working';
-		$log_data['log_data'] = $this->output->get_output();
+		$log_data['log_data'] = $this->_cron_result;
 		$this->panel_log->save_log($log_data);
 
 	}
