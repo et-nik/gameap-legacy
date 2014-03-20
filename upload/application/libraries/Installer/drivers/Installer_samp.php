@@ -17,7 +17,7 @@
 /**
  * San-Andreas Multiplayer Installer драйвер
  *
- * Драйвер для установки игровых серверов Minecraft
+ * Драйвер для установки игровых серверов GTA: San-Andreas Multiplayer
  *
  * @package		Game AdminPanel
  * @category	Drivers
