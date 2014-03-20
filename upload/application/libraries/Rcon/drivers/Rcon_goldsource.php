@@ -180,34 +180,20 @@ class Rcon_goldsource extends CI_Driver {
 		$this->CI->load->helper('ds');
 		$this->CI->load->helper('string');
 		
-		switch(get_file_protocol($this->CI->servers->server_data)) {
-			case 'ftp':
-				$dir = reduce_double_slashes($this->CI->servers->server_data['ftp_path'] . '/' . $this->CI->servers->server_data['dir'] . '/');
-				break;
-				
-			case 'sftp':
-				$dir = reduce_double_slashes($this->CI->servers->server_data['ssh_path'] . '/' . $this->CI->servers->server_data['dir'] . '/');
-				break;
-				
-			case 'local':
-				$dir = reduce_double_slashes($this->CI->servers->server_data['script_path'] . '/' . $this->CI->servers->server_data['dir'] . '/');
-				break;
-				
-			default:
-				$this->_show_message(lang('server_files_driver_not_set'));
-				return false;
-		}
+		$server_data =& $this->CI->servers->server_data;
+
+		$dir = get_ds_file_path($server_data);
 		
 		$file = $dir. $this->CI->servers->server_data['start_code'] . '/server.cfg'; // Конфиг файл
-		$file_contents = $this->CI->servers->read_file($file);
+		$file_contents = read_ds_file($file, $server_data);
 		
 		/* Ошибка чтения, либо файл не найден */
 		if(!$file_contents) {
 			return false;
 		}
 
-		$file_contents = change_value_on_file($file_contents, 'rcon_password', $rcon_password);
-		$write_result = $this->CI->servers->write_file($file, $file_contents, $this->CI->servers->server_data);
+		$file_contents 	= change_value_on_file($file_contents, 'rcon_password', $rcon_password);
+		$write_result 	= write_ds_file($file, $file_contents, $server_data);
 		
 		/* Отправляем новый rcon пароль в консоль сервера*/
 		if($write_result && $this->CI->servers->server_status($this->CI->servers->server_data['server_ip'], $this->CI->servers->server_data['server_port'])) {
