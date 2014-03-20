@@ -94,7 +94,8 @@ class Rcon_samp extends CI_Driver {
                 break;
             }
         }
-        return $result;
+        
+        return implode("\n", $result);
     }
     
     // ----------------------------------------------------------------
@@ -158,7 +159,8 @@ class Rcon_samp extends CI_Driver {
     * @param $delay delay time, if you don't expect any data back set this to false
     * @return Output from command
     */
-    public function command($command, $delay=1.0) {
+    public function command($command, $delay=1.0) 
+    {
         return $this->rconSend($command, $delay);
     }
 
@@ -199,6 +201,24 @@ class Rcon_samp extends CI_Driver {
 	*/
 	function change_rcon($rcon_password = '')
 	{
-		return true;
+		$this->CI->load->helper('ds');
+		$this->CI->load->helper('string');
+		
+		$server_data =& $this->CI->servers->server_data;
+
+		$dir = get_ds_file_path($server_data);
+		
+		$file = $dir. 'server.cfg'; // Конфиг файл
+		$file_contents = read_ds_file($file, $server_data);
+		
+		/* Ошибка чтения, либо файл не найден */
+		if(!$file_contents) {
+			return false;
+		}
+
+		$file_contents 	= change_value_on_file($file_contents, 'rcon_password', $rcon_password);
+		$write_result 	= write_ds_file($file, $file_contents, $server_data);
+		
+		return $write_result;
 	}
 }
