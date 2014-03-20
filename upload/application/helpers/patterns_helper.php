@@ -84,6 +84,25 @@ if ( ! function_exists('get_matches')) {
 // ----------------------------------------------------------------
     
 /**
+ * Правка значения в xml файле
+ * 
+ * @param string 	$file_contents xml содержимое файла
+ * @param string	$variable_name переменная
+ * @param string	$variable_value новое значение переменной
+ * @return string	новое содержимое файла
+*/ 
+if ( ! function_exists('change_value_on_xml_file')) {
+	function change_value_on_xml_file($file_contents, $variable_name, $variable_value)
+	{
+		$xml = new SimpleXMLElement($file_contents);
+		$xml->$variable_name = $variable_value;
+		return $xml->asXML();
+	}
+}
+
+// ----------------------------------------------------------------
+    
+/**
  * Правка значения в файле
  * 
  * @param string 	$file_contents содержимое файла
@@ -94,6 +113,11 @@ if ( ! function_exists('get_matches')) {
 if ( ! function_exists('change_value_on_file')) {
 	function change_value_on_file($file_contents, $variable_name, $variable_value) 
 	{
+		if (simplexml_load_string($file_contents)) {
+			// XML файл
+			return change_value_on_xml_file($file_contents, $variable_name, $variable_value);
+		}
+		
 		$found = false;
 		$file_contents = explode("\n", $file_contents);
 		
