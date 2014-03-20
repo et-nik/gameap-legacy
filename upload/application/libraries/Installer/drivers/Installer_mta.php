@@ -76,16 +76,22 @@ class Installer_mta extends CI_Driver {
 	{
 		$CI =& get_instance();
 		
-		$file = 'mods/deathmatch/mtaserver.conf';
-		$dir = get_ds_file_path($this->server_data);
+		$server_data = $this->server_data;
 		
-		$file_contents = read_ds_file($dir . $file, $this->server_data);
+		$file = 'mods/deathmatch/mtaserver.conf';
+		$dir = get_ds_file_path($server_data);
+		
+		$file_contents = read_ds_file($dir . $file, $server_data);
 		
 		// Установка портов
-		$file_contents = change_value_on_file($file_contents, 'serverport', $this->server_data['server_port']);
-		$file_contents = change_value_on_file($file_contents, 'httpport', $this->server_data['server_port']);
+		$file_contents = change_value_on_file($file_contents, 'serverport', $server_data['server_port']);
+		$file_contents = change_value_on_file($file_contents, 'httpport', $server_data['server_port']);
 		
-		$write_result = write_ds_file($dir . $file, $file_contents, $this->server_data);
+		$write_result = write_ds_file($dir . $file, $file_contents, $server_data);
+		
+		// Обновление Query порта
+		$sql_data['query_port'] = $server_data['server_port'] + 123;
+		$CI->servers->edit_game_server($server_data['id'], $sql_data);
 		
 		return true;
 	}
