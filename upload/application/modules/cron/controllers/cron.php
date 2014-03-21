@@ -980,6 +980,48 @@ class Cron extends MX_Controller {
 					}
 
 					break;
+				
+				case 'delete_files':
+					
+						// Команда удаления
+						switch(strtolower($this->servers->server_data['os'])) {
+							case 'windows':
+								$command = 'rmdir /S ' . $this->servers->server_data['dir'];
+								break;
+							default:
+								// Linux
+								$command = 'rm -rf ' . $this->servers->server_data['dir'];
+								break;
+						}
+						
+						$log_data['type'] = 'server_command';
+						$log_data['command'] = $task_list[$i]['command'];
+						$log_data['server_id'] = $server_id;
+						
+						try {
+							// Остановка сервера
+							$response = $this->servers->stop($this->servers_data[$server_id]);
+							
+							// Отправка команды удаления
+							$result = send_command($command, $this->servers_data[$server_id]);
+							
+							$this->_cmd_output('Task: server #' . $server_id . '  delete success');
+							$cron_stats['success'] ++;
+							$log_data['msg'] = 'Delete successful';
+							
+							// Удаление задания
+							$this->db->delete('cron', array('id' => $task_list[$i]['id'])); 
+							
+						} catch (Exception $e) {
+							$this->_cmd_output('Task: server #' . $server_id . '  delete failed');
+							$cron_stats['failed'] ++;
+							$log_data['msg'] = 'Delete failed';
+							$log_data['log_data'] = $e->getMessage();
+						}
+						
+						$this->panel_log->save_log($log_data);
+						
+					break;
 					
 				default:
 					$i ++;
@@ -988,17 +1030,15 @@ class Cron extends MX_Controller {
 
 			}
 
-			/* Задание было успешно выполнено */
-			if($cron_success) {
-				$sql_data[$a]['id'] = $task_list[$i]['id'];
-				$sql_data[$a]['started'] = '0';
+			/* Задание было выполнено */
+			$sql_data[$a]['id'] = $task_list[$i]['id'];
+			$sql_data[$a]['started'] = '0';
 
-				// Устанавливаем дату выполнения
-				$sql_data[$a]['date_performed'] = $time;
+			// Устанавливаем дату выполнения
+			$sql_data[$a]['date_performed'] = $time;
 
-				// Устанавливаем дату следующего выполнения
-				$sql_data[$a]['date_perform'] = $task_list[$i]['date_perform'] + $task_list[$i]['time_add'];
-			}
+			// Устанавливаем дату следующего выполнения
+			$sql_data[$a]['date_perform'] = $task_list[$i]['date_perform'] + $task_list[$i]['time_add'];
 
 			$i ++;
 			$a ++;
