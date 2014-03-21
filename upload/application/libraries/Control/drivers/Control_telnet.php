@@ -119,10 +119,15 @@ class Control_telnet extends CI_Driver {
 					}
 					
 					/* С побитовыми операциями не дружу, поэтому способ извращенский =) */
+					
+					// Значение $values
+					// Debian: -rwxr-xr-x  1 root        root     3361 Feb  8 15:02 server.sh
+					// CentOS: -rwxrwxrwx. 1 root root 3361 Mar 21 02:10 server.sh
+					
 					$file_perm['exists'] 		= true;
-					$file_perm['readable'] 		= preg_match('/^\-r..r..r..$/i', $values_exp[0]);
-					$file_perm['writable'] 		= preg_match('/^\-.w..w..w.$/i', $values_exp[0]);
-					$file_perm['executable'] 	= preg_match('/^\-..x..x..x$/i', $values_exp[0]);
+					$file_perm['readable'] 		= preg_match('/^\-r..r..r../i', $values_exp[0]);
+					$file_perm['writable'] 		= preg_match('/^\-.w..w..w./i', $values_exp[0]);
+					$file_perm['executable'] 	= preg_match('/^\-..x..x..x/i', $values_exp[0]);
 					break;
 				}
 				
@@ -181,7 +186,7 @@ class Control_telnet extends CI_Driver {
 				break;
 		}
 		
-		$this->_connection = @fsockopen($this->ip, $this->port);
+		$this->_connection = @fsockopen($this->ip, $this->port, $errno, $errstr, 10);
 		//~ @stream_set_timeout($this->_connection, 30);
 
 		if (!$this->_connection) {
