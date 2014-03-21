@@ -360,6 +360,11 @@ class Server_control extends CI_Controller {
 			$i = 0;
 			$count_i = count($task_list);
 			while($i < $count_i) {
+				
+				if (false == in_array($task_list[$i]['code'], $this->_available_tasks)) {
+					$i ++;
+					continue;
+				}
 
 				switch($task_list[$i]['code']) {
 					case 'server_start':
@@ -383,7 +388,6 @@ class Server_control extends CI_Controller {
 						break;
 						
 					default:
-						continue;
 						break;
 				}
 				
