@@ -83,6 +83,8 @@ class Installer_mta extends CI_Driver {
 		
 		$file_contents = read_ds_file($dir . $file, $server_data);
 		
+		$file_contents = change_value_on_file($file_contents, 'serverip', $server_data['server_ip']);
+		
 		// Установка портов
 		$file_contents = change_value_on_file($file_contents, 'serverport', $server_data['server_port']);
 		$file_contents = change_value_on_file($file_contents, 'httpport', $server_data['server_port']);
