@@ -37,6 +37,14 @@ class Server_control extends CI_Controller {
 	// Количество игроков на сервере
 	var $players = 0;
 	
+	private $_available_tasks = array(
+		'server_start',
+		'server_stop',
+		'server_restart',
+		'server_update',
+		'server_rcon',
+	);
+	
 	//--------------------------------------------------------------------------
 	
 	public function __construct()
@@ -417,10 +425,10 @@ class Server_control extends CI_Controller {
 		$local_tpl_data = array();
 		
 		if(!$server_id) {
-				$this->_show_message(lang('server_control_empty_server_id'));
-				return false;
+			$this->_show_message(lang('server_control_empty_server_id'));
+			return false;
 		} else {
-				$server_id = (int)$server_id;
+			$server_id = (int)$server_id;
 		}
 		
 		/* Получение данных сервера и привилегий на сервер */
@@ -461,9 +469,14 @@ class Server_control extends CI_Controller {
 
 			$sql_data['server_id'] = $server_id;
 			
-			$sql_data['name'] = $this->input->post('name');
-			$sql_data['code'] = $this->input->post('code');
-			$sql_data['command'] = $this->input->post('command');
+			$sql_data['name'] 		= $this->input->post('name');
+			$sql_data['code'] 		= $this->input->post('code');
+			$sql_data['command'] 	= $this->input->post('command');
+			
+			if (false == in_array($sql_data['code'], $this->_available_tasks)) {
+				$this->_show_message('Task code unavailable');
+				return false;
+			}
 			
 			if ($sql_data['code'] == 'server_update') {
 				/* 
@@ -491,7 +504,7 @@ class Server_control extends CI_Controller {
 
 			
 			if(!$sql_data['date_perform'] = human_to_unix($this->input->post('date_perform'))) {
-				$this->_show_message(lang('server_control_date_unavailable'), 'javascript:history.back()');
+				$this->_show_message(lang('server_control_date_unavailable'));
 				return false;
 			}
 			
@@ -500,12 +513,12 @@ class Server_control extends CI_Controller {
 			$this->db->insert('cron', $sql_data);
 			
 			// Сохраняем логи
-			$log_data['type'] = 'server_task';
-			$log_data['command'] = 'add_task';
-			$log_data['user_name'] = $this->users->auth_login;
-			$log_data['server_id'] = $server_id;
-			$log_data['msg'] = 'Add new task';
-			$log_data['log_data'] = 'Name: ' . $sql_data['name'];
+			$log_data['type'] 		= 'server_task';
+			$log_data['command'] 	= 'add_task';
+			$log_data['user_name'] 	= $this->users->auth_login;
+			$log_data['server_id'] 	= $server_id;
+			$log_data['msg'] 		= 'Add new task';
+			$log_data['log_data'] 	= 'Name: ' . $sql_data['name'];
 			$this->panel_log->save_log($log_data);
 			
 			$this->_show_message(lang('server_control_new_task_success'), site_url('admin/server_control/main/' . $server_id), lang('next'));
