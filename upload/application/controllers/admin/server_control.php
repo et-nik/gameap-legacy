@@ -455,7 +455,8 @@ class Server_control extends CI_Controller {
 		$this->form_validation->set_rules('date_perform', 'дата выполнения', 'trim|required|max_length[19]|xss_clean');
 		$this->form_validation->set_rules('time_add', 'период повтора', 'trim|required|integer|max_length[16]|xss_clean');
 		
-		$local_tpl_data['server_id'] = $server_id;
+		$local_tpl_data['server_id'] 	= $server_id;
+		$local_tpl_data['date_perform'] = unix_to_human(time()+86400, true, 'eu');
 		
 		if($this->form_validation->run() == false) {
 			
