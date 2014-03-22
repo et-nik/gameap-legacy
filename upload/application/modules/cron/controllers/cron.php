@@ -1066,6 +1066,9 @@ class Cron extends MX_Controller {
 		$count_i = count($this->servers->servers_list);
 		while($i < $count_i) {
 			$server_id = $this->servers->servers_list[$i]['id'];
+			
+			// Костыль
+			$this->games->get_games_list(array('code' => $this->servers->servers_list[$i]['game']));
 
 			// Получение данных сервера
 			$this->_get_server_data($server_id);
