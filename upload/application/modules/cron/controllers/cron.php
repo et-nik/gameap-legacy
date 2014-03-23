@@ -198,6 +198,8 @@ class Cron extends MX_Controller {
 			$console = send_command($command, $this->servers->server_data);
 			return $console;
 		} catch (Exception $e) {
+			$message = $e->getMessage();
+			$this->_cmd_output('Get console error. Message: ' . $message);
 			return;
 		}
 	}
@@ -528,7 +530,8 @@ class Cron extends MX_Controller {
 				$stats_string['total_memory'] 	= $this->control->command('wmic os get TotalVisibleMemorySize');
 				
 			} catch (Exception $e) {
-				//~ $this->_errors = $e->getMessage();
+				$message = $e->getMessage();
+				$this->_cmd_output('Getting stats failure. Message: ' . $message);
 				return false;
 			}
 
@@ -609,7 +612,8 @@ class Cron extends MX_Controller {
 				$stats_string['cpu_load'] 		= $this->control->command('top -b -n 2 | grep Cpu');
 				$stats_string['memory_usage'] 	= $this->control->command('free');
 			} catch (Exception $e) {
-				//~ $this->_errors = $e->getMessage();
+				$message = $e->getMessage();
+				$this->_cmd_output('Getting stats failure. Message: ' . $message);
 				return false;
 			}
 
