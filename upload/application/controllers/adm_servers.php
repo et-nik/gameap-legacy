@@ -583,6 +583,7 @@ class Adm_servers extends CI_Controller {
 					$this->form_validation->set_rules('ram', lang('adm_servers_ram'), 'trim|max_length[64]|xss_clean');
 					$this->form_validation->set_rules('cpu', lang('adm_servers_cpu'), 'trim|max_length[64]|xss_clean');
 					$this->form_validation->set_rules('steamcmd_path', lang('adm_servers_steamcmd_path'), 'trim|max_length[256]|xss_clean');
+					$this->form_validation->set_rules('script_path', lang('adm_servers_script_path'), 'trim|max_length[256]|xss_clean');
 					
 					$this->form_validation->set_rules('ssh_host', lang('adm_servers_ssh_host'), 'trim|max_length[64]|xss_clean');
 					$this->form_validation->set_rules('ssh_login', 'SSH login', 'trim|max_length[64]|xss_clean');
@@ -721,12 +722,12 @@ class Adm_servers extends CI_Controller {
 						$sql_data['ssh_host'] = $this->input->post('ssh_host');
 						$sql_data['ssh_login'] = $this->input->post('ssh_login');
 						$sql_data['ssh_password'] = $this->input->post('ssh_password');
-						$sql_data['ssh_path'] = $this->input->post('ssh_path');
+						$sql_data['ssh_path'] = $this->input->post('script_path');
 						
 						$sql_data['telnet_host'] = $this->input->post('telnet_host');
 						$sql_data['telnet_login'] = $this->input->post('telnet_login');
 						$sql_data['telnet_password'] = $this->input->post('telnet_password');
-						$sql_data['telnet_path'] = $this->input->post('telnet_path');
+						$sql_data['telnet_path'] = $this->input->post('script_path');
 						
 						$sql_data['ftp_host'] = $this->input->post('ftp_host');
 						$sql_data['ftp_login'] = $this->input->post('ftp_login');
@@ -1142,6 +1143,7 @@ class Adm_servers extends CI_Controller {
 				
 				$local_tpl_data['control_protocol'] = form_dropdown('control_protocol', $options, $this->dedicated_servers->ds_list['0']['control_protocol']);
 				
+				$local_tpl_data['script_path'] 		= $this->dedicated_servers->ds_list['0']['script_path'];
 				$local_tpl_data['steamcmd_path'] 	= $this->dedicated_servers->ds_list['0']['steamcmd_path'];
 				$local_tpl_data['ssh_host'] 		= $this->dedicated_servers->ds_list['0']['ssh_host'];
 				$local_tpl_data['ssh_login'] 		= $this->dedicated_servers->ds_list['0']['ssh_login'];
@@ -1176,7 +1178,8 @@ class Adm_servers extends CI_Controller {
 				$this->form_validation->set_rules('cpu', 'CPU', 'trim|max_length[64]|xss_clean');
 
 				// Редактирование данных доступа к серверу (пароли ftp, ssh)
-				$this->form_validation->set_rules('steamcmd_path', 'путь к SteamCMD', 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('steamcmd_path', lang('adm_servers_steamcmd_path'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('script_path', lang('adm_servers_script_path'), 'trim|max_length[256]|xss_clean');
 				
 				$this->form_validation->set_rules('ssh_host', 'SSH хост', 'trim|max_length[64]|xss_clean');
 				$this->form_validation->set_rules('ssh_login', 'SSH логин', 'trim|max_length[64]|xss_clean');
@@ -1669,12 +1672,12 @@ class Adm_servers extends CI_Controller {
 					$sql_data['ssh_host'] 			= $this->input->post('ssh_host');
 					$sql_data['ssh_login'] 			= $this->input->post('ssh_login');
 					$sql_data['ssh_password'] 		= $this->input->post('ssh_password');
-					$sql_data['ssh_path'] 			= $this->input->post('ssh_path');
+					$sql_data['ssh_path'] 			= $this->input->post('script_path');
 					
 					$sql_data['telnet_host'] 		= $this->input->post('telnet_host');
 					$sql_data['telnet_login']		= $this->input->post('telnet_login');
 					$sql_data['telnet_password'] 	= $this->input->post('telnet_password');
-					$sql_data['telnet_path']		= $this->input->post('telnet_path');
+					$sql_data['telnet_path']		= $this->input->post('script_path');
 					
 					$sql_data['ftp_host'] 			= $this->input->post('ftp_host');
 					$sql_data['ftp_login'] 			= $this->input->post('ftp_login');
@@ -2234,7 +2237,7 @@ class Adm_servers extends CI_Controller {
 			}
 			
 			if ($this->games->get_games_list(array('code'=> $new_gs['game']), 1)) {
-
+				
 				if(!$this->games->games_list[0]['app_id'] && !$this->games->games_list[0]['local_repository'] && !$this->games->games_list[0]['remote_repository']) {
 					/*
 					 * Для игры не задан или не существует парамера app_update для SteamCMD,

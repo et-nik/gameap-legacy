@@ -99,6 +99,11 @@
 			</tbody>
 			
 			<tr>
+				<td>{lang_adm_servers_path_to_executable_file}:</td>
+				<td><input type="text" name="script_path" value="{script_path}" /></td>
+			</tr>
+			
+			<tr>
 				<td>{lang_adm_servers_steamcmd_path}:<br /><span class="description">[ {lang_adm_servers_steamcmd_path_desc} ]</span></td>
 				<td><input type="text" name="steamcmd_path" value="{steamcmd_path}" /></td>
 			</tr>
@@ -133,11 +138,6 @@
 				<td>{lang_password}:</td>
 				<td><input type="text" name="ssh_password" /></td>
 			</tr>
-			
-			<tr>
-				<td>{lang_adm_servers_path_to_executable_file}:</td>
-				<td><input type="text" name="ssh_path" value="{ssh_path}" /></td>
-			</tr>
 			<?php else: ?>
 			<tr>
 				<td colspan="2">{lang_adm_servers_not_ssh_php}</td>
@@ -169,10 +169,6 @@
 				<td><input type="text" name="telnet_password"  /></td>
 			</tr>
 			
-			<tr>
-				<td>{lang_adm_servers_path_to_executable_file}:</td>
-				<td><input type="text" name="telnet_path" value="{telnet_path}" /></td>
-			</tr>
 		</table>
 	</div>
 
@@ -198,11 +194,6 @@
 			<tr>
 				<td>{lang_password}:</td>
 				<td><input type="text" name="ftp_password" /></td>
-			</tr>
-
-			<tr>
-				<td>{lang_adm_servers_path_to_executable_file}:</td>
-				<td><input type="text" name="ftp_path" value="{ftp_path}" /></td>
 			</tr>
 
 		</table>
