@@ -19,7 +19,7 @@
  * @category	Controllers
  * @category	Controllers
  * @author		Nikita Kuznetsov (ET-NiK)
- * @sinse		0.7.1
+ * @sinse		0.9
  */
 
 /* ----------------------------------------------------- */
@@ -410,7 +410,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "2",
@@ -441,7 +441,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "3",
@@ -472,7 +472,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "4",
@@ -503,7 +503,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "5",
@@ -534,7 +534,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "6",
@@ -565,7 +565,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "7",
@@ -596,7 +596,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "8",
@@ -627,7 +627,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "9",
@@ -658,7 +658,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "10",
@@ -689,7 +689,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "11",
@@ -720,7 +720,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "12",
@@ -751,7 +751,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "13",
@@ -782,7 +782,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "14",
@@ -813,7 +813,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "15",
@@ -844,7 +844,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "16",
@@ -875,7 +875,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "17",
@@ -906,7 +906,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "18",
@@ -937,7 +937,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "19",
@@ -968,7 +968,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "20",
@@ -999,7 +999,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "21",
@@ -1030,7 +1030,7 @@ $data = array(
 		'passwd_cmd' => "",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "22",
@@ -1061,7 +1061,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "23",
@@ -1092,7 +1092,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "25",
@@ -1123,7 +1123,7 @@ $data = array(
 		'passwd_cmd' => "",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "26",
@@ -1154,7 +1154,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "27",
@@ -1185,7 +1185,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "28",
@@ -1216,7 +1216,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "29",
@@ -1247,7 +1247,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "30",
@@ -1278,7 +1278,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "31",
@@ -1309,7 +1309,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "32",
@@ -1340,7 +1340,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "33",
@@ -1371,7 +1371,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "34",
@@ -1402,7 +1402,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "35",
@@ -1433,7 +1433,7 @@ $data = array(
 		'passwd_cmd' => "password {password}",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "36",
@@ -1464,7 +1464,7 @@ $data = array(
 		'passwd_cmd' => "",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
 
 $data = array(
 		'id' => "37",
@@ -1495,4 +1495,4 @@ $data = array(
 		'passwd_cmd' => "",
 		'game_types' => "",
 );
-$this->games->add_game_type($data);
+$this->game_types->add_game_type($data);
