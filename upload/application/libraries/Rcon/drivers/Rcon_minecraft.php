@@ -64,15 +64,24 @@ class Rcon_minecraft extends CI_Driver {
 	*/
 	function change_rcon($rcon_password = '')
 	{
-		$file = 'server.properties'; // Конфиг файл
-		$file_contents = $this->CI->servers->read_file($file);
+		$this->CI->load->helper('ds');
+		$this->CI->load->helper('string');
+		
+		$server_data =& $this->CI->servers->server_data;
+
+		$dir = get_ds_file_path($server_data);
+		
+		$file = $dir . 'server.properties'; // Конфиг файл
+		$file_contents = read_ds_file($file, $server_data);
 		
 		/* Ошибка чтения, либо файл не найден */
 		if(!$file_contents) {
 			return false;
 		}
 
-		$file_contents = change_value_on_file($file_contents, 'rcon.password', $rcon_password);
-		return $this->CI->servers->write_file($file, $file_contents, $this->CI->servers->server_data);
+		$file_contents 	= change_value_on_file($file_contents, 'rcon.password', $rcon_password);
+		$write_result 	= write_ds_file($file, $file_contents, $server_data);
+		
+		return $write_result;
 	}
 }

@@ -79,7 +79,8 @@ class Installer_minecraft extends CI_Driver {
 		$CI =& get_instance();
 		
 		$file = 'server.properties';
-		$file_contents = read_ds_file($file, $this->server_data);
+		$dir = get_ds_file_path($this->server_data);
+		$file_contents = read_ds_file($dir . $file, $this->server_data);
 		
 		// Костыль. Меняет права файла на 666
 		send_command('chmod 666 {dir}/server.properties', $this->server_data);
@@ -93,7 +94,7 @@ class Installer_minecraft extends CI_Driver {
 		$file_contents = change_value_on_file($file_contents, 'enable-query', 'true');
 		$file_contents = change_value_on_file($file_contents, 'enable-rcon', 'true');
 		
-		$write_result = write_ds_file($file, $file_contents, $this->server_data);
+		$write_result = write_ds_file($dir . $file, $file_contents, $this->server_data);
 		
 		return true;
 	}
