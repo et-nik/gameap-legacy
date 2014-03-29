@@ -160,6 +160,47 @@ class Control extends CI_Driver_Library {
 		
 		$this->driver = $driver;
 	}
+	
+	// ---------------------------------------------------------------------
+	
+	/**
+	 * Обращает слэш Linux в обратный слэш Windows
+	 * 
+	 * У некоторых команд Windows возникают ошибки со слэшами
+	 * например, не будет работать
+	 * 		mkdir dir/my_dir
+	 * будет работать
+	 * 		mkdir dir\mydir
+	 */
+	private function _slash_reverse($command)
+	{
+		if ($this->os != 'windows') {
+			return $command;
+		}
+		
+		$commands = explode('&&', $command);
+		
+		if (count($commands) > 1) {
+			foreach($commands as &$value) {
+				$return[] = $this->_slash_reverse(trim($value));
+			}
+			return implode(' && ', $return);
+		} else {
+			$command = $commands[0];
+		}
+
+		$cmd_tokens = explode(' ', $command);
+		
+		switch($cmd_tokens[0]) {
+			case 'mkdir':
+				$cmd_tokens[1] = str_replace('/', '\\', $cmd_tokens[1]);
+				break;
+		}
+		
+		$command = implode(' ', $cmd_tokens);
+		
+		return $command;
+	}
 
 	// ---------------------------------------------------------------------
 	
@@ -175,8 +216,9 @@ class Control extends CI_Driver_Library {
 		$file = $path . '/' . $explode[0];
 
 		$cd 		= $path ? $this->_path_proccess($path) . ' && ' : '';
+		$command 	= $this->_slash_reverse($command);
 		$command 	= $this->_add_sudo($command);
-
+		
 		// Подготовка полной команды
 		$final_command = $cd . $command;
 		$this->_sended_commands[] = $final_command;
@@ -184,7 +226,7 @@ class Control extends CI_Driver_Library {
 		if (strpos($file, '.sh') !== false OR strpos($file, '.exe') !== false) {
 			$this->_check_file($file, 'x');
 		}
-
+		
 		return $this->{$this->driver}->command($final_command);
 	}
 	
@@ -195,7 +237,7 @@ class Control extends CI_Driver_Library {
 		if (!$this->driver) {
 			throw new Exception('Driver no set');
 		}
-		
+
 		if ($this->ip != $ip && $this->port != $port) {
 			$this->clear_commands();
 		}
