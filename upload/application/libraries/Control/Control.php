@@ -105,17 +105,8 @@ class Control extends CI_Driver_Library {
 
 		switch($this->os) {
 			case 'ubuntu':
-				$command =  'sudo ' . $command;
-				break;
-				
 			case 'debian':
-				$command =  'sudo ' . $command;
-				break;
-				
 			case 'linux':
-				$command =  'sudo ' . $command;
-				break;
-				
 			case 'centos':
 				$command =  'sudo ' . $command;
 				break;
