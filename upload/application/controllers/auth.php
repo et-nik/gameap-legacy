@@ -380,6 +380,11 @@ class Auth extends CI_Controller {
 			// Загрузка модели для шифровки пароля
 			$this->load->model('password');
 			
+			if (in_array($this->input->post('login'), $this->_denied_logins)) {
+				$this->_show_message('Unavailable login', site_url('auth/register'));
+				return false;
+			}
+			
 			// Проверяем, правильно ли введено сообщение
 			if (!$this->_check_captcha($this->input->post('image'))) {
 				// Сохраняем логи
