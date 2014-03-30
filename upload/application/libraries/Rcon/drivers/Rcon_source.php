@@ -28,7 +28,7 @@ class Rcon_source extends CI_Driver {
 	
 	function connect() 
 	{
-		$this->fp = fsockopen($this->host, $this->port);
+		$this->fp = @fsockopen($this->host, $this->port);
 
 		if ($this->fp) {
 			$this->_set_timeout($this->fp, 1, 500);
@@ -41,6 +41,9 @@ class Rcon_source extends CI_Driver {
 
 	function auth() 
 	{
+		if (!$this->fp) {
+			return false;
+		}
 		
 		$packid = $this->_write(SERVERDATA_AUTH, $this->password);
 
