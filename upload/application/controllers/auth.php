@@ -17,7 +17,7 @@ class Auth extends CI_Controller {
 	public $user_data = array();
 	
 	// Список запрещенных логинов при регистрации
-	private $_denied_logins = array('administrator', 'admin', 'system', 'gameap');
+	private $_denied_logins = array('administrator', 'admin', 'system', 'gameap', 'root');
 	
 	// -----------------------------------------------------------------------------------------
 
