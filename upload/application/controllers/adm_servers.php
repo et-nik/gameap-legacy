@@ -620,7 +620,7 @@ class Adm_servers extends CI_Controller {
 					$tpl_file_add = 'adm_servers/games_add.html';
 					
 					$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[32]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('code', lang('adm_servers_game_code'), 'trim|required|max_length[64]|min_length[2]|xss_clean');
+					$this->form_validation->set_rules('code', lang('adm_servers_game_code'), 'trim|required|is_unique[games.code]|max_length[64]|min_length[2]|xss_clean');
 					$this->form_validation->set_rules('start_code', lang('adm_servers_game_start_code'), 'trim|required|max_length[32]|min_length[2]|xss_clean');
 					$this->form_validation->set_rules('engine', lang('adm_servers_engine'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
 					$this->form_validation->set_rules('engine_version', lang('adm_servers_engine_version'), 'trim|numeric|max_length[11]|xss_clean');
