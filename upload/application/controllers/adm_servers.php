@@ -2238,7 +2238,11 @@ class Adm_servers extends CI_Controller {
 			
 			if ($this->games->get_games_list(array('code'=> $new_gs['game']), 1)) {
 				
-				if(!$this->games->games_list[0]['app_id'] && !$this->games->games_list[0]['local_repository'] && !$this->games->games_list[0]['remote_repository']) {
+				if(!$new_gs['installed'] 
+					&& !$this->games->games_list[0]['app_id'] 
+					&& !$this->games->games_list[0]['local_repository'] 
+					&& !$this->games->games_list[0]['remote_repository']
+				) {
 					/*
 					 * Для игры не задан или не существует парамера app_update для SteamCMD,
 					 * нет ссылок на локальный и удаленные репозитории
