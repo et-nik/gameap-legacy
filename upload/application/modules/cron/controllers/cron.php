@@ -401,7 +401,7 @@ class Cron extends MX_Controller {
 						break;
 						
 					case 'gz':
-						$commands[] = 'tar -xvfz ' . basename($pack_file) . ' && rm ' . basename($pack_file);;
+						$commands[] = 'tar -xvf ' . basename($pack_file) . ' && rm ' . basename($pack_file);;
 						break;
 					
 					case 'bz2':
@@ -1321,7 +1321,14 @@ class Cron extends MX_Controller {
 
 				// Проверка статуса сервера
 				$status = $this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['query_port'], $this->servers_data[$server_id]['engine'], $this->servers_data[$server_id]['engine_version']);
-
+				
+				/* Повторная проверка, контрольная.
+				 * Бывали случаи, что сервер перезагружался, даже если нормально работал */
+				if (!$status) {
+					sleep(3);
+					$status = $this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['query_port'], $this->servers_data[$server_id]['engine'], $this->servers_data[$server_id]['engine_version']);
+				}
+				
 				if(!$status) {
 					/* Смотрим данные предыдущих проверок, если сервер был в оффе, то запускаем его */
 
