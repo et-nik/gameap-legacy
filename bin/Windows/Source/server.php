@@ -5,11 +5,11 @@
  *
  * 
  *
- * @package    Game AdminPanel
- * @author    Nikita Kuznetsov (ET-NiK)
- * @copyright  Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
- * @license    http://www.gameap.ru/license.html
- * @link    http://www.gameap.ru
+ * @package    	Game AdminPanel
+ * @author    	Nikita Kuznetsov (ET-NiK)
+ * @copyright  	Copyright (c) 2013-2014, Nikita Kuznetsov (http://hldm.org)
+ * @license    	http://www.gameap.ru/license.html
+ * @link    	http://www.gameap.ru
  * @filesource  
  */
  
@@ -98,28 +98,45 @@ if(file_exists('psexec.exe')) {
 	
 //chdir($dir);
 set_time_limit (3);
-	
+
+// ---------------------------------------------------------------------
+
+/**
+ * Проверка статуса сервера
+ */
 function server_status()
 {
-	global $program, $dir, $ip, $port,  $start_command, $psexec;
-		
-	//chdir($dir);
-		
-	system("netstat -ano | findstr " . $port .">" . $dir . '\\pid.txt');
-	$file = file($dir . '\\pid.txt');
-
-	//UDP    0.0.0.0:27015          *:*                                    1508
-	//$file['0'] = 'Hello';
-			
-	$file['0'] = str_replace(' ', '', $file['0']);
+	global $program, $dir, $ip, $port, $start_command, $psexec;
 	
-	if(preg_match('/^UDP(\d*)\.(\d*)\.(\d*)\.(\d*)\:(\d*)\*\:\*(\d*)/xsi', $file['0'], $text)){
-		$pid = $text['6'];
-	}
+	$pid = NULL;
+	
+	system("netstat -ano | findstr " . $port .">" . $dir . '\pid.txt');
+	$file = file($dir . '\pid.txt');
 
+	// TCP 10.99.1.8:27015 0.0.0.0:0 LISTENING 3496
+	// UDP 10.99.1.8:27015 : 3496
+
+	foreach ($file as $str) {
+		$str = str_replace(' ', '', $str);
+		if(preg_match('/^UDP(\d*).(\d*).(\d*).(\d*):(\d*)*:*(\d*)/xsi', $str, $text)) {
+			$pid = $text['6'];
+		} 
+	}
+	
+	if ($pid) {
+		system("echo " . $pid .">" . $dir . '\pid.txt');
+	} else {
+		system("echo NOT FOUND>" . $dir . '\pid.txt');
+	}
+	
 	return $pid;
 }
-	
+
+// ---------------------------------------------------------------------
+
+/**
+ * Запуск сервера
+ */
 function server_start()
 {
 	global $programm, $arguments, $dir, $ip, $port,  $start_command, $psexec;
@@ -131,8 +148,13 @@ function server_start()
 		
 	return server_status();
 }
+
+// ---------------------------------------------------------------------
 	
-function server_stop(){
+/**
+ * Остановка сервера
+ */
+function server_stop() {
 	global $program, $dir, $ip, $port,  $start_command, $psexec;
 		
 	if($pid = server_status()) {
@@ -204,12 +226,16 @@ switch($command) {
 		break;
 		
 	case 'get_console':
-		if (!file_exists($dir . '\\' . 'qconsole.log')) {
-			echo 'File qconsole.log not found. Add -condebug in server start parameters';
+		if (file_exists($dir . '\\' . 'qconsole.log')) {
+			$console_file = 'qconsole.log';
+		} elseif (file_exists($dir . '\\' . 'console.log')) {
+			$console_file = 'console.log';
+		} else {
+			echo 'Console file not found. Add -condebug in server start parameters';
 			exit;
 		}
 		
-		$console_content = file_get_contents($dir . '\\' . 'qconsole.log');
+		$console_content = file_get_contents($dir . '\\' . $console_file);
 		$console_content = explode("\n", $console_content);
 		
 		/* Файл может быть большим, поэтому оставляем только последние 100 строк */
