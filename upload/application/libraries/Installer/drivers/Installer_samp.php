@@ -84,7 +84,9 @@ class Installer_samp extends CI_Driver {
 		$file_contents = read_ds_file($dir . $file, $this->server_data);
 		
 		// Костыль. Меняет права файла на 666
-		send_command('chmod 666 {dir}/server.cfg', $this->server_data);
+		if(strtolower($this->_os) != 'windows') {
+			send_command('chmod 666 {dir}/server.cfg', $this->server_data);
+		}
 		
 		// Установка портов
 		$file_contents = change_value_on_file($file_contents, 'port', $this->server_data['server_port']);

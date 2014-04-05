@@ -31,12 +31,12 @@ class Installer extends CI_Driver_Library {
 	
 	private $_CI;
 	
-	private $_os	 			= 'linux';
-	private $_game_code 		= '';
-	private $_engine 			= '';
-	private $_engine_version 	= 1;
+	public $_os	 			= 'linux';
+	public $_game_code 		= '';
+	public $_engine 			= '';
+	public $_engine_version 	= 1;
 	
-	private $_parameters_value	= array();
+	public $_parameters_value	= array();
 	
 	public $server_data 		= array();
 	
