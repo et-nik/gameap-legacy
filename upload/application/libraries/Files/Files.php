@@ -52,15 +52,23 @@ class Files extends CI_Driver_Library {
 	{
 		$this->tmp_dir = sys_get_temp_dir();
 		
-		if (!is_writable($this->tmp_dir)) {
+		if (is_writable($this->tmp_dir)) {
+			return $this->tmp_dir;
+		} elseif (file_exists(FCPATH . 'tmp') && is_writable(FCPATH . 'tmp')) {
+			$this->tmp_dir = FCPATH . 'tmp';
+			return $this->tmp_dir;
+		} elseif (file_exists(FCPATH . 'application/cache') && is_writable(FCPATH . 'application/cache')) {
 			
-			if (file_exists(FCPATH . 'tmp') && is_writable(FCPATH . 'tmp')) {
-				$this->tmp_dir = FCPATH . 'tmp';
-			} else {
-				show_error('Failed to set the tmp directory');
+			if (file_exists(FCPATH . 'application/cache/tmp')) {
+				mkdir(FCPATH . 'application/cache/tmp');
 			}
+			
+			$this->tmp_dir = FCPATH . 'application/cache/tmp';
+			return $this->tmp_dir;
+		} else {
+			show_error('Failed to set the tmp directory. <a target="blank" href="http://wiki.hldm.org/index.php/%D0%90%D0%B4%D0%BC%D0%B8%D0%BD%D0%9F%D0%B0%D0%BD%D0%B5%D0%BB%D1%8C:FAQ#.D0.9F.D0.BE.D1.8F.D0.B2.D0.B8.D0.BB.D0.B0.D1.81.D1.8C_.D0.BE.D1.88.D0.B8.D0.B1.D0.BA.D0.B0_.27Failed_to_set_the_tmp_directory.27">See FAQ</a>');
 		}
-		
+
 		return $this->tmp_dir;
 	}
 
