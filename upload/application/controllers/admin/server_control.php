@@ -247,14 +247,13 @@ class Server_control extends CI_Controller {
 		
 		
 		if ($this->servers->server_data['server_status']) {
-
-			// Отправка команды
-			$rcon_string = $this->rcon->command("status");
 			
 			$local_tpl_data['users_list'] 	= array();
+			$local_tpl_data['players_list'] = array();
 			
-			if($rcon_string){
-				$local_tpl_data['users_list'] = $this->rcon->get_players($rcon_string, $this->servers->server_data['engine']);
+			if($users_list = $this->rcon->get_players()){
+				$local_tpl_data['users_list'] = $users_list;
+				$local_tpl_data['players_list'] = $users_list;
 			}
 			
 			if ($local_tpl_data['users_list']) {
