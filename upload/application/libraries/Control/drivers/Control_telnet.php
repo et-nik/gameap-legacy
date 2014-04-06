@@ -127,7 +127,7 @@ class Control_telnet extends CI_Driver {
 					$file_perm['exists'] 		= true;
 					$file_perm['readable'] 		= preg_match('/^\-r..r..r../i', $values_exp[0]);
 					$file_perm['writable'] 		= preg_match('/^\-.w..w..w./i', $values_exp[0]);
-					$file_perm['executable'] 	= preg_match('/^\-..x..x..x/i', $values_exp[0]);
+					$file_perm['executable'] 	= preg_match('/^\-..[xs]..[xs]..[xt]/', $values_exp[0]);
 					break;
 				}
 				
