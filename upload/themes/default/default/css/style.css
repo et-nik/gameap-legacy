@@ -77,6 +77,10 @@ body {
 	display:block;
 }
 
+#left ul {
+	margin-left: -20px;
+}
+
 #left a:hover {
 	-webkit-transform: translate(8px,0);
 	-moz-transform: translate(8px,0);
@@ -355,7 +359,7 @@ button {
 /* Links */
 
 .awesome, .awesome:visited {
-    background: #222 url(/themes/default/images/alert-overlay.png) repeat-x; 
+    background: #222 url(../images/alert-overlay.png) repeat-x; 
     display: inline-block; 
     padding: 5px 10px 6px; 
     color: #fff; 
@@ -617,26 +621,21 @@ ul.tabs li.active, ul.tabs li.active a:hover  {
 .accordion {
 	border-bottom: solid 1px #c4c4c4;
 }
-.accordion h3 {
-	background: #FFF url(../images/arrow-square.gif) no-repeat right -51px;
+.accordion thead {
+	background: #FFF url(../images/arrow-square.gif) no-repeat 3% -47px;
 	
 	border-bottom: 1px solid #D0D0D0;
 	line-height: 32px;
 	padding: 0 50px 0 50px;
 	margin: 0;
 }
-.accordion h3:hover {
+.accordion thead:hover {
 	background-color: #F4F2F2;
 }
-.accordion h3.active {
-	background-position: right 5px;
+.accordion thead.active {
+	background-position: 3% 9px;
 }
 
-.accordion div {
+.accordion .gt_list {
 	margin: 25px 0 25px 0;
 }
-
-
-img.ruble-img { height: 1.5ex; }
-span.dot { position:absolute; text-indent: -1000em; }
-
