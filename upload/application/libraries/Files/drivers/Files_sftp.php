@@ -306,7 +306,7 @@ class Files_sftp extends CI_Driver {
 			$this->_error('ftp_unable_to_download');
 			return FALSE;
 		}
-		
+
 		$result = ssh2_scp_recv($this->conn, $rempath, $locpath);
 
 		@fclose($stream);
@@ -457,6 +457,12 @@ class Files_sftp extends CI_Driver {
 			
 			$pathinfo = pathinfo($file);
 			
+			/* Если файл не имеет расширения, а нам нужны файлы с определенным
+			 * расширением и не нужны нотисы */
+			if (!empty($extensions) && !isset($pathinfo['extension'])) {
+				continue;
+			}
+			
 			/* Если заданы расширения $extensions и в массиве нет расширения,
 			 * то такой файл пропускаем */
 			if (!empty($extensions) && !in_array($pathinfo['extension'], $extensions)) {
@@ -559,7 +565,7 @@ class Files_sftp extends CI_Driver {
 		foreach($list_files as &$sftp_file) {
 			$list_base_name[] = basename($sftp_file);
 		}
-		
+
 		if (is_array($file)) {
 			foreach($file as $value) {
 				if (in_array($value, $list_base_name)) {

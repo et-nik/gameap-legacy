@@ -497,6 +497,12 @@ class Files_ftp extends CI_Driver {
 			
 			$pathinfo = pathinfo($file);
 			
+			/* Если файл не имеет расширения, а нам нужны файлы с определенным
+			 * расширением и не нужны нотисы */
+			if (!empty($extensions) && !isset($pathinfo['extension'])) {
+				continue;
+			}
+			
 			/* Если заданы расширения $extensions и в массиве нет расширения,
 			 * то такой файл пропускаем */
 			if (!empty($extensions) && !in_array($pathinfo['extension'], $extensions)) {
