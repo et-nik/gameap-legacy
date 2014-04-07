@@ -226,11 +226,33 @@ switch($command) {
 		break;
 		
 	case 'get_console':
+	
+		$console_file = '';
+		
 		if (file_exists($dir . '\\' . 'qconsole.log')) {
 			$console_file = 'qconsole.log';
-		} elseif (file_exists($dir . '\\' . 'console.log')) {
-			$console_file = 'console.log';
 		} else {
+			$tokens = explode(' ', $start_command);
+			
+			$count = count($tokens);
+			$i = 0;
+			
+			while($i < $count) {
+				if ($tokens[$i] == '-game') {
+					if (file_exists($dir . '\\' . $tokens[ $i+1 ] . '\\' . 'console.log')) {
+						$console_file = $dir . '\\' . $tokens[ $i+1 ] . '\\' . 'console.log';
+					}
+					
+					break;
+				}
+				
+				$i ++;
+				// END while($i < $count)
+			}
+		}
+		
+		
+		if (!$console_file) {
 			echo 'Console file not found. Add -condebug in server start parameters';
 			exit;
 		}
