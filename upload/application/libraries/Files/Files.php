@@ -52,14 +52,14 @@ class Files extends CI_Driver_Library {
 	{
 		$this->tmp_dir = sys_get_temp_dir();
 		
-		if (is_writable($this->tmp_dir)) {
+		if (@is_writable($this->tmp_dir)) {
 			return $this->tmp_dir;
 		} elseif (file_exists(FCPATH . 'tmp') && is_writable(FCPATH . 'tmp')) {
 			$this->tmp_dir = FCPATH . 'tmp';
 			return $this->tmp_dir;
 		} elseif (file_exists(FCPATH . 'application/cache') && is_writable(FCPATH . 'application/cache')) {
 			
-			if (file_exists(FCPATH . 'application/cache/tmp')) {
+			if (!file_exists(FCPATH . 'application/cache/tmp')) {
 				mkdir(FCPATH . 'application/cache/tmp');
 			}
 			
