@@ -83,7 +83,7 @@ $fields = array(
 		),
 		
 		'code' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 32,
 		),
 		
@@ -146,7 +146,7 @@ $fields = array(
 		),
 		
 		'control_protocol' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 8,
 		),
 		
@@ -242,12 +242,12 @@ $this->dbforge->create_table('dedicated_servers');
 
 $fields = array(
 		'code' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 16, 
 		),
 		
 		'start_code' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 16, 
 		),
 
@@ -260,7 +260,7 @@ $fields = array(
 		),
 		
 		'engine_version' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 32,
 							'default' => '1',
 		),
@@ -271,7 +271,7 @@ $fields = array(
 		),
 		
 		'app_set_config' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 64,
 							'default' => '',
 		),
@@ -303,7 +303,7 @@ $fields = array(
 		),
 		
 		'game_code' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 16, 
 		),
 		
@@ -347,12 +347,12 @@ $fields = array(
 		),
 		
 		'execfile_windows' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 32,
 		),
 		
 		'execfile_linux' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 32,
 		),
 		
@@ -453,7 +453,7 @@ $fields = array(
 		),
 		
 		'command' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 32, 
 		),
 		
@@ -491,7 +491,7 @@ $this->dbforge->create_table('logs');
 
 $fields = array(
 		'short_name' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 32, 
 		),
 		
@@ -508,7 +508,7 @@ $fields = array(
 		),
 		
 		'version' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 64, 
 		),
 		
@@ -522,7 +522,7 @@ $fields = array(
 		),
 
 		'developer' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 64, 
 		),
 		
@@ -559,13 +559,13 @@ $fields = array(
 		),
 		
 		'screen_name' => array(
-							'type' 			=> 'CHAR',
+							'type' 			=> 'VARCHAR',
 							'constraint' 	=> 64,
 							'default'		=> '',
 		),
 		
 		'game' => array(
-							'type' 			=> 'CHAR',
+							'type' 			=> 'VARCHAR',
 							'constraint' 	=> 16, 
 		),
 		
@@ -635,7 +635,7 @@ $fields = array(
 		),
 		
 		'su_user' => array(
-							'type' 			=> 'CHAR',
+							'type' 			=> 'VARCHAR',
 							'constraint'	=> 32,
 							'default'		=> '',
 		),
@@ -691,7 +691,7 @@ $this->dbforge->create_table('servers_privileges');
 
 $fields = array(
 		'sett_id' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 32, 
 		),
 		
@@ -706,7 +706,7 @@ $fields = array(
 		),
 		
 		'value' => array(
-							'type' => 'CHAR',
+							'type' => 'VARCHAR',
 							'constraint' => 64, 
 		),
 );
@@ -760,7 +760,7 @@ $fields = array(
 		),
 		
 		'reg_date' => array(
-							'type' 			=> 'CHAR',
+							'type' 			=> 'VARCHAR',
 							'constraint' 	=> 	32,
 		),
 		
