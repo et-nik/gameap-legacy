@@ -115,10 +115,13 @@ function server_status()
 
 	// TCP 10.99.1.8:27015 0.0.0.0:0 LISTENING 3496
 	// UDP 10.99.1.8:27015 : 3496
+	
+	// TCP 192.168.17.2:27050 0.0.0.0:0 LISTENING 4352
+	// UDP 0.0.0.0:27050 *:* 4352
 
 	foreach ($file as $str) {
 		$str = str_replace(' ', '', $str);
-		if(preg_match('/^UDP(\d*).(\d*).(\d*).(\d*):(\d*)*:*(\d*)/xsi', $str, $text)) {
+		if(preg_match('/^UDP(\d*).(\d*).(\d*).(\d*)\**:\**(\d*)*:*(\d*)/xsi', $str, $text)) {
 			$pid = $text['6'];
 		} 
 	}
@@ -240,7 +243,7 @@ switch($command) {
 			while($i < $count) {
 				if ($tokens[$i] == '-game') {
 					if (file_exists($dir . '\\' . $tokens[ $i+1 ] . '\\' . 'console.log')) {
-						$console_file = $dir . '\\' . $tokens[ $i+1 ] . '\\' . 'console.log';
+						$console_file = $tokens[ $i+1 ] . '\\' . 'console.log';
 					}
 					
 					break;
