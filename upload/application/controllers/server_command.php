@@ -756,7 +756,7 @@ class Server_command extends CI_Controller {
 						$log_data['user_name'] 	= $this->users->auth_login;
 						$log_data['server_id'] 	= $this->servers->server_data['id'];
 						$log_data['msg'] 		= $message;
-						$log_data['log_data'] 	= $response;
+						$log_data['log_data'] 	= $response . "\nCommand:\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
 						
 						// Оставлено, на всякий случай
@@ -858,7 +858,7 @@ class Server_command extends CI_Controller {
 						$log_data['user_name'] 	= $this->users->auth_login;
 						$log_data['server_id'] 	= $this->servers->server_data['id'];
 						$log_data['msg'] 		= $message;
-						$log_data['log_data'] 	= $response;
+						$log_data['log_data'] 	= $response . "\nCommand:\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
 						
 						// Оставлено, на всякий случай
@@ -960,7 +960,7 @@ class Server_command extends CI_Controller {
 						$log_data['user_name'] 	= $this->users->auth_login;
 						$log_data['server_id'] 	= $this->servers->server_data['id'];
 						$log_data['msg'] 		= $message;
-						$log_data['log_data'] 	= $response;
+						$log_data['log_data'] 	= $response . "\nCommand:\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
 						
 						// Оставлено, на всякий случай
