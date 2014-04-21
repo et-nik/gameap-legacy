@@ -438,6 +438,9 @@ class Cron extends MX_Controller {
 	private function _install_from_steamcmd($server_id)
 	{
 		/* Установка через SteamCMD */
+		if (!isset($this->servers_data[$server_id])) {
+			$this->_get_server_data($server_id);
+		}
 
 		//steamcmd +login anonymous +force_install_dir ../czero +app_set_config 90 mod czero +app_update 90 validate +quit
 		$cmd['app'] = '';
@@ -460,6 +463,7 @@ class Cron extends MX_Controller {
 				$command = './steamcmd.sh ' . $cmd['login'] . ' ' . $cmd['install_dir'] . ' ' . $cmd['app'] . ' validate +quit';
 				break;
 		}
+		
 		
 		$result = send_command($command, $this->servers_data[$server_id], $this->servers_data[$server_id]['steamcmd_path']);
 		$this->_install_result .= $result;
