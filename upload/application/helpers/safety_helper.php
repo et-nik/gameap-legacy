@@ -26,10 +26,10 @@ function safesql($string)
 	if(is_array($string)){
 		
 		foreach($string as $key => $value){
-			$return[$key] = mysql_real_escape_string($string[$key]);
+			$return[$key] = mysqli_real_escape_string($string[$key]);
 		}
 	}else{
-		$return = mysql_real_escape_string($string);
+		$return = mysqli_real_escape_string($string);
 	}
 	
 	return $return;
