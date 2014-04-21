@@ -23,16 +23,8 @@
 
 function safesql($string)
 {
-	if(is_array($string)){
-		
-		foreach($string as $key => $value){
-			$return[$key] = mysqli_real_escape_string($string[$key]);
-		}
-	}else{
-		$return = mysqli_real_escape_string($string);
-	}
-	
-	return $return;
+	$CI =& get_instance();
+	return $CI->db->escape_str($string);
 }
 
 // -----------------------------------------
