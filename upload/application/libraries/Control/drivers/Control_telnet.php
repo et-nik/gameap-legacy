@@ -112,7 +112,7 @@ class Control_telnet extends CI_Driver {
 					
 					$values_exp = explode(" ", $values);
 					// Удаление пустых значений
-					$values_exp = array_values(array_filter($values_exp,function($el){ return ($el !== '');}));
+					$values_exp = array_diff($values_exp, array(null));
 					
 					if ($values_exp[8] != $file_name) {
 						continue;
