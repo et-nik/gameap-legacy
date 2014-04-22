@@ -1249,6 +1249,7 @@ class Adm_servers extends CI_Controller {
 				$where = array('game_code' => $this->servers->server_data['game']);
 				$gametypes_list = $this->game_types->get_gametypes_list($where);
 				
+				$options = array();
 				$i = 0;
 				foreach($gametypes_list as $list) {
 					$options[$list['id']] = $list['name'];
