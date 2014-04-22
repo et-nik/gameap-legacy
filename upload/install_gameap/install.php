@@ -205,28 +205,30 @@ switch($page) {
 	case '3':
 		$title = lang('install_title');
 		$content = '<h2>' . lang('install_configuration') . '</h2>';
-		
+
 		$content .= '<form action="' . site_url('install/page/4/' . $language)  . '" method="post" accept-charset="utf-8">';
 		$content .= '<input type="hidden" name="' . $this->security->get_csrf_token_name() .'" value="' . $this->security->get_csrf_hash() . '" />';
 		
 		$content .= '<table class="zebra" width="100%">';
 		
 		$content .= '<p class="hr"><strong>' . lang('install_data_base') . '</strong></p>';
+		
+		$db_driver_options = array();
+		!extension_loaded('mysql') 		OR ($db_driver_options['mysql'] = 'MySQL' & $db_driver_default = 'mysql');
+		!extension_loaded('mysqli')  	OR ($db_driver_options['mysqli'] = 'MySQLi' & $db_driver_default = 'mysqli');
+		!extension_loaded('pdo') 		OR $db_driver_options['pdo'] = 'PDO';
+		!extension_loaded('postgre') 	OR $db_driver_options['postgre'] = 'Postgre';
+		!extension_loaded('cubrid')		OR $db_driver_options['cubrid'] = 'CUBRID';
+		!extension_loaded('mssql') 		OR $db_driver_options['mssql'] = 'Microsoft SQL';
+		!extension_loaded('oci8') 		OR $db_driver_options['oci8'] = 'oci8';
+		!extension_loaded('odbc')  		OR $db_driver_options['odbc'] = 'ODBC';
+		!extension_loaded('sqlite') 	OR $db_driver_options['sqlite'] = 'SQLite';
+		//~ !extension_loaded('sqlite3')	OR $db_driver_options['sqlite3'] = 'SQLite3';
+		!extension_loaded('sqlsrv') 	OR $db_driver_options['sqlsrv'] = 'SQLSRV';
+		
 		$content .= '
 						<td>' . lang('install_db_dbdriver') . ':</td>
-						<td><select name="dbdriver">
-								<option value="mysql">MySQL</option>
-								<option value="mysqli">MySQLi</option>
-								<option value="pdo">PDO</option>
-								<option value="postgre">Postgre</option>
-								<option value="cubrid">CUBRID</option>
-								<option value="mssql">Microsoft SQL</option>
-								<option value="oci8">oci8</option>
-								<option value="odbc">ODBC</option>
-								<option value="sqlite">SQLite</option>
-								<option value="sqlsrv">SQLSRV</option>
-							</select>
-						</td>
+						<td>' . form_dropdown('dbdriver', $db_driver_options, $db_driver_default) . '</td>
 					<tr>
 						<td>' . lang('install_db_hostname') . ':</td>
 						<td width="40%"><input type="text" name="hostname" value="localhost"/></td>
