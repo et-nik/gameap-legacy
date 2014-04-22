@@ -236,6 +236,15 @@ class Adm_servers extends CI_Controller {
 			$this->files->connect($sftp_config);
 			return $this->files->search(array('server.sh', 'server.exe'), $sftp_path, $exclude_dirs, 4);
 		} catch (Exception $e) {
+			
+			// Сохраняем логи
+			$log_data['type'] 			= 'sftp_search';
+			$log_data['command'] 		= 'search_file';
+			$log_data['server_id'] 		= 0;
+			$log_data['msg'] 			= 'server.sh/server.exe not found';
+			$log_data['log_data'] 		= $e->getMessage() . "\nPath: " . $sftp_path;
+			$this->panel_log->save_log($log_data);
+			
 			return false;
 		}
 	}
