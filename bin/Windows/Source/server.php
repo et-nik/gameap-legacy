@@ -121,7 +121,7 @@ function server_status()
 
 	foreach ($file as $str) {
 		$str = str_replace(' ', '', $str);
-		if(preg_match('/^UDP(\d*).(\d*).(\d*).(\d*)\**:\**(\d*)*:*(\d*)/xsi', $str, $text)) {
+		if(preg_match('/^UDP(\d*).(\d*).(\d*).(\d*):(\d*)\**:\**(\d*)/xsi', $str, $text)) {
 			$pid = $text['6'];
 		} 
 	}
