@@ -36,13 +36,25 @@ if($this->users->auth_privileges['srv_restart'] == 1
 	<a class="large magenta awesome" href={site_url}server_command/update/{server_id}>&#10162;&nbsp;{lang_update}</a>
 <?php endif; ?>
 
-<?php if ($this->users->auth_servers_privileges['SERVER_SETTINGS']): ?>
-	<a class="large awesome" href="{site_url}admin/settings/server/{server_id}">{lang_server_control_settings}</a>
-<?php endif; ?>
+<p class="hr"><strong>Инструменты</strong></p>
 
-<?php if ($this->users->auth_servers_privileges['CONSOLE_VIEW']): ?>
-	<a class="large awesome" href="{site_url}server_command/console_view/{server_id}">{lang_server_control_console_view}</a>
-<?php endif; ?>
+<div style="overflow: hidden;">
+    <div style="width: 100%;">
+        <div style="text-align: center; float: left; width: 20%; height: 85px;"><a href="{site_url}admin/servers_files/server/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/files.png" /><br />Конфиг. файлы</a></div>
+        <div style="text-align: center; float: left; width: 20%; height: 85px;"><a href="{site_url}admin/servers_log/list_logs/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/logviewer.png" /><br />Логи</a></div>
+        <div style="text-align: center; float: left; width: 20%; height: 85px;"><a href="{site_url}server_command/console_view/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/console.png" /><br />{lang_server_control_console_view}</a></div>
+        <div style="text-align: center; float: left; width: 20%; height: 85px;"><a href="{site_url}admin/settings/server/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/settings.png" /><br />{lang_server_control_settings}</a></div>
+		
+		<?php if (module_exists('amxx_plugins_control') && strtolower($this->servers->server_data['engine']) == 'goldsource'): ?>
+        <div style="text-align: center; float: left; width: 20%; height: 85px;"><a href="{site_url}amxx_plugins_control/server/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/plugins.png" /><br />AMX Plugins</a></div>
+		<?php endif; ?>
+		
+		<?php if (module_exists('chat') && strtolower($this->servers->server_data['engine']) == 'goldsource'): ?>
+        <div style="text-align: center; float: left; width: 20%; height: 85px;"><a href="{site_url}chat/server/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/chat.png" /><br />Chat</a></div>
+		<?php endif; ?>
+		
+	</div>
+</div>
 
 <?php if ($this->servers->server_data['server_status']): ?>
 	<?php /* Сервер запущен */ ?>
