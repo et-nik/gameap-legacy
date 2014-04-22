@@ -2315,6 +2315,9 @@ class Adm_servers extends CI_Controller {
 				//~ // Директория не удалена
 			//~ }
 			
+			// Остановка сервера
+			$this->servers->stop($id);
+			
 			$sql_data['installed'] = 0;
 			
 			if ($this->servers->edit_game_server($id, $sql_data)) {
