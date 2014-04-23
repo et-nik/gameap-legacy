@@ -80,8 +80,8 @@ define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 |
 */
 
-define('AP_VERSION',	'0.9.1');
-define('AP_DATE',	'06.04.2014');
+define('AP_VERSION',	'0.9.2');
+define('AP_DATE',	'23.04.2014');
 
 
 /* End of file constants.php */
