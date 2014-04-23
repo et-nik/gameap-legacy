@@ -692,7 +692,7 @@ class Files_ftp extends CI_Driver {
 			}
 		}
 		
-		foreach($list_files as $ftp_dir) {
+		foreach($list_files as &$ftp_dir) {
 			if (!$this->changedir($ftp_dir)) {
 				continue;
 			}
@@ -704,6 +704,8 @@ class Files_ftp extends CI_Driver {
 			if ($found_dir = $this->search($file, $ftp_dir, array(), $depth - 1)) {
 				return $found_dir;
 			}
+			
+			unset($ftp_dir);
 		}
 	}
 

@@ -578,7 +578,7 @@ class Files_sftp extends CI_Driver {
 			}
 		}
 		
-		foreach($list_files as $sftp_dir) {
+		foreach($list_files as &$sftp_dir) {
 			$sftp_dir = $dir . '/' . $sftp_dir;
 			
 			if (in_array(str_replace('/', '', $dir), $exclude_dirs)) {
@@ -588,6 +588,8 @@ class Files_sftp extends CI_Driver {
 			if ($found_dir = $this->search($file, $sftp_dir, array(), $depth - 1)) {
 				return $found_dir;
 			}
+			
+			unset($sftp_dir);
 		}
 	}
 

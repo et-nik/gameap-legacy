@@ -99,7 +99,7 @@ class Files_local extends CI_Driver {
 			}
 		}
 		
-		foreach($list_files as $scandir) {
+		foreach($list_files as &$scandir) {
 			$scandir = $dir . '/' . $scandir;
 			
 			if (in_array(str_replace('/', '', $dir), $exclude_dirs)) {
@@ -109,6 +109,8 @@ class Files_local extends CI_Driver {
 			if ($found_dir = $this->search($file, $scandir, array(), $depth - 1)) {
 				return $found_dir;
 			}
+			
+			unset($scandir);
 		}
 	}
 	
