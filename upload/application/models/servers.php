@@ -252,7 +252,7 @@ class Servers extends CI_Model {
 		
 		if(!is_array($server_data)) {
 			// был передан id, получаем данные сервера
-			$server_data = $this->get_server_data($server_data, false, true, true);
+			$server_data = $this->get_server_data($server_data);
 		}
 		
 		$command = $this->command_generate($server_data, 'stop');

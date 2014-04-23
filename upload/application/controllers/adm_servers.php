@@ -2316,7 +2316,18 @@ class Adm_servers extends CI_Controller {
 			//~ }
 			
 			// Остановка сервера
-			$this->servers->stop($id);
+			try {
+				$this->servers->stop($id);
+			} catch (Exception $e) {
+				// Сохраняем логи
+				$log_data['type'] = 'server_command';
+				$log_data['command'] = 'stop';
+				$log_data['user_name'] = $this->users->auth_login;
+				$log_data['server_id'] = $id;
+				$log_data['msg'] = 'Stop server Error';
+				$log_data['log_data'] = $e->getMessage() . "\n" . get_last_command();
+				$this->panel_log->save_log($log_data);
+			}
 			
 			$sql_data['installed'] = 0;
 			
