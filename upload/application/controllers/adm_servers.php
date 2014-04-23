@@ -225,7 +225,7 @@ class Adm_servers extends CI_Controller {
 		$this->load->driver('files');
 		
 		// Исключаемые директории. В них поиск не ведется
-		$exclude_dirs = array('bin', 'boot', 'cdrom', 'dev', 'etc', 'lib',
+		$exclude_dirs = array('bin', 'boot', 'build', 'cdrom', 'dev', 'etc', 'lib',
 								'lib32', 'lib64', 'proc', 'media', 'mnt', 'run', 'sbin',
 								'selinux', 'sys', 'tmp',
 							);
@@ -258,9 +258,11 @@ class Adm_servers extends CI_Controller {
 	 * @return array
 	 * 
 	*/
-	function _gs_default_data($data) {
+	function _gs_default_data($data) 
+	{
+		$this->load->driver('installer');
 		
-		if (!$this->dedicated_servers->ds_list && $data['ds_id'] !== 0) {
+		if (!$this->dedicated_servers->ds_list) {
 			$where = array('id' => $data['ds_id']);
 			$this->dedicated_servers->get_ds_list($where, 1);
 		}
@@ -270,45 +272,25 @@ class Adm_servers extends CI_Controller {
 			$this->games->get_games_list($where, 1);
 		}
 		
-		if ($data['ds_id']) {
-			$os = $this->dedicated_servers->ds_list[0]['os'];
-		} else {
-			$os = $this->config->config['local_os'];
+		foreach ($this->dedicated_servers->ds_list as &$ds) {
+			if ($ds['id'] == $data['ds_id']) {
+				$os = strtolower($ds['os']);
+				break;
+			} else {
+				$os = 'linux';
+			}
 		}
+
+		$this->installer->set_game_variables($this->games->games_list[0]['start_code'], 
+												$this->games->games_list[0]['engine'],
+												$this->games->games_list[0]['engine_version']
+		);
+					
+		$this->installer->set_os($os);
+		$this->installer->server_data = $data;
 		
-		if (strtolower($os) == 'windows') {
-			
-			switch (strtolower($this->games->games_list[0]['engine'])) {
-				case 'source':
-					$data['start_command'] 	= 'srcds.exe -console -game {game} +ip {ip} +port {port} +map de_dust2 +maxplayers 32';
-					break;
-				
-				case 'goldsource':
-					$data['start_command'] 	= 'hlds.exe -console -game {game} +ip {ip} +port {port} +map de_dust2 +maxplayers 32';
-					break;
-					
-				case 'minecraft':
-					$data['start_command'] 	= "\"%ProgramFiles(x86)%\Java\jre7\bin\java.exe\" -Xmx1024M -Xms1024M -jar {dir}/craftbukkit.jar";
-					break;
-			}
-			
-		} else {
-			
-			switch (strtolower($this->games->games_list[0]['engine'])) {
-				case 'source':
-					$data['start_command'] 	= './srcds_run -game {game} +ip {ip} +port {port} +map de_dust2 +maxplayers 32';
-					break;
-				
-				case 'goldsource':
-					$data['start_command'] 	= './hlds_run -console -game {game} +ip {ip} +port {port} +map de_dust2 +maxplayers 32';
-					break;
-					
-				case 'minecraft':
-					$data['start_command'] 	= 'java -Xincgc -Xmx1G -jar {dir}/craftbukkit.jar';
-					break;	
-					
-			}
-		}
+		$data['aliases'] = json_encode($this->installer->get_default_parameters());
+		$data['start_command'] 	= $this->installer->get_start_command();
 		
 		/* Присваиваем значения пути к картам и имя screen  */
 		$data['screen_name'] = $data['game'] . '_' . random_string('alnum', 6) . '_' . $data['server_port'];
