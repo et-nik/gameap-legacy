@@ -11,7 +11,10 @@ $config['local_script_path'] 	= '/home/servers';
 $config['local_steamcmd_path'] 	= '/home/servers';
 $config['system_email'] 		= 'no-reply@example.com';
 
-$config['register_users'] 		= FALSE;
+$config['register_users'] 		= false;
+
+$config['delete_server_on_reinstall']	= true;
+$config['disable_sftp_search']			= false;
 
 /* End of file gameap_config.php */
 /* Location: ./application/config/gameap_config.php */
