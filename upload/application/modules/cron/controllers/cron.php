@@ -526,7 +526,7 @@ class Cron extends MX_Controller {
 			$this->control->set_driver($control_protocol);
 			
 			try {
-				$this->control->connect($ds['control_ip'], $ds['os']['control_port']);
+				$this->control->connect($ds['control_ip'], $ds['control_port']);
 				$this->control->auth($ds['control_login'], $ds['control_password']);
 				
 				$stats_string['cpu_load'] 		= $this->control->command('wmic cpu get LoadPercentage');
