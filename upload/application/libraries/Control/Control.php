@@ -327,8 +327,13 @@ class Control extends CI_Driver_Library {
 		
 		$i = 0;
 		$count = count($this->_sended_commands);
+		reset($this->_sended_commands);
 		while($i < $count) {
-			$results[] = $this->_sended_commands[$i] . PHP_EOL . $this->_commands_result[$i];
+			if (isset($this->_commands_result[$i])) {
+				$command_result =& $this->_commands_result[$i];
+			}
+			
+			$results[] = $this->_sended_commands[$i] . PHP_EOL . $command_result;
 			$i ++;
 		}
 
