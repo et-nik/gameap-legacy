@@ -191,6 +191,11 @@ class Log_view extends CI_Controller {
 		// Получаем содержимое лога
 		$where = array('id' => $id);
 		$log_list = $this->panel_log->get_log($where, 1);
+		
+		if (empty($log_list)) {
+			$this->_show_message(lang('log_view_record_not_found'));
+			return false;
+		}
 
 		/* Если пользователь не админ, то делаем проверочки на права доступа к логам */
 		if (!$this->users->auth_data['is_admin']) {
