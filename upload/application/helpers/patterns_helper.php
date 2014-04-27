@@ -113,7 +113,7 @@ if ( ! function_exists('change_value_on_xml_file')) {
 if ( ! function_exists('change_value_on_file')) {
 	function change_value_on_file($file_contents, $variable_name, $variable_value) 
 	{
-		if (@simplexml_load_string($file_contents)) {
+		if (function_exists('simplexml_load_string') && @simplexml_load_string($file_contents)) {
 			// XML файл
 			return change_value_on_xml_file($file_contents, $variable_name, $variable_value);
 		}
