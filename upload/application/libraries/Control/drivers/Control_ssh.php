@@ -109,7 +109,7 @@ class Control_ssh extends CI_Driver {
 					
 					$values_exp = explode(" ", $values);
 					// Удаление пустых значений
-					$values_exp = array_diff($values_exp, array(null));
+					$values_exp = array_values(array_diff($values_exp, array(null)));
 					
 					if ($values_exp[8] != $file_name) {
 						continue;
