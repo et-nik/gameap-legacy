@@ -54,7 +54,7 @@ $lang['server_control_add_task'] 						= 'Добавить задание';
 $lang['server_control_rcon_command'] 					= 'RCON команда';
 $lang['server_control_password_to_server'] 				= 'Пароль на сервер';
 $lang['server_control_set_password'] 					= 'Установить пароль';
-$lang['server_control_leave_blank_that_unset'] 			= 'Оставте пустым, чтобы снять пароль.';
+$lang['server_control_leave_blank_that_unset'] 			= 'Оставьте пустым, чтобы снять пароль.';
 
 $lang['server_control_add_task'] 						= 'Добавить задание';
 $lang['server_control_edit_task'] 						= 'Редактировать задание';
