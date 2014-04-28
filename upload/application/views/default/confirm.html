@@ -1,4 +1,12 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
-<p class="hr">{message}</p>
-<a href="{confirmed_url}"><button class="minimal">{lang_yes}</button></a>
-<a href="javascript:history.back()"><button class="minimal">{lang_no}</button></a>
+<p align="center" class="hr">{message}</p>
+<form id="fconfirm" action="{confirmed_url}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+	<?php if(isset($this->_ci_cached_vars['extra_checkbox'])): ?>
+	<label>{extra_checkbox}&nbsp;{extra_text}</label>
+	<?php endif; ?>
+	<p align="center">
+		<a href="{confirmed_url}"><button form="fconfirm" class="minimal">{lang_yes}</button></a>
+		<a href="javascript:history.back()"><button class="minimal">{lang_no}</button></a>
+	</p>
+</form>
