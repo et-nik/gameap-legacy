@@ -59,6 +59,8 @@ class Server_control extends CI_Controller {
 			$this->load->model('servers');
 			$this->lang->load('server_control');
 			$this->lang->load('server_command');
+			$this->lang->load('server_files');
+			$this->lang->load('servers_log');
 			
 			//Base Template
 			$this->tpl_data['title'] 	= lang('server_control_title');
@@ -268,7 +270,7 @@ class Server_control extends CI_Controller {
 			
 		} else {
 			// Ошибка соединения с сервером
-			$this->tpl_data['content'] .= lang('server_control_server_down');
+			//~ $this->tpl_data['content'] .= lang('server_control_server_down');
 		}
 		
 		/* Получение последних действий с сервером
