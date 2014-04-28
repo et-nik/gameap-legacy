@@ -23,11 +23,16 @@ class Rcon_minecraft extends CI_Driver {
 	*/
 	function get_players()
 	{
+		$rplayers = array();
+		$players = array();
+		
 		$result = $this->command('list');
 		$result = explode("\n", $result);
-		$players = explode(",", $result[1]);
-		$rplayers = array();
-
+		
+		if (isset($result[1])) {
+			$players = explode(",", $result[1]);
+		}
+		
 		foreach($players as $str) {
 			if ($str == '') {
 				continue;

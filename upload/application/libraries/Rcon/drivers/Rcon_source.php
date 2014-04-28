@@ -73,6 +73,10 @@ class Rcon_source extends CI_Driver {
 
 	function _write($cmd, $s1='', $s2='') 
 	{
+		if (!is_resource($this->fp)) {
+			return 0;
+		}
+		
 		// Get and increment the packet id
 		$id = ++$this->_id;
 
@@ -83,7 +87,7 @@ class Rcon_source extends CI_Driver {
 		$data = pack("V",strlen($data)).$data;
 
 		// Send packet
-		fwrite($this->fp,$data,strlen($data));
+		fwrite($this->fp, $data,strlen($data));
 
 		// In case we want it later we'll return the packet id
 		return $id;
