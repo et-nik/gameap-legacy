@@ -956,23 +956,25 @@ class Adm_servers extends CI_Controller {
 							return false;
 						}
 						
-						/* Удаление директории на выделенном сервере */
-						switch(strtolower($this->servers->server_data['os'])) {
-							case 'windows':
-								$command = 'rmdir /S ' . $this->servers->server_data['dir'];
-								break;
-							default:
-								// Linux
-								$command = 'rm -rf ' . $this->servers->server_data['dir'];
-								break;
+						if ($this->input->post('delete_files')) {
+							/* Удаление директории на выделенном сервере */
+							switch(strtolower($this->servers->server_data['os'])) {
+								case 'windows':
+									$command = 'rmdir /S ' . $this->servers->server_data['dir'];
+									break;
+								default:
+									// Linux
+									$command = 'rm -rf ' . $this->servers->server_data['dir'];
+									break;
+							}
+							
+							try {
+								$result = send_command($command, $this->servers->server_data);
+							} catch (Exception $e) {
+								// Директория не удалена
+							}
 						}
-						
-						try {
-							$result = send_command($command, $this->servers->server_data);
-						} catch (Exception $e) {
-							// Директория не удалена
-						}
-						
+
 						if ($this->servers->delete_game_server($id)) {
 							$local_tpl_data['message'] = lang('adm_servers_delete_server_successful');
 						} else {
@@ -1062,6 +1064,8 @@ class Adm_servers extends CI_Controller {
 						$confirm_tpl['confirmed_url'] = site_url('adm_servers/delete/dedicated_servers/'. $id . '/' . $this->security->get_csrf_hash());
 						break;
 					case 'game_servers':
+						$confirm_tpl['extra_checkbox'] = form_checkbox('delete_files', 'accept', true, 'id="extra"');
+						$confirm_tpl['extra_text']		= lang('adm_servers_delete_files');
 						$confirm_tpl['message'] = lang('adm_servers_delete_gs_confirm');
 						$confirm_tpl['confirmed_url'] = site_url('adm_servers/delete/game_servers/'. $id . '/' . $this->security->get_csrf_hash());
 						break;
