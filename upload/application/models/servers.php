@@ -884,9 +884,8 @@ class Servers extends CI_Model {
 	 */
 	function get_servers_count($where = array())
 	{
-		
 		$this->db->where($where);
-		return $this->db->count_all('servers');
+		return $this->db->count_all_results('servers');
 	}
 	
 	// ----------------------------------------------------------------
