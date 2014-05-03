@@ -28,7 +28,7 @@ class Servers_files extends CI_Controller {
         $this->lang->load('server_files');
         $this->lang->load('server_command');
 
-        if($this->users->check_user()){
+        if ($this->users->check_user()) {
 			//Base Template
 			$this->tpl_data['title'] 		= lang('server_files_title_index');
 			$this->tpl_data['heading']		= lang('server_files_header_index');
@@ -36,7 +36,7 @@ class Servers_files extends CI_Controller {
 			$this->tpl_data['menu'] 		= $this->parser->parse('menu.html', $this->tpl_data, true);
 			$this->tpl_data['profile'] 		= $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
         
-        }else{
+        } else {
             redirect('auth');
         }
     }
@@ -445,7 +445,7 @@ class Servers_files extends CI_Controller {
 			return false;
 		}
 		
-		$tmp_dir = sys_get_temp_dir();
+		$tmp_dir = $this->files->_get_tmp_dir();
 		$remdir = $this->_get_path($this->servers->server_data) . $s_content_dirs[$dir_id]['path'] . '/';
 
 		$upload_config['upload_path'] 	= $tmp_dir;
