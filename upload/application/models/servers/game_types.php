@@ -119,12 +119,13 @@ class Game_types extends CI_Model {
 				$tpl_data[$num]['remote_repository']	= $game_types['remote_repository'];
 				
 				// Заменяем двойные кавычки на html символы
-				$tpl_data[$num]['script_start'] 	= str_replace('"', '&quot;', $game_types['script_start'] );
-				$tpl_data[$num]['script_stop'] 		= str_replace('"', '&quot;', $game_types['script_stop'] );
-				$tpl_data[$num]['script_restart'] 	= str_replace('"', '&quot;', $game_types['script_restart'] );
-				$tpl_data[$num]['script_status'] 	= str_replace('"', '&quot;', $game_types['script_status'] );
-				$tpl_data[$num]['script_update'] 	= str_replace('"', '&quot;', $game_types['script_update'] );
+				$tpl_data[$num]['script_start'] 		= str_replace('"', '&quot;', $game_types['script_start'] );
+				$tpl_data[$num]['script_stop'] 			= str_replace('"', '&quot;', $game_types['script_stop'] );
+				$tpl_data[$num]['script_restart'] 		= str_replace('"', '&quot;', $game_types['script_restart'] );
+				$tpl_data[$num]['script_status'] 		= str_replace('"', '&quot;', $game_types['script_status'] );
+				$tpl_data[$num]['script_update'] 		= str_replace('"', '&quot;', $game_types['script_update'] );
 				$tpl_data[$num]['script_get_console'] 	= str_replace('"', '&quot;', $game_types['script_get_console'] );
+				$tpl_data[$num]['script_send_command'] 	= str_replace('"', '&quot;', $game_types['script_send_command'] );
 				
 				$tpl_data[$num]['kick_cmd'] 		= str_replace('"', '&quot;', $game_types['kick_cmd'] );
 				$tpl_data[$num]['ban_cmd'] 			= str_replace('"', '&quot;', $game_types['ban_cmd'] );

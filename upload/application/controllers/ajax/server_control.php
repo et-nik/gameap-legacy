@@ -282,24 +282,48 @@ class Server_control extends CI_Controller {
 			return false;
 		}
 		
-		if(!$this->_check_rcon_command($rcon_command)) {
-			show_404();
-		}
-		
-		$this->load->driver('rcon');
-						
-		$this->rcon->set_variables(
-						$this->servers->server_data['server_ip'],
-						$this->servers->server_data['rcon_port'],
-						$this->servers->server_data['rcon'], 
-						$this->servers->servers->server_data['engine'],
-						$this->servers->servers->server_data['engine_version']
-		);
-		
-		if($this->rcon->connect()) {
-			$this->rcon->command($rcon_command);
+		if (strtolower($this->servers->server_data['os']) == 'windows') {
+			// Для Windows отправка через RCON
+
+			if(!$this->_check_rcon_command($rcon_command)) {
+				show_404();
+			}
+			
+			$this->load->driver('rcon');
+							
+			$this->rcon->set_variables(
+							$this->servers->server_data['server_ip'],
+							$this->servers->server_data['rcon_port'],
+							$this->servers->server_data['rcon'], 
+							$this->servers->servers->server_data['engine'],
+							$this->servers->servers->server_data['engine_version']
+			);
+			
+			if($this->rcon->connect()) {
+				$this->rcon->command($rcon_command);
+			} else {
+				$this->output->append_output('Rcon connect error');
+			}
 		} else {
-			$this->output->append_output('Rcon connect error');
+			// Для Linux отправка прямиков в Screen
+			
+			$this->load->helper('ds');
+			
+			$command = $this->servers->server_data['script_send_command'];
+			
+			/* На некоторых серверах могут использоваться двойные кавычки*/
+			//~ $command = str_replace('"', "'", $command);
+
+			$command = str_replace('{command}', $rcon_command, $command);
+			$send_command = replace_shotcodes($command, $this->servers->server_data);
+			
+			try {
+				send_command($send_command, $this->servers->server_data);
+			} catch (Exception $e) {
+				$this->output->append_output($e->getMessage());
+				return false;
+			}
+
 		}
 	}
 	

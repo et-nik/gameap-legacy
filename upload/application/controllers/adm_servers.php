@@ -1593,6 +1593,7 @@ class Adm_servers extends CI_Controller {
 				$this->form_validation->set_rules('script_status', lang('adm_servers_command_status'), 'trim|max_length[256]|xss_clean');
 				$this->form_validation->set_rules('script_update', lang('adm_servers_command_update'), 'trim|max_length[256]|xss_clean');
 				$this->form_validation->set_rules('script_get_console', lang('adm_servers_command_get_console'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('script_send_command', lang('adm_servers_send_command'), 'trim|max_length[256]|xss_clean');
 				
 				/* Сведения о cfg файлах */
 				$this->form_validation->set_rules('cfg_desc[]', 'описание конф. файла', 'trim|max_length[64]|xss_clean');
@@ -1873,12 +1874,13 @@ class Adm_servers extends CI_Controller {
 					$sql_data['execfile_linux'] 	= $this->input->post('execfile_linux');
 					$sql_data['execfile_windows'] 	= $this->input->post('execfile_windows');
 					
-					$sql_data['script_start'] 		= $this->input->post('script_start');
-					$sql_data['script_stop'] 		= $this->input->post('script_stop');
-					$sql_data['script_restart'] 	= $this->input->post('script_restart');
-					$sql_data['script_status'] 		= $this->input->post('script_status');
-					$sql_data['script_update'] 		= $this->input->post('script_update');
-					$sql_data['script_get_console'] = $this->input->post('script_get_console');
+					$sql_data['script_start'] 			= $this->input->post('script_start');
+					$sql_data['script_stop'] 			= $this->input->post('script_stop');
+					$sql_data['script_restart'] 		= $this->input->post('script_restart');
+					$sql_data['script_status'] 			= $this->input->post('script_status');
+					$sql_data['script_update'] 			= $this->input->post('script_update');
+					$sql_data['script_get_console'] 	= $this->input->post('script_get_console');
+					$sql_data['script_send_command'] 	= $this->input->post('script_send_command');
 					
 					$sql_data['kick_cmd'] 			= $this->input->post('kick_cmd');
 					$sql_data['ban_cmd'] 			= $this->input->post('ban_cmd');

@@ -12,7 +12,7 @@
 # 
 # Параметры запуска
 #
-# @command - команда (start|stop|restart|status|get_console)
+# @command - команда (start|stop|restart|status|get_console|send_command)
 # @dir - директория относительно скрипта
 # @name - имя для screen
 # @serverip - ip сервера
@@ -22,6 +22,7 @@
 #
 # Example:
 # ./server.sh start /home/hl_server screen_hldm 127.0.0.1 27015 "hlds_run -game valve +ip 127.0.0.1 +port 27015 +map crossfire" user
+# ./server.sh send_command /home/hl_server screen_hldm 127.0.0.1 27015 "stats" user
 #
 #
 #
@@ -125,9 +126,17 @@ case "$1" in
 		USER=$4
 	fi
 	
-	su $USER -c "screen -S $NAME -X -p 0 hardcopy -h $DIR/console.txt && chmod 666 $DIR/console.txt"
-	RESULT=`cat $DIR/console.txt`
+	#~ su $USER -c "screen -S $NAME -X -p 0 hardcopy -h $DIR/gap_console.txt && chmod 666 $DIR/gap_console.txt"
+	su $USER -c "screen -S $NAME -X -p 0 hardcopy -h $DIR/gap_console.txt && chmod 666 $DIR/gap_console.txt"
+	RESULT=`cat $DIR/gap_console.txt`
 	echo -e "$RESULT"
+	;;
+ send_command)
+ 
+	#./server.sh send_command /home/hl_server screen_hldm 127.0.0.1 27015 "stats" user
+	su $USER "-c screen -p 0 -S $NAME -X stuff '$COMMAND
+	'"
+	
 	;;
  *)
     echo "Usage all parameters"

@@ -691,12 +691,13 @@ class Servers extends CI_Model {
 				}
 			}
 			
-			$this->server_data['script_start'] 		= $execfile . ' ' . $this->game_types->game_types_list['0']['script_start'];
-			$this->server_data['script_stop'] 		= $execfile . ' ' . $this->game_types->game_types_list['0']['script_stop'];
-			$this->server_data['script_restart'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_restart'];
-			$this->server_data['script_status'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_status'];
-			$this->server_data['script_update'] 	= $execfile_upd . ' ' . $this->game_types->game_types_list['0']['script_update'];
-			$this->server_data['script_get_console'] = $execfile . ' ' . $this->game_types->game_types_list['0']['script_get_console'];
+			$this->server_data['script_start'] 			= $execfile . ' ' . $this->game_types->game_types_list['0']['script_start'];
+			$this->server_data['script_stop'] 			= $execfile . ' ' . $this->game_types->game_types_list['0']['script_stop'];
+			$this->server_data['script_restart'] 		= $execfile . ' ' . $this->game_types->game_types_list['0']['script_restart'];
+			$this->server_data['script_status'] 		= $execfile . ' ' . $this->game_types->game_types_list['0']['script_status'];
+			$this->server_data['script_update'] 		= $execfile_upd . ' ' . $this->game_types->game_types_list['0']['script_update'];
+			$this->server_data['script_get_console'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_get_console'];
+			$this->server_data['script_send_command'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_send_command'];
 			
 			$this->server_data['kick_cmd'] 		= $this->game_types->game_types_list['0']['kick_cmd'];
 			$this->server_data['ban_cmd'] 		= $this->game_types->game_types_list['0']['ban_cmd'];
