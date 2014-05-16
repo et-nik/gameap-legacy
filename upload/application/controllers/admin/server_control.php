@@ -190,6 +190,10 @@ class Server_control extends CI_Controller {
 			
 			$password_status = 	$base_cvars['password'] ? lang('set') : lang('no_set');				
 			$tpl_data[] = array('cvar_name' => lang('password'), 'cvar_value' => $password_status);
+			
+			if (isset($base_cvars['joinlink']) && $base_cvars['joinlink']) {
+				$tpl_data[] = array('cvar_name' => lang('cvarname_joinlink'), 'cvar_value' => anchor($base_cvars['joinlink']));
+			}
 		}
 		
 		return $tpl_data;
@@ -265,8 +269,6 @@ class Server_control extends CI_Controller {
 			$local_tpl_data['maps_list']	= $this->_get_maps_list();
 			$local_tpl_data['frcon_list'] 	= $this->_get_frcon_list();
 			$local_tpl_data['base_cvars'] 	= $this->_get_base_cvars();
-			
-			
 			
 		} else {
 			// Ошибка соединения с сервером

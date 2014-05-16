@@ -70,3 +70,6 @@ $lang['server_control_command_not_set'] 				= 'Команда не задана'
 $lang['cvarname_hostname']								= 'Имя сервера';
 $lang['cvarname_map']									= 'Текущая карта';
 $lang['cvarname_players']								= 'Игроки';
+
+/* -- 0.9.3 -- */
+$lang['cvarname_joinlink']								= 'Подключиться к серверу';
