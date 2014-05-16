@@ -4,7 +4,6 @@ class Dedicated_servers extends CI_Model {
 	
 	var $ds_list = array();				// Список удаленных серверов
 	
-	//~ var $commands; 							// Команды, которые отправлялись на сервер
     var $errors; 							// Строка с ошибкой (если имеются)
     
     private $_commands = array();
@@ -234,9 +233,9 @@ class Dedicated_servers extends CI_Model {
 					default:
 						$this->ds_list[$i]['local_server'] 	= true;
 						
-						$this->ds_list[$i]['script_path'] = $this->config->config['local_script_path'] OR 
-							$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
-							
+						$this->ds_list[$i]['script_path'] = $this->config->config['local_script_path']
+							OR $this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
+
 						break;
 				}
 

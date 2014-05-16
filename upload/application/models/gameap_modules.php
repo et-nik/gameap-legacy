@@ -33,7 +33,7 @@ class Gameap_modules extends CI_Model {
     {
         // Call the Model constructor
         parent::__construct();
-        
+
         /* 
          * Получение списка модулей 
          * 
@@ -48,6 +48,7 @@ class Gameap_modules extends CI_Model {
 			}
 			
 			$this->get_modules_data();
+			//~ $this->get_modules_list();
 		}
     }
     
@@ -145,7 +146,7 @@ class Gameap_modules extends CI_Model {
 		
 		$i = 0;
 		foreach ($this->modules_data as $module) {
-			
+
 			if ($for_menu) {
 				if ($module['show_in_menu']) {
 					$this->modules_list[$i] = str_replace(' ', '_', strtolower($module['short_name']));	

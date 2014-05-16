@@ -37,7 +37,6 @@ if (!function_exists('module_exists')) {
 	function module_exists($module)
 	{
 		$CI =& get_instance();
-		
 		$CI->gameap_modules->get_modules_list();
 		
 		if (in_array($module, $CI->gameap_modules->modules_list)) {
