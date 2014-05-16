@@ -59,6 +59,18 @@ class Migration_Version090 extends CI_Migration {
 		
 		$this->db->where('ds_id', 0);
 		$this->db->update('servers', $new_servers_data);
+		
+		// Пользовательские фильтры
+		
+		if (!$this->db->field_exists('filters', 'users')) {
+			$fields = array(
+							'filters' => array(
+													 'type' => 'TINYTEXT',
+											  ),	
+			);
+
+			$this->dbforge->add_column('users', $fields, 'modules_data');
+		}
 
 	}
 	
