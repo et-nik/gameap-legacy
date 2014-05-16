@@ -166,3 +166,6 @@ $lang['no_set']									= 'Не задан';
 $lang['contents']								= 'Содержимое';
 $lang['filter']									= 'Фильтр';
 $lang['reset']									= 'Сброс';
+
+/* -- 0.9.3 -- */
+$lang['administration']							= 'Администрирование';
