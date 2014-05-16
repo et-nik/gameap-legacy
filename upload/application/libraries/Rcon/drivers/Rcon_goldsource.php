@@ -121,6 +121,8 @@ class Rcon_goldsource extends CI_Driver {
 			$return = array();
 			
 			// # 7 "seeking chiters" 818 HLTV hltv:0/128 delay:0 1:17:53 178.124.124.119:44892
+			// #21 "bitl" 611 STEAM_0:0:10982749 -1 23:16 77 0 31.23.107.68:27005;
+			// # 2 "-=MaZaHaKa=-" 609 STEAM_0:0:850042824 0 23:18 113 0 92.115.87.48:23083
 			$pattern = '!#\s*\d*\s*\"(.*?)\"\s*(\d*)\s*([a-zA-Z0-9\_\:]*)\s*(hltv\:0\/128 delay\:0|[a-z\-\:0-9]*)\s*([0-9\:]*)\s*(\s*|\d*)\s*(\s*|\d*)\s*([0-9\.]*):(\d*)!si';
 			$matches = get_matches($pattern, $result);
 			
