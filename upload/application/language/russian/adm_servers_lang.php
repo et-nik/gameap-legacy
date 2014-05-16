@@ -216,3 +216,4 @@ $lang['adm_servers_empty_ds_list']					= 'Необходимо добавить 
 
 // 0.9.3
 $lang['adm_servers_delete_files']					= 'Удалить файлы сервера.';
+$lang['adm_servers_send_command']					= 'Команда отправки в консоль сервера';
