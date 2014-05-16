@@ -205,7 +205,7 @@ class Adminpanel extends CI_Controller {
 				if(version_compare(AP_VERSION, $available_version) == -1) {
 					$this->tpl_data['content'] .= '<p align="center"><font color="red">' . lang('ap_you_version_old') . '</font></p>';
 					//~ $this->tpl_data['content'] .= '<p align="center"><a class="small awesome" href="#">' . lang('ap_autoupdate') . '</a></p>';
-					$this->tpl_data['content'] .= '<p align="center"><a class="small awesome" href="#">Manual Update</a></p>';
+					$this->tpl_data['content'] .= '<p align="center"><a class="small awesome" href="' . base_url('/adminpanel/update/manual') . '">Manual Update</a></p>';
 				} elseif(version_compare(AP_VERSION, $available_version) == 0) {
 					$this->tpl_data['content'] .= '<p align="center"><font color="green">' . lang('ap_you_version_actual') . '</font></p>';
 					//~ $this->tpl_data['content'] .= '<p align="center"><a class="small awesome" href="' . base_url('/adminpanel/update/back') . '">Откат к предыдущей версии</a></p>';
