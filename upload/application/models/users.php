@@ -215,7 +215,6 @@ class Users extends CI_Model {
             $this->auth_data 	= $user_data;
             $this->auth_data['balance'] = (int)$this->encrypt->decode($user_data['balance']);
             
-            
             return $this->auth_id;
         } else {
             return false;
@@ -272,11 +271,7 @@ class Users extends CI_Model {
     */
     function add_user($user_data)
     {
-        if($this->db->insert('users', $user_data)){
-			return true;
-		}else{
-			return false;
-		}
+        return (bool)$this->db->insert('users', $user_data);
     }
     
     // ----------------------------------------------------------------
@@ -286,11 +281,7 @@ class Users extends CI_Model {
     */
     public function delete_user($id)
     {
-		if($this->db->delete('users', array('id' => $id))){
-			return true;
-		}else{
-			return false;
-		}
+		return (bool)$this->db->delete('users', array('id' => $id));
 	}
     
     // ----------------------------------------------------------------
@@ -649,7 +640,7 @@ class Users extends CI_Model {
      * 
      * @return bool
     */  
-    function user_live($string, $type = 'id'){
+    function user_live($string, $type = 'id') {
 		
 		$type = strtolower($type);
         
