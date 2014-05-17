@@ -1,6 +1,54 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
 <?php if($this->users->auth_privileges['usr_create']): ?>
 <a class="awesome" href="{site_url}admin/users_control/add">{lang_users_add_user}</a>
+
+<a class="awesome" onclick="anichange('#filter'); return false" href="#">{lang_filter}</a>
+<script>
+function anichange (objName) {
+  if ( $(objName).css('display') == 'none' ) {
+    $(objName).animate({height: 'show'}, 400);
+  } else {
+    $(objName).animate({height: 'hide'}, 200);
+  }
+}
+</script>
+
+<div id="filter" style="display: none">
+	<br />
+	<form action="{site_url}admin/settings/set_filter/users_list" method="post" accept-charset="utf-8">
+		<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+		
+		<table class="zebra" width="100%">
+			<tr>
+				<td width="30%">{lang_login}:</td>
+				<td><input type="text" name="filter_login" value="{filter_login}"/></td>
+			</tr>
+			
+			<tr>
+				<td width="30%">{lang_profile_registered}:</td>
+				<td>
+					<input type="text" name="filter_register_before" value="{filter_register_before}"/>&nbsp;-&nbsp;
+					<input type="text" name="filter_register_after" value="{filter_register_after}"/>
+				</td>
+			</tr>
+			
+			<tr>
+				<td width="30%">{lang_profile_last_visit}:</td>
+				<td>
+					<input type="text" name="filter_last_visit_before" value="{filter_last_visit_before}"/>&nbsp;-&nbsp;
+					<input type="text" name="filter_last_visit_after" value="{filter_last_visit_after}"/>
+				</td>
+			</tr>
+
+
+		</table>
+			<p align="center">
+				<input class="button" type="submit" name="submit_filter" value="{lang_apply}" />
+				<input class="button" type="submit" name="reset" value="{lang_reset}" />
+			</p>
+	</form>
+</div>
+
 <br /><br />
 <?php endif; ?>
 {pagination}
@@ -18,7 +66,7 @@
 		<td>{login}</td>
 		<td>{user_reg_date}</td>
 		<td>{user_last_auth}</td>
-		<td>
+		<td align="center">
 			<a class="small awesome" href="{site_url}admin/users_control/base_privileges/{id}">{lang_users_base_privileges}</a>
 			<a class="small awesome" href="{site_url}admin/users_control/servers_privileges/{id}">{lang_users_servers_privileges}</a>
 			<a class="yellow small awesome" href="{site_url}admin/users_control/edit/{id}">{lang_edit}</a>

@@ -32,6 +32,17 @@ class Users extends CI_Model {
     var $servers_privileges 	= array();	// Привилегии на отдельные серверы
     var $user_data 				= array();	// Данные пользователя
     
+    /* Фильтр списка пользователей */
+    private $_filter_users_list	= array(
+									'login' 			=> false,
+									
+									'register_before' 	=> false,
+									'register_after' 	=> false,
+									
+									'last_visit_before' => false,
+									'last_visit_after' 	=> false,
+								);
+	
     /* Списки и пользователи которые получает авторизованный пользователь */
     var $users_list = array();				// Список пользователей
     
@@ -577,7 +588,8 @@ class Users extends CI_Model {
         if(empty($this->users_list)){
 			$this->get_users_list(false, $limit, $offset);
 		}
-
+		
+		$list = array();
         $num = -1;
         foreach ($this->users_list as $users){
             $num++;
@@ -614,6 +626,14 @@ class Users extends CI_Model {
 		if($where) {
 			$this->db->where($where);
 		}
+		
+		!$this->_filter_users_list['login'] OR $this->db->like('login', $this->_filter_users_list['login']);
+		
+		!$this->_filter_users_list['register_before'] 	OR $this->db->where('reg_date >', $this->_filter_users_list['register_before']);
+		!$this->_filter_users_list['register_after'] 	OR $this->db->where('reg_date <', $this->_filter_users_list['register_after']);
+		
+		!$this->_filter_users_list['last_visit_before'] OR $this->db->where('last_auth >', $this->_filter_users_list['last_visit_before']);
+		!$this->_filter_users_list['last_visit_after'] 	OR $this->db->where('last_auth <', $this->_filter_users_list['last_visit_after']);
 		
 		$query = $this->db->get('users', $limit, $offset);
 
@@ -724,6 +744,24 @@ class Users extends CI_Model {
 		$user_data = $this->get_user_data($user_id, false, true);
 		return $user_data['recovery_code'];
     }
+    
+    //-----------------------------------------------------------
+	
+	/**
+     * Задает фильтры для получения пользоватей с определенными данными
+    */
+	function set_filter($filter)
+	{
+		if (is_array($filter)) {
+			!isset($filter['login']) OR $this->_filter_users_list['login'] = $filter['login'];
+			
+			!isset($filter['register_before']) OR $this->_filter_users_list['register_before'] = $filter['register_before'];
+			!isset($filter['register_after']) OR $this->_filter_users_list['register_after'] = $filter['register_after'];
+			
+			!isset($filter['last_visit_before']) OR $this->_filter_users_list['last_visit_before'] = $filter['last_visit_before'];
+			!isset($filter['last_visit_after']) OR $this->_filter_users_list['last_visit_after'] = $filter['last_visit_after'];
+		}
+	}
     
     // ----------------------------------------------------------------
     

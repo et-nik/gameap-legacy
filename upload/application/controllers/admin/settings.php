@@ -230,11 +230,21 @@ class Settings extends CI_Controller {
 				$this->form_validation->set_rules('filter_game', lang('game'), 'trim|xss_clean');
 				break;
 			
-			case 'panel_log';
+			case 'panel_log':
 				$this->form_validation->set_rules('filter_type', lang('action'), 'trim|xss_clean');
 				$this->form_validation->set_rules('filter_command', lang('command'), 'trim|xss_clean');
 				$this->form_validation->set_rules('filter_user', lang('user'), 'trim|xss_clean');
 				$this->form_validation->set_rules('filter_contents', lang('contents'), 'trim|xss_clean');
+				break;
+				
+			case 'users_list':
+				$this->form_validation->set_rules('filter_login', lang('login'), 'trim|xss_clean');
+				
+				$this->form_validation->set_rules('filter_register_before', lang('lang_profile_registered'), 'trim|xss_clean');
+				$this->form_validation->set_rules('filter_register_after', lang('lang_profile_registered'), 'trim|xss_clean');
+				
+				$this->form_validation->set_rules('filter_last_visit_before', lang('lang_profile_last_visit'), 'trim|xss_clean');
+				$this->form_validation->set_rules('filter_last_visit_after', lang('lang_profile_last_visit'), 'trim|xss_clean');
 				break;
 				
 			default:
@@ -260,11 +270,23 @@ class Settings extends CI_Controller {
 					$filter['game'] = $reset ? '' : $this->input->post('filter_game');
 					break;
 				
-				case 'panel_log';
+				case 'panel_log':
 					$filter['type'] 	= $reset ? '' : $this->input->post('filter_action');
 					$filter['command'] 	= $reset ? '' : $this->input->post('filter_command');
 					$filter['user_name']= $reset ? '' : $this->input->post('filter_user');
 					$filter['contents'] = $reset ? '' : $this->input->post('filter_contents');
+					break;
+					
+				case 'users_list':
+					$this->load->helper('date');
+					
+					$filter['login'] 			= $reset ? '' : $this->input->post('filter_login');
+					
+					$filter['register_before'] 	= $reset ? '' : human_to_unix($this->input->post('filter_register_before'));
+					$filter['register_after']	= $reset ? '' : human_to_unix($this->input->post('filter_register_after'));
+					
+					$filter['last_visit_before']= $reset ? '' : human_to_unix($this->input->post('filter_last_visit_before'));
+					$filter['last_visit_after'] = $reset ? '' : human_to_unix($this->input->post('filter_last_visit_after'));
 					break;
 			}
 			

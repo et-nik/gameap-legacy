@@ -6,7 +6,7 @@
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
+ * @copyright	Copyright (c) 2013-2014, Nikita Kuznetsov (http://hldm.org)
  * @license		http://www.gameap.ru/license.html
  * @link		http://www.gameap.ru
  * @filesource
@@ -44,6 +44,38 @@ class Users_control extends CI_Controller {
             redirect('auth');
         }
     }
+    
+    // -----------------------------------------------------------------
+	
+	/**
+	 * Получение данных фильтра для вставки в шаблон
+	 */
+	private function _get_tpl_filter($filter = false)
+	{
+		if (!$filter) {
+			$filter = $this->users->get_filter('users_list');
+		}
+		
+		$tpl_data['filter_login']				= isset($filter['login']) ? $filter['login'] : '';
+		
+		$tpl_data['filter_register_before']		= isset($filter['register_before']) && $filter['register_before'] 
+													? unix_to_human($filter['register_before']) 
+													: '';
+		$tpl_data['filter_register_after']		= isset($filter['register_after']) && $filter['register_after'] 	
+													? unix_to_human($filter['register_after']) 
+													: unix_to_human(now());
+		
+		$tpl_data['filter_last_visit_before'] 	= isset($filter['last_visit_before']) && $filter['last_visit_before']
+													? unix_to_human($filter['last_visit_before']) 
+													: '';
+		$tpl_data['filter_last_visit_after'] 	= isset($filter['last_visit_after']) && $filter['last_visit_after']
+													? unix_to_human($filter['last_visit_after']) 
+													: unix_to_human(now());
+		
+		return $tpl_data;
+	}
+	
+	// -----------------------------------------------------------------
     
     // Отображение информационного сообщения
     function _show_message($message = false, $link = false, $link_text = false)
@@ -87,6 +119,11 @@ class Users_control extends CI_Controller {
 		if(!$this->users->auth_privileges['usr_edit']){
 			redirect('admin');
         }
+        
+        $filter = $this->users->get_filter('users_list');
+        $this->users->set_filter($filter);
+        
+        $local_tpl_data = $this->_get_tpl_filter($filter);
         
         /* Постраничная навигация */
 		$config['base_url'] = site_url('admin/users_control/index');
