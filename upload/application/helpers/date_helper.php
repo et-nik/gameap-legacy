@@ -496,11 +496,11 @@ if ( ! function_exists('human_to_unix'))
 		$datestr = trim($datestr);
 		$datestr = preg_replace("/\040+/", ' ', $datestr);
 
-		if ( ! preg_match('/^[0-9]{1,2}\-[0-9]{1,2}\-[0-9]{2,4}\s[0-9]{1,2}:[0-9]{1,2}(?::[0-9]{1,2})?(?:\s[AP]M)?$/i', $datestr))
+		if ( ! preg_match('/^[0-9]{1,2}\-[0-9]{1,2}\-[0-9]{2,4}(\s[0-9]{1,2}:[0-9]{1,2})?(?::[0-9]{1,2})?(?:\s[AP]M)?$/i', $datestr))
 		{
 			return FALSE;
 		}
-
+		
 		$split = explode(' ', $datestr);
 
 		$ex = explode("-", $split['0']);
@@ -509,10 +509,16 @@ if ( ! function_exists('human_to_unix'))
 		$month = (strlen($ex['1']) == 1) ? '0'.$ex['1']  : $ex['1'];
 		$year  = (strlen($ex['2']) == 2) ? '20'.$ex['2'] : $ex['2'];
 		
-		$ex = explode(":", $split['1']);
+		if (isset($split['1'])) {
+			$ex = explode(":", $split['1']);
 
-		$hour = (strlen($ex['0']) == 1) ? '0'.$ex['0'] : $ex['0'];
-		$min  = (strlen($ex['1']) == 1) ? '0'.$ex['1'] : $ex['1'];
+			$hour = (strlen($ex['0']) == 1) ? '0'.$ex['0'] : $ex['0'];
+			$min  = (strlen($ex['1']) == 1) ? '0'.$ex['1'] : $ex['1'];
+		} else {
+			$ex = array('00', '00', '00');
+			$hour 	= '00';
+			$min 	= '00';
+		}
 
 		if (isset($ex['2']) && preg_match('/[0-9]{1,2}/', $ex['2']))
 		{
