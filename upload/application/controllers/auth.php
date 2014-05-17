@@ -342,7 +342,7 @@ class Auth extends CI_Controller {
 			return false;
 		}
 
-        $this->form_validation->set_rules('login', 'логин', 'trim|required|is_unique[users.login]|max_length[32]|xss_clean');
+        $this->form_validation->set_rules('login', 'логин', 'trim|required|alpha_dash|is_unique[users.login]|max_length[32]|xss_clean');
 		$this->form_validation->set_rules('password', 'пароль', 'trim|required|max_length[64]|matches[passconf]|md5|xss_clean');
 		$this->form_validation->set_rules('passconf', 'подтверждение пароля', 'trim|required|max_length[64]|xss_clean');
 		$this->form_validation->set_rules('email', 'email адрес', 'trim|required|is_unique[users.email]|max_length[64]|valid_email|xss_clean');
