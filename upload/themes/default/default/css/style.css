@@ -353,7 +353,7 @@ p.footer{
 }
 
 button {
-    min-width: 110px;
+    /* min-width: 110px; */
 }
 
 /* Links */
