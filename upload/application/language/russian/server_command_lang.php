@@ -78,3 +78,6 @@ $lang['server_command_file_not_found']						= 'Файл %s не найден';
 $lang['server_command_file_not_readable']					= 'Нет прав на чтение файла %s';
 $lang['server_command_file_not_writable']					= 'Нет прав на запись файла %s';
 $lang['server_command_file_not_executable']					= 'Нет прав на выполнение файла %s';
+
+// 0.9.3
+$lang['server_command_player_not_found']					= 'Игрок не найден.';
