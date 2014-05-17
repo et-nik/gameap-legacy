@@ -4,7 +4,7 @@
 <p class="hr">{lang_servers_log_filter}</p>
 
 <form action="{site_url}admin/servers_log/list_logs/{server_id}/{id_dir}" method="post" accept-charset="utf-8">
-	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
 		<table class="zebra" width="50%">
 			<tr>
 				<td>{lang_file_name}:</td>

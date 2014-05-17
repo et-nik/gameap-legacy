@@ -12,7 +12,7 @@ function anichange (objName) {
 <div id="filter" style="display: none">
 	<br />
 	<form action="{site_url}admin/settings/set_filter/panel_log" method="post" accept-charset="utf-8">
-		<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+		<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
 		
 		<table class="zebra" width="100%">
 			<tr>

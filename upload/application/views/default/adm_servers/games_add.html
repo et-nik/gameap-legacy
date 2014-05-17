@@ -5,7 +5,7 @@
 <p>{lang_adm_servers_games_documentation}</p>
 
 <form action="{site_url}adm_servers/add/games" method="post" accept-charset="utf-8">
-	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
 
 	<table class="zebra" width="100%">
 		<tbody>

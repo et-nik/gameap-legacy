@@ -24,7 +24,7 @@
 </div>
 
 <form action="{site_url}adm_servers/edit/games/{game_code}" method="post" accept-charset="utf-8">
-	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
 	
 	<ul class="tabs">
 		<li><a href="#base_parameters">{lang_base_parameters}</a></li>

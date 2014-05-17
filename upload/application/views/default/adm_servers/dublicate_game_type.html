@@ -2,7 +2,7 @@
 <h2>{lang_adm_servers_dublicate_game_type}</h2>
 
 <form action="{site_url}adm_servers/dublicate_game_type/{gt_id}" method="post" accept-charset="utf-8">
-	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
 	<table class="zebra" width="75%">
 		<tr>
 			<td width="40%">{lang_name}:</td>

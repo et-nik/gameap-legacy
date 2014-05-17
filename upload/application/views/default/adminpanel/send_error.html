@@ -2,7 +2,7 @@
 <h2>{lang_ap_heading_report_error}</h2>
 
 <form action="{site_url}adminpanel/send_error" method="post" accept-charset="utf-8" enctype="multipart/form-data">
-	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
 
 	<table width="100%">
 

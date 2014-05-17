@@ -1,6 +1,9 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+
+<a class="awesome" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>
+
 <form action="{site_url}admin/settings/server/{server_id}" method="post" accept-charset="utf-8">
-	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
 	
 <table width="75%" class="zebra">
 	{settings}

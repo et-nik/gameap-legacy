@@ -35,7 +35,7 @@
 					data:
 					{
 						'command': command,
-						'<?php echo $this->security->get_csrf_token_name(); ?>': '<?php echo $this->security->get_csrf_hash(); ?>'
+						'{csrf_token_name}': '{csrf_hash}'
 					},
 					success: function(response) {
 						if (response == 'Server is down') {
@@ -69,5 +69,5 @@
 </script>
 
 <p align="left"><div id="console_content" class="code" style="height:250px;overflow:scroll;">{console_content}</div></p>
-<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" />
+<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
 <p><input id="command_input" type="text" style="width:75%" name="command" />&nbsp;<a onclick="send_command();return false;" class="small blue awesome">{lang_send}</a></p>
