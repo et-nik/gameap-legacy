@@ -44,7 +44,41 @@ class Server_command extends CI_Controller {
         }
     }
     
-    // -----------------------------------
+    
+	// -----------------------------------------------------------------------
+	
+	/**
+	 * Получение ника игрока по id
+	 */
+	private function _get_player($player_id)
+	{
+		$this->load->driver('rcon');
+		
+		if (!$this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['query_port'])) {
+			throw new Exception(lang('server_command_server_down'));
+		}
+		
+		$this->rcon->set_variables(
+				$this->servers->server_data['server_ip'],
+				$this->servers->server_data['rcon_port'],
+				$this->servers->server_data['rcon'], 
+				$this->servers->servers->server_data['engine'],
+				$this->servers->servers->server_data['engine_version']
+		);
+		
+		$rcon_connect = $this->rcon->connect();
+		$players_list = $this->rcon->get_players();
+		
+		foreach ($players_list as &$player) {
+			if ($player['user_id'] == $player_id) {
+				return $player;
+			}
+		}
+		
+		throw new Exception(lang('server_command_player_not_found'));
+	}
+
+	// -----------------------------------------------------------------------
     
 	// Отображение информационного сообщения
 	function _show_message($message = false, $link = false, $link_text = false)
@@ -229,7 +263,7 @@ class Server_command extends CI_Controller {
 	}
 	
 	
-	function rcon($command = false, $server_id = false, $id = false, $confirm = false)
+	function rcon($command = false, $server_id = false, $custom_id = false, $confirm = false)
 	{
 		$this->servers->get_server_data($server_id);
 		$this->users->get_server_privileges($server_id);
@@ -241,6 +275,9 @@ class Server_command extends CI_Controller {
 				
 			// Получение прав на сервер
 			$this->users->get_server_privileges($this->servers->server_data['id']);
+			
+			$local_tpl_data['server_id'] = $server_id;
+			$local_tpl_data['custom_id'] = $custom_id;
 				
 			/**
 			 * Проверки на права
@@ -272,6 +309,17 @@ class Server_command extends CI_Controller {
 					$privileges = (bool)($this->users->auth_servers_privileges['PLAYERS_CH_NAME']);
 					$isset = (bool)$this->servers->server_data['chname_cmd'];
 					
+					try {
+						$player_data = $this->_get_player($custom_id);
+					} catch (Exception $e) {
+						$this->_show_message($e->getMessage());
+						return false;
+					}
+					
+					$local_tpl_data['nickname'] 	= $player_data['user_name'];
+					$local_tpl_data['steam_id'] 	= $player_data['steam_id'];
+					$local_tpl_data['user_ip'] 		= $player_data['user_ip'];
+
 					$submit_name = 'submit_changename';
 					$template_file = 'player_changename.html';
 					break;
@@ -335,7 +383,7 @@ class Server_command extends CI_Controller {
 				if(!$no_submit_name && !$this->input->post($submit_name)) {
 						
 					if($template_file){
-						$this->tpl_data['content'] .= $this->parser->parse($template_file, $this->tpl_data, true);
+						$this->tpl_data['content'] .= $this->parser->parse($template_file, $local_tpl_data, true);
 					}
 						
 				} else {
@@ -395,8 +443,8 @@ class Server_command extends CI_Controller {
 						
 						if($confirm == $this->security->get_csrf_hash()) {
 							$form_validate = true;
-						} elseif($id == $this->security->get_csrf_hash()) {
-							/* В некоторых случаях $id можно использовать как $confirm */
+						} elseif($custom_id == $this->security->get_csrf_hash()) {
+							/* В некоторых случаях $custom_id можно использовать как $confirm */
 							$form_validate = true;
 						} else {
 							$form_validate = false;
@@ -446,12 +494,12 @@ class Server_command extends CI_Controller {
 								$fast_rcon = json_decode($this->servers->server_data['fast_rcon'], true);
 									
 								// Существует ли команда
-								if(!$fast_rcon OR !array_key_exists($id, $fast_rcon)){
+								if(!$fast_rcon OR !array_key_exists($custom_id, $fast_rcon)){
 									$this->_show_message(lang('server_command_rcon_command_not_found'), site_url('admin/server_control/main/' . $server_id));
 									return false;
 								}
 									
-								$rcon_command = $fast_rcon[$id]['rcon_command'];
+								$rcon_command = $fast_rcon[$custom_id]['rcon_command'];
 									
 								break;
 								
@@ -484,7 +532,7 @@ class Server_command extends CI_Controller {
 						$rcon_connect = $this->rcon->connect();
 							
 						if(@$rcon_connect) {
-							$player_id = $id;
+							$player_id = $custom_id;
 								
 							switch($command){
 								case 'pl_ban':
