@@ -32,15 +32,16 @@
 
 <tr>
 	<td>{lang_server_control_execution_date}:</td>
-	<td><input id="datepicker" type="text" name="date_perform" value="{date_perform}" /><br />{lang_server_control_execution_date_desc}</td>
+	<td><input id="datetimepicker1" type="text" name="date_perform" value="{date_perform}" /><br />{lang_server_control_execution_date_desc}</td>
 </tr>
- <script>
-	 $.datepicker.formatDate( "yy-mm-dd", new Date( 2007, 1 - 1, 26 ) );
-  $(function() {
-	$.datepicker.formatDate( "yy-mm-dd", new Date( 2007, 1 - 1, 26 ) );
-	$( "#datepicker" ).datepicker();
-  });
-  </script>
+
+<script>
+	jQuery('#datetimepicker1').datetimepicker({
+	  format:'d-m-Y H:i',
+	  lang:'{language}',
+	});
+</script>
+  
 <tr>
 	<td>{lang_server_control_repeat_period}:</td>
 	<td>
