@@ -60,7 +60,7 @@ class Query {
 	
 	public function set_data($server_info)
 	{
-		if (array_key_exists($server_info['id'], $this->request_data)) {
+		if (isset($server_info['id']) && array_key_exists($server_info['id'], $this->request_data)) {
 			return;
 		}
 		
