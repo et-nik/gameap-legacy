@@ -140,7 +140,7 @@ class Auth extends CI_Controller {
 		}
 
         $this->form_validation->set_rules('user_login', 'Username', 'trim|required|max_length[32]|xss_clean');
-        $this->form_validation->set_rules('user_password', 'Password', 'trim|required|md5');
+        $this->form_validation->set_rules('user_password', 'Password', 'trim|required');
 
         /* Проверка формы */
 		if ($this->form_validation->run() == false){
@@ -343,7 +343,7 @@ class Auth extends CI_Controller {
 		}
 
         $this->form_validation->set_rules('login', 'логин', 'trim|required|alpha_dash|is_unique[users.login]|max_length[32]|xss_clean');
-		$this->form_validation->set_rules('password', 'пароль', 'trim|required|max_length[64]|matches[passconf]|md5|xss_clean');
+		$this->form_validation->set_rules('password', 'пароль', 'trim|required|max_length[64]|matches[passconf]|xss_clean');
 		$this->form_validation->set_rules('passconf', 'подтверждение пароля', 'trim|required|max_length[64]|xss_clean');
 		$this->form_validation->set_rules('email', 'email адрес', 'trim|required|is_unique[users.email]|max_length[64]|valid_email|xss_clean');
 		
@@ -402,10 +402,7 @@ class Auth extends CI_Controller {
 			 
             $user_data['login'] = $this->input->post('login');
             $user_data['password'] = $this->input->post('password');
-            $user_data['password'] = $this->password->encryption($user_data['password'], array('login' => $user_data['login'],
-                                                                                             'reg_date' => $user_data['reg_date'],
-                                                                                            )
-			);
+            $user_data['password'] = hash_password($user_data['password']);
 			
 			$user_data['privileges'] = json_encode(array(
 													'srv_global' 			=> false,
@@ -469,8 +466,7 @@ class Auth extends CI_Controller {
 				/* Генерируем новый пароль */
 				$new_password = generate_code(8);
 				
-				$user_data['password'] = $this->password->encryption(md5($new_password), array('login' => $user_list['0']['login'],
-                                                                                          'reg_date' => $user_list['0']['reg_date']));
+				$user_data['password'] = hash_password($new_password);
                 
                 /* Сохраняем пользователя */
                 $this->users->update_user($user_data, $user_list['0']['id']);

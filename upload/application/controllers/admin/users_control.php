@@ -128,7 +128,7 @@ class Users_control extends CI_Controller {
         /* Постраничная навигация */
 		$config['base_url'] = site_url('admin/users_control/index');
 		$config['uri_segment'] = 4;
-		$config['total_rows'] = $this->db->count_all_results('users');
+		$config['total_rows'] = $this->users->count_all_users();
 		$config['per_page'] = 20;
 		$config['full_tag_open'] = '<p id="pagination">';
 		$config['full_tag_close'] = '</p>';
@@ -160,7 +160,7 @@ class Users_control extends CI_Controller {
 		$this->load->model('password');
 		
 		$this->form_validation->set_rules('login', lang('login'), 'trim|required|is_unique[users.login]|max_length[32]|min_length[3]|xss_clean');
-		$this->form_validation->set_rules('password', lang('password'), 'trim|required|max_length[64]|md5');
+		$this->form_validation->set_rules('password', lang('password'), 'trim|required|max_length[64]');
 		$this->form_validation->set_rules('email', 'E-Mail', 'trim|required|is_unique[users.email]|valid_email');
 			
 		$i = -1;
@@ -202,10 +202,7 @@ class Users_control extends CI_Controller {
 			$sql_data['reg_date'] = time();
 			$sql_data['login'] = $this->input->post('login', true);
 			$sql_data['password'] = $this->input->post('password', true);
-			$sql_data['password'] = $this->password->encryption($sql_data['password'], array('login' => $sql_data['login'],
-																							 'reg_date' => $sql_data['reg_date'],
-																							)
-			);
+			$sql_data['password'] = hash_password($sql_data['password']);
 		
 			if ($this->users->add_user($sql_data)) {   
 				$this->_show_message(lang('users_usr_add_sucessful'), site_url('admin/users_control'), lang('users_back_to_users'));
@@ -397,7 +394,7 @@ class Users_control extends CI_Controller {
 				
 				$this->form_validation->set_rules('name', 'Имя', 'trim|xss_clean');
 				$this->form_validation->set_rules('email', 'E-Mail', 'trim|required|valid_email');
-				$this->form_validation->set_rules('new_password', 'Пароль', 'trim|md5');
+				$this->form_validation->set_rules('new_password', 'Пароль', 'trim');
 				
 				if (!$this->form_validation->run()){
 					
@@ -413,7 +410,7 @@ class Users_control extends CI_Controller {
 						$this->load->model('password');
 						
 						$password_encrypt = $this->input->post('new_password', true);
-						$password_encrypt = $this->password->encryption($password_encrypt, $user_data);
+						$password_encrypt = hash_password($password_encrypt);
 						$user_new_data['password'] = $password_encrypt;
 					}
 					

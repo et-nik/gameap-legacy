@@ -192,6 +192,24 @@ class Users extends CI_Model {
     // ----------------------------------------------------------------
     
     /**
+     * Подсчет пользователей в базе. Учитываются фильтры
+     */
+    function count_all_users()
+    {
+		!$this->_filter_users_list['login'] OR $this->db->like('login', $this->_filter_users_list['login']);
+		
+		!$this->_filter_users_list['register_before'] 	OR $this->db->where('reg_date >', $this->_filter_users_list['register_before']);
+		!$this->_filter_users_list['register_after'] 	OR $this->db->where('reg_date <', $this->_filter_users_list['register_after']);
+		
+		!$this->_filter_users_list['last_visit_before'] OR $this->db->where('last_auth >', $this->_filter_users_list['last_visit_before']);
+		!$this->_filter_users_list['last_visit_after'] 	OR $this->db->where('last_auth <', $this->_filter_users_list['last_visit_after']);
+		
+		return $this->db->count_all_results('users');
+	}
+    
+    // ----------------------------------------------------------------
+    
+    /**
      * Авторизация пользователя
      * Проверка логина и пароля
     */
@@ -211,15 +229,28 @@ class Users extends CI_Model {
             $this->user_data = $query->row_array();
             $user_data = $this->user_data;
             
-            $this->load->model('password');
-            $password_md5 = $this->password->encryption($user_password, $this->user_data);
-            
+            if (substr($this->user_data['password'], 0, 4) == '$2a$') {
+				// Используется blowfish
+				$old_hash = false;
+				$password_hash = hash_password($user_password, $this->user_data['password']);
+			} else {
+				/* Используется старый md5, будет удален в 1.0 версии*/
+				$old_hash = true;
+				$password_hash = hash_password_old($user_password, $this->user_data);
+			}
+
         } else {
             return false;
         }
         
         // Проверка пароля
-        if($password_md5 == $this->user_data['password']){
+        if ($password_hash == $this->user_data['password']) {
+			
+			if ($old_hash) {
+				// Обновляем хеш пароля
+				$new_hash = hash_password($user_password);
+				$this->update_user(array('password' => $new_hash), $this->user_data['id']);
+			}
             
             $this->auth_id 		= $user_data['id'];
             $this->auth_login 	= $user_data['login'];

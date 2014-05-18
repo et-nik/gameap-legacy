@@ -134,8 +134,8 @@ class Profile extends CI_Controller {
 				$this->load->model('password');
 				
 				$this->form_validation->set_rules('old_password', 'Текущий пароль', 'trim|required|md5');
-				$this->form_validation->set_rules('new_password', 'Пароль', 'trim|required|matches[new_password_confirm]|md5');
-				$this->form_validation->set_rules('new_password_confirm', 'Подтверждение пароля', 'trim|required|md5');
+				$this->form_validation->set_rules('new_password', 'Пароль', 'trim|required|matches[new_password_confirm]');
+				$this->form_validation->set_rules('new_password_confirm', 'Подтверждение пароля', 'trim|required');
 				
 				if (!$this->form_validation->run()){
 					
@@ -148,13 +148,13 @@ class Profile extends CI_Controller {
 				}else{
 					
 					$password_encrypt = $this->input->post('old_password', true);
-					$password_encrypt = $this->password->encryption($password_encrypt, $this->users->auth_data);
+					$password_encrypt = hash_password($password_encrypt);
 
 					$query = $this->db->get_where('users', array('login' => $this->users->auth_data['login'], 'password' => $password_encrypt));
 					
 					if($query->num_rows == 1){
 							$new_password = $this->input->post('new_password', true);
-							$new_password = $this->password->encryption($new_password, $this->users->auth_data);
+							$new_password = hash_password($new_password);
 							
 							$this->users->update_user(array('password' => $new_password), $this->users->auth_data['id']);
 							
