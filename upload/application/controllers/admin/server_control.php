@@ -463,7 +463,7 @@ class Server_control extends CI_Controller {
 		$this->form_validation->set_rules('time_add', 'период повтора', 'trim|required|integer|max_length[16]|xss_clean');
 		
 		$local_tpl_data['server_id'] 	= $server_id;
-		$local_tpl_data['date_perform'] = unix_to_human(time()+86400, true, 'eu');
+		$local_tpl_data['date_perform'] = unix_to_human(time()+86400, false, 'eu');
 		
 		if($this->form_validation->run() == false) {
 			
@@ -719,7 +719,7 @@ class Server_control extends CI_Controller {
 			$local_tpl_data['command'] = $task_list[0]['command'];	
 			$local_tpl_data['task_id'] = $task_list[0]['id'];
 			$local_tpl_data['name'] = $task_list[0]['name'];
-			$local_tpl_data['date_perform'] = unix_to_human($task_list[0]['date_perform'], true, 'eu');
+			$local_tpl_data['date_perform'] = unix_to_human($task_list[0]['date_perform'], false, 'eu');
 			
 			$this->tpl_data['content'] .= $this->parser->parse('servers/task_edit.html', $local_tpl_data, true);
 		} else {
