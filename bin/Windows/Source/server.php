@@ -32,6 +32,14 @@ $ip 			= $_SERVER['argv'][4];			// IP
 $port 			= $_SERVER['argv'][5];			// Порт
 $start_command 	= $_SERVER['argv'][6];			// Дополнительные параметры
 
+// Каким бы ни было значение $dir, оно будет всегда с виндовыми слешами без дублирования
+// C:/windows 					-> C:\windows
+// C:/windows/ 					-> C:\windows
+// C:\servers\\my_server//001/ 	-> C:\servers\my_server\001
+$dir = str_replace('/', '\\', $dir . '\\');
+$dir = preg_replace('/\\\\{2,}/si', '\\', $dir);
+$dir = substr($dir, 0, strlen($dir)-1);
+
 if(!$command){
 	echo "----------------------------- \n";
 	echo "Welcome to HLDS Console Launcher \n";
@@ -52,7 +60,7 @@ if(!$command){
 if(isset($start_command)) {
 	$start_command = trim($start_command);
 	$commands = explode(' ', $start_command);
-	$programm = $commands[0];
+	$program = $commands[0];
 	
 	$i = 1;
 	$count = count($commands);
@@ -73,27 +81,32 @@ function get_lowload_cpu()
 	unset($res[0]);
 	// Сносим отступ в конце вывода
 	unset($res[count($res)]);
-
-	$cpu = 1;
-	$cpu_load = 0;
 	
-	foreach ($res as $n => $load) {
-		if ($cpu_load > $load OR !$cpu_load) {
-			$cpu = $n;
-			$cpu_load = $load;
-		}
+	$cpu_load = array();
+	
+	$i = 1;
+	foreach ($res as $load) {
+		$cpu_load[$i] = $load;
+		$i ++;
 	}
+	
+	if (empty($cpu_load)) {
+		return 1;
+	}
+	
+	asort($cpu_load);
+	reset($cpu_load);
 
-	return array($cpu, $cpu_load);
+	return key($cpu_load);
 }
 
 if(file_exists('psexec.exe')) {
-	$psexec = 'psexec.exe -s -i -d '.$useCpu[0].' -w "' . $dir . '" ';
+	$psexec = 'psexec.exe -s -i -d -w "' . $dir . '" -a ' . get_lowload_cpu() . ' ';
 } elseif(file_exists('paexec.exe')) {
-	$psexec = 'paexec.exe \\\\localhost -s -d -w "' . $dir . '" ';
+	$psexec = 'paexec.exe \\\\localhost -s -d -w "' . $dir . '" -a ' . get_lowload_cpu() . ' ';
 } else {
 	echo "psexec.exe and paexec.exe not found\n";
-	$psexec = 'start /D "' . $dir . '" /I ';
+	$psexec = 'start /D "' . $dir . '" /I /affinity ' . get_lowload_cpu() . ' ';
 }
 	
 //chdir($dir);
@@ -110,26 +123,33 @@ function server_status()
 	
 	$pid = NULL;
 	
-	system("netstat -ano | findstr " . $port .">" . $dir . '\pid.txt');
-	$file = file($dir . '\pid.txt');
-
-	// TCP 10.99.1.8:27015 0.0.0.0:0 LISTENING 3496
-	// UDP 10.99.1.8:27015 : 3496
+	/* wmic process where description="rust_server.exe" get executablepath, processid
+	 * 
+	 * ExecutablePath                       ProcessId
+	 * C:\servers\rust_01\rust_server.exe   2448
+	 * C:\servers\rust_02\rust_server.exe  	2240
+	*/
 	
-	// TCP 192.168.17.2:27050 0.0.0.0:0 LISTENING 4352
-	// UDP 0.0.0.0:27050 *:* 4352
+	exec('wmic process where description="' . $program . '" get executablepath, processid', $ex_output);
+	unset($ex_output[0]);
 
-	foreach ($file as $str) {
-		$str = str_replace(' ', '', $str);
-		if(preg_match('/^UDP(\d*).(\d*).(\d*).(\d*):(\d*)\**:\**(\d*)/xsi', $str, $text)) {
-			$pid = $text['6'];
-		} 
+	foreach ($ex_output as $str) {
+		$str = preg_replace('/\s{2,}/i', ' ', $str);
+		$ex 		= explode(' ', $str);
+		$ex[0] 	= substr($ex[0], 0, strlen($ex[0])-strlen($program)-1);
+		
+		//~ echo "\n" . $dir . ' ' . $ex[0] . "\n";
+		
+		if (isset($ex[1]) && $ex[0] == $dir) {
+			$pid = $ex[1];
+			break;
+		}
 	}
 	
 	if ($pid) {
-		system("echo " . $pid .">" . $dir . '\pid.txt');
+		system("echo " . $pid .">" . $dir . '/pid.txt');
 	} else {
-		system("echo NOT FOUND>" . $dir . '\pid.txt');
+		system("echo NOT FOUND>" . $dir . '/pid.txt');
 	}
 	
 	return $pid;
@@ -142,10 +162,10 @@ function server_status()
  */
 function server_start()
 {
-	global $programm, $arguments, $dir, $ip, $port,  $start_command, $psexec;
-	pclose(popen($psexec . '"' . $dir . '\\' . $programm . '" ' . $arguments, "r" ));
+	global $program, $arguments, $dir, $ip, $port,  $start_command, $psexec;
+	pclose(popen($psexec . '"' . $dir . '\\' . $program . '" ' . $arguments, "r" ));
 	
-	//echo "\n\n\n" . $psexec . '"' . $dir . '\\' . $programm . '" ' . $arguments, "r\n\n";
+	//echo "\n\n\n" . $psexec . '"' . $dir . '\\' . $program . '" ' . $arguments, "r\n\n";
 
 	sleep(2);
 		
@@ -161,6 +181,8 @@ function server_stop() {
 	global $program, $dir, $ip, $port,  $start_command, $psexec;
 		
 	if($pid = server_status()) {
+		print_r($psexec . 'taskkill /f /pid ' . $pid);
+		echo "\n";
 		system($psexec . 'taskkill /f /pid ' . $pid);
 	} else {
 		return FALSE;
@@ -232,7 +254,7 @@ switch($command) {
 	
 		$console_file = '';
 		
-		if (file_exists($dir . '\\' . 'qconsole.log')) {
+		if (file_exists($dir . '/qconsole.log')) {
 			$console_file = 'qconsole.log';
 		} else {
 			$tokens = explode(' ', $start_command);
@@ -242,7 +264,7 @@ switch($command) {
 			
 			while($i < $count) {
 				if ($tokens[$i] == '-game') {
-					if (file_exists($dir . '\\' . $tokens[ $i+1 ] . '\\' . 'console.log')) {
+					if (file_exists($dir . '/' . $tokens[ $i+1 ] . '\\' . 'console.log')) {
 						$console_file = $tokens[ $i+1 ] . '\\' . 'console.log';
 					}
 					
@@ -260,7 +282,7 @@ switch($command) {
 			exit;
 		}
 		
-		$console_content = file_get_contents($dir . '\\' . $console_file);
+		$console_content = file_get_contents($dir . '/' . $console_file);
 		$console_content = explode("\n", $console_content);
 		
 		/* Файл может быть большим, поэтому оставляем только последние 100 строк */
