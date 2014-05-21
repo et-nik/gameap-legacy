@@ -462,7 +462,7 @@ class Server_command extends CI_Controller {
 						/* Получение данных полей */
 						switch($command) {
 							case 'pl_ban':
-								$pl_ban_reason = translit($this->input->post('reason', true));
+								$pl_ban_reason = $this->input->post('reason', true);
 								$pl_ban_time = $this->input->post('time', true) * $this->input->post('time_multiply', true);
 								break;
 								
@@ -471,15 +471,15 @@ class Server_command extends CI_Controller {
 								break;
 								
 							case 'pl_changename':
-								$pl_newname = translit($this->input->post('new_name', true));
+								$pl_newname = $this->input->post('new_name', true);
 								break;
 								
 							case 'send_msg';
-								$msg_text = translit($this->input->post('msg_text', true));
+								$msg_text = $this->input->post('msg_text', true);
 								break;
 								
 							case 'changemap';
-								$map = translit($this->input->post('map', true));
+								$map = $this->input->post('map', true);
 								break;
 								
 							case 'restart';
@@ -487,7 +487,7 @@ class Server_command extends CI_Controller {
 								break;
 								
 							case 'set_password':
-								$password = translit($this->input->post('password', true));
+								$password = $this->input->post('password', true);
 								break;
 								
 							case 'fast':
@@ -504,7 +504,7 @@ class Server_command extends CI_Controller {
 								break;
 								
 							case 'rcon_command';
-								$rcon_command = translit($this->input->post('rcon_command', true));
+								$rcon_command = $this->input->post('rcon_command', true);
 									
 								if(!$this->_check_rcon_command($rcon_command)) {
 									$this->_show_message(lang('server_command_rcon_command_access_denied'), site_url('admin/server_control/main/' . $server_id));
