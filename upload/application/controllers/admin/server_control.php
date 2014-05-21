@@ -407,7 +407,7 @@ class Server_control extends CI_Controller {
 		$local_tpl_data['server_name'] = $this->servers->server_data['name'];
 		$this->tpl_data['heading'] = lang('server_control_header') . ' "' . $this->servers->server_data['name'] . '"';
 
-		if (file_exists(APPPATH . 'views/' . $this->config->config['template'] . '/servers_control/' . $this->servers->server_data['game'] . '.html')) {
+		if (file_exists(APPPATH . 'views/' . $this->config->config['template'] . '/server_control/' . $this->servers->server_data['game'] . '.html')) {
 			$this->tpl_data['content'] .= $this->parser->parse('server_control/' . $this->servers->server_data['game'] . '.html', $local_tpl_data, true);
 		} else {
 			$this->tpl_data['content'] .= $this->parser->parse('server_control/default.html', $local_tpl_data, true);
