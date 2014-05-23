@@ -19,7 +19,7 @@ class Auth extends CI_Controller {
 	// Список запрещенных логинов при регистрации
 	private $_denied_logins = array('administrator', 'admin', 'system', 'gameap', 'root');
 	
-	// -----------------------------------------------------------------------------------------
+	// -----------------------------------------------------------------
 
 	public function __construct()
     {
@@ -41,6 +41,8 @@ class Auth extends CI_Controller {
         $this->tpl_data['title'] 	= lang('auth_title_index');
 		$this->tpl_data['heading'] 	= lang('auth_heading');
     }
+    
+    // -----------------------------------------------------------------
     
     // Отображение информационного сообщения
     function _show_message($message = false, $link = false, $link_text = false)
@@ -65,17 +67,46 @@ class Auth extends CI_Controller {
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
-    // -----------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------
 
     /**
      * Проверка капчи
     */ 
     private function _check_captcha($word)
     {
+		$this->load->library('session');
 		return (bool)($word == $this->session->flashdata('captcha'));
 	}
 	
-	// -----------------------------------------------------------------------------------------
+	// -----------------------------------------------------------------
+	
+	private function _create_captcha()
+	{
+		$this->load->library('session');
+		
+		// Слово для капчи
+		$cap['word'] = rand(1000, 9999);
+		
+		// Создаем капчу
+		$vals = array(
+			'word'	 		=> $cap['word'],
+			'img_path'	 	=> './uploads/security/',
+			'img_url'	 	=> base_url('uploads/security') . '/',
+			'font_path'	 	=> './system/fonts/U1Uabbif.ttf',
+			'img_width'	 	=> 300,
+			'img_height' 	=> 50,
+			'expiration' 	=> 7200
+			);
+
+		$captcha = create_captcha($vals);
+		$this->tpl_data['captcha'] = $captcha['image'];
+		
+		$this->session->set_flashdata('captcha', $cap['word']);
+		
+		return $captcha['image'];
+	}
+	
+	// -----------------------------------------------------------------
 
     /**
      * Главная страница
@@ -95,7 +126,7 @@ class Auth extends CI_Controller {
         }
 	}
 	
-    //-----------------------------------------------------------
+    // -----------------------------------------------------------------
 	
 	/**
      * Авторизация
@@ -116,6 +147,8 @@ class Auth extends CI_Controller {
 		
 		$this->tpl_data['heading'] 	= lang('auth_heading');
         $this->tpl_data['title'] 	= lang('auth_title_in');
+        
+        $this->tpl_data['captcha'] = '';
         
         $check = $this->users->check_user();
 			
@@ -138,6 +171,14 @@ class Auth extends CI_Controller {
 
 			exit;
 		}
+		
+		/* Капча от брутфорса*/
+		if(count($this->panel_log->get_log(array('date >' => time() - 300, 'ip' => $_SERVER['REMOTE_ADDR'], 'msg' => 'Authorization Failed'))) > 3) {
+			$captcha_login = true;
+			$this->_create_captcha();
+		} else {
+			$captcha_login = false;
+		}
 
         $this->form_validation->set_rules('user_login', 'Username', 'trim|required|max_length[32]|xss_clean');
         $this->form_validation->set_rules('user_password', 'Password', 'trim|required');
@@ -151,14 +192,22 @@ class Auth extends CI_Controller {
 			$user_data['login'] = $this->input->post('user_login', true);
 			$user_data['password'] = $this->input->post('user_password', true);
 			
+			if ($captcha_login) {
+				// Проверяем капчу
+				if (!$this->_check_captcha($this->input->post('image'))) {
+					$this->_show_message(lang('auth_captcha_enter_wrong'), site_url('auth/in'));
+					return false;
+				}
+			}
+
 			/* Защита от брутфорса по одному ip */
 			if(count($this->panel_log->get_log(array('date >' => time() - 300, 'ip' => $_SERVER['REMOTE_ADDR'], 'msg' => 'Authorization Failed'))) > 5 ) {
 				$this->_show_message(lang('auth_repeat_enter_wrong_password'));
 				return false;
 			}
-			
+
 			/* Защита от брутфорса для определенного пользователя */
-			if(count($this->panel_log->get_log(array('date >' => time() - 300, 'user_name' => $user_data['login'], 'msg' => 'Authorization Failed'))) > 5 ) {
+			if(count($this->panel_log->get_log(array('date >' => time() - 300, 'user_name' => $user_data['login'], 'msg' => 'Authorization Failed'))) > 10 ) {
 				if($this->users->user_live($user_data['login'], 'LOGIN')) {
 					$code_is_true = false;
 
@@ -325,15 +374,13 @@ class Auth extends CI_Controller {
         $this->parser->parse('main.html', $this->tpl_data);
 	}
 	
-	// -----------------------------------------------------------------------------------------
+	// -----------------------------------------------------------------
 
     /**
      * Регистрация пользователя
     */ 
 	function register()
     {
-        $this->load->library('session');
-        
         $this->tpl_data['heading'] 	= lang('auth_title_register');
         $this->tpl_data['title'] 	= lang('auth_heading_register');
         
@@ -352,25 +399,8 @@ class Auth extends CI_Controller {
         /* Проверка формы */
 		if ($this->form_validation->run() == false) {
 			
-			// Слово для капчи
-			$cap['word'] = rand(1000, 9999);
-			
-			// Создаем капчу
-			$vals = array(
-				'word'	 		=> $cap['word'],
-				'img_path'	 	=> './uploads/security/',
-				'img_url'	 	=> base_url('uploads/security') . '/',
-				'font_path'	 	=> './system/fonts/U1Uabbif.ttf',
-				'img_width'	 	=> 300,
-				'img_height' 	=> 50,
-				'expiration' 	=> 7200
-				);
+			$this->_create_captcha();
 
-			$captcha = create_captcha($vals);
-			$this->tpl_data['captcha'] = $captcha['image'];
-			
-			$this->session->set_flashdata('captcha', $cap['word']);
-			
 			//~ 
 			//~ $query = $this->db->insert('captcha', $data);
             
@@ -430,7 +460,7 @@ class Auth extends CI_Controller {
 	}
 	
 	
-	// -----------------------------------------------------------------------------------------
+	// -----------------------------------------------------------------
 
     /**
      * Восстановление пароля

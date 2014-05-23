@@ -23,10 +23,19 @@
 								<label>{lang_login}:</label>
 								<input type="text" name="user_login" value=""  />
 							</div>
+							
 							<div>
 								<label>{lang_password}:</label>
 								<input type="password" name="user_password" value=""  />
 							</div>
+							
+							<?php if($this->_ci_cached_vars['captcha']): ?>
+							<div>
+								<label>Изображение:</label>
+								{captcha}
+								<input type="text" name="image" value=""  />
+							</div>
+							<?php endif; ?>
 
 							<div class="bottom">
 								<input type="submit" value="{lang_in}"></input>
