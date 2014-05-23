@@ -208,7 +208,7 @@ $lang['adm_servers_go_to_game']						= 'Proceed';
 
 // 0.9
 $lang['adm_servers_sftp_path_not_found']			= 'Cannot locate server.sh or server.exe via SSH path.';
-lang['adm_servers_ftp_path_not_found']				= 'Cannot locate server.sh or server.exe via FTP path.';
+$lang['adm_servers_ftp_path_not_found']				= 'Cannot locate server.sh or server.exe via FTP path.';
 $lang['adm_servers_modifications']					= 'Mods';
 $lang['adm_servers_must_be_one']					= 'You can have only one localhost server.';
 $lang['adm_servers_empty_ds_list']					= 'You need to <a href="%s">add</a> a dedicated server first.';
