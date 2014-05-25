@@ -10,13 +10,21 @@ class Migration_Version093 extends CI_Migration {
 			$fields = array(
 							'script_send_command' => array(
 													 'type' => 'TINYTEXT',
-											  ),	
+							),	
 			);
 
 			$this->dbforge->add_column('game_types', $fields, 'script_get_console');
 		}
 		
 		$this->db->update('game_types', array('script_send_command' => 'send_command {dir} {name} {ip} {port} "{command}" {user}'));
+		
+		$fields = array(
+						'modules_data' => array(
+												 'type' => 'TINYTEXT',
+						),	
+		);
+
+		$this->dbforge->add_column('servers', $fields, 'aliases');
 
 	}
 	
