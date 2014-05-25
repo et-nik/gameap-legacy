@@ -2,7 +2,10 @@
 ::webkit-selection{ background-color: #E13300; color: white; }
 
 body {
+    background-color: #fff;
+    margin: 40px;
     font: 13px/20px normal Helvetica, Arial, sans-serif;
+    color: #4F5155;
 }
 
 #body{
@@ -19,10 +22,10 @@ body {
 }
 
 #content{
-    margin: 60px 0px 10px 150px;
+    margin: 0 10px 10px 10px;
     padding: 10px;
+    margin-left: 200px; 
     border: 1px solid #D0D0D0;
-    background-color: #fff;
     -webkit-box-shadow: 0 0 8px #D0D0D0;
 }
 
@@ -57,20 +60,20 @@ body {
 .box-modal_close:hover { color: #666; }
 
 #left {
-	margin: 50px 0px 10px 0px;
-	padding-top: 15px;
-	background: #222;
-	min-height: 750px;
-	color: #ccc;
-	width: 220px;
-	float: left;
+    float: left;
+    width: 175px;
+    min-height:200px;
+    margin-left: 10px;
+    padding: 2px;
+    border: 1px solid #D0D0D0;
+    -webkit-box-shadow: 0 0 8px #D0D0D0;
 }
 
 #left a {
 	-moz-transition: all 0.1s ease-in-out;
 	-o-transition: all 0.1s ease-in-out;
 	-webkit-transition: all 0.1s ease-in-out;
-	color: #ccc;
+	color:#222;
 	display:block;
 }
 
@@ -79,10 +82,10 @@ body {
 }
 
 #left a:hover {
-	text-decoration: none;
 	-webkit-transform: translate(8px,0);
 	-moz-transform: translate(8px,0);
 	-o-transform: translate(8px,0);
+	color: #ffb515;
 }
 
 span.description {
@@ -208,20 +211,17 @@ $(".zebra tr:even").addClass('alternate');
 
 .zebra {
 	border-spacing: 2px 2px;
-	border-collapse: separate;
 }
 
 .zebra td, .zebra th {
 	border-bottom: 1px solid #f2f2f2;  
-	padding: 3px;
 }
 
 .zebra tbody tr:nth-child(even) {
     background: #f5f5f5;
     -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.8) inset; 
     -moz-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;  
-    box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;
-    padding: 3px;        
+    box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;        
 }
 
 .zebra th {
@@ -374,7 +374,7 @@ button {
     cursor: pointer;
 }
 
-.awesome:hover                  { background-color: #111; color: #fff; text-decoration: none;}
+.awesome:hover                  { background-color: #111; color: #fff; }
 .awesome:active                 { top: 1px; }
 .small.awesome, .small.awesome:visited      { font-size: 11px; padding: ; }
 .awesome, .awesome:visited,
@@ -638,41 +638,4 @@ ul.tabs li.active, ul.tabs li.active a:hover  {
 
 .accordion .gt_list {
 	margin: 25px 0 25px 0;
-}
-
-/* ------------------------------------------------------------------ */
-/* ---------------------------- NEW --------------------------------- */
-/* ------------------------------------------------------------------ */
-
-.page-sidebar-menu {
-	list-style: none;
-	padding-left: 28px;
-	padding-right: 8px;
-}
-
-.page-sidebar-menu>li {
-	margin-bottom: 5px;
-}
-
-.page-sidebar-menu>li>a {
-	padding: 5px 2px;
-	background: #333;
-	display: block;
-	line-height: 20px;
-}
-
-ul.nav li.dropdown:hover ul.dropdown-menu{
-	display: block;
-	margin: 0;
-}
- 
-a.menu:after, .dropdown-toggle:after {
-	content: none;
-}
-
-.container {
-	width: 1200px;
-	margin-left: 50px;
-	margin-right: 0px;
-	padding-right: 0px;
 }
