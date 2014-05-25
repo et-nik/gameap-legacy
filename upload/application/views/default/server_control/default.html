@@ -144,7 +144,7 @@ if($this->users->auth_privileges['srv_restart'] == 1
 		<p class="hr"><strong>{lang_server_control_chat}</strong></p>
 		<form action="{site_url}server_command/rcon/send_msg/{server_id}/" method="post" accept-charset="utf-8">
 			<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
-			<table width="50%">
+			<table width="75%">
 				<tr>
 					<td>Сообщение:</td>
 					<td><input type="text" name="msg_text" size="50"/>&nbsp;&nbsp;<input type="submit" name="submit_sendmsg" value="{lang_send}" /></td>
