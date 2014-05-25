@@ -77,3 +77,6 @@ $lang['server_command_file_not_found']						= 'File %s not found';
 $lang['server_command_file_not_readable']					= 'No read rights for %s';
 $lang['server_command_file_not_writable']					= 'No write rights for %s';
 $lang['server_command_file_not_executable']					= 'No execute rights for %s';
+
+// 0.9.3
+$lang['server_command_player_not_found']					= 'Players not found.';

@@ -212,3 +212,7 @@ $lang['adm_servers_ftp_path_not_found']				= 'Cannot locate server.sh or server.
 $lang['adm_servers_modifications']					= 'Mods';
 $lang['adm_servers_must_be_one']					= 'You can have only one localhost server.';
 $lang['adm_servers_empty_ds_list']					= 'You need to <a href="%s">add</a> a dedicated server first.';
+
+// 0.9.3
+$lang['adm_servers_delete_files']					= 'Delete files.';
+$lang['adm_servers_send_command']					= 'Send command on console';

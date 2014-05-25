@@ -161,3 +161,6 @@ $lang['no_set']									= 'Not set';
 $lang['contents']								= 'Contents';
 $lang['filter']									= 'Filter';
 $lang['reset']									= 'Reset';
+
+/* -- 0.9.3 -- */
+$lang['administration']							= 'Admin';

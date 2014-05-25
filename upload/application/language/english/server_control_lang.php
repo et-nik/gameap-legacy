@@ -17,7 +17,7 @@ $lang['server_control_new_task_success'] 				= 'New task added successfully';
 $lang['server_control_task_delete_confirm'] 			= 'Do you want delete this task?';
 $lang['server_control_task_saved'] 						= 'Task settings changed successfully';
 
-// Период повтора для задания
+// ГЏГҐГ°ГЁГ®Г¤ ГЇГ®ГўГІГ®Г°Г  Г¤Г«Гї Г§Г Г¤Г Г­ГЁГї
 $lang['server_control_never'] 							= 'Never';
 $lang['server_control_day'] 							= '24 hours';
 $lang['server_control_two_day'] 						= '2 days';
@@ -71,3 +71,7 @@ $lang['server_control_command_not_set'] 				= 'Control command not set';
 $lang['cvarname_hostname']								= 'Server';
 $lang['cvarname_map']									= 'Map';
 $lang['cvarname_players']								= 'Players';
+
+/* -- 0.9.3 -- */
+$lang['cvarname_joinlink']								= 'Connect to server';
+
