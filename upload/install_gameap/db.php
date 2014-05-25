@@ -380,6 +380,10 @@ $fields = array(
 							'type' => 'TINYTEXT',
 		),
 		
+		'script_send_command' => array(
+							 'type' => 'TINYTEXT',
+		),	
+		
 		'kick_cmd' => array(
 							'type' => 'VARCHAR',
 							'constraint' => 64,
@@ -652,6 +656,10 @@ $fields = array(
 		'aliases' => array(
 							'type' => 'TEXT',
 		),
+		
+		'modules_data' => array(
+							'type' => 'TINYTEXT',
+		),	
 
 
 );
