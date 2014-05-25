@@ -87,6 +87,8 @@ class Tpl_replace
 		$output = str_replace($this->l_delim . 'csrf_hash'. $this->r_delim, $this->CI->security->get_csrf_hash(), $output);
 		$output = str_replace($this->l_delim . 'csrf_token_name'. $this->r_delim, $this->CI->security->get_csrf_token_name(), $output);
 		
+		$output = str_replace($this->l_delim . 'language'. $this->r_delim, $this->CI->config->config['language'], $output);
+		
 		if (isset($this->CI->config->config['template'])) {
 			$output = str_replace($this->l_delim .  'template' . $this->r_delim, $this->CI->config->config['template'], $output);
 		} else {
