@@ -20,7 +20,6 @@ $lang['server_files_edit'] 										= 'Редактирование файла'
 $lang['server_files_cfg_files'] 								= 'Конфигурационные файлы';
 $lang['server_files_content'] 									= 'Контент';
 
-
 // 0.9
 $lang['server_files_driver_not_set']							= 'Не настроен протокол передачи файлов (FTP, sFTP).';
 $lang['server_files_file_not_found']							= 'Файл отсутствует.';
