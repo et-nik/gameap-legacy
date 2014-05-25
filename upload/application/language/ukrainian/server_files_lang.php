@@ -19,3 +19,20 @@ $lang['server_files_upload_error'] = 'Помилка завантаження';
 $lang['server_files_edit'] = 'Редагування файлу'; 
 $lang['server_files_cfg_files'] = 'Конфігураційні файли'; 
 $lang['server_files_content'] = 'Контент';
+
+// 0.9
+$lang['server_files_driver_not_set '] = ' Чи не налаштований протокол передачі файлів (FTP , sFTP ).';
+$lang['server_files_file_not_found '] = 'Файл відсутня.';
+$lang['server_files_no_permission_on_read '] = ' Відсутні права на читання.';
+$lang['server_files_no_permission_on_write '] = ' Відсутні права на запис.';
+$lang['server_files_no_permission_on_execute '] = ' Відсутні права на виконання .';
+$lang['server_files_to_makdir '] = 'Неможливо створити каталог з вказаним Вами ім\'ям.';
+$lang['server_files_unable_to_changedir '] = 'Неможливо змінити каталог. ';
+$lang['server_files_unable_to_chmod '] = 'Неможливо встановити права доступу до файлів. Будь ласка, перевірте вказану Вами шлях . Примітка: ця функція доступна тільки в PHP 5 і вище.';
+$lang['server_files_unable_to_upload '] = 'Неможливо завантажити вказаний файл. Будь ласка, перевірте вказану Вами шлях.';
+$lang['server_files_unable_to_download '] = 'Неможливо завантажити вказаний файл. Будь ласка, перевірте вказану Вами шлях .';
+$lang['server_files_no_source_file '] = 'Неможливо знайти вихідний файл. Будь ласка, перевірте вказану Вами шлях.';
+$lang['server_files_unable_to_rename '] = 'Неможливо перейменувати файл.';
+$lang['server_files_unable_to_delete '] = 'Неможливо видалити файл.';
+$lang['server_files_unable_to_move '] = 'Неможливо перемістити файл. Будь ласка, переконайтеся що каталог призначення існує.';
+$lang['server_files_directory_not_found '] = ' Директорія не знайдена.';

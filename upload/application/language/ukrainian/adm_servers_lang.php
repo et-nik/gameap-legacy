@@ -206,3 +206,14 @@ $lang['adm_servers_ip_description']					= 'Якщо IP-адрес декільк
 
 // 0.8.8
 $lang['adm_servers_go_to_game']						= 'Перейти до гри';
+
+// 0.9 
+$lang['adm_servers_sftp_path_not_found'] = 'Виконавчий файл на сервері SSH за вказаною шляху не знайдений (server.sh або server.exe).'; 
+$lang['adm_servers_ftp_path_not_found'] = 'На FTP сервері не найден шлях до виконуваних файлів (server.sh або server.exe).'; 
+$lang['adm_servers_modifications'] = 'Модифікації'; 
+$lang['adm_servers_must_be_one'] = 'Локальний сервер повинен бути тільки один.'; 
+$lang['adm_servers_empty_ds_list'] = 'Необхідно додати хоча б один виділений сервер. <a href="%s">Додати</a> '; 
+
+// 0.9.3 
+$lang['adm_servers_delete_files'] = 'Видалити файли сервера.'; 
+$lang['adm_servers_send_command'] = 'Команда відправки в консоль сервера';

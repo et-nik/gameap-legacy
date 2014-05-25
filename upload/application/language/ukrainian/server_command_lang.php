@@ -60,3 +60,24 @@ $lang['server_command_restart_failed'] = 'Не вдалося перезапус
 $lang['server_command_update_failed'] = 'Помилка поновлення';
 $lang['server_command_start_file_not_found'] = 'Виконуваний файл не знайдено';
 $lang['server_command_start_file_not_executable'] = 'У виконуваного файлу відсутні права на запуск';
+
+// 0.8.10
+$lang['server_command_update_task_exists'] = 'Завдання поновлення вже є , встановіть для нього нову дату. ';
+$lang['server_command_max_tasks'] = 'Даних завдань не може бути більше трьох , видаліть існуючі завдання або встановіть їм нову дату. ';
+
+// 0.9
+$lang['server_command_connection_failed'] = 'З\'єднання не вдалося ';
+$lang['server_command_empty_connect_data '] = 'Не задано дані для з\'єднання ';
+$lang['server_command_empty_auth_data'] = 'Не задано дані для авторизації';
+$lang['server_command_empty_command'] = 'Порожня команда ';
+$lang['server_command_not_connected'] = 'Відсутня з\'єднання ';
+$lang['server_command_login_failed'] = 'Авторизація не вдалася ';
+$lang['server_command_exec_disabled'] = 'Функція exec відключена в налаштуваннях PHP';
+
+$lang['server_command_file_not_found'] = 'Файл% s не найден';
+$lang['server_command_file_not_readable'] = 'Немає прав на читання файлу %s';
+$lang['server_command_file_not_writable'] = 'Немає прав на запис файлу %s';
+$lang['server_command_file_not_executable'] = 'Немає прав на виконання файлу %s';
+
+// 0.9.3
+$lang['server_command_player_not_found'] = 'Равець не є знайдений.';

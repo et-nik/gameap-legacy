@@ -151,9 +151,19 @@ $lang['values'] 								= 'Значення';
 /* -- 0.8.8 -- */
 $lang['go']										= 'Перейти';
 
-/* -- 0.9 -- */
+/* - 0.9 - */ 
 
-/* Menu */
-$lang['menu_files_config']						= 'Конфігурація серверів';
+/* Menu */ 
+$lang['menu_files_config'] = 'Конфігурація серверів'; 
 
-$lang['modules']								= 'Модулі';
+$lang['modules'] = 'Модулі'; 
+
+$lang['set'] = 'Заданий'; 
+$lang['no_set'] = 'Не задан'; 
+
+$lang['contents'] = 'Вміст'; 
+$lang['filter'] = 'Фільтр'; 
+$lang['reset'] = 'Скидання'; 
+
+/* - 0.9.3 - */ 
+$lang['administration'] = 'Адміністрування';

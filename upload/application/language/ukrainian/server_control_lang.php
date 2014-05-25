@@ -62,3 +62,14 @@ $lang['server_control_param_for_command'] = 'Параметри для кома�
 $lang['server_control_execution_date'] = 'Дата виконання';
 $lang['server_control_execution_date_desc'] = 'Приклад: 29-06-2013 12:32';
 $lang['server_control_repeat_period'] = 'Період затримки';
+
+// 0.7.2 
+$lang['server_control_command_not_set'] = 'Команда не задане'; 
+
+/* - 0.9 - */ 
+$lang['cvarname_hostname'] = 'Ім\'я сервера'; 
+$lang['cvarname_map'] = 'Поточна карта'; 
+$lang['cvarname_players'] = 'Гравці'; 
+
+/* - 0.9.3 - */ 
+$lang['cvarname_joinlink'] = 'Підключитися до сервера';
