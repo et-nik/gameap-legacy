@@ -81,3 +81,8 @@ $lang['server_command_file_not_executable']					= 'Нет прав на выпо
 
 // 0.9.3
 $lang['server_command_player_not_found']					= 'Игрок не найден.';
+
+// 0.9.4
+$lang['server_command_wait_one_minute_to_restart']			= 'С момента последнего перезапуска должна пройти одна минута.';
+$lang['server_command_wait_one_minute_to_start']			= 'С момента последнего запуска должна пройти одна минута.';
+

@@ -787,6 +787,23 @@ class Server_command extends CI_Controller {
 					$this->_show_message(lang('server_command_start_not_param'));
 					return false;
 				}
+				
+				// Обращаться к перезапуску можно не чаще 1 раза в минуту
+				$this->panel_log->set_filter(array(	'type' => null, 
+													'command' => 'start',
+													'user_name' => null,
+													'contents' => null,
+													'server_id' => $server_id,
+											)
+				);
+				
+				$this->db->where('date >', now()-90);
+				
+				if ($this->panel_log->get_count_all_log() >= 1) {
+					//~ $this->_show_message(lang(''));
+					$this->_show_message(lang('server_command_wait_one_minute_to_start'));
+					return false;
+				}
 
 				/* Подтверждение 
 				 * Чтобы избежать случаев случайного запуска сервера
@@ -965,6 +982,8 @@ class Server_command extends CI_Controller {
 	*/
 	public function restart($server_id, $confirm = false)
     {
+		$this->load->helper('date');
+		
 		if($this->servers->get_server_data($server_id)){
 			
 			// Получение прав на сервер
@@ -996,6 +1015,23 @@ class Server_command extends CI_Controller {
 				 * Чтобы избежать случаев случайного запуска сервера
 				*/
 				if($confirm == $this->security->get_csrf_hash()){
+					
+					// Обращаться к перезапуску можно не чаще 1 раза в минуту
+					$this->panel_log->set_filter(array(	'type' => null, 
+														'command' => 'restart',
+														'user_name' => null,
+														'contents' => null,
+														'server_id' => $server_id,
+												)
+					);
+					
+					$this->db->where('date >', now()-90);
+					
+					if ($this->panel_log->get_count_all_log() >= 1) {
+						//~ $this->_show_message(lang(''));
+						$this->_show_message(lang('server_command_wait_one_minute_to_restart'));
+						return false;
+					}
 					
 					try {
 						$response = $this->servers->restart($this->servers->server_data);
