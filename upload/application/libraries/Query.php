@@ -75,7 +75,11 @@ class Query {
 			$server_info['host'] = "{$server_info['host']}:{$server_info['port']}";
 		}
 		
-		return $this->gameq->addServer($server_info);
+		try {
+			return $this->gameq->addServer($server_info);
+		} catch(Exception $e) {
+			
+		}
 	}
 	
 	// ---------------------------------------------------------------------
