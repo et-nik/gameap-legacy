@@ -311,7 +311,7 @@ class Server_control extends CI_Controller {
 			
 			$command = $this->servers->server_data['script_send_command'];
 			
-			if ($command = '') {
+			if ($command == '') {
 				$command = 'send_command {dir} {name} {ip} {port} "{command}" {user}';
 			}
 			
