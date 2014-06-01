@@ -22,6 +22,9 @@ class Rcon_rust extends CI_Driver {
 	*/
 	function get_players()
 	{
+		$this->CI->load->helper('games');
+		
+		$return = array();
 		if ($result = $this->command('status')) {
 			$return = array();
 			
@@ -38,8 +41,8 @@ class Rcon_rust extends CI_Driver {
 				$return[] = array(
 						'user_name' 	=> htmlspecialchars($matches[$a]['2']), 
 						'user_id' 		=> $matches[$a]['1'],
-						//'steam_id' 	=> $matches[$a]['1'],
-						'steam_id' 		=> '',
+						'steam_id' 		=> steamid64_to_steamid($matches[$a]['1']),
+						//~ 'steam_id' 		=> '',
 						'user_ip' 		=> $matches[$a]['4'],
 						'user_time' 	=> $matches[$a]['3'],
 					);
