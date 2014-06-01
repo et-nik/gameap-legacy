@@ -133,7 +133,7 @@ class Profile extends CI_Controller {
 				$this->load->library('form_validation');
 				$this->load->model('password');
 				
-				$this->form_validation->set_rules('old_password', 'Текущий пароль', 'trim|required|md5');
+				$this->form_validation->set_rules('old_password', 'Текущий пароль', 'trim|required');
 				$this->form_validation->set_rules('new_password', 'Пароль', 'trim|required|matches[new_password_confirm]');
 				$this->form_validation->set_rules('new_password_confirm', 'Подтверждение пароля', 'trim|required');
 				
@@ -147,8 +147,7 @@ class Profile extends CI_Controller {
 					$this->tpl_data['content'] .= lang('profile_form_unavailable');
 				}else{
 					
-					$password_encrypt = $this->input->post('old_password', true);
-					$password_encrypt = hash_password($password_encrypt);
+					$password_encrypt = hash_password($this->input->post('old_password', true));
 
 					$query = $this->db->get_where('users', array('login' => $this->users->auth_data['login'], 'password' => $password_encrypt));
 					
