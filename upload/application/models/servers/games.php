@@ -68,8 +68,13 @@ class Games extends CI_Model {
 		$query = $this->db->get('games');
 
 		if($query->num_rows > 0){
-			
 			$this->games_list = $query->result_array();
+			
+			// Заполнение массива с именами игр
+			foreach($this->games_list as &$game) {
+				$this->name_games[ $game['code'] ] = $game['name'];
+			}
+			
 			return $this->games_list;
 			
 		}else{
@@ -118,39 +123,47 @@ class Games extends CI_Model {
 	}
 	
 	//-----------------------------------------------------------
+	
 	/**
      * Получение названия игры по ее коду
      *
     */
-	function game_name_by_code($code){
+	function game_name_by_code($code)
+	{
+		$get_games = false;
 		
 		if(!$this->games_list){
+			$get_games = true;
 			$this->get_games_list();
 		}
 		
-		if(!empty($this->name_games[$code])){
+		if (isset($this->name_games[$code])) {
 			return $this->name_games[$code];
 		}
 		
 		$count_games = count($this->games_list);
 		$i = 0;
 		
-		while($i < $count_games) {
-			
-			$this->name_games[$this->games_list[$i]['code']] = $this->games_list[$i]['name'];
-			
-			if($code == $this->games_list[$i]['code']){
-				$return = $this->games_list[$i]['name'];
+		foreach ($this->games_list as &$game) {
+			if ($code == $game['code']) {
+				return $game['name'];
 			}
-			
-			$i++;
 		}
 		
-		if(isset($return)){
-			return $return;
+		if (!$get_games) {
+			return false;
 		}
 		
-		return FALSE;
+		$this->get_games_list();
+		
+		foreach ($this->games_list as &$game) {
+			if ($code == $game['code']) {
+				return $game['name'];
+			}
+		}
+		
+		return false;
+		
 	}
 	
 }

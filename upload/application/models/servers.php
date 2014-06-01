@@ -974,7 +974,7 @@ class Servers extends CI_Model {
 		 * в массиве
 		*/
 		
-		if ($files_list) {
+		if (!empty($files_list)) {
 			uasort($files_list, array('Servers','uasort_asc'));
 			
 			$num = -1;
