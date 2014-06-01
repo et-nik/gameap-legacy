@@ -115,3 +115,37 @@ if ( ! function_exists('servers_list_to_games_list'))
 		return clean_games_list($games_list);
 	}
 }
+
+// ---------------------------------------------------------------------
+
+/**
+ * Преобразует SteamID64 в SteamID
+ * Основа взята с http://facepunch.com/showthread.php?t=1238157
+ */
+if ( ! function_exists('steamid64_to_steamid'))
+{
+	function steamid64_to_steamid($steamid) 
+	{
+		$steamY = $steamid - 76561197960265728;
+		$steamX = (int)($steamY%2 == 1);
+
+		$steamY = (($steamY - $steamX) / 2);
+		$steamID = "STEAM_0:" . $steamX . ":" . $steamY;
+		return $steamID;
+	}
+}
+
+// ---------------------------------------------------------------------
+
+/**
+ * Преобразует SteamID в SteamID64
+ */
+if ( ! function_exists('steamid_to_steamid64'))
+{
+	function steamid_to_steamid64($steamid) 
+	{
+		$steamid = str_replace('STEAM_', '' ,$steamid);
+		$parts = explode(':', $steamid);
+		return bcadd((bcadd('76561197960265728', $parts[1])), (bcmul($parts[2], '2')));
+	}
+}
