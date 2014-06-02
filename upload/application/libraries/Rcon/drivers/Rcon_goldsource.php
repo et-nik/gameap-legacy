@@ -28,9 +28,29 @@ class Rcon_goldsource extends CI_Driver {
 	
 	public function command($command)
 	{
-		$return = $this->rconcommand("\xff\xff\xff\xffrcon $this->challenge_number \"$this->password\" $command");
-		// Вырезаем лишние символы
-		$return = $this->cut_symbols($return);
+		$first_command = true;
+		$return = '';
+		$i = 0;
+		
+		while (true) {
+			
+			$rcmd = $first_command 
+						? $this->rconcommand("\xff\xff\xff\xffrcon $this->challenge_number \"$this->password\" $command")
+						: $this->rconcommand("\xff\xff\xff\xffrcon $this->challenge_number \"$this->password\"");
+			
+			$rcmd = $this->cut_symbols($rcmd);
+			$return .= $rcmd;
+			
+			if (strlen($rcmd) < 2048) {
+				break;
+			}
+			
+			if (!$rcmd) {
+				break;
+			}
+			
+			$first_command = false;
+		}
 		
 		return $return;
 	}
@@ -65,8 +85,8 @@ class Rcon_goldsource extends CI_Driver {
 	*/
 	private function cut_symbols($string)
 	{
-		$string = str_replace("\xff\xff\xff\xff", "" , $string);
-		$string = substr($string, 1);
+		//~ $string = str_replace("\xff\xff\xff\xff", "" , $string);
+		$string = substr($string, 7);
 		
 		return $string;
 	}
