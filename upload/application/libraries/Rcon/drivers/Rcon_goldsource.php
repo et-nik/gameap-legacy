@@ -38,17 +38,15 @@ class Rcon_goldsource extends CI_Driver {
 						? $this->rconcommand("\xff\xff\xff\xffrcon $this->challenge_number \"$this->password\" $command")
 						: $this->rconcommand("\xff\xff\xff\xffrcon $this->challenge_number \"$this->password\"");
 			
+			
 			$rcmd = $this->cut_symbols($rcmd);
+			
 			$return .= $rcmd;
 			
-			if (strlen($rcmd) < 2048) {
+			if (strlen($rcmd) < 256) {
 				break;
 			}
-			
-			if (!$rcmd) {
-				break;
-			}
-			
+
 			$first_command = false;
 		}
 		
@@ -86,7 +84,7 @@ class Rcon_goldsource extends CI_Driver {
 	private function cut_symbols($string)
 	{
 		//~ $string = str_replace("\xff\xff\xff\xff", "" , $string);
-		$string = substr($string, 7);
+		$string = substr($string, 5);
 		
 		return $string;
 	}
