@@ -505,6 +505,11 @@ class Server_command extends CI_Controller {
 								
 							case 'rcon_command';
 								$rcon_command = $this->input->post('rcon_command', true);
+								
+								// Объединение массива с частями в одну команду
+								if (is_array($rcon_command)) {
+									$rcon_command = implode('', $rcon_command);
+								}
 									
 								if(!$this->_check_rcon_command($rcon_command)) {
 									$this->_show_message(lang('server_command_rcon_command_access_denied'), site_url('admin/server_control/main/' . $server_id));
@@ -791,12 +796,13 @@ class Server_command extends CI_Controller {
 				// Обращаться к перезапуску можно не чаще 1 раза в минуту
 				$this->panel_log->set_filter(array(	'type' => null, 
 													'command' => 'start',
-													'user_name' => null,
+													'user_name' => $this->users->auth_data['login'],
 													'contents' => null,
 													'server_id' => $server_id,
 											)
 				);
 				
+				$this->db->where('server_id', $server_id);
 				$this->db->where('date >', now()-90);
 				
 				if ($this->panel_log->get_count_all_log() >= 1) {
@@ -1018,13 +1024,14 @@ class Server_command extends CI_Controller {
 					
 					// Обращаться к перезапуску можно не чаще 1 раза в минуту
 					$this->panel_log->set_filter(array(	'type' => null, 
-														'command' => 'restart',
-														'user_name' => null,
+														'command' => 'start',
+														'user_name' => $this->users->auth_data['login'],
 														'contents' => null,
 														'server_id' => $server_id,
 												)
 					);
 					
+					$this->db->where('server_id', $server_id);
 					$this->db->where('date >', now()-90);
 					
 					if ($this->panel_log->get_count_all_log() >= 1) {
