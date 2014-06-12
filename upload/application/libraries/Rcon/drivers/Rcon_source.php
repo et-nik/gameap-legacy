@@ -111,7 +111,7 @@ class Rcon_source extends CI_Driver {
 				$packet = "\x00\x00\x00\x00\x00\x00\x00\x00".fread($this->fp, 4096);
 			} else {
 				//Read the packet back
-				$packet = fread($this->fp,$size["Size"]);
+				$packet = @fread($this->fp,$size["Size"]);
 			}
 			array_push($retarray,unpack("V1ID/V1Response/a*S1/a*S2",$packet));
 		}
@@ -154,7 +154,7 @@ class Rcon_source extends CI_Driver {
 		$ret = $this->read();
 
 		//ATM: Source servers don't return the request id, but if they fix this the code below should read as
-		return $ret[$this->_id]['S1'];
+		return @$ret[$this->_id]['S1'];
 		//return $ret[0]['S1'];
 	}
 	
@@ -176,7 +176,7 @@ class Rcon_source extends CI_Driver {
 			$a = 0;
 			while ($a < $count) {
 				$return[] = array(
-						'user_name' => $matches[$a]['4'], 
+						'user_name' => htmlspecialchars($matches[$a]['4']), 
 						'steam_id' => $matches[$a]['6'],
 						'user_id' => $matches[$a]['2'],
 						'user_ip' => $matches[$a]['16'],
