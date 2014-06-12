@@ -13,24 +13,25 @@
 */
 class Servers extends CI_Model {
 
-    public $server_id   		= 0;			// ИД сервера
+    public $server_id   			= 0;			// ИД сервера
     
 	private $_filter_servers_list	= array('name' => false, 'ip' => false, 'game' => false);		// Фильтр списка серверов
+	private $_fields 				= '';			// Поля, которые нужно выбрать
 	public $servers_list 			= array();		// Список игровых серверов
 	
-    public $server_data 		= array();		// Данные сервера
-    public $server_query_data 	= array();		// query данные сервера
-    public $server_ds_data 	= array();		// Данные DS игрового сервера
-    public $server_game_data 	= array();		// Данные игры к которой принадлежит сервер
+    public $server_data 			= array();		// Данные сервера
+    public $server_query_data 		= array();		// query данные сервера
+    public $server_ds_data 			= array();		// Данные DS игрового сервера
+    public $server_game_data 		= array();		// Данные игры к которой принадлежит сервер
     
     public $all_settings = array(
 		'SERVER_AUTOSTART'			=> 'Автостарт сервера в случае его падения (через cron)',
 		'SERVER_RCON_AUTOCHANGE' 	=> 'Автоматическая смена rcon пароля, в случае если в админпанели и на сервере он не совпадает',
     );
     
-    public $server_settings 	= array();
+    public $server_settings 		= array();
     //~ public $commands			= array(); // Команды, которые отправлялись на сервер
-    public $errors 			= ''; 	// Строка с ошибкой (если имеются)
+    public $errors 					= ''; 	// Строка с ошибкой (если имеются)
 
     function __construct()
     {
@@ -377,6 +378,23 @@ class Servers extends CI_Model {
 	
 	/**
      * Получение списка серверов
+     * Алиас $this->get_servers_list()
+     * 
+     * @param int - id пользователя для которого получаем серверы
+     * @param str - привилегия пользователя
+     * @param array - where для запроса sql
+     *
+    */
+	function get_list($user_id = false, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1', ))
+	{
+		return $this->get_servers_list($user_id, $privilege_name, $where);
+	}
+	
+	//-----------------------------------------------------------
+	
+	/**
+     * Получение списка серверов
+     * Алиас $this->get_servers_list()
      * 
      * @param int - id пользователя для которого получаем серверы
      * @param str - привилегия пользователя
@@ -442,7 +460,19 @@ class Servers extends CI_Model {
 			
 			!$this->_filter_servers_list['name'] OR $this->db->like('name', $this->_filter_servers_list['name']);
 			!$this->_filter_servers_list['ip'] OR $this->db->like('server_ip', $this->_filter_servers_list['ip']);
-			!$this->_filter_servers_list['game'] OR $this->db->where('game', $this->_filter_servers_list['game']);
+			
+			if ($this->_filter_servers_list['game']) {
+				if (is_array($this->_filter_servers_list['game'])) {
+					$this->db->where_in('game', $this->_filter_servers_list['game']);
+				} else {
+					$this->db->where('game', $this->_filter_servers_list['game']);
+				}
+			}
+			
+			!$this->_fields OR $this->db->select($this->_fields);
+			
+			// Сброс полей
+			$this->_fields = '';
 			
 			$query = $this->db->get('servers');
 		} else {
@@ -497,7 +527,12 @@ class Servers extends CI_Model {
 				if (is_array($where) && !empty($where)) { 
 					$this->db->where($where);
 				}
-			
+				
+				!$this->_fields OR $this->db->select($this->_fields);
+				
+				// Сброс полей
+				$this->_fields = '';
+				
 				$query = $this->db->get('servers');
 			}
 			
@@ -508,11 +543,11 @@ class Servers extends CI_Model {
 					
 					$server_list[$a] = $server_data;
 					
-					if (!$server_data['query_port']) {
+					if (isset($server_data['server_port']) && !$server_data['query_port']) {
 						$server_list[$a]['query_port'] = $server_data['server_port'];
 					}
 					
-					if (!$server_data['rcon_port']) {
+					if (isset($server_data['server_port']) && !$server_data['rcon_port']) {
 						$server_list[$a]['rcon_port'] = $server_data['server_port'];
 					}
 					
@@ -758,12 +793,14 @@ class Servers extends CI_Model {
 	function server_live($server_id)
 	{
 		$this->db->where('id', $server_id);
-		if($this->db->count_all_results('servers') > 0){
-			return true;
-		}else{
-			return false;
-		}
-		
+		return (bool)($this->db->count_all_results('servers') > 0);
+	}
+	
+	// -----------------------------------------------------------------
+	
+	function select_fields($fields)
+	{
+		$this->_fields = $fields;
 	}
 	
 	// ----------------------------------------------------------------
@@ -776,12 +813,7 @@ class Servers extends CI_Model {
 	function ds_server_live($server_id){
 		
 		$this->db->where('id', $server_id);
-		if($this->db->count_all_results('dedicated_servers') > 0){
-			return true;
-		}else{
-			return false;
-		}
-		
+		return (bool)($this->db->count_all_results('dedicated_servers') > 0);
 	}
 
 	// ----------------------------------------------------------------

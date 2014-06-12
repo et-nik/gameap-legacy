@@ -345,10 +345,9 @@ class Adm_servers extends CI_Controller {
 		}
 		
 		if (empty($this->games->games_list)) {
-			$this->games->get_games_list();
+			$this->games->get_active_games_list();
 		}
 		
-		$games_option[0] = '---';
 		foreach($this->games->games_list as &$game) {
 			$games_option[ $game['code'] ] = $game['name'];
 		}
@@ -357,7 +356,7 @@ class Adm_servers extends CI_Controller {
 		$tpl_data['filter_ip']				= isset($filter['ip']) ? $filter['ip'] : '';
 		
 		$default = isset($filter['game']) ? $filter['game'] : null;
-		$tpl_data['filter_games_dropdown'] 	= form_dropdown('filter_game', $games_option, $default);
+		$tpl_data['filter_games_dropdown'] 	= form_multiselect('filter_game[]', $games_option, $default);
 		
 		return $tpl_data;
 	}

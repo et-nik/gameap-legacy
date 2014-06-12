@@ -227,7 +227,7 @@ class Settings extends CI_Controller {
 			case 'servers_list':
 				$this->form_validation->set_rules('filter_name', lang('name'), 'trim|xss_clean');
 				$this->form_validation->set_rules('filter_ip', lang('ip'), 'trim|xss_clean');
-				$this->form_validation->set_rules('filter_game', lang('game'), 'trim|xss_clean');
+				$this->form_validation->set_rules('filter_game', lang('game'), 'xss_clean');
 				break;
 			
 			case 'panel_log':
@@ -289,7 +289,7 @@ class Settings extends CI_Controller {
 					$filter['last_visit_after'] = $reset ? '' : human_to_unix($this->input->post('filter_last_visit_after'));
 					break;
 			}
-			
+
 			$this->users->update_filter($filter_name, $filter);
 			redirect($_SERVER['HTTP_REFERER']);
 		}

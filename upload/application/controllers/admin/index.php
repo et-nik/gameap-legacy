@@ -59,10 +59,9 @@ class Index extends CI_Controller {
 		}
 		
 		if (empty($this->games->games_list)) {
-			$this->games->get_games_list();
+			$this->games->get_active_games_list();
 		}
 		
-		$games_option[0] = '---';
 		foreach($this->games->games_list as &$game) {
 			$games_option[ $game['code'] ] = $game['name'];
 		}
@@ -71,11 +70,11 @@ class Index extends CI_Controller {
 		$tpl_data['filter_ip']				= isset($filter['ip']) ? $filter['ip'] : '';
 		
 		$default = isset($filter['game']) ? $filter['game'] : null;
-		$tpl_data['filter_games_dropdown'] 	= form_dropdown('filter_game', $games_option, $default);
+		$tpl_data['filter_games_dropdown'] 	= form_multiselect('filter_game[]', $games_option, $default);
 		
 		return $tpl_data;
 	}
-	
+
 	// -----------------------------------------------------------------
 	
 	public function index()
@@ -88,11 +87,13 @@ class Index extends CI_Controller {
 		$this->load->helper('games');
 		$this->load->model('servers/games');
 		
-		$this->db->select('code, start_code, name, engine, engine_version');
-		$this->games->get_games_list();
-		
-		$filter = $this->users->get_filter('servers_list');
-		$local_tpl_data = $this->_get_tpl_filter($filter);
+		$local_tpl_data = array();
+	
+		$this->games->get_active_games_list();
+		$local_tpl_data['games_list'] = $this->games->tpl_data_games();
+
+		$filter 		= $this->users->get_filter('servers_list');
+		$local_tpl_data += $this->_get_tpl_filter($filter);
 
 		$this->servers->set_filter($filter);
 
@@ -101,8 +102,6 @@ class Index extends CI_Controller {
 
 			$num = 0;
 
-			$local_tpl_data['games_list'] = $this->games->tpl_data_games();
-				
 			foreach ($this->servers->servers_list as $this->server_data) {
 					$server_commands = '';
 					

@@ -51,6 +51,55 @@ class Games extends CI_Model {
 		return (bool)$this->db->update('games', $data);
 	}
 	
+	// -----------------------------------------------------------
+	
+	function select_fields($fields)
+	{
+		if (is_array($fields)) {
+			$fields = implode(',', $fields);
+		}
+		
+		return $this->db->select($fields);
+	}
+	
+	// -----------------------------------------------------------
+	
+	/**
+	 * Массив с кодами игр, которые нужно получить
+	 */
+	function select_games($games_codes)
+	{
+		if (empty($games_codes)) {
+			return false;
+		}
+		
+		return $this->db->where_in('code', $games_codes);
+	}
+	
+	// -----------------------------------------------------------------
+	
+	/**
+	 * Получение списка активных игр (серверы которых имеются)
+	 */
+	function get_active_games_list()
+	{
+		$this->load->model('servers');
+		
+		$games_array = array(); // Массив с кодами активных игр
+		
+		$this->servers->select_fields('game');
+
+		foreach($this->servers->get_list() as $server) {
+			if (!in_array($server['game'], $games_array)) {
+				$games_array[] = $server['game'];
+			}
+		}
+		
+		$this->games->select_fields('code, start_code, name, engine, engine_version');
+		$this->games->select_games($games_array);
+		return $this->games->get_games_list();
+	}
+
 	//-----------------------------------------------------------
 	
 	/**
@@ -61,7 +110,9 @@ class Games extends CI_Model {
 		$this->db->order_by('name', 'asc'); 
 		
 		if (is_array($where)) {
-			$query = $this->db->where($where);
+			$this->db->where($where);
+		} else {
+			$this->db->where('code', $where);
 		}
 		
 		$this->db->limit($limit, $offset);
@@ -87,6 +138,9 @@ class Games extends CI_Model {
 	/**
      * Получение данных игр для шаблона
      * (вырезаны ненужные данные - пароли и пр.)
+     * 
+     * @param array
+     * @param int
     */
 	function tpl_data_games($where = FALSE, $limit = 99999)
     {
