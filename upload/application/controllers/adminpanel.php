@@ -89,9 +89,9 @@ class Adminpanel extends CI_Controller {
 		foreach($this->gameap_modules->modules_data as $module) {
 			
 			$tpl_data[$i] = $module;
-			$tpl_data[$i]['available_version'] 		= 'Unknown';
-			$tpl_data[$i]['download_url'] 			= 		'#';
-			$tpl_data[$i]['available_url'] 			= 		'#';
+			$tpl_data[$i]['available_version'] 		= '-';
+			$tpl_data[$i]['download_url'] 			= '#';
+			$tpl_data[$i]['available_url'] 			= '#';
 			
 			if (!isset($module['update_info']) OR !$module['update_info']) {
 				$i++;
