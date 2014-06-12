@@ -144,29 +144,29 @@ class Profile extends CI_Controller {
 						return false;
 					}
 					
-					$this->tpl_data['content'] .= lang('profile_form_unavailable');
+					$this->_show_message(lang('profile_form_unavailable'));
+					return false;
 				}else{
 					
-					$password_encrypt = hash_password($this->input->post('old_password', true));
-
-					$query = $this->db->get_where('users', array('login' => $this->users->auth_data['login'], 'password' => $password_encrypt));
+					//~ $password_encrypt = hash_password($this->input->post('old_password', true));
 					
-					if($query->num_rows == 1){
-							$new_password = $this->input->post('new_password', true);
-							$new_password = hash_password($new_password);
-							
-							$this->users->update_user(array('password' => $new_password), $this->users->auth_data['id']);
-							
-							$local_tpl_data = array();
-							$local_tpl_data['message'] = lang('profile_password_changed');
-							$local_tpl_data['link'] = site_url();
-							$local_tpl_data['back_link_txt'] = lang('profile');
-							$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
-							
-					}else{
-						$this->tpl_data['content'] .= lang('profile_password_unavailable');
+					$password_encrypt = hash_password($this->input->post('old_password', true), $this->users->auth_data['password']);
+					
+					if ($password_encrypt != $this->users->auth_data['password']) {
+						$this->_show_message(lang('profile_password_unavailable'));
+						return false;
 					}
 					
+					$new_password = $this->input->post('new_password', true);
+					$new_password = hash_password($new_password);
+					
+					$this->users->update_user(array('password' => $new_password), $this->users->auth_data['id']);
+					
+					$local_tpl_data = array();
+					$local_tpl_data['message'] = lang('profile_password_changed');
+					$local_tpl_data['link'] = site_url();
+					$local_tpl_data['back_link_txt'] = lang('profile');
+					$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
 					//Смена пароля закончена
 				}
 				
