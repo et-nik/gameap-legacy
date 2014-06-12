@@ -1,16 +1,17 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
-<a class="awesome" onclick="anichange('#filter'); return false" href="#">{lang_filter}</a>
+<a class="awesome" id="filter" href="#">{lang_filter}</a>
+
 <script>
-function anichange (objName) {
-  if ( $(objName).css('display') == 'none' ) {
-    $(objName).animate({height: 'show'}, 400);
-  } else {
-    $(objName).animate({height: 'hide'}, 200);
-  }
-}
+$(document).ready(function() {
+	$('div#filter').hide();
+});
+
+$("a#filter" ).click(function() {
+	$("div#filter").toggle('fast');
+});
 </script>
 
-<div id="filter" style="display: none">
+<div id="filter">
 	<br />
 	<form action="{site_url}admin/settings/set_filter/servers_list" method="post" accept-charset="utf-8">
 		<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
@@ -38,6 +39,10 @@ function anichange (objName) {
 			</p>
 	</form>
 </div>
+
+<script>
+	$('select[multiple="multiple"]').multipleSelect();
+</script>
 
 <p class="hr">{lang_select_server}</p>
 <table width="100%" class="zebra">
