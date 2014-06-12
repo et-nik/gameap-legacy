@@ -265,6 +265,10 @@ class Server_control extends CI_Controller {
 			if ($local_tpl_data['users_list']) {
 				$this->players = 1;
 			}
+			
+			// Костыль
+			$local_tpl_data['users_list1'] =& $local_tpl_data['users_list'];
+			$local_tpl_data['users_list2'] =& $local_tpl_data['users_list'];
 
 			$local_tpl_data['maps_list']	= $this->_get_maps_list();
 			$local_tpl_data['frcon_list'] 	= $this->_get_frcon_list();
@@ -402,6 +406,8 @@ class Server_control extends CI_Controller {
 			}
 			
 		}
+		
+		//~ $local_tpl_data['test'] = array(array('test1' => 'test1'), array('test1' => 'test1'), array('test1' => 'test1'), array('test1' => 'test1'),);
 		
 		$local_tpl_data['server_id'] = $server_id;
 		$local_tpl_data['server_name'] = $this->servers->server_data['name'];
