@@ -746,7 +746,7 @@ class Server_command extends CI_Controller {
 			$response = $this->_crop_console($response);
 			$local_tpl_data['console_content_original'] = $response;
 			
-			$console_content = str_replace("\n", "<br />", htmlspecialchars($response));
+			$console_content = str_replace("\n", "<br />", htmlspecialchars($response, ENT_SUBSTITUTE));
 			$local_tpl_data['console_content'] = $console_content;
 			
 			$this->tpl_data['content'] = $this->parser->parse('servers/console_view.html', $local_tpl_data, true);

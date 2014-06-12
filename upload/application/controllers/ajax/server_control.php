@@ -239,7 +239,8 @@ class Server_control extends CI_Controller {
 		try {
 			$response = send_command($command, $this->servers->server_data);
 			$response = $this->_crop_console($response);
-			$console_content = str_replace("\n", "<br />", htmlspecialchars($response));
+			$console_content = str_replace("\n", "<br />", htmlspecialchars($response, ENT_SUBSTITUTE));
+			//~ $console_content = str_replace("\n", "<br />", htmlspecialchars($response));
 			$this->output->append_output($console_content);
 		} catch (Exception $e) {
 			show_404();
@@ -311,8 +312,8 @@ class Server_control extends CI_Controller {
 			
 			$command = $this->servers->server_data['script_send_command'];
 			
-			if ($command == '') {
-				$command = 'send_command {dir} {name} {ip} {port} "{command}" {user}';
+			if ($command == '' OR $command == './server.sh') {
+				$command = './server.sh send_command {dir} {name} {ip} {port} "{command}" {user}';
 			}
 			
 			/* На некоторых серверах могут использоваться двойные кавычки*/
