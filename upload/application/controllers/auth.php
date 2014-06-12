@@ -22,37 +22,36 @@ class Auth extends CI_Controller {
 	// -----------------------------------------------------------------
 
 	public function __construct()
-    {
-        parent::__construct();
-        
+	{
+		parent::__construct();
+		
 		$this->load->database();
 		
-        $this->load->library('form_validation');
-        $this->load->model('users');
-        $this->load->helper('safety');
-        $this->load->helper('captcha');
-        
-        $this->lang->load('auth');
-        
-        $this->tpl_data['menu'] = '';
-        $this->tpl_data['profile'] = '';
-        $this->tpl_data['content'] = '';
-        
-        $this->tpl_data['title'] 	= lang('auth_title_index');
+		$this->load->library('form_validation');
+		$this->load->model('users');
+		$this->load->helper('safety');
+		
+		$this->lang->load('auth');
+		
+		$this->tpl_data['menu'] = '';
+		$this->tpl_data['profile'] = '';
+		$this->tpl_data['content'] = '';
+		
+		$this->tpl_data['title'] 	= lang('auth_title_index');
 		$this->tpl_data['heading'] 	= lang('auth_heading');
-    }
-    
-    // -----------------------------------------------------------------
-    
-    // Отображение информационного сообщения
-    function _show_message($message = false, $link = false, $link_text = false)
-    {
-        
-        if (!$message) {
+	}
+	
+	// -----------------------------------------------------------------
+	
+	// Отображение информационного сообщения
+	function _show_message($message = false, $link = false, $link_text = false)
+	{
+		
+		if (!$message) {
 			$message = lang('error');
 		}
 		
-        if (!$link) {
+		if (!$link) {
 			$link = site_url('auth/in');
 		}
 		
@@ -60,97 +59,77 @@ class Auth extends CI_Controller {
 			$link_text = lang('back');
 		}
 
-        $local_tpl_data['message'] = $message;
-        $local_tpl_data['link'] = $link;
-        $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
-        $this->parser->parse('main.html', $this->tpl_data);
-    }
-    
-    // -----------------------------------------------------------------
+		$local_tpl_data['message'] = $message;
+		$local_tpl_data['link'] = $link;
+		$local_tpl_data['back_link_txt'] = $link_text;
+		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+		$this->parser->parse('main.html', $this->tpl_data);
+	}
+	
+	// -----------------------------------------------------------------
 
-    /**
-     * Проверка капчи
-    */ 
-    private function _check_captcha($word)
-    {
-		$this->load->library('session');
-		return (bool)($word == $this->session->flashdata('captcha'));
+	/**
+	 * Проверка капчи
+	*/ 
+	private function _check_captcha()
+	{
+		$this->load->driver('captcha');
+		return $this->captcha->check();
 	}
 	
 	// -----------------------------------------------------------------
 	
 	private function _create_captcha()
 	{
-		$this->load->library('session');
-		
-		// Слово для капчи
-		$cap['word'] = rand(1000, 9999);
-		
-		// Создаем капчу
-		$vals = array(
-			'word'	 		=> $cap['word'],
-			'img_path'	 	=> './uploads/security/',
-			'img_url'	 	=> base_url('uploads/security') . '/',
-			'font_path'	 	=> './system/fonts/U1Uabbif.ttf',
-			'img_width'	 	=> 300,
-			'img_height' 	=> 50,
-			'expiration' 	=> 7200
-			);
-
-		$captcha = create_captcha($vals);
-		$this->tpl_data['captcha'] = $captcha['image'];
-		
-		$this->session->set_flashdata('captcha', $cap['word']);
-		
-		return $captcha['image'];
+		$this->load->driver('captcha');
+		return $this->captcha->get_html();
 	}
 	
 	// -----------------------------------------------------------------
 
-    /**
-     * Главная страница
-    */ 
+	/**
+	 * Главная страница
+	*/ 
 	public function index()
 	{
 		// Обычно библиотека запущена
-        // $this->load->library('parser');
-        
-        $this->tpl_data['code'] = '';
+		// $this->load->library('parser');
+		
+		$this->tpl_data['code'] = '';
 
-        /* Проверяем пользователя */
-        if (!$this->users->check_user()) {
-            redirect('auth/in');
-        } else {
+		/* Проверяем пользователя */
+		if (!$this->users->check_user()) {
+			redirect('auth/in');
+		} else {
 			redirect('admin');
-        }
+		}
 	}
 	
-    // -----------------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
-     * Авторизация
-     * 
-     * @param code - необязательный параметр для авторизации пользователей, 
-     * подвергшихся брутфорс атаке.
-    */
-    public function in($code = false)
-    {
-        /* Загрузка модели проверки пользователей */
-        //$this->load->model('check_user');
+	 * Авторизация
+	 * 
+	 * @param code - необязательный параметр для авторизации пользователей, 
+	 * подвергшихся брутфорс атаке.
+	*/
+	public function in($code = false)
+	{
+		/* Загрузка модели проверки пользователей */
+		//$this->load->model('check_user');
 
-        if($code) {
+		if($code) {
 			$this->tpl_data['code'] = $code;
 		} else {
 			$this->tpl_data['code'] = '';
 		}
 		
 		$this->tpl_data['heading'] 	= lang('auth_heading');
-        $this->tpl_data['title'] 	= lang('auth_title_in');
-        
-        $this->tpl_data['captcha'] = '';
-        
-        $check = $this->users->check_user();
+		$this->tpl_data['title'] 	= lang('auth_title_in');
+		
+		$this->tpl_data['captcha'] = '';
+		
+		$check = $this->users->check_user();
 			
 		if ($check) {
 			/* Перенаправляем пользователя в нужное место, 
@@ -180,14 +159,14 @@ class Auth extends CI_Controller {
 			$captcha_login = false;
 		}
 
-        $this->form_validation->set_rules('user_login', 'Username', 'trim|required|max_length[32]|xss_clean');
-        $this->form_validation->set_rules('user_password', 'Password', 'trim|required');
+		$this->form_validation->set_rules('user_login', 'Username', 'trim|required|max_length[32]|xss_clean');
+		$this->form_validation->set_rules('user_password', 'Password', 'trim|required');
 
-        /* Проверка формы */
+		/* Проверка формы */
 		if ($this->form_validation->run() == false){
 			//$this->tpl_data['content'] .= $this->parser->parse('login.html', $this->tpl_data);
 
-        } else {
+		} else {
 
 			$user_data['login'] = $this->input->post('user_login', true);
 			$user_data['password'] = $this->input->post('user_password', true);
@@ -270,7 +249,7 @@ class Auth extends CI_Controller {
 				}
 			}
 
-            $check = $this->users->user_auth($user_data['login'], $user_data['password']);
+			$check = $this->users->user_auth($user_data['login'], $user_data['password']);
 
 			/* Если все сходится, то задаем куки*/
 			if($check) {
@@ -335,22 +314,22 @@ class Auth extends CI_Controller {
 				$log_data['msg'] = 'Authorization Failed';
 				$this->panel_log->save_log($log_data);
 			}
-        }
-        /* Конец проверки формы*/
+		}
+		/* Конец проверки формы*/
 
-        $this->parser->parse('login.html', $this->tpl_data);
-    }
-    
-    // -----------------------------------------------------------------------------------------
+		$this->parser->parse('login.html', $this->tpl_data);
+	}
+	
+	// -----------------------------------------------------------------------------------------
 
-    /**
-     * Выход
-    */ 
-    public function out()
-    {
+	/**
+	 * Выход
+	*/ 
+	public function out()
+	{
 		$this->tpl_data['menu'] = '';
-        $this->tpl_data['title'] 		= lang('auth_title_out');
-        $this->tpl_data['heading'] 		= lang('auth_heading_out');
+		$this->tpl_data['title'] 		= lang('auth_title_out');
+		$this->tpl_data['heading'] 		= lang('auth_heading_out');
 		
 		$cookie = array(
 			'name'   => 'user_id',
@@ -371,41 +350,36 @@ class Auth extends CI_Controller {
 		$local_tpl_data['back_link_txt'] 	= lang('auth_goto_main');
 		$this->tpl_data['content'] 			= $this->parser->parse('info.html', $local_tpl_data, true);
 
-        $this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl_data);
 	}
 	
 	// -----------------------------------------------------------------
 
-    /**
-     * Регистрация пользователя
-    */ 
+	/**
+	 * Регистрация пользователя
+	*/ 
 	function register()
-    {
-        $this->tpl_data['heading'] 	= lang('auth_title_register');
-        $this->tpl_data['title'] 	= lang('auth_heading_register');
-        
-        if(!$this->config->config['register_users']) {
+	{
+		$this->tpl_data['heading'] 	= lang('auth_title_register');
+		$this->tpl_data['title'] 	= lang('auth_heading_register');
+		
+		if(!$this->config->config['register_users']) {
 			$this->_show_message(lang('auth_registration_closed'), site_url());
 			return false;
 		}
 
-        $this->form_validation->set_rules('login', 'логин', 'trim|required|alpha_dash|is_unique[users.login]|max_length[32]|xss_clean');
+		$this->form_validation->set_rules('login', 'логин', 'trim|required|alpha_dash|is_unique[users.login]|max_length[32]|xss_clean');
 		$this->form_validation->set_rules('password', 'пароль', 'trim|required|max_length[64]|matches[passconf]|xss_clean');
 		$this->form_validation->set_rules('passconf', 'подтверждение пароля', 'trim|required|max_length[64]|xss_clean');
 		$this->form_validation->set_rules('email', 'email адрес', 'trim|required|is_unique[users.email]|max_length[64]|valid_email|xss_clean');
 		
-		$this->form_validation->set_rules('image', 'капча', 'trim|required|max_length[12]|xss_clean');
-        
-        /* Проверка формы */
+		//~ $this->form_validation->set_rules('image', 'капча', 'trim|required|max_length[12]|xss_clean');
+		
+		/* Проверка формы */
 		if ($this->form_validation->run() == false) {
-			
-			$this->_create_captcha();
-
-			//~ 
-			//~ $query = $this->db->insert('captcha', $data);
-            
-            $this->parser->parse('register.html', $this->tpl_data);
-        } else {
+			$this->tpl_data['captcha'] = $this->_create_captcha();	
+			$this->parser->parse('register.html', $this->tpl_data);
+		} else {
 			
 			// Загрузка модели для шифровки пароля
 			$this->load->model('password');
@@ -416,7 +390,7 @@ class Auth extends CI_Controller {
 			}
 			
 			// Проверяем, правильно ли введено сообщение
-			if (!$this->_check_captcha($this->input->post('image'))) {
+			if (!$this->_check_captcha()) {
 				// Сохраняем логи
 				$log_data['type'] = 'reg';
 				$log_data['user_name'] = $this->input->post('login');
@@ -430,9 +404,9 @@ class Auth extends CI_Controller {
 			$user_data['email'] = $this->input->post('email', true);
 			$user_data['reg_date'] = time();
 			 
-            $user_data['login'] = $this->input->post('login');
-            $user_data['password'] = $this->input->post('password');
-            $user_data['password'] = hash_password($user_data['password']);
+			$user_data['login'] 		= $this->input->post('login');
+			$user_data['password'] 		= $this->input->post('password');
+			$user_data['password'] 		= hash_password($user_data['password']);
 			
 			$user_data['privileges'] = json_encode(array(
 													'srv_global' 			=> false,
@@ -462,16 +436,16 @@ class Auth extends CI_Controller {
 	
 	// -----------------------------------------------------------------
 
-    /**
-     * Восстановление пароля
-    */ 
+	/**
+	 * Восстановление пароля
+	*/ 
 	function recovery_password($code = false)
 	{
 		$this->tpl_data['heading'] 	= lang('auth_title_recovery_password');
-        $this->tpl_data['title'] 	= lang('auth_heading_recovery_password');
+		$this->tpl_data['title'] 	= lang('auth_heading_recovery_password');
 
-        /* Если ключ указан */
-        if($code) {
+		/* Если ключ указан */
+		if($code) {
 			$where = array('recovery_code' => $code);
 			$user_list = $this->users->get_users_list($where, 1);
 			
@@ -497,11 +471,11 @@ class Auth extends CI_Controller {
 				$new_password = generate_code(8);
 				
 				$user_data['password'] = hash_password($new_password);
-                
-                /* Сохраняем пользователя */
-                $this->users->update_user($user_data, $user_list['0']['id']);
-                
-                // Загрузка моделей
+				
+				/* Сохраняем пользователя */
+				$this->users->update_user($user_data, $user_list['0']['id']);
+				
+				// Загрузка моделей
 				$this->load->library('email');
 				$this->load->helper('url');
 					
@@ -553,10 +527,10 @@ class Auth extends CI_Controller {
 		/* ---------------------------------------------------------- */
 		/* Код указан неверно, либо вообще не указан, отображем форму */
 		/* ---------------------------------------------------------- */
-        
-        $this->form_validation->set_rules('login', 'логин', 'trim|max_length[12]|xss_clean');
+		
+		$this->form_validation->set_rules('login', 'логин', 'trim|max_length[12]|xss_clean');
 		$this->form_validation->set_rules('email', 'email адрес', 'trim|max_length[64]|min_length[0]|valid_email|xss_clean');
-        
+		
 		if ($this->form_validation->run() == false) {
 			$this->parser->parse('recovery_password.html', $this->tpl_data);
 		} else {
