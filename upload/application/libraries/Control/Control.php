@@ -64,8 +64,8 @@ class Control extends CI_Driver_Library {
 		}
 		
 		return $path;
-	}
-	
+	}	
+
 	// ---------------------------------------------------------------------
     
     /*

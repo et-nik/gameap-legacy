@@ -57,6 +57,9 @@ class CI_Parser {
 		}
 		
 		$template = $CI->load->view($template, $data, TRUE);
+		
+		/* $template = str_replace('[IS_ADMIN]', '<?php if($this->users->auth_data[\'is_admin\']): ?>', $template);
+		$template = str_replace('[/IS_ADMIN]', '<?php endif; ?>', $template); */
 
 		return $this->_parse($template, $data, $return);
 	}

@@ -13,7 +13,7 @@
 */
 class Panel_log extends CI_Model {
 	
-	private $_filter = array('type' => null, 'command' => null, 'user_name' => null, 'contents' => null);
+	private $_filter = array('type' => null, 'command' => null, 'user_name' => null, 'contents' => null, 'server_id' => null);
 	
 	
 	//-----------------------------------------------------------

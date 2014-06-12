@@ -851,7 +851,8 @@ class Users extends CI_Model {
      * Отправка сообщения администратору на почту
      * @return string
     */  
-    function admin_msg($subject = '<empty>', $message) {
+    function admin_msg($subject = '<empty>', $message) 
+    {
 		
 		$admin_list = $this->get_users_list(array('is_admin' => '1'), 1000);
 		
