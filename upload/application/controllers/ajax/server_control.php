@@ -239,7 +239,13 @@ class Server_control extends CI_Controller {
 		try {
 			$response = send_command($command, $this->servers->server_data);
 			$response = $this->_crop_console($response);
-			$console_content = str_replace("\n", "<br />", htmlspecialchars($response, ENT_SUBSTITUTE));
+			
+			if (version_compare(phpversion(), '5.4.0') == -1) {
+				$console_content = str_replace("\n", "<br />\n", htmlspecialchars($response));
+			} else {
+				$console_content = str_replace("\n", "<br />\n", htmlspecialchars($response, ENT_SUBSTITUTE));
+			}
+
 			//~ $console_content = str_replace("\n", "<br />", htmlspecialchars($response));
 			$this->output->append_output($console_content);
 		} catch (Exception $e) {
