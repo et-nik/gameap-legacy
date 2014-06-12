@@ -42,7 +42,6 @@ class Rcon_rust extends CI_Driver {
 						'user_name' 	=> htmlspecialchars($matches[$a]['2']), 
 						'user_id' 		=> $matches[$a]['1'],
 						'steam_id' 		=> steamid64_to_steamid($matches[$a]['1']),
-						//~ 'steam_id' 		=> '',
 						'user_ip' 		=> $matches[$a]['4'],
 						'user_time' 	=> $matches[$a]['3'],
 					);
