@@ -173,7 +173,7 @@ class Auth extends CI_Controller {
 			
 			if ($captcha_login) {
 				// Проверяем капчу
-				if (!$this->_check_captcha($this->input->post('image'))) {
+				if (!$this->_check_captcha()) {
 					$this->_show_message(lang('auth_captcha_enter_wrong'), site_url('auth/in'));
 					return false;
 				}
