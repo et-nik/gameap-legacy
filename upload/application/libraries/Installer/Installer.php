@@ -74,6 +74,16 @@ class Installer extends CI_Driver_Library {
 	*/
 	public function set_parameters($parameters)
 	{
+		$this->set_data($parameters);
+	}
+	
+	// ------------------------------------------------------------------------
+	
+	/**
+	 * Задает значение игры и движка
+	*/
+	public function set_data($parameters)
+	{
 		$this->_parameters = $parameters;
 	}
 	
