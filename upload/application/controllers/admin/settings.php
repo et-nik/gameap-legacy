@@ -226,7 +226,7 @@ class Settings extends CI_Controller {
 		switch($filter_name) {
 			case 'servers_list':
 				$this->form_validation->set_rules('filter_name', lang('name'), 'trim|xss_clean');
-				$this->form_validation->set_rules('filter_ip', lang('ip'), 'trim|xss_clean');
+				$this->form_validation->set_rules('filter_ip', lang('ip'), 'xss_clean');
 				$this->form_validation->set_rules('filter_game', lang('game'), 'xss_clean');
 				break;
 			

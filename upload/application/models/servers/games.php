@@ -80,24 +80,26 @@ class Games extends CI_Model {
 	
 	/**
 	 * Получение списка активных игр (серверы которых имеются)
+	 * 
+	 * @param array массив со списком игр
 	 */
-	function get_active_games_list()
+	function get_active_games_list($games_array = array())
 	{
 		$this->load->model('servers');
-		
-		$games_array = array(); // Массив с кодами активных игр
-		
-		$this->servers->select_fields('game');
+	
+		if (empty($games_list)) {
+			$this->servers->select_fields('game');
 
-		foreach($this->servers->get_list() as $server) {
-			if (!in_array($server['game'], $games_array)) {
-				$games_array[] = $server['game'];
+			foreach($this->servers->get_list() as $server) {
+				if (!in_array($server['game'], $games_array)) {
+					$games_array[] = $server['game'];
+				}
 			}
 		}
 		
-		$this->games->select_fields('code, start_code, name, engine, engine_version');
-		$this->games->select_games($games_array);
-		return $this->games->get_games_list();
+		//~ $this->games->select_fields('code, start_code, name, engine, engine_version');
+		$this->select_games($games_array);
+		return $this->get_games_list();
 	}
 
 	//-----------------------------------------------------------

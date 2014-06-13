@@ -24,7 +24,7 @@ $("a#filter" ).click(function() {
 			
 			<tr>
 				<td width="30%">{lang_ip}:</td>
-				<td><input type="text" name="filter_ip" value="{filter_ip}"/></td>
+				<td>{filter_ip_dropdown}</td>
 			</tr>
 			
 			<tr>
@@ -41,7 +41,7 @@ $("a#filter" ).click(function() {
 </div>
 
 <script>
-	$('select[multiple="multiple"]').multipleSelect();
+	$('select[multiple="multiple"]').multipleSelect({width:200});
 </script>
 
 <p class="hr">{lang_select_server}</p>

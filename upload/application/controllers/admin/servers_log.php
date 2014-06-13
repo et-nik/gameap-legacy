@@ -82,8 +82,25 @@ class Servers_log extends CI_Controller {
 	 */
 	private function _get_tpl_filter($filter = false)
 	{
+		$this->load->model('servers');
+		
 		if (!$filter) {
 			$filter = $this->users->get_filter('servers_list');
+		}
+		
+		$this->servers->select_fields('game, server_ip');
+		
+		$games_array 	= array();
+		$ip_array		= array();
+
+		foreach($this->servers->get_list() as $server) {
+			if (!in_array($server['game'], $games_array)) {
+				$games_array[] 	= $server['game'];
+			}
+			
+			if (!in_array($server['server_ip'], $ip_array)) {
+				$ip_array[ $server['server_ip'] ]		= $server['server_ip'];
+			}
 		}
 		
 		if (empty($this->games->games_list)) {
@@ -96,6 +113,8 @@ class Servers_log extends CI_Controller {
 		
 		$tpl_data['filter_name']			= isset($filter['name']) ? $filter['name'] : '';
 		$tpl_data['filter_ip']				= isset($filter['ip']) ? $filter['ip'] : '';
+		
+		$tpl_data['filter_ip_dropdown']		= form_multiselect('filter_ip[]', $ip_array, $tpl_data['filter_ip']);
 		
 		$default = isset($filter['game']) ? $filter['game'] : null;
 		$tpl_data['filter_games_dropdown'] 	= form_multiselect('filter_game[]', $games_option, $default);
