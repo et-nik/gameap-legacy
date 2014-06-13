@@ -131,17 +131,18 @@ class Adm_modules extends CI_Controller {
 					include_once APPPATH . 'modules/' . $key . '/module_info.php';
 					
 					$sql_data['short_name'] 	= $key;
-					$sql_data['name']			= (isset($module_info['name'])) ? $module_info['name'] : '';
-					$sql_data['description']	= (isset($module_info['description'])) ? $module_info['description'] : '';
-					$sql_data['cron_script']	= (isset($module_info['cron_script'])) ? $module_info['cron_script'] : '';
-					$sql_data['version']		= (isset($module_info['version'])) ? $module_info['version'] : '0.0.0';
+					$sql_data['name']			= (isset($module_info['name'])) 		? $module_info['name'] : '';
+					$sql_data['description']	= (isset($module_info['description'])) 	? $module_info['description'] : '';
+					$sql_data['cron_script']	= (isset($module_info['cron_script'])) 	? $module_info['cron_script'] : '';
+					$sql_data['version']		= (isset($module_info['version'])) 		? $module_info['version'] : '0.0.0';
+					$sql_data['update_info']	= (isset($module_info['update_info'])) 	? $module_info['update_info'] : '';
 					$sql_data['show_in_menu']	= (isset($module_info['show_in_menu'])) ? (int)(bool)$module_info['show_in_menu'] : 0;
-					$sql_data['access']			= (isset($module_info['access'])) ? $module_info['access'] : '';
-					$sql_data['developer']		= (isset($module_info['developer'])) ? $module_info['developer'] : '';
-					$sql_data['site']			= (isset($module_info['site'])) ? $module_info['site'] : '';
-					$sql_data['email']			= (isset($module_info['email'])) ? $module_info['email'] : '';
-					$sql_data['copyright']		= (isset($module_info['copyright'])) ? $module_info['copyright'] : '';
-					$sql_data['license']		= (isset($module_info['license'])) ? $module_info['license'] : '';
+					$sql_data['access']			= (isset($module_info['access'])) 		? $module_info['access'] : '';
+					$sql_data['developer']		= (isset($module_info['developer'])) 	? $module_info['developer'] : '';
+					$sql_data['site']			= (isset($module_info['site'])) 		? $module_info['site'] : '';
+					$sql_data['email']			= (isset($module_info['email'])) 		? $module_info['email'] : '';
+					$sql_data['copyright']		= (isset($module_info['copyright'])) 	? $module_info['copyright'] : '';
+					$sql_data['license']		= (isset($module_info['license'])) 		? $module_info['license'] : '';
 					
 					$this->gameap_modules->add_module($sql_data);
 					
