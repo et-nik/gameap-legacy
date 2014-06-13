@@ -479,7 +479,7 @@ $fields = array(
 		),
 		
 		'log_data' => array(
-							'type' => 'TEXT',
+							'type' => 'MEDIUMTEXT',
 		),
 
 
@@ -515,6 +515,10 @@ $fields = array(
 							'type' => 'VARCHAR',
 							'constraint' => 64, 
 		),
+		
+		'update_info' => array(
+							'type' => 'TINYTEXT',
+		),	
 		
 		'show_in_menu' => array(
 							'type' => 'INT',

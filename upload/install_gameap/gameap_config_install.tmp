@@ -16,5 +16,7 @@ $config['register_users'] 		= false;
 $config['delete_server_on_reinstall']	= true;
 $config['disable_sftp_search']			= false;
 
+$config['captcha_driver']				= 'codeigniter';
+
 /* End of file gameap_config.php */
 /* Location: ./application/config/gameap_config.php */
