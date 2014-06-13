@@ -64,15 +64,15 @@ case "$1" in
 		then
 		echo "Server is already running"
     else
-		su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
+		su $USER -c "cd $DIR; screen -U -m -d -S $NAME $COMMAND"
 		sleep 4
 		
-		if [[ `su $USER -c "screen -ls |grep $NAME"` ]]
+		if [[ `su $USER -c "screen -U -ls |grep $NAME"` ]]
 			then
 			echo "Server started"
 		else
 		   echo -e "Server not started \nStart command:"
-		   echo su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
+		   echo su $USER -c "cd $DIR; screen -U -m -d -S $NAME $COMMAND"
 		fi
     fi
     ;;
@@ -81,7 +81,7 @@ case "$1" in
     if [[ `su $USER -c "screen -ls |grep $NAME"` ]]
        then
        kill -TERM `ps aux | grep -v grep | grep -i screen | grep -i $NAME | awk '{print $2}'`
-       su $USER -c  "screen -X -S $NAME kill"
+       su $USER -c  "screen -U -X -S $NAME kill"
        echo "Server stopped"
     else
        echo "Coulnd't find a running server"
@@ -92,10 +92,10 @@ case "$1" in
     if [[ `su $USER -c "screen -ls |grep $NAME"` ]]
 		then
 		kill -TERM `ps aux | grep -v grep | grep -i screen | grep -i $NAME | awk '{print $2}'`
-		su $USER -c  "screen -X -S $NAME kill"
+		su $USER -c  "screen -U -X -S $NAME kill"
 		sleep 2
        
-		su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
+		su $USER -c "cd $DIR; screen -U -m -d -S $NAME $COMMAND"
 		sleep 4
 		
 		if [[ `su $USER -c "screen -ls |grep $NAME"` ]]
@@ -103,7 +103,7 @@ case "$1" in
 			echo "Server restarted"
 		else
 		   echo -e "Server not restarted \nStart command:"
-		   echo su $USER -c "cd $DIR; screen -m -d -S $NAME $COMMAND"
+		   echo su $USER -c "cd $DIR; screen -U -m -d -S $NAME $COMMAND"
 		fi
     else
        echo "Coulnd't find a running server"
@@ -127,14 +127,14 @@ case "$1" in
 	fi
 	
 	#~ su $USER -c "screen -S $NAME -X -p 0 hardcopy -h $DIR/gap_console.txt && chmod 666 $DIR/gap_console.txt"
-	su $USER -c "screen -S $NAME -X -p 0 hardcopy -h $DIR/gap_console.txt && chmod 666 $DIR/gap_console.txt"
+	su $USER -c "screen -U -S $NAME -X -p 0 hardcopy -h $DIR/gap_console.txt && chmod 666 $DIR/gap_console.txt"
 	RESULT=`cat $DIR/gap_console.txt`
 	echo -e "$RESULT"
 	;;
  send_command)
  
 	#./server.sh send_command /home/hl_server screen_hldm 127.0.0.1 27015 "stats" user
-	su $USER "-c screen -p 0 -S $NAME -X stuff '$COMMAND
+	su $USER "-c screen -U -p 0 -S $NAME -X stuff '$COMMAND
 	'"
 	
 	;;
