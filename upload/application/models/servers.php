@@ -44,11 +44,35 @@ class Servers extends CI_Model {
     
 	//-----------------------------------------------------------
 	
-   private function _strip_quotes($string) {
+	private function _strip_quotes($string) 
+	{
 		$string = str_replace('"', '', $string);
 		$string = str_replace('\'', '', $string);
 		
 		return $string;
+	}
+	
+	//-----------------------------------------------------------
+	
+	private function _apply_filter()
+	{
+		!$this->_filter_servers_list['name'] OR $this->db->like('name', $this->_filter_servers_list['name']);
+		
+		if (!empty($this->_filter_servers_list['ip'])) {
+			if (is_array($this->_filter_servers_list['ip'])) {
+				$this->db->where_in('server_ip', $this->_filter_servers_list['ip']);
+			} else {
+				$this->db->where('server_ip', $this->_filter_servers_list['ip']);
+			}
+		}
+		
+		if (!empty($this->_filter_servers_list['game'])) {
+			if (is_array($this->_filter_servers_list['game'])) {
+				$this->db->where_in('game', $this->_filter_servers_list['game']);
+			} else {
+				$this->db->where('game', $this->_filter_servers_list['game']);
+			}
+		}
 	}
 	
 	//-----------------------------------------------------------
@@ -458,17 +482,8 @@ class Servers extends CI_Model {
 			if (!empty($games)) { $this->db->where_in('game', $games); }
 			$this->db->where($where);
 			
-			!$this->_filter_servers_list['name'] OR $this->db->like('name', $this->_filter_servers_list['name']);
-			!$this->_filter_servers_list['ip'] OR $this->db->like('server_ip', $this->_filter_servers_list['ip']);
-			
-			if ($this->_filter_servers_list['game']) {
-				if (is_array($this->_filter_servers_list['game'])) {
-					$this->db->where_in('game', $this->_filter_servers_list['game']);
-				} else {
-					$this->db->where('game', $this->_filter_servers_list['game']);
-				}
-			}
-			
+			$this->_apply_filter();
+
 			!$this->_fields OR $this->db->select($this->_fields);
 			
 			// Сброс полей
@@ -520,9 +535,7 @@ class Servers extends CI_Model {
 					return NULL;
 				}
 				
-				!$this->_filter_servers_list['name'] OR $this->db->like('name', $this->_filter_servers_list['name']);
-				!$this->_filter_servers_list['ip'] OR $this->db->like('server_ip', $this->_filter_servers_list['ip']);
-				!$this->_filter_servers_list['game'] OR $this->db->where('game', $this->_filter_servers_list['game']);
+				$this->_apply_filter();
 				
 				if (is_array($where) && !empty($where)) { 
 					$this->db->where($where);
