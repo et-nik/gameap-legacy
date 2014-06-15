@@ -154,7 +154,7 @@ class Auth extends CI_Controller {
 		/* Капча от брутфорса*/
 		if(count($this->panel_log->get_log(array('date >' => time() - 300, 'ip' => $_SERVER['REMOTE_ADDR'], 'msg' => 'Authorization Failed'))) > 3) {
 			$captcha_login = true;
-			$this->_create_captcha();
+			$this->tpl_data['captcha'] = $this->_create_captcha();
 		} else {
 			$captcha_login = false;
 		}
