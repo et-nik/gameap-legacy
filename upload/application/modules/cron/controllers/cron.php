@@ -65,6 +65,7 @@ class Cron extends MX_Controller {
 		$this->load->driver('installer');
 		
 		$this->load->helper('ds');
+		$this->load->helper('date');
 		//~ $this->load->library('ssh');
 		//~ $this->load->library('telnet');
 		$this->load->library('query');
@@ -1073,7 +1074,7 @@ class Cron extends MX_Controller {
 		$i = 0;
 		$count_i = count($this->servers->servers_list);
 		while($i < $count_i) {
-			$server_id = $this->servers->servers_list[$i]['id'];
+			$server_id = &$this->servers->servers_list[$i]['id'];
 			
 			// Костыль
 			$this->games->get_games_list(array('code' => $this->servers->servers_list[$i]['game']));
@@ -1344,7 +1345,9 @@ class Cron extends MX_Controller {
 
 					if(count($logs) >= 1) {
 						/* Перед запуском получаем консоль, чтобы знать от чего сервер упал */
-						$console_data = $this->_get_console($server_id);
+						if (strtolower($this->servers->server_data['os']) != 'windows') {
+							$console_data = $this->_get_console($server_id);
+						}
 						
 						/* При последней проверке сервер был оффлайн, запускаем его*/
 						try {
@@ -1498,7 +1501,7 @@ class Cron extends MX_Controller {
 					continue;
 				}
 				
-				if(isset($stats['cpu_usage']) && isset($stats['cpu_usage'])) {
+				if(isset($stats['cpu_usage']) && isset($stats['memory_usage'])) {
 					$this->_cmd_output('Stats server #' . $ds['id'] . ' successful');
 				} else {
 					$this->_cmd_output('Stats server #' . $ds['id'] . ' failed');
@@ -1514,7 +1517,9 @@ class Cron extends MX_Controller {
 				*/
 
 				$stats_array = json_decode($ds['stats'], true);
-				$stats_array = array_slice($stats_array, -20);
+				$stats_array OR $stats_array = array();
+				
+				$stats_array = array_slice($stats_array, -40);
 
 				$stats_array[] = array('date' => $time, 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
 				$data['stats'] = json_encode($stats_array);
@@ -1533,6 +1538,9 @@ class Cron extends MX_Controller {
 		 * а после этого запускаем пользовательский крон
 		*/
 		$this->_modules_cron();
+		
+		// Очистка старых cron логов (старше 3 дня)
+		$this->db->delete('logs', array('date <' => now() - 86400*3, 'type' => 'cron'));
 		
 		$this->_cmd_output("Cron end");
 
