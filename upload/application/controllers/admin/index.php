@@ -64,14 +64,16 @@ class Index extends CI_Controller {
 		
 		$games_array 	= array();
 		$ip_array		= array();
-
-		foreach($this->servers->get_list() as $server) {
-			if (!in_array($server['game'], $games_array)) {
-				$games_array[] 	= $server['game'];
-			}
-			
-			if (!in_array($server['server_ip'], $ip_array)) {
-				$ip_array[ $server['server_ip'] ]		= $server['server_ip'];
+		
+		if ($servers_list = $this->servers->get_list()) {
+			foreach($servers_list as $server) {
+				if (!in_array($server['game'], $games_array)) {
+					$games_array[] 	= $server['game'];
+				}
+				
+				if (!in_array($server['server_ip'], $ip_array)) {
+					$ip_array[ $server['server_ip'] ]		= $server['server_ip'];
+				}
 			}
 		}
 		

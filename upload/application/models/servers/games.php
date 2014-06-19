@@ -86,13 +86,16 @@ class Games extends CI_Model {
 	function get_active_games_list($games_array = array())
 	{
 		$this->load->model('servers');
+		$games_array = array();
 	
 		if (empty($games_list)) {
 			$this->servers->select_fields('game');
-
-			foreach($this->servers->get_list() as $server) {
-				if (!in_array($server['game'], $games_array)) {
-					$games_array[] = $server['game'];
+			
+			if ($servers_list = $this->servers->get_list()) {
+				foreach($servers_list as $server) {
+					if (!in_array($server['game'], $games_array)) {
+						$games_array[] = $server['game'];
+					}
 				}
 			}
 		}

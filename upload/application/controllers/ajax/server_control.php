@@ -139,12 +139,12 @@ class Server_control extends CI_Controller {
 			show_404();
 		}
 		
-		if($this->servers->server_status($this->servers->server_data['server_ip'], 
+		if ($this->servers->server_status($this->servers->server_data['server_ip'], 
 											$this->servers->server_data['query_port'], 
 											$this->servers->server_data['engine'], 
-											$this->servers->server_data['engine_version'])) {
-			$this->output->append_output(1);
-											
+											$this->servers->server_data['engine_version'])
+		){
+			$this->output->append_output(1);							
 		} else {
 			$this->output->append_output(0);
 		}
