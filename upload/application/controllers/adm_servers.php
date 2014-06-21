@@ -976,7 +976,7 @@ class Adm_servers extends CI_Controller {
 							return false;
 						}
 						
-						if ($this->input->post('delete_files')) {
+						if ($this->input->post('delete_files') && !empty($this->servers->server_data['dir'])) {
 							/* Удаление директории на выделенном сервере */
 							switch(strtolower($this->servers->server_data['os'])) {
 								case 'windows':
