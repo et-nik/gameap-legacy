@@ -86,8 +86,8 @@ class Control_telnet extends CI_Driver {
 				$file_dir = str_replace('/', '\\', $file_dir);
 
 				$result = $this->command('dir ' . $file_dir . ' /a:-d /b');
-				$result = explode("\r\n", $result);
-
+				$result = explode("\n", $result);
+				
 				foreach($result as &$value) {
 					$value = trim($value);
 				}
@@ -104,7 +104,7 @@ class Control_telnet extends CI_Driver {
 			default:
 				$result = $this->command('ls ' . $file_dir . ' --color=none -l | grep ^- | grep ' . $file_name . ' --color=none');
 				$result = explode("\n", $result);
-
+				
 				foreach($result as &$values) {
 					if ($values == '') {
 						continue;
@@ -133,7 +133,7 @@ class Control_telnet extends CI_Driver {
 				
 				break;
 		}
-		
+
 		if (!$file_perm['exists']) {
 			throw new Exception(lang('server_command_file_not_found', $file_name) . ' (Telnet)');
 		}
@@ -248,14 +248,14 @@ class Control_telnet extends CI_Driver {
 		}
 		
 		$this->_write($command . "\r\n");
-		sleep(1);
 		$result = explode("\n", $this->_read_till($this->_prompt));
 		
 		$last_element = count($result)-1;
 		unset($result[0]);
-		if (strpos($result[$last_element], '>') !== false) {
+		
+		if ($last_element && strpos($result[$last_element], '>') !== false) {
 			unset($result[$last_element]);
-		} elseif (strpos($result[$last_element], '~$') !== false) {
+		} elseif ($last_element && strpos($result[$last_element], '~$') !== false) {
 			unset($result[$last_element]);
 		}
 		
@@ -264,7 +264,7 @@ class Control_telnet extends CI_Driver {
 		if ($this->os == 'windows') {
 			$result = iconv('CP866', 'UTF-8//TRANSLIT', $result);
 		}
-		
+
 		return $result;
 	}
 	
@@ -285,7 +285,8 @@ class Control_telnet extends CI_Driver {
 	*/
 	function disconnect() 
 	{
-		if ($this->_connection){
+		if ($this->_connection) {
+			$this->command('exit');
             fclose($this->_connection);
 		}
         
