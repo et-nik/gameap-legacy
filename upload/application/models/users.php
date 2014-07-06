@@ -31,7 +31,7 @@ class Users extends CI_Model {
     var $user_privileges 		= array();	// Базовые привилегии
     var $servers_privileges 	= array();	// Привилегии на отдельные серверы
     var $user_data 				= array();	// Данные пользователя
-    
+
     /* Фильтр списка пользователей */
     private $_filter_users_list	= array(
 									'login' 			=> false,
@@ -42,6 +42,11 @@ class Users extends CI_Model {
 									'last_visit_before' => false,
 									'last_visit_after' 	=> false,
 								);
+	
+	/* Массив с id пользователей, которые будут получены 
+	 * функцией get_users_list
+	 */
+	private $_where_in 			= array();
 	
     /* Списки и пользователи которые получает авторизованный пользователь */
     var $users_list = array();				// Список пользователей
@@ -613,9 +618,13 @@ class Users extends CI_Model {
     /**
      * Получение списка пользователей
      * 
+     * @param int  		лимит списка
+     * @param int 		смещение
+     * @param string	префикс названия ключей в массиве, по умолчанию user_
+     * 
      * @return array
     */
-    public function tpl_users_list($limit = null, $offset = 0)
+    public function tpl_users_list($limit = null, $offset = 0, $prefix = 'user_')
     {
         $this->load->helper('date');
         
@@ -629,10 +638,11 @@ class Users extends CI_Model {
             $num++;
             
             $list[$num] = $users;
-            $list[$num]['user_id'] 			= $users['id'];
-            $list[$num]['user_reg_date'] 	= unix_to_human($users['reg_date'], true, 'eu');
-            $list[$num]['user_last_auth'] 	= unix_to_human($users['last_auth'], true, 'eu');
-            $list[$num]['user_balance'] 	= $users['balance'];
+            $list[$num][$prefix . 'id'] 		= $users['id'];
+            $list[$num][$prefix . 'login'] 		= $users['login'];
+            $list[$num][$prefix . 'reg_date'] 	= unix_to_human($users['reg_date'], true, 'eu');
+            $list[$num][$prefix . 'last_auth'] 	= unix_to_human($users['last_auth'], true, 'eu');
+            $list[$num][$prefix . 'balance'] 	= $users['balance'];
         }
         
         return $list;
@@ -648,7 +658,7 @@ class Users extends CI_Model {
      * @return array
      *
     */
-    function get_users_list($where = false, $limit = false, $offset = 0)
+    function get_users_list($where = false, $limit = 9999, $offset = 0, $no_filter = false)
     {
 		/*
 		 * В массиве $where храняться данные для выборки.
@@ -661,16 +671,22 @@ class Users extends CI_Model {
 			$this->db->where($where);
 		}
 		
-		!$this->_filter_users_list['login'] OR $this->db->like('login', $this->_filter_users_list['login']);
+		if (!empty($this->_where_in) && is_array($this->_where_in)) {
+			$this->db->where_in('id', $this->_where_in);
+		}
 		
-		!$this->_filter_users_list['register_before'] 	OR $this->db->where('reg_date >', $this->_filter_users_list['register_before']);
-		!$this->_filter_users_list['register_after'] 	OR $this->db->where('reg_date <', $this->_filter_users_list['register_after']);
-		
-		!$this->_filter_users_list['last_visit_before'] OR $this->db->where('last_auth >', $this->_filter_users_list['last_visit_before']);
-		!$this->_filter_users_list['last_visit_after'] 	OR $this->db->where('last_auth <', $this->_filter_users_list['last_visit_after']);
+		if ($no_filter != true) {
+			!$this->_filter_users_list['login'] OR $this->db->like('login', $this->_filter_users_list['login']);
+			
+			!$this->_filter_users_list['register_before'] 	OR $this->db->where('reg_date >', $this->_filter_users_list['register_before']);
+			!$this->_filter_users_list['register_after'] 	OR $this->db->where('reg_date <', $this->_filter_users_list['register_after']);
+			
+			!$this->_filter_users_list['last_visit_before'] OR $this->db->where('last_auth >', $this->_filter_users_list['last_visit_before']);
+			!$this->_filter_users_list['last_visit_after'] 	OR $this->db->where('last_auth <', $this->_filter_users_list['last_visit_after']);
+		}
 		
 		$query = $this->db->get('users', $limit, $offset);
-
+		
 		if($query->num_rows > 0){
 			
 			$this->users_list = $query->result_array();
@@ -796,6 +812,17 @@ class Users extends CI_Model {
 			!isset($filter['last_visit_after']) OR $this->_filter_users_list['last_visit_after'] = $filter['last_visit_after'];
 		}
 	}
+	
+	// ----------------------------------------------------------------
+	
+	/**
+	 * Задает список пользователей
+	 */
+	function where_in($list = array())
+	{
+		$this->_where_in = $list;
+	}
+	
     
     // ----------------------------------------------------------------
     
