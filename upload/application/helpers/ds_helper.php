@@ -40,31 +40,53 @@ if ( ! function_exists('replace_shotcodes'))
 			$server_data['screen_name'] = 'null';
 		}
 		
-		$command = str_replace('{command}', 	strip_quotes($server_data['start_command']) , $command);							// Команда запуска игрового сервера (напр. "hlds_run -game valve +ip 127.0.0.1 +port 27015 +map crossfire")
-		$command = str_replace('{id}', 			strip_quotes($server_data['id']) 			, $command);							// ID сервера
+		isset($server_data['start_command']) 	OR $server_data['start_command'] 	= '';
+		isset($server_data['id']) 				OR $server_data['id'] 				= '';
+		isset($server_data['script_path']) 		OR $server_data['script_path'] 		= '';
+		isset($server_data['dir']) 				OR $server_data['dir'] 				= '';
+		isset($server_data['script_path']) 		OR $server_data['script_path']	 	= '';
+		isset($server_data['screen_name']) 		OR $server_data['screen_name'] 		= '';
+		isset($server_data['server_ip']) 		OR $server_data['server_ip'] 		= '';
+		isset($server_data['server_port']) 		OR $server_data['server_port'] 		= '';
+		isset($server_data['start_code']) 		OR $server_data['start_code'] 		= '';
+		isset($server_data['su_user']) 			OR $server_data['su_user'] 			= '';
+		
+		// Команда запуска игрового сервера (напр. "hlds_run -game valve +ip 127.0.0.1 +port 27015 +map crossfire")
+		$command = str_replace('{command}', 	strip_quotes($server_data['start_command']) , $command);
+		// ID сервера
+		$command = str_replace('{id}', 			strip_quotes($server_data['id']) 			, $command);
 		$command = str_replace('{script_path}', strip_quotes($server_data['script_path']) 	, $command);
-		$command = str_replace('{game_dir}', 	strip_quotes($server_data['dir'])  			, $command);							// Директория с игрой
-		$command = str_replace('{dir}', 		strip_quotes($server_data['script_path'] . '/' . $server_data['dir'])  , $command);	// Корневая директория (где скрипт запуска)
-		$command = str_replace('{name}', 		strip_quotes($server_data['screen_name']) 	, $command);							// Имя скрина
-		$command = str_replace('{ip}', 			strip_quotes($server_data['server_ip']) 	, $command);							// IP сервера для коннекта (может не совпадать с ip дедика)
-		$command = str_replace('{port}', 		strip_quotes($server_data['server_port']) 	, $command);							// Порт сервера для коннекта
-		$command = str_replace('{game}', 		strip_quotes($server_data['start_code']) 	, $command);							// Игра
-		$command = str_replace('{user}', 		strip_quotes($server_data['su_user']) 		, $command);							// Пользователь
+		// Директория с игрой
+		$command = str_replace('{game_dir}', 	strip_quotes($server_data['dir'])  			, $command);
+		// Корневая директория (где скрипт запуска)
+		$command = str_replace('{dir}', 		strip_quotes($server_data['script_path'] . '/' . $server_data['dir'])  , $command);
+		// Имя скрина
+		$command = str_replace('{name}', 		strip_quotes($server_data['screen_name']) 	, $command);
+		// IP сервера для коннекта (может не совпадать с ip дедика)
+		$command = str_replace('{ip}', 			strip_quotes($server_data['server_ip']) 	, $command);
+		// Порт сервера для коннекта
+		$command = str_replace('{port}', 		strip_quotes($server_data['server_port']) 	, $command);
+		// Игра
+		$command = str_replace('{game}', 		strip_quotes($server_data['start_code']) 	, $command);
+		// Пользователь
+		$command = str_replace('{user}', 		strip_quotes($server_data['su_user']) 		, $command);
 
 		/*-------------------*/
 		/* Замена по алиасам */
 		/*-------------------*/
 		
 		/* Допустимые алиасы */
-		$allowable_aliases 	= json_decode($server_data['aliases_list'], true);
-		/* Значения алиасов на сервере */
-		$server_aliases 	= json_decode($server_data['aliases'], true);
-		
-		/* Прогон по алиасам */
-		if($allowable_aliases && !empty($allowable_aliases)){
-			foreach ($allowable_aliases as $alias) {
-				if(isset($server_aliases[$alias['alias']]) && !empty($server_aliases[$alias['alias']])) {
-					$command = str_replace('{' . $alias['alias'] . '}', $server_aliases[$alias['alias']] , $command);	
+		if (isset($server_data['aliases_list']) && isset($server_data['aliases'])) {
+			$allowable_aliases 	= json_decode($server_data['aliases_list'], true);
+			/* Значения алиасов на сервере */
+			$server_aliases 	= json_decode($server_data['aliases'], true);
+			
+			/* Прогон по алиасам */
+			if($allowable_aliases && !empty($allowable_aliases)){
+				foreach ($allowable_aliases as $alias) {
+					if(isset($server_aliases[$alias['alias']]) && !empty($server_aliases[$alias['alias']])) {
+						$command = str_replace('{' . $alias['alias'] . '}', $server_aliases[$alias['alias']] , $command);	
+					}
 				}
 			}
 		}
