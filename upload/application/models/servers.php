@@ -839,6 +839,7 @@ class Servers extends CI_Model {
 	function server_status($host = false, $port = false, $engine = false, $engine_version = false)
 	{
 		$this->load->library('query');
+		$this->load->driver('rcon');
 		
 		if (!$host) {
 			$host = $this->server_data['server_ip'];
@@ -853,15 +854,29 @@ class Servers extends CI_Model {
 			$engine_version 	= $engine[1];
 			$engine 			= $engine[0];
 		}
-		
+
 		$server['id'] = isset($this->server_data['id']) ? $this->server_data['id'] : 'get_status';
 		$server['type'] = $engine;
 		$server['host'] = $host . ':' . $port;
 		$this->query->set_data($server);
 		
 		$request = $this->query->get_status();
+		$status = (bool)$request[ $server['id'] ];
 		
-		return (bool)$request[ $server['id'] ];
+		if (!$status && $engine == 'rust') {
+			// Костыль для rust nosteam
+			$this->rcon->set_variables(
+				$this->server_data['server_ip'],
+				$this->server_data['rcon_port'],
+				$this->server_data['rcon'], 
+				$this->server_data['engine'],
+				$this->server_data['engine_version']
+			);
+			
+			$status = $this->rcon->connect();
+		}
+		
+		return $status;
 	}
 
 	//-----------------------------------------------------------
@@ -990,6 +1005,7 @@ class Servers extends CI_Model {
 	// ----------------------------------------------------------------
 	
     /**
+     * ФУНКЦИЯ УСТАРЕЛА!
      * Получает список карт
      * 
     */
@@ -997,6 +1013,10 @@ class Servers extends CI_Model {
     {
 		$this->load->helper('path');
 		$this->load->helper('ds');
+		
+		if (strtolower($this->server_data['engine']) != 'goldsource' OR strtolower($this->server_data['engine']) != 'source') {
+			return;
+		}
 		
 		$time = time();
 
@@ -1055,8 +1075,6 @@ class Servers extends CI_Model {
 		} else {
 			return NULL;
 		}
-
-		
 	}
 	
 	// ----------------------------------------------------------------
