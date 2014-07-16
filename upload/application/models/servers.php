@@ -1029,6 +1029,11 @@ class Servers extends CI_Model {
 			return $maps_cache;
 		}
 		
+		// Если в пути пусто, то никаких карт
+		if (empty($this->server_data['maps_path'])) {
+			return;
+		}
+		
 		$file_path = get_ds_file_path($this->server_data);
 		$files_list = list_ds_files($file_path. '/' . $this->server_data['maps_path'], $this->server_data);
 
