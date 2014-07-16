@@ -12,7 +12,7 @@
  * @filesource
 */
 
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------
 
 /**
  * Installer библиотека
@@ -31,8 +31,8 @@ class Installer extends CI_Driver_Library {
 	
 	private $_CI;
 	
-	public $_os	 			= 'linux';
-	public $_game_code 		= '';
+	public $_os	 				= 'linux';
+	public $_game_code 			= '';
 	public $_engine 			= '';
 	public $_engine_version 	= 1;
 	
@@ -40,7 +40,7 @@ class Installer extends CI_Driver_Library {
 	
 	public $server_data 		= array();
 	
-	// ------------------------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	function __construct()
     {
@@ -51,11 +51,11 @@ class Installer extends CI_Driver_Library {
         $this->_CI->load->helper('string');
         $this->_CI->load->helper('ds');
         $this->valid_drivers = array('installer_goldsource', 'installer_source', 'installer_minecraft', 'installer_cod4',
-										'installer_mta', 'installer_samp',
+										'installer_mta', 'installer_samp', 'installer_rust',
 									);
     }
     
-    // ------------------------------------------------------------------------
+    // -----------------------------------------------------------------
 	
 	/**
 	 * Задает значение игры и движка
@@ -67,7 +67,7 @@ class Installer extends CI_Driver_Library {
 		$this->_engine_version 		= $engine_version;
 	}
 	
-	// ------------------------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Задает значение игры и движка
@@ -77,7 +77,7 @@ class Installer extends CI_Driver_Library {
 		$this->set_data($parameters);
 	}
 	
-	// ------------------------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Задает значение игры и движка
@@ -87,7 +87,7 @@ class Installer extends CI_Driver_Library {
 		$this->_parameters = $parameters;
 	}
 	
-	// ------------------------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Задает значение операционной системы
@@ -97,7 +97,45 @@ class Installer extends CI_Driver_Library {
 		$this->_os = $os;
 	}
 	
-	// ------------------------------------------------------------------------
+	// -----------------------------------------------------------------
+	
+	/**
+	 * Получает дополнительные данные сервера
+	 * Возвращает массив с тремя портами:
+	 * 		1. Порт для подключения
+	 * 		2. Query порт
+	 * 		3. Rcon порт
+	 * 
+	 * @param int порт для подключения
+	 * @return array
+	 * 
+	 */
+	public function get_ports($connect_port = 0)
+	{
+		if (false == in_array('installer_' . $this->_engine, $this->valid_drivers)) {
+			$this->errors = 'Driver' . $this->_engine . ' not found';
+			return '';
+		}
+		
+		return $this->{$this->_engine}->get_ports($this->server_data['server_port']);
+	}
+	
+	// -----------------------------------------------------------------
+
+	/**
+	 * Получает путь к списку карт
+	 */
+	public function get_maps_path($game_code = 'valve')
+	{
+		if (false == in_array('installer_' . $this->_engine, $this->valid_drivers)) {
+			$this->errors = 'Driver' . $this->_engine . ' not found';
+			return '';
+		}
+		
+		return $this->{$this->_engine}->get_maps_path($this->_game_code);
+	}
+	
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Получение параметра запуска игры
@@ -112,7 +150,7 @@ class Installer extends CI_Driver_Library {
 		return $this->{$this->_engine}->get_start_command($this->_game_code, $this->_os);
 	}
 	
-	// ------------------------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Получение настроек по умолчанию
@@ -127,7 +165,7 @@ class Installer extends CI_Driver_Library {
 		return $this->{$this->_engine}->get_default_parameters($this->_game_code, $this->_os, $aliases_values);
 	}
 	
-	// ------------------------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Устанавливает нужные значения в конфигурации

@@ -37,6 +37,34 @@ class Installer_cod4 extends CI_Driver {
 		return true;
 	}
 	
+	// -----------------------------------------------------------------
+	
+	/**
+	 * Получает дополнительные данные сервера
+	 * Возвращает массив с тремя портами:
+	 * 		1. Порт для подключения
+	 * 		2. Query порт
+	 * 		3. Rcon порт
+	 * 
+	 * @param int порт для подключения
+	 * @return array
+	 * 
+	 */
+	public function get_ports($connect_port = 0)
+	{
+		return array($connect_port, $connect_port, $connect_port);
+	}
+	
+	// -----------------------------------------------------------------
+
+	/**
+	 * Получает путь к списку карт
+	 */
+	public function get_maps_path($game_code = 'cod4')
+	{
+		return '';
+	}
+	
 	// ------------------------------------------------------------------------
 	
 	/**
@@ -62,7 +90,7 @@ class Installer_cod4 extends CI_Driver {
 	/**
 	 * Получение настроек для сервера по умолчанию
 	*/
-	public function get_default_parameters($game_code = 'cstrike', $os = 'linux', $parameters = array())
+	public function get_default_parameters($game_code = 'cod4', $os = 'linux', $parameters = array())
 	{
 		$parameters['maxplayers'] 	= isset($parameters['maxplayers']) ? $parameters['maxplayers'] : 32;
 		$parameters['fps'] 			= isset($parameters['fps']) ? $parameters['fps'] : 66;

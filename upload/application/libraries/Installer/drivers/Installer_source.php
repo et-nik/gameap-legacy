@@ -50,6 +50,34 @@ class Installer_source extends CI_Driver {
 		return $default_maps[$game_code];
 	}
 	
+	// -----------------------------------------------------------------
+	
+	/**
+	 * Получает дополнительные данные сервера
+	 * Возвращает массив с тремя портами:
+	 * 		1. Порт для подключения
+	 * 		2. Query порт
+	 * 		3. Rcon порт
+	 * 
+	 * @param int порт для подключения
+	 * @return array
+	 * 
+	 */
+	public function get_ports($connect_port = 0)
+	{
+		return array($connect_port, $connect_port, $connect_port);
+	}
+	
+	// -----------------------------------------------------------------
+
+	/**
+	 * Получает путь к списку карт
+	 */
+	public function get_maps_path($game_code = 'cstrike')
+	{
+		return $game_code . '/maps';
+	}
+	
 	// ------------------------------------------------------------------------
 	
 	/**

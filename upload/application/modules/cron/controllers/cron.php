@@ -1074,7 +1074,7 @@ class Cron extends MX_Controller {
 		$i = 0;
 		$count_i = count($this->servers->servers_list);
 		while($i < $count_i) {
-			$server_id = &$this->servers->servers_list[$i]['id'];
+			$server_id = $this->servers->servers_list[$i]['id'];
 			
 			// Костыль
 			$this->games->get_games_list(array('code' => $this->servers->servers_list[$i]['game']));
@@ -1273,6 +1273,16 @@ class Cron extends MX_Controller {
 						$server_data['start_command'] 	= $this->installer->get_start_command();
 					}
 					
+					// Путь к картам
+					$server_data['maps_path'] = $this->installer->get_maps_path();
+					
+					// Список портов
+					$ports = $this->installer->get_ports();
+					
+					$server_data['query_port'] = $ports[1];
+					$server_data['rcon_port'] = $ports[2];
+					unset($ports);
+					
 					$this->servers->edit_game_server($server_id, $server_data);
 					
 					$log_data['type'] = 'server_command';
@@ -1345,9 +1355,7 @@ class Cron extends MX_Controller {
 
 					if(count($logs) >= 1) {
 						/* Перед запуском получаем консоль, чтобы знать от чего сервер упал */
-						if (strtolower($this->servers->server_data['os']) != 'windows') {
-							$console_data = $this->_get_console($server_id);
-						}
+						$console_data = $this->_get_console($server_id);
 						
 						/* При последней проверке сервер был оффлайн, запускаем его*/
 						try {
