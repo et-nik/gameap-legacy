@@ -46,11 +46,11 @@ class Cron extends MX_Controller {
 	private $_install_result = '';
 
 	public function __construct()
-    {
-        parent::__construct();
-        
-        /* Скрипт можно запустить только из командной строки (через cron) */
-        if(php_sapi_name() != 'cli'){
+	{
+		parent::__construct();
+		
+		/* Скрипт можно запустить только из командной строки (через cron) */
+		if(php_sapi_name() != 'cli'){
 			show_404();
 		}
 
@@ -72,9 +72,9 @@ class Cron extends MX_Controller {
 
 		set_time_limit(0);
 		$this->load->database();
-    }
-    
-    // -----------------------------------------------------------------------
+	}
+	
+	// -----------------------------------------------------------------------
 	
 	/**
 	 * По ответу на команду, отправленную на физ. сервер получает
@@ -125,14 +125,14 @@ class Cron extends MX_Controller {
 		
 		return $message;
 	}
-    
-    // ----------------------------------------------------------------
-    
-    /**
-     * Получение консоли сервера
-    */
-    private function _get_console($server_id)
-    {
+	
+	// ----------------------------------------------------------------
+	
+	/**
+	 * Получение консоли сервера
+	*/
+	private function _get_console($server_id)
+	{
 		/*
 		 * Список расширений php
 		 */
@@ -204,15 +204,15 @@ class Cron extends MX_Controller {
 			return;
 		}
 	}
-    
-    // ----------------------------------------------------------------
-    
-    /**
-     * Получает информацию о сервере информации о котором 
-     * еще нет в массиве $this->server_data
-    */
-    private function _get_server_data($server_id)
-    {
+	
+	// ----------------------------------------------------------------
+	
+	/**
+	 * Получает информацию о сервере информации о котором 
+	 * еще нет в массиве $this->server_data
+	*/
+	private function _get_server_data($server_id)
+	{
 		if(!array_key_exists($server_id, $this->servers_data)) {
 			$this->servers_data[$server_id] = $this->servers->get_server_data($server_id);
 		}
@@ -221,16 +221,16 @@ class Cron extends MX_Controller {
 	}
 	
 	// ----------------------------------------------------------------
-    
-    /**
-     * Создает директорию на выделенном сервере
-     * 
-     * @param string
-     * @param integer
-     * @param bool
-     * @param string
-     * @return bool
-    */
+	
+	/**
+	 * Создает директорию на выделенном сервере
+	 * 
+	 * @param string
+	 * @param integer
+	 * @param bool
+	 * @param string
+	 * @return bool
+	*/
 	private function _mkdir($server_id)
 	{
 		$commands = array();
@@ -251,12 +251,12 @@ class Cron extends MX_Controller {
 	}
 	
 	// ----------------------------------------------------------------
-    
-    /**
-     * Отправляет сообщение в командную строку
-     * 
-     * @param string
-    */
+	
+	/**
+	 * Отправляет сообщение в командную строку
+	 * 
+	 * @param string
+	*/
 	private function _cmd_output($msg = '')
 	{
 		$this->_cron_result .= $msg . PHP_EOL;
@@ -264,16 +264,16 @@ class Cron extends MX_Controller {
 	}
 	
 	// ----------------------------------------------------------------
-    
-    /**
-     * Загружает файлы на удаленный сервер
-     * 
-     * @param string
-     * @param integer
-     * @param bool
-     * @param string
-     * @return bool
-    */
+	
+	/**
+	 * Загружает файлы на удаленный сервер
+	 * 
+	 * @param string
+	 * @param integer
+	 * @param bool
+	 * @param string
+	 * @return bool
+	*/
 	private function _wget_files($server_id, $link, $rep_type = 'local')
 	{
 		$commands = array();
@@ -377,14 +377,14 @@ class Cron extends MX_Controller {
 	}
 	
 	// ----------------------------------------------------------------
-    
-    /**
-     * Распаковка архивов на выделенном сервере
-     * 
-     * @param integer
-     * @param string
-     * @return bool
-    */
+	
+	/**
+	 * Распаковка архивов на выделенном сервере
+	 * 
+	 * @param integer
+	 * @param string
+	 * @return bool
+	*/
 	private function _unpack_files($server_id, $pack_file)
 	{
 		$pathinfo = pathinfo($pack_file);
@@ -432,10 +432,10 @@ class Cron extends MX_Controller {
 	}
 
 	// ----------------------------------------------------------------
-    
-    /**
-     * Установка игрового сервера с помощью SteamCMD
-    */
+	
+	/**
+	 * Установка игрового сервера с помощью SteamCMD
+	*/
 	private function _install_from_steamcmd($server_id)
 	{
 		/* Установка через SteamCMD */
@@ -508,10 +508,10 @@ class Cron extends MX_Controller {
 	}
 
 	// ----------------------------------------------------------------
-    
-    /**
-     * Обрабатывает полученные данные статистики
-    */
+	
+	/**
+	 * Обрабатывает полученные данные статистики
+	*/
 	private function _stats_processing($ds)
 	{
 		$control_protocol =& $ds['control_protocol'];
@@ -659,10 +659,10 @@ class Cron extends MX_Controller {
 	}
 	
 	// ----------------------------------------------------------------
-    
-    /**
-     * Выполняет cron скрипты модулей
-    */
+	
+	/**
+	 * Выполняет cron скрипты модулей
+	*/
 	private function _modules_cron()
 	{
 		/* Массив с именами cron скриптов 
@@ -716,14 +716,14 @@ class Cron extends MX_Controller {
 		}
 	}
 
-    
-    // ----------------------------------------------------------------
-    
-    /**
-     * Функция, выполняющаяся при запуске cron
-    */
-    public function index()
-    {
+	
+	// ----------------------------------------------------------------
+	
+	/**
+	 * Функция, выполняющаяся при запуске cron
+	*/
+	public function index()
+	{
 		$time = time();
 		$cron_stats = array(
 			'success' => 0,
@@ -1051,7 +1051,6 @@ class Cron extends MX_Controller {
 
 			$i ++;
 			$a ++;
-
 		}
 
 		// Обновляем данные
@@ -1068,7 +1067,9 @@ class Cron extends MX_Controller {
 		/*==================================================*/
 
 		$this->_cmd_output("== Runner ==");
-
+		
+		$this->servers->order_by('ds_id', 'asc');
+		$this->servers->select_fields('id, ds_id');
 		$this->servers->get_server_list(false, false, array('enabled' => '1'));
 
 		$i = 0;
@@ -1098,13 +1099,7 @@ class Cron extends MX_Controller {
 				$this->_install_result = '';
 				$this->control->clear_commands();
 				
-				/* Получение данных об игровой модификации */
-				$this->game_types->get_gametypes_list(array('id' => $this->servers_data[$server_id]['game_type']));
-
-				/*
-				 * Полю installed устанавливаем значение 2, что сервер начал устанавливаться
-				*/
-
+				// Полю installed устанавливаем значение 2, что сервер начал устанавливаться
 				$this->servers->edit_game_server($server_id, array('installed' => '2'));
 				
 				try {
@@ -1170,6 +1165,8 @@ class Cron extends MX_Controller {
 				*/
 				if ($server_installed == true) {
 					/* Загружаем дополнительный файлы игровой модификации */
+					$this->game_types->get_gametypes_list(array('id' => $this->servers_data[$server_id]['game_type']));
+					
 					if (isset($this->game_types->game_types_list[0]['local_repository'])
 						&& $this->game_types->game_types_list[0]['local_repository']
 					) {
@@ -1314,25 +1311,14 @@ class Cron extends MX_Controller {
 
 			}
 
-			$this->servers->get_server_settings($server_id);
-
 			/*==================================================*/
 			/*     Перезапуск сервера в случае падения          */
 			/*==================================================*/
+			
+			$this->servers->get_server_settings($server_id);
 
 			/* В настройках указано, что сервер перезапускать не нужно */
 			if($this->servers->server_settings['SERVER_AUTOSTART']) {
-
-				/* Получение id игры в массиве */
-				$a = 0;
-				$count = count($this->games->games_list);
-				while($a < $count) {
-					if ($this->servers->servers_list[$i] == $this->games->games_list[$a]['code']) {
-						$game_arr_id = $a;
-						break;
-					}
-					$a++;
-				}
 
 				// Проверка статуса сервера
 				$status = $this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['query_port'], $this->servers_data[$server_id]['engine'], $this->servers_data[$server_id]['engine_version']);

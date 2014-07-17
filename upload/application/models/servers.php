@@ -17,6 +17,7 @@ class Servers extends CI_Model {
     
 	private $_filter_servers_list	= array('name' => false, 'ip' => false, 'game' => false);		// Фильтр списка серверов
 	private $_fields 				= '';			// Поля, которые нужно выбрать
+	private $_order_by				= array('field' => 'id', 'order' => 'asc');
 	public $servers_list 			= array();		// Список игровых серверов
 	
     public $server_data 			= array();		// Данные сервера
@@ -443,6 +444,17 @@ class Servers extends CI_Model {
 			$this->_filter_servers_list['game'] = (isset($filter['game']) && $filter['game']) ? $filter['game'] : null;
 		}
 	}
+	
+	//-----------------------------------------------------------
+	
+	/**
+	 * Сортировка для списка серверов
+	 */
+	function order_by($fiel, $order = 'asc')
+	{
+		$this->_order_by['field'] = $field;
+		$this->_order_by['order'] = $order;
+	}
 
 	//-----------------------------------------------------------
 	
@@ -482,8 +494,13 @@ class Servers extends CI_Model {
 			if (!empty($games)) { $this->db->where_in('game', $games); }
 			$this->db->where($where);
 			
+			// Приминение фильтров
 			$this->_apply_filter();
+			
+			// Сортировка
+			empty($this->_order_by) OR $this->db->order_by($this->_order_by['field'], $this->_order_by['order']);
 
+			// Выбор полей
 			!$this->_fields OR $this->db->select($this->_fields);
 			
 			// Сброс полей
@@ -1045,7 +1062,7 @@ class Servers extends CI_Model {
 		*/
 		
 		if (!empty($files_list)) {
-			uasort($files_list, array('Servers','uasort_asc'));
+			asort($files_list);
 			
 			$num = -1;
 			$maps = array();
