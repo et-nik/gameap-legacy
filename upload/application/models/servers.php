@@ -450,7 +450,7 @@ class Servers extends CI_Model {
 	/**
 	 * Сортировка для списка серверов
 	 */
-	function order_by($fiel, $order = 'asc')
+	function order_by($field, $order = 'asc')
 	{
 		$this->_order_by['field'] = $field;
 		$this->_order_by['order'] = $order;
