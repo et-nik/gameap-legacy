@@ -112,6 +112,18 @@ class Installer_rust extends CI_Driver {
 	*/
 	public function change_config()
 	{
+		//~ $CI =& get_instance();
+		//~ 
+		//~ $file = 'serverdata/cfg/server.cfg';
+		//~ $dir = get_ds_file_path($this->server_data);
+		//~ 
+		//~ // Костыль. Меняет права файла на 666
+		//~ if(strtolower($this->_os) != 'windows') {
+			//~ send_command('chmod 666 {dir}/serverdata/cfg/server.cfg', $this->server_data);
+		//~ }
+		//~ 
+		//~ // Rcon пароль
+		//~ $file_contents = change_value_on_file($file_contents, 'rcon.password', $this->server_data['rcon']);
 		return true;
 	}
 }
