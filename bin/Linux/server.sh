@@ -134,7 +134,12 @@ case "$1" in
  send_command)
  
 	#./server.sh send_command /home/hl_server screen_hldm 127.0.0.1 27015 "stats" user
+	
+	# Screen version 4.00.03jw4 (FAU) 2-May-06
 	su $USER "-c screen -p 0 -S $NAME -X stuff '$COMMAND'$'\n'"
+	
+	# Screen version 4.01.00devel (GNU) 2-May-06
+	#~ su $USER "-c screen -p 0 -S $NAME -X stuff '$COMMAND\n'"
 	
 	;;
  *)
