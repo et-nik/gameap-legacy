@@ -1069,7 +1069,7 @@ class Cron extends MX_Controller {
 		$this->_cmd_output("== Runner ==");
 		
 		$this->servers->order_by('ds_id', 'asc');
-		$this->servers->select_fields('id, ds_id');
+		$this->servers->select_fields('id, ds_id, game');
 		$this->servers->get_server_list(false, false, array('enabled' => '1'));
 
 		$i = 0;
