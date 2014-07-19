@@ -726,7 +726,7 @@ class Cron extends MX_Controller {
 	*/
 	public function index()
 	{
-		$start_microtime = microtime();
+		$start_microtime = microtime(true);
 		
 		$time = time();
 		$cron_stats = array(
@@ -1547,7 +1547,7 @@ class Cron extends MX_Controller {
 		$this->db->delete('logs', array('date <' => now() - 86400*3, 'type' => 'cron'));
 		
 		// Статистика
-		$end_mircotime = microtime();
+		$end_mircotime = microtime(true);
 		$this->_cmd_output('Time elapsed: ' . round($end_mircotime - $start_microtime, 4) . ' seconds');
 		$this->_cmd_output('Memory peak usage: ' . round(memory_get_peak_usage()/1024, 2) . ' Kb');
 		
