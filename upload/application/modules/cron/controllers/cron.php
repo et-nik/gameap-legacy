@@ -726,6 +726,8 @@ class Cron extends MX_Controller {
 	*/
 	public function index()
 	{
+		$start_microtime = microtime();
+		
 		$time = time();
 		$cron_stats = array(
 			'success' => 0,
@@ -1061,12 +1063,13 @@ class Cron extends MX_Controller {
 		if(!empty($sql_data)) {
 			$this->db->update_batch('cron', $sql_data, 'id');
 		}
-		
-		unset($sql_data);
-		unset($task_list);
 
 		// Отображаем статистику заданий
 		$this->_cmd_output("Success: {$cron_stats['success']} Failed: {$cron_stats['failed']} Skipped: {$cron_stats['skipped']}");
+		
+		unset($sql_data);
+		unset($task_list);
+		unset($cron_stats);
 
 		/*==================================================*/
 		/*    				БЕГУН					        */
@@ -1542,6 +1545,11 @@ class Cron extends MX_Controller {
 		
 		// Очистка старых cron логов (старше 3 дня)
 		$this->db->delete('logs', array('date <' => now() - 86400*3, 'type' => 'cron'));
+		
+		// Статистика
+		$end_mircotime = microtime();
+		$this->_cmd_output('Time elapsed: ' . round($end_mircotime - $start_microtime, 4) . ' seconds');
+		$this->_cmd_output('Memory peak usage: ' . round(memory_get_peak_usage()/1024, 2) . ' Kb');
 		
 		$this->_cmd_output("Cron end");
 
