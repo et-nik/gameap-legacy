@@ -70,7 +70,9 @@ class Cron extends MX_Controller {
 		//~ $this->load->library('telnet');
 		$this->load->library('query');
 
-		set_time_limit(0);
+		// Максимальное время выполнени 3 часа
+		set_time_limit(3*3600);
+		
 		$this->load->database();
 	}
 	
@@ -1048,6 +1050,8 @@ class Cron extends MX_Controller {
 
 			// Устанавливаем дату следующего выполнения
 			$sql_data[$a]['date_perform'] = $task_list[$i]['date_perform'] + $task_list[$i]['time_add'];
+			
+			unset($task_list[$i]);
 
 			$i ++;
 			$a ++;
@@ -1057,6 +1061,9 @@ class Cron extends MX_Controller {
 		if(!empty($sql_data)) {
 			$this->db->update_batch('cron', $sql_data, 'id');
 		}
+		
+		unset($sql_data);
+		unset($task_list);
 
 		// Отображаем статистику заданий
 		$this->_cmd_output("Success: {$cron_stats['success']} Failed: {$cron_stats['failed']} Skipped: {$cron_stats['skipped']}");
