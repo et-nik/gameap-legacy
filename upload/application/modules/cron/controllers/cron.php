@@ -1351,7 +1351,9 @@ class Cron extends MX_Controller {
 
 					if(count($logs) >= 1) {
 						/* Перед запуском получаем консоль, чтобы знать от чего сервер упал */
-						$console_data = $this->_get_console($server_id);
+						if (strtolower($this->server_data[$server_id]['os']) != 'windows') {
+							$console_data = $this->_get_console($server_id);
+						}
 						
 						/* При последней проверке сервер был оффлайн, запускаем его*/
 						try {
@@ -1541,7 +1543,7 @@ class Cron extends MX_Controller {
 		 * и на своем месте, то записываем весь вывод предыдущих задач 
 		 * а после этого запускаем пользовательский крон
 		*/
-		$this->_modules_cron();
+		//~ $this->_modules_cron();
 		
 		// Очистка старых cron логов (старше 3 дня)
 		$this->db->delete('logs', array('date <' => now() - 86400*3, 'type' => 'cron'));
