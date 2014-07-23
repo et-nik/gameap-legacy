@@ -1351,7 +1351,7 @@ class Cron extends MX_Controller {
 
 					if(count($logs) >= 1) {
 						/* Перед запуском получаем консоль, чтобы знать от чего сервер упал */
-						if (strtolower($this->server_data[$server_id]['os']) != 'windows') {
+						if (strtolower($this->servers_data[$server_id]['os']) != 'windows') {
 							$console_data = $this->_get_console($server_id);
 						}
 						
