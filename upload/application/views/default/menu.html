@@ -63,6 +63,7 @@
 					
 					<li><a href="{site_url}admin/profile">{lang_menu_profile}</a></li>
 					
+					<?php if($this->users->auth_data['is_admin']): ?>
 					<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">{lang_menu_gameap}<b class="caret"></b></a>
 						<ul class="dropdown-menu">
 							<?php if(($this->users->auth_data['is_admin'] == 1)): ?>
@@ -74,6 +75,8 @@
 							<li><a href="{site_url}adminpanel/help">{lang_menu_help}</a></li>
 						</ul>
 					</li>
+					<?php endif; ?>
+					
 					<li><a href="{site_url}auth/out">{lang_out}</a></li>
 				</ul>
 			</div>
