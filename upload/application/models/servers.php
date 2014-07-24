@@ -1034,8 +1034,6 @@ class Servers extends CI_Model {
 		if (strtolower($this->server_data['engine']) != 'goldsource' OR strtolower($this->server_data['engine']) != 'source') {
 			return;
 		}
-		
-		$time = time();
 
 		/* Получаем список карт из базы (своеобразный кеш)*/
 		$maps_cache = json_decode($this->server_data['maps_list'], true);
@@ -1077,17 +1075,6 @@ class Servers extends CI_Model {
 				$maps[]['map_name'] = str_replace('.bsp', '', basename($file));
 			}
 			
-			/* 
-			 * Т.к получение карт процесс долгий, а в некоторых случаях
-			 * (когда количество карт на сервере очень большое),
-			 * то в этом случае список карт лучше отправлять в данные к серверу,
-			 * что ниже и происходит.
-			*/
-			
-			$time_array = array('time' => $time);
-			$server_data['maps_list'] = json_encode($maps + $time_array);
-			$this->edit_game_server($this->server_data['id'], $server_data);
-
 			return $maps;
 			
 		} else {

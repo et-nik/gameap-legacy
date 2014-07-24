@@ -28,7 +28,7 @@ class Rcon_source extends CI_Driver {
 	
 	function connect() 
 	{
-		$this->fp = @fsockopen($this->host, $this->port);
+		$this->fp = @fsockopen($this->host, $this->port, $errno, $errstr, 2);
 
 		if ($this->fp) {
 			$this->_set_timeout($this->fp, 1, 500);
@@ -205,16 +205,20 @@ class Rcon_source extends CI_Driver {
 	public function get_maps()
 	{
 		$maps = array();
-		$maps_ = explode("\n", $this->command("maps *"));
-		foreach($maps_ as $i => $val){
+		
+		$maps_exp1 = explode("\n", $this->command("maps *"));
+		asort($maps_exp1);
+		
+		foreach($maps_exp1 as $i => $val){
 			if($i != 0){
 				$val = trim($val);
 				if(!empty($val)){
-					$maps__ = explode(".", $val);
-					$maps[]['map_name'] = $maps__[0];
+					$maps_exp2 = explode(".", $val);
+					$maps[]['map_name'] = $maps_exp2[0];
 				}
 			}
 		}
+		
 		return $maps;
 	}
 	

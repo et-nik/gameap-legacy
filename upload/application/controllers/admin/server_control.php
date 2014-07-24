@@ -155,6 +155,17 @@ class Server_control extends CI_Controller {
 			if (!$tpl_list = $this->servers->get_server_maps()) {
 				$tpl_list = $this->rcon->get_maps();
 			}
+			
+			/* 
+			 * Т.к получение карт процесс долгий, а в некоторых случаях
+			 * (когда количество карт на сервере очень большое),
+			 * то в этом случае список карт лучше отправлять в данные к серверу,
+			 * что ниже и происходит.
+			*/
+			$time_array = array('time' => time());
+			$server_data['maps_list'] = json_encode($tpl_list + $time_array);
+			$this->edit_game_server($this->server_data['id'], $server_data);
+			
 		} catch(Exception $e) {
 			// Что-то с ftp или sftp
 		}
