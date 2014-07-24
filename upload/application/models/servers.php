@@ -1030,8 +1030,9 @@ class Servers extends CI_Model {
     {
 		$this->load->helper('path');
 		$this->load->helper('ds');
+		$this->load->helper('date');
 		
-		if (strtolower($this->server_data['engine']) != 'goldsource' OR strtolower($this->server_data['engine']) != 'source') {
+		if (strtolower($this->server_data['engine']) != 'goldsource' && strtolower($this->server_data['engine']) != 'source') {
 			return;
 		}
 
@@ -1039,8 +1040,9 @@ class Servers extends CI_Model {
 		$maps_cache = json_decode($this->server_data['maps_list'], true);
 		
 		/* Если списку не более суток */
-		if($maps_cache && $maps_cache['time'] > $time - 86400){
+		if($maps_cache && $maps_cache['time'] > now() - 86400){
 			unset ($maps_cache['time']); // Удаляем time элемент
+			$maps_cache['from_cache'] = 1;
 			return $maps_cache;
 		}
 		
