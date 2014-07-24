@@ -433,7 +433,7 @@ class Server_command extends CI_Controller {
 							break;
 							
 						case 'rcon_command';
-							$this->form_validation->set_rules('rcon_command', 'команда', 'trim|required|max_length[64]|min_length[1]|xss_clean');
+							$this->form_validation->set_rules('rcon_command', 'команда', 'required|xss_clean');
 							break;
 					}
 						
@@ -799,21 +799,23 @@ class Server_command extends CI_Controller {
 				}
 				
 				// Обращаться к перезапуску можно не чаще 1 раза в минуту
-				$this->panel_log->set_filter(array(	'type' => null, 
-													'command' => 'start',
-													'user_name' => $this->users->auth_data['login'],
-													'contents' => null,
-													'server_id' => $server_id,
-											)
-				);
-				
-				$this->db->where('server_id', $server_id);
-				$this->db->where('date >', now()-90);
-				
-				if ($this->panel_log->get_count_all_log() >= 1) {
-					//~ $this->_show_message(lang(''));
-					$this->_show_message(lang('server_command_wait_one_minute_to_start'));
-					return false;
+				if (!$this->users->auth_data['is_admin']) {
+					$this->panel_log->set_filter(array(	'type' => null, 
+														'command' => 'start',
+														'user_name' => $this->users->auth_data['login'],
+														'contents' => null,
+														'server_id' => $server_id,
+												)
+					);
+					
+					$this->db->where('server_id', $server_id);
+					$this->db->where('date >', now()-90);
+					
+					if ($this->panel_log->get_count_all_log() >= 1) {
+						//~ $this->_show_message(lang(''));
+						$this->_show_message(lang('server_command_wait_one_minute_to_start'));
+						return false;
+					}
 				}
 
 				/* Подтверждение 
@@ -1028,21 +1030,23 @@ class Server_command extends CI_Controller {
 				if($confirm == $this->security->get_csrf_hash()){
 					
 					// Обращаться к перезапуску можно не чаще 1 раза в минуту
-					$this->panel_log->set_filter(array(	'type' => null, 
-														'command' => 'start',
-														'user_name' => $this->users->auth_data['login'],
-														'contents' => null,
-														'server_id' => $server_id,
-												)
-					);
-					
-					$this->db->where('server_id', $server_id);
-					$this->db->where('date >', now()-90);
-					
-					if ($this->panel_log->get_count_all_log() >= 1) {
-						//~ $this->_show_message(lang(''));
-						$this->_show_message(lang('server_command_wait_one_minute_to_restart'));
-						return false;
+					if (!$this->users->auth_data['is_admin']) {
+						$this->panel_log->set_filter(array(	'type' => null, 
+															'command' => 'start',
+															'user_name' => $this->users->auth_data['login'],
+															'contents' => null,
+															'server_id' => $server_id,
+													)
+						);
+						
+						$this->db->where('server_id', $server_id);
+						$this->db->where('date >', now()-90);
+						
+						if ($this->panel_log->get_count_all_log() >= 1) {
+							//~ $this->_show_message(lang(''));
+							$this->_show_message(lang('server_command_wait_one_minute_to_restart'));
+							return false;
+						}
 					}
 					
 					try {
@@ -1058,11 +1062,6 @@ class Server_command extends CI_Controller {
 						$log_data['msg'] 		= $message;
 						$log_data['log_data'] 	= $response . "\nCommand:\n" . get_last_command();
 						$this->panel_log->save_log($log_data);
-						
-						// Оставлено, на всякий случай
-						//~ if($this->users->auth_data['is_admin']) {
-							//~ $message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . get_last_command() . '</code></p>';
-						//~ }
 						
 						$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
 						return true;
