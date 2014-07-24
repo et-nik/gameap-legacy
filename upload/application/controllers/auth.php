@@ -380,10 +380,6 @@ class Auth extends CI_Controller {
 			$this->tpl_data['captcha'] = $this->_create_captcha();	
 			$this->parser->parse('register.html', $this->tpl_data);
 		} else {
-			
-			// Загрузка модели для шифровки пароля
-			$this->load->model('password');
-			
 			if (in_array($this->input->post('login'), $this->_denied_logins)) {
 				$this->_show_message('Unavailable login', site_url('auth/register'));
 				return false;

@@ -89,7 +89,6 @@ class Profile extends CI_Controller {
 				$this->tpl_data['content'] .= $this->parser->parse('profile/profile_edit.html', $this->tpl_data, true);
 			}else{
 				$this->load->library('form_validation');
-				$this->load->model('password');
 				
 				$this->form_validation->set_rules('name', 'Имя', 'trim|xss_clean');
 				$this->form_validation->set_rules('email', 'E-Mail', 'trim|required|valid_email');
@@ -131,7 +130,6 @@ class Profile extends CI_Controller {
 				$this->tpl_data['content'] .= $this->parser->parse('profile/profile_change_password.html', $this->tpl_data, true);
 			}else{
 				$this->load->library('form_validation');
-				$this->load->model('password');
 				
 				$this->form_validation->set_rules('old_password', 'Текущий пароль', 'trim|required');
 				$this->form_validation->set_rules('new_password', 'Пароль', 'trim|required|matches[new_password_confirm]');

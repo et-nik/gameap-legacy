@@ -157,7 +157,6 @@ class Users_control extends CI_Controller {
 		
 		$this->load->library('form_validation');
 		$this->load->helper('form');
-		$this->load->model('password');
 		
 		$this->form_validation->set_rules('login', lang('login'), 'trim|required|is_unique[users.login]|max_length[32]|min_length[3]|xss_clean');
 		$this->form_validation->set_rules('password', lang('password'), 'trim|required|max_length[64]');
@@ -390,7 +389,6 @@ class Users_control extends CI_Controller {
 				$this->tpl_data['content'] .= $this->parser->parse('web_users/user_edit.html', $local_tpl_data, true);
 			}else{
 				$this->load->library('form_validation');
-				$this->load->model('password');
 				
 				$this->form_validation->set_rules('name', 'Имя', 'trim|xss_clean');
 				$this->form_validation->set_rules('email', 'E-Mail', 'trim|required|valid_email');
@@ -407,7 +405,6 @@ class Users_control extends CI_Controller {
 				}else{
 					
 					if($this->input->post('new_password') !== ''){
-						$this->load->model('password');
 						
 						$password_encrypt = $this->input->post('new_password', true);
 						$password_encrypt = hash_password($password_encrypt);
