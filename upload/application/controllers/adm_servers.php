@@ -988,7 +988,7 @@ class Adm_servers extends CI_Controller {
 							/* Удаление директории на выделенном сервере */
 							switch(strtolower($this->servers->server_data['os'])) {
 								case 'windows':
-									$command = 'rmdir /S ' . $this->servers->server_data['dir'];
+									$command = 'rmdir /S /Q ' . str_replace('/', '\\', $this->servers->server_data['dir']);
 									break;
 								default:
 									// Linux
@@ -997,9 +997,17 @@ class Adm_servers extends CI_Controller {
 							}
 							
 							try {
+								//~ print_r($command);
 								$result = send_command($command, $this->servers->server_data);
 							} catch (Exception $e) {
-								// Директория не удалена
+								/* Сохраняем логи */
+								$log_data['type'] = 'server_files';
+								$log_data['command'] = 'delete_files';
+								$log_data['user_name'] = $this->users->auth_login;
+								$log_data['server_id'] = $this->servers->server_data['id'];
+								$log_data['msg'] = 'Delete files failure';
+								$log_data['log_data'] = 'Directory: ' . $this->servers->server_data['dir'] . "\n";
+								$this->panel_log->save_log($log_data);
 							}
 						}
 
