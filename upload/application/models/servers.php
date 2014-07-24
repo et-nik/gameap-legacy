@@ -1064,20 +1064,17 @@ class Servers extends CI_Model {
 		if (!empty($files_list)) {
 			asort($files_list);
 			
-			$num = -1;
 			$maps = array();
 			
 			/* Перебор карт, и удаление расширения файла */	
 			foreach ($files_list as $file) {
-				$num++;
-				
 				$extension = pathinfo($file, PATHINFO_EXTENSION);
 				
 				if ($extension != 'bsp') {
 					continue;
 				}
 				
-				$maps[$num]['map_name'] = str_replace('.bsp', '', basename($file));
+				$maps[]['map_name'] = str_replace('.bsp', '', basename($file));
 			}
 			
 			/* 
@@ -1090,8 +1087,7 @@ class Servers extends CI_Model {
 			$time_array = array('time' => $time);
 			$server_data['maps_list'] = json_encode($maps + $time_array);
 			$this->edit_game_server($this->server_data['id'], $server_data);
-			
-			
+
 			return $maps;
 			
 		} else {
