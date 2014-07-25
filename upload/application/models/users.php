@@ -198,9 +198,10 @@ class Users extends CI_Model {
     {
         $user_id = safesql($this->input->cookie('user_id', true));
         $user_hash = safesql($this->input->cookie('hash', true));
+        $md5_ipua = md5($this->input->ip_address() . $this->input->user_agent());
         
         if($user_id && $user_hash) {
-            $query = $this->db->get_where('users', array('id' => $user_id, 'hash' => $user_hash), 1);
+            $query = $this->db->get_where('users', array('id' => $user_id, 'hash' => $user_hash . $md5_ipua), 1);
             $this->auth_data = $query->row_array();
         } else {
             return false;
@@ -818,11 +819,13 @@ class Users extends CI_Model {
      * @return string
      * 
     */  
-    function get_user_hash(){
-        
+    function get_user_hash()
+    {
         $this->load->helper('safety');
-        $hash = md5(generate_code(10) . $_SERVER['REMOTE_ADDR']);
-        $this->update_user(array('hash' => $hash, 'last_auth' => time()));
+        $hash 	= md5(generate_code(10) . $this->input->ip_address());
+        $md5_ipua = md5($this->input->ip_address() . $this->input->user_agent());
+        
+        $this->update_user(array('hash' => $hash . $md5_ipua, 'last_auth' => time()));
         
         return $hash;
     }
