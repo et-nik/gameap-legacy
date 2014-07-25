@@ -154,6 +154,38 @@ class Users extends CI_Model {
 		
 		return $servers_privileges[$server_id];
 	}
+	
+	// ----------------------------------------------------------------
+	
+	/**
+	 * Проверка подсети админа
+	 */
+	private function _check_subnet()
+	{
+		if (is_array($this->config->config['admin_ip'])) {
+			/* В конфигурации задан список белых IP
+			 * Если IP, с которого происходит авторизация нет в белом списке,
+			 * то авторизация неудачна
+			 */
+			if (!in_subnet($this->input->ip_address(), $this->config->config['admin_ip'])) {
+				return false;
+			}
+			
+			
+		} else {
+			$ip_ex = explode(' ', $this->config->config['admin_ip']);
+			
+			/* В конфигурации задан список белых IP
+			 * Если IP, с которого происходит авторизация нет в белом списке,
+			 * то авторизация неудачна
+			 */
+			if (!in_subnet($this->input->ip_address(), $ip_ex)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
 
     // ----------------------------------------------------------------
 
@@ -175,6 +207,13 @@ class Users extends CI_Model {
         }
 
         if ($query->num_rows > 0) {
+			
+			 // Проверка на разрешенные IP
+            if ($this->auth_data['is_admin'] && isset($this->config->config['admin_ip'])) {
+				if (!$this->_check_subnet()) {
+					return false;
+				}
+			}
 			
 			$this->auth_id 						= $user_id;
 			$this->auth_login 					= $this->auth_data['login'];
@@ -232,7 +271,14 @@ class Users extends CI_Model {
         if ($query->num_rows > 0) {
             
             $this->user_data = $query->row_array();
-            $user_data = $this->user_data;
+            $user_data = &$this->user_data;
+            
+            // Проверка на разрешенные IP
+            if ($user_data['is_admin'] && isset($this->config->config['admin_ip'])) {
+				if (!$this->_check_subnet()) {
+					return false;
+				}
+			}
             
             if (substr($this->user_data['password'], 0, 4) == '$2a$') {
 				// Используется blowfish
