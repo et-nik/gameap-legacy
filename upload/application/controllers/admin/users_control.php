@@ -205,10 +205,24 @@ class Users_control extends CI_Controller {
 		
 			if ($this->users->add_user($sql_data)) {   
 				$this->_show_message(lang('users_usr_add_sucessful'), site_url('admin/users_control'), lang('users_back_to_users'));
-				return true;
+				$log_data['msg'] 			= 'Add user successed';
+			} else {
+				$this->_show_message('Error');
+				$log_data['msg'] 			= 'Add user failed';
 			}
 			
-			//Форма проверена, данные записаны в базу   
+			// Записываем логи
+			$log_data['type'] 			= 'users_control';
+			$log_data['command'] 		= 'add_user';
+			$log_data['server_id'] 		= 0;
+			$log_data['user_name'] 		= $this->users->auth_login;
+			
+			$log_data['log_data'] 		= 'AdminID: ' . $this->users->auth_id 
+											. ' AdminName: ' . $this->users->auth_login;
+											
+			$this->panel_log->save_log($log_data);
+			
+			return;
 		}
             
         $this->parser->parse('main.html', $this->tpl_data);
@@ -329,8 +343,6 @@ class Users_control extends CI_Controller {
 				return false;
 			}
 
-			//$this->load->model('servers');
-			
 			$local_tpl_data = $this->users->tpl_userdata($user_id);
 			$this->tpl_data['heading'] .= '&nbsp;::&nbsp;' . $local_tpl_data['user_login'];
 			
@@ -341,13 +353,27 @@ class Users_control extends CI_Controller {
 				$this->users->set_server_privileges($privilege_name, $privilege_value, $server_id, $user_id);
 			}
 			
-			$this->users->update_server_privileges($user_id, $server_id);
+			if ($this->users->update_server_privileges($user_id, $server_id)) {
+				$log_data['msg'] 			= 'Save server privileges successed';
+				$this->_show_message(lang('users_srv_privileges_saved'), site_url('admin/users_control'), lang('users_back_to_users'));
+			} else {
+				$log_data['msg'] 			= 'Save server privileges failed';
+				$this->_show_message('Error');
+			}
 			
-			$local_tpl_data = array();
-			$local_tpl_data['message'] = lang('users_srv_privileges_saved');
-			$local_tpl_data['link'] = site_url('admin/users_control');
-			$local_tpl_data['back_link_txt'] = 'Вернуться к пользователям';
-			$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+			// Записываем логи
+			$log_data['type'] 			= 'users_control';
+			$log_data['command'] 		= 'edit_privileges';
+			$log_data['server_id'] 		= 0;
+			$log_data['user_name'] 		= $this->users->auth_login;
+			
+			$log_data['log_data'] 		= 'UserID: ' . $user_id 
+											. ' AdminID: ' . $this->users->auth_id 
+											. ' AdminName: ' . $this->users->auth_login;
+											
+			$this->panel_log->save_log($log_data);
+			
+			return;
 		}
             
         $this->parser->parse('main.html', $this->tpl_data);
@@ -414,13 +440,28 @@ class Users_control extends CI_Controller {
 					$user_new_data['name'] = $this->input->post('name', true);
 					$user_new_data['email'] = $this->input->post('email', true);
 
-					$this->users->update_user($user_new_data, $user_data['id']);
+					if ($this->users->update_user($user_new_data, $user_data['id'])) {
+						$log_data['msg'] 			= 'Update user successed';
+						$this->_show_message(lang('users_usr_data_saved'), site_url('admin/users_control'), lang('users_back_to_users'));
+					} else {
+						$log_data['msg'] 			= 'Update user failed';
+						$this->_show_message('Error');
+					}
+					
+					// Записываем логи
+					$log_data['type'] 			= 'users_control';
+					$log_data['command'] 		= 'edit_user';
+					$log_data['server_id'] 		= 0;
+					$log_data['user_name'] 		= $this->users->auth_login;
+					
+					$log_data['log_data'] 		= 'UserID: ' . $user_id 
+													. ' UserName: ' . $user_data['login'] 
+													. ' AdminID: ' . $this->users->auth_id 
+													. ' AdminName: ' . $this->users->auth_login;
+													
+					$this->panel_log->save_log($log_data);
 							
-					$local_tpl_data = array();
-					$local_tpl_data['message'] 			= lang('users_usr_data_saved');
-					$local_tpl_data['link'] 			= site_url('admin/users_control');
-					$local_tpl_data['back_link_txt'] 	= lang('users_back_to_users');
-					$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+					return true;
 				}
 			}
 		}
@@ -462,8 +503,26 @@ class Users_control extends CI_Controller {
 						return false;
 					}
 					
-					$this->users->delete_user($user_id);
-					$this->_show_message(lang('users_usr_deleted'), site_url('admin/users_control'));
+					if ($this->users->delete_user($user_id)) {
+						$log_data['msg'] 			= 'Delete user successed';
+						$this->_show_message(lang('users_usr_deleted'), site_url('admin/users_control'));
+					} else {
+						$log_data['msg'] 			= 'Delete user failed';
+						$this->_show_message('Error');
+					}
+					
+					// Записываем логи
+					$log_data['type'] 			= 'users_control';
+					$log_data['command'] 		= 'delete_user';
+					$log_data['server_id'] 		= 0;
+					$log_data['user_name'] 		= $this->users->auth_login;
+					$log_data['log_data'] 		= 'UserID: ' . $user_id 
+													. ' UserName: ' . $user_data['login'] 
+													. ' AdminID: ' . $this->users->auth_id 
+													. ' AdminName: ' . $this->users->auth_login;
+													
+					$this->panel_log->save_log($log_data);
+					
 					return true;
 				}
 			} else {
@@ -551,11 +610,23 @@ class Users_control extends CI_Controller {
 				$subject = lang('users_mail_subject_change_privileges');
 				$message = lang('users_mail_message_change_privileges', $this->users->user_data['login'], $this->users->auth_data['login']);
 				$this->users->admin_msg($subject, $message);
-				return true;
+				$log_data['msg'] 			= lang('users_mail_subject_change_privileges');
 			} else {
+				$log_data['msg'] = 'Change privileges failed';
 				$this->_show_message(lang('unknown_error'));
-				return false;
 			}
+			
+			// Записываем логи
+			$log_data['type'] 			= 'users_control';
+			$log_data['command'] 		= 'save_privileges';
+			$log_data['server_id'] 		= 0;
+			$log_data['user_name'] 		= $this->users->auth_login;
+			$log_data['log_data'] 		= 'UserID: ' . $user_id 
+											. ' AdminID: ' . $this->users->auth_id 
+											. ' AdminName: ' . $this->users->auth_login;
+			$this->panel_log->save_log($log_data);
+			
+			return;
 		}
         
         $this->parser->parse('main.html', $this->tpl_data);
