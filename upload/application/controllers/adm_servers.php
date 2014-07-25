@@ -69,9 +69,7 @@ class Adm_servers extends CI_Controller {
 			
 			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
 			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
-			
-			
-        
+
         } else {
 			redirect('auth');
         }
@@ -834,6 +832,15 @@ class Adm_servers extends CI_Controller {
 							$local_tpl_data['message'] = lang('adm_servers_add_server_failed');
 						}
 						
+						// Записываем логи
+						$log_data['type'] 			= 'adm_servers';
+						$log_data['command'] 		= 'add_ds';
+						$log_data['server_id'] 		= 0;
+						$log_data['user_name'] 		= $this->users->auth_login;
+						$log_data['msg'] 			= $local_tpl_data['message'];
+						$log_data['log_data'] 		= '';
+						$this->panel_log->save_log($log_data);
+						
 						$local_tpl_data['link'] = site_url('adm_servers/view/dedicated_servers');
 						$local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_servers');
 						
@@ -872,6 +879,15 @@ class Adm_servers extends CI_Controller {
 							$local_tpl_data['message'] = lang('adm_servers_add_game_failed');
 						}
 						
+						// Записываем логи
+						$log_data['type'] 			= 'adm_servers';
+						$log_data['command'] 		= 'add_game';
+						$log_data['server_id'] 		= 0;
+						$log_data['user_name'] 		= $this->users->auth_login;
+						$log_data['msg'] 			= $local_tpl_data['message'];
+						$log_data['log_data'] 		= '';
+						$this->panel_log->save_log($log_data);
+						
 						$local_tpl_data['link'] = site_url('adm_servers/view/games');
 						$local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_games');
 						
@@ -892,6 +908,15 @@ class Adm_servers extends CI_Controller {
 						} else {
 							$local_tpl_data['message'] = lang('adm_servers_add_game_type_failed');
 						}
+						
+						// Записываем логи
+						$log_data['type'] 			= 'adm_servers';
+						$log_data['command'] 		= 'add_game_type';
+						$log_data['server_id'] 		= 0;
+						$log_data['user_name'] 		= $this->users->auth_login;
+						$log_data['msg'] 			= $local_tpl_data['message'];
+						$log_data['log_data'] 		= '';
+						$this->panel_log->save_log($log_data);
 
 						$local_tpl_data['link'] = site_url('adm_servers/edit/game_types/' . $this->db->insert_id());
 						$local_tpl_data['back_link_txt'] = 'Далее';
@@ -968,6 +993,15 @@ class Adm_servers extends CI_Controller {
 						} else {
 							$local_tpl_data['message'] = lang('adm_servers_delete_server_failed');
 						}
+						
+						// Записываем логи
+						$log_data['type'] 			= 'adm_servers';
+						$log_data['command'] 		= 'delete_ds';
+						$log_data['server_id'] 		= 0;
+						$log_data['user_name'] 		= $this->users->auth_login;
+						$log_data['msg'] 			= $local_tpl_data['message'];
+						$log_data['log_data'] 		= 'ID: ' . $id;
+						$this->panel_log->save_log($log_data);
 									
 						$local_tpl_data['link'] 			= site_url('adm_servers/view/dedicated_servers');
 						$local_tpl_data['back_link_txt'] 	= lang('adm_servers_back_to_servers');
@@ -983,6 +1017,16 @@ class Adm_servers extends CI_Controller {
 							$this->_show_message(lang('adm_servers_server_not_found'), site_url('adm_servers/view/game_servers'));
 							return false;
 						}
+						
+						// Остановка сервера
+						try {
+							send_command($this->command_generate($this->servers->server_data, 'stop'), $server_data);
+						} catch (Exception $e) {
+							// Не удалось остановить сервер
+						}
+						
+						// Для логов
+						$files_deleted = 'false';
 						
 						if ($this->input->post('delete_files') 
 							&& !empty($this->servers->server_data['dir'])
@@ -1001,9 +1045,15 @@ class Adm_servers extends CI_Controller {
 							}
 							
 							try {
-								//~ print_r($command);
 								$result = send_command($command, $this->servers->server_data);
+								
+								// Для логов
+								$files_deleted = 'true';
 							} catch (Exception $e) {
+								
+								// Для логов
+								$files_deleted = 'false';
+								
 								/* Сохраняем логи */
 								$log_data['type'] = 'server_files';
 								$log_data['command'] = 'delete_files';
@@ -1020,6 +1070,15 @@ class Adm_servers extends CI_Controller {
 						} else {
 							$local_tpl_data['message'] = lang('adm_servers_delete_server_failed');
 						}
+						
+						// Записываем логи
+						$log_data['type'] 			= 'adm_servers';
+						$log_data['command'] 		= 'delete_game_server';
+						$log_data['server_id'] 		= $id;
+						$log_data['user_name'] 		= $this->users->auth_login;
+						$log_data['msg'] 			= $local_tpl_data['message'];
+						$log_data['log_data'] 		= 'ID: ' . $id . ' Files deleted: ' . $files_deleted;
+						$this->panel_log->save_log($log_data);
 							
 						$local_tpl_data['link'] = site_url('adm_servers/view/game_servers');
 						$local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_servers');
@@ -1049,6 +1108,15 @@ class Adm_servers extends CI_Controller {
 						}else{
 							$local_tpl_data['message'] = lang('adm_servers_delete_game_failed');
 						}
+						
+						// Записываем логи
+						$log_data['type'] 			= 'adm_servers';
+						$log_data['command'] 		= 'delete_game';
+						$log_data['server_id'] 		= 0;
+						$log_data['user_name'] 		= $this->users->auth_login;
+						$log_data['msg'] 			= $local_tpl_data['message'];
+						$log_data['log_data'] 		= 'ID: ' . $id;
+						$this->panel_log->save_log($log_data);
 							
 						$local_tpl_data['link'] 			= site_url('adm_servers/view/games');
 						$local_tpl_data['back_link_txt'] 	= lang('adm_servers_back_to_games');
@@ -1079,6 +1147,15 @@ class Adm_servers extends CI_Controller {
 						}else{
 							$local_tpl_data['message'] = lang('adm_servers_delete_game_type_failed');
 						}
+						
+						// Записываем логи
+						$log_data['type'] 			= 'adm_servers';
+						$log_data['command'] 		= 'delete_game_type';
+						$log_data['server_id'] 		= 0;
+						$log_data['user_name'] 		= $this->users->auth_login;
+						$log_data['msg'] 			= $local_tpl_data['message'];
+						$log_data['log_data'] 		= 'ID: ' . $id;
+						$this->panel_log->save_log($log_data);
 							
 						$local_tpl_data['link'] 			= site_url('adm_servers/view/game_types');
 						$local_tpl_data['back_link_txt'] 	= lang('adm_servers_back_to_game_types');
@@ -1813,6 +1890,15 @@ class Adm_servers extends CI_Controller {
 					}else{
 						$local_tpl_data['message'] = lang('adm_servers_error_server_edit');
 					}
+					
+					// Записываем логи
+					$log_data['type'] 			= 'adm_servers';
+					$log_data['command'] 		= 'edit_ds';
+					$log_data['server_id'] 		= 0;
+					$log_data['user_name'] 		= $this->users->auth_login;
+					$log_data['msg'] 			= $local_tpl_data['message'];
+					$log_data['log_data'] 		= 'ID: ' . $id;
+					$this->panel_log->save_log($log_data);
 							
 					$local_tpl_data['link'] = site_url('adm_servers/view/dedicated_servers');
 					$local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_servers');
@@ -1862,6 +1948,15 @@ class Adm_servers extends CI_Controller {
 					}else{
 						$local_tpl_data['message'] = lang('adm_servers_error_server_edit');
 					}
+					
+					// Записываем логи
+					$log_data['type'] 			= 'adm_servers';
+					$log_data['command'] 		= 'edit_game_server';
+					$log_data['server_id'] 		= $id;
+					$log_data['user_name'] 		= $this->users->auth_login;
+					$log_data['msg'] 			= $local_tpl_data['message'];
+					$log_data['log_data'] 		= 'ID: ' . $id;
+					$this->panel_log->save_log($log_data);
 							
 					$local_tpl_data['link'] = site_url('adm_servers/view/game_servers');
 					$local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_servers');
@@ -1896,6 +1991,15 @@ class Adm_servers extends CI_Controller {
 					}else{
 						$local_tpl_data['message'] = lang('adm_servers_error_game_edit');
 					}
+					
+					// Записываем логи
+					$log_data['type'] 			= 'adm_servers';
+					$log_data['command'] 		= 'edit_game';
+					$log_data['server_id'] 		= 0;
+					$log_data['user_name'] 		= $this->users->auth_login;
+					$log_data['msg'] 			= $local_tpl_data['message'];
+					$log_data['log_data'] 		= 'ID: ' . $id;
+					$this->panel_log->save_log($log_data);
 							
 					$local_tpl_data['link'] 			= site_url('adm_servers/view/games');
 					$local_tpl_data['back_link_txt'] 	= lang('adm_servers_back_to_games');
@@ -2160,6 +2264,15 @@ class Adm_servers extends CI_Controller {
 					}else{
 						$local_tpl_data['message'] = lang('adm_servers_error_game_type_edit');
 					}
+					
+					// Записываем логи
+					$log_data['type'] 			= 'adm_servers';
+					$log_data['command'] 		= 'edit_game_type';
+					$log_data['server_id'] 		= 0;
+					$log_data['user_name'] 		= $this->users->auth_login;
+					$log_data['msg'] 			= $local_tpl_data['message'];
+					$log_data['log_data'] 		= 'ID: ' . $id;
+					$this->panel_log->save_log($log_data);
 
 					$local_tpl_data['link'] = site_url('adm_servers/edit/game_types/' . $id);
 					$local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_game_types');
@@ -2310,11 +2423,21 @@ class Adm_servers extends CI_Controller {
 				$new_server_id = $this->db->call_function('insert_id', $this->db->conn_id);
 				$succes_mesage = $new_gs['installed'] ? lang('adm_servers_add_server_successful') : lang('adm_servers_server_to_be_installed');
 				$this->_show_message($succes_mesage, site_url('adm_servers/edit/game_servers/' . $new_server_id), lang('adm_servers_go_to_settings'));
-				return true;
+				$log_data['msg'] = $succes_mesage;
 			} else {
 				$this->_show_message(lang('adm_servers_add_game_failed'));
-				return false;
+				$log_data['msg'] = lang('adm_servers_add_game_failed');
 			}
+			
+			// Записываем логи
+			$log_data['type'] 			= 'adm_servers';
+			$log_data['command'] 		= 'edit_ds';
+			$log_data['server_id'] 		= 0;
+			$log_data['user_name'] 		= $this->users->auth_login;
+			$log_data['log_data'] 		= '';
+			$this->panel_log->save_log($log_data);
+			
+			return;
 
 		}
 		
@@ -2379,11 +2502,21 @@ class Adm_servers extends CI_Controller {
 			
 			if ($this->servers->edit_game_server($id, $sql_data)) {
 				$this->_show_message(lang('adm_servers_server_will_be_reinstalled'), site_url('adm_servers/edit/game_servers/' . $id), lang('next'));
-				return true;
+				$log_data['msg'] = lang('adm_servers_server_will_be_reinstalled');
 			} else {
 				$this->_show_message(lang('adm_servers_error_server_edit'), site_url('adm_servers/edit/game_servers/' . $id), lang('next'));
-				return false;
+				$log_data['msg'] = lang('adm_servers_error_server_edit');
 			}
+			
+			// Записываем логи
+			$log_data['type'] 			= 'adm_servers';
+			$log_data['command'] 		= 'edit_ds';
+			$log_data['server_id'] 		= 0;
+			$log_data['user_name'] 		= $this->users->auth_login;
+			$log_data['log_data'] 		= 'ID: ' . $id;
+			$this->panel_log->save_log($log_data);
+			
+			return;
 			
 		} else {
 
@@ -2454,6 +2587,15 @@ class Adm_servers extends CI_Controller {
 			} else {
 				$local_tpl_data['message'] = lang('adm_servers_add_game_type_failed');
 			}
+			
+			// Записываем логи
+			$log_data['type'] 			= 'adm_servers';
+			$log_data['command'] 		= 'clone_game_type';
+			$log_data['server_id'] 		= 0;
+			$log_data['user_name'] 		= $this->users->auth_login;
+			$log_data['msg'] 			= $local_tpl_data['message'];
+			$log_data['log_data'] 		= 'ID: ' . $id . ' CloneID: ' . $this->db->insert_id();
+			$this->panel_log->save_log($log_data);
 			
 			$this->_show_message($local_tpl_data['message'], site_url('adm_servers/edit/game_types/' . $this->db->insert_id()), lang('next')); 
 			return true;
