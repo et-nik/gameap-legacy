@@ -116,7 +116,7 @@ class Games extends CI_Model {
 		
 		if (is_array($where)) {
 			$this->db->where($where);
-		} else {
+		} else if($where) {
 			$this->db->where('code', $where);
 		}
 		
