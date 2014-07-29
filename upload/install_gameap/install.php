@@ -459,16 +459,12 @@ switch($page) {
 		/* ADMIN ADD  */
 		/*------------*/
 		
-		$user_data['email'] = $this->input->post('admin_email');
-		$user_data['reg_date'] = time();
+		$user_data['email'] 	= $this->input->post('admin_email');
+		$user_data['reg_date'] 	= time();
 			 
-        $user_data['login'] = $this->input->post('admin_login');
-        $user_data['password'] = $this->input->post('admin_password');
-        $user_data['password'] = $this->password->encryption($user_data['password'], array('login' => $user_data['login'],
-                                                                                             'reg_date' => $user_data['reg_date'],
-                                                                                            )
-		);
-			
+        $user_data['login'] 	= $this->input->post('admin_login');
+        $user_data['password'] 	= hash_password($this->input->post('admin_password'));
+
 		$user_data['privileges'] = json_encode(array(
 													'srv_global' 			=> TRUE,
 													'srv_start' 			=> TRUE,

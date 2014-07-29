@@ -23,7 +23,7 @@ class Install extends MX_Controller {
 	var $autoload = array(
         'helper'    => array('url', 'form', 'safety'),
         'libraries' => array('form_validation'),
-        'model' => array('users', 'password', 'servers', 'servers/dedicated_servers', 'servers/games', 'servers/game_types'),
+        'model' => array('users', 'servers', 'servers/dedicated_servers', 'servers/games', 'servers/game_types'),
     );
 	
 	public function __construct()
