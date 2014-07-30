@@ -9,7 +9,9 @@ $config['encryption_key'] 		= 'DFpd5SDDqac04';
 $config['local_os'] 			= 'Linux';
 $config['local_script_path'] 	= '/home/servers';
 $config['local_steamcmd_path'] 	= '/home/servers';
+
 $config['system_email'] 		= 'no-reply@example.com';
+$config['email_sender_name']	= 'GameAP';
 
 $config['register_users'] 		= false;
 

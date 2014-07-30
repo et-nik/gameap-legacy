@@ -912,7 +912,7 @@ class Users extends CI_Model {
 		$message = str_replace('{user_balance}', $user_data['balance'], $message);
 		
 		$this->email->to($user_data['email']);
-		$this->email->from($this->config->config['system_email'], 'GameAP');
+		$this->email->from($this->config->config['system_email'], $this->config->config['email_sender_name']);
 		$this->email->subject($subject);
 		$this->email->message($message);
 		
@@ -947,7 +947,7 @@ class Users extends CI_Model {
 		$this->load->library('email');
 		
 		$this->email->to($email_list);
-		$this->email->from($this->config->config['system_email'], 'AdminPanel');
+		$this->email->from($this->config->config['system_email'], $this->config->config['email_sender_name']);
 		$this->email->subject($subject);
 		$this->email->message($message);
 							
