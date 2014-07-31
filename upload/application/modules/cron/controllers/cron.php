@@ -268,11 +268,40 @@ class Cron extends MX_Controller {
 	// ----------------------------------------------------------------
 	
 	/**
+	 * Копирование файлов
+	 * 
+	 * @param int
+	 * @param string
+	 * @return bool
+	*/
+	private function _copy_files($server_id, $link) 
+	{
+		switch (strtolower($this->servers_data[$server_id]['os'])) {
+			case 'windows':
+				$commands[] = 'xcopy ' . $link . ' ' . $this->servers_data[$server_id]['script_path'] . '\\' . $this->servers_data[$server_id]['dir'] . ' /Y /E';
+				break;
+	
+			default:
+				$commands[] = 'cp -R ' . $link . ' ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'];
+				break;
+		}
+		
+		$this->_install_result .= send_command(
+						$commands,
+						$this->servers_data[$server_id], 
+						$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
+		);
+		
+		return;
+	}
+	
+	// ----------------------------------------------------------------
+	
+	/**
 	 * Загружает файлы на удаленный сервер
 	 * 
+	 * @param int
 	 * @param string
-	 * @param integer
-	 * @param bool
 	 * @param string
 	 * @return bool
 	*/
@@ -713,7 +742,7 @@ class Cron extends MX_Controller {
 			
 			/* Выполняем cron скрипт из модуля */
 			$this->_cmd_output("Start {$value['short_name']}");
-			$result = modules::run($value['short_name'] . '/' . $value['cron_script'] . '/index');
+			echo modules::run($value['short_name'] . '/' . $value['cron_script'] . '/index');
 			//~ $this->_cmd_output($result);
 		}
 	}
@@ -1123,15 +1152,35 @@ class Cron extends MX_Controller {
 					
 					$this->_cmd_output("Install from local repository");
 					
+					$rep_info = pathinfo($this->games->games_list[0]['local_repository']);
+					
 					try {
-						$this->_wget_files($server_id, $this->games->games_list[0]['local_repository'], 'local');
-						$this->_unpack_files($server_id, $this->games->games_list[0]['local_repository']);
+						if (isset($rep_info['extension'])) {
+							// Распаковка архива
+							$this->_wget_files($server_id, $this->games->games_list[0]['local_repository'], 'local');
+							$this->_unpack_files($server_id, $this->games->games_list[0]['local_repository']);
+						} else {
+							// Копирование директории
+							$this->_copy_files($server_id, $this->games->games_list[0]['local_repository']);
+						}
+						
 						$server_installed = true;
 					} catch (Exception $e) {
 						$this->_cmd_output("Install from local repository failed. Message: " . $e->getMessage());
 						$server_installed = false;
 					}
 					
+					if (isset($rep_info['extension'])) {
+						try {
+							$this->_wget_files($server_id, $this->games->games_list[0]['local_repository'], 'local');
+							$this->_unpack_files($server_id, $this->games->games_list[0]['local_repository']);
+							$server_installed = true;
+						} catch (Exception $e) {
+							$this->_cmd_output("Install from local repository failed. Message: " . $e->getMessage());
+							$server_installed = false;
+						}
+					} else {
+
 				} elseif ($this->games->games_list[0]['remote_repository']) {
 					/* Установка из удаленного репозитория */
 					
