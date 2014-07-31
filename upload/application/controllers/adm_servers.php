@@ -1497,7 +1497,10 @@ class Adm_servers extends CI_Controller {
 				*/
 
 				/* Допустимые алиасы */
-				$allowable_aliases = json_decode($this->servers->server_data['aliases_list'], true);
+				$allowable_aliases = isset($this->servers->server_data['aliases_list']) 
+										? json_decode($this->servers->server_data['aliases_list'], true)
+										: false;
+										
 				/* Значения алиасов на сервере */
 				$server_aliases = json_decode($this->servers->server_data['aliases'], true);
 
@@ -2431,7 +2434,7 @@ class Adm_servers extends CI_Controller {
 			
 			// Записываем логи
 			$log_data['type'] 			= 'adm_servers';
-			$log_data['command'] 		= 'edit_ds';
+			$log_data['command'] 		= 'add_game_server';
 			$log_data['server_id'] 		= 0;
 			$log_data['user_name'] 		= $this->users->auth_login;
 			$log_data['log_data'] 		= '';
@@ -2588,6 +2591,8 @@ class Adm_servers extends CI_Controller {
 				$local_tpl_data['message'] = lang('adm_servers_add_game_type_failed');
 			}
 			
+			$new_game_type_id = $this->db->insert_id();
+			
 			// Записываем логи
 			$log_data['type'] 			= 'adm_servers';
 			$log_data['command'] 		= 'clone_game_type';
@@ -2597,7 +2602,7 @@ class Adm_servers extends CI_Controller {
 			$log_data['log_data'] 		= 'ID: ' . $id . ' CloneID: ' . $this->db->insert_id();
 			$this->panel_log->save_log($log_data);
 			
-			$this->_show_message($local_tpl_data['message'], site_url('adm_servers/edit/game_types/' . $this->db->insert_id()), lang('next')); 
+			$this->_show_message($local_tpl_data['message'], site_url('adm_servers/edit/game_types/' . $new_game_type_id), lang('next')); 
 			return true;
 		}
 		
