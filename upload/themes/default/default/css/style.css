@@ -564,7 +564,6 @@ ul.tabs {
 	padding: 0;
 	float: left;
 	list-style: none;
-	height: 32px;
 	border-bottom: 1px solid #999;
 	border-left: 1px solid #999;
 	width: 100%;
@@ -586,7 +585,7 @@ ul.tabs li a {
 	text-decoration: none;
 	color: #000;
 	display: block;
-	padding: 0 10px;
+	padding: 0 7px;
 	border: 1px solid #fff;
 	outline: none;
 }
@@ -604,7 +603,6 @@ ul.tabs li.active, ul.tabs li.active a:hover  {
 	clear: both;
 	float: left;
 	width: 100%;
-	background: #fff;
 	-moz-border-radius-bottomright: 5px;
 	-khtml-border-radius-bottomright: 5px;
 	-webkit-border-bottom-right-radius: 5px;
@@ -678,4 +676,11 @@ a.menu:after, .dropdown-toggle:after {
 	margin-left: 50px;
 	margin-right: 0px;
 	padding-right: 0px;
+}
+
+.menu_icons {
+	text-align: center;
+	float: left; 
+	width: 20%;
+	height: 85px;
 }
