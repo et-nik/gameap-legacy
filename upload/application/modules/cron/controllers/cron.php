@@ -1170,17 +1170,6 @@ class Cron extends MX_Controller {
 						$server_installed = false;
 					}
 					
-					if (isset($rep_info['extension'])) {
-						try {
-							$this->_wget_files($server_id, $this->games->games_list[0]['local_repository'], 'local');
-							$this->_unpack_files($server_id, $this->games->games_list[0]['local_repository']);
-							$server_installed = true;
-						} catch (Exception $e) {
-							$this->_cmd_output("Install from local repository failed. Message: " . $e->getMessage());
-							$server_installed = false;
-						}
-					} else {
-
 				} elseif ($this->games->games_list[0]['remote_repository']) {
 					/* Установка из удаленного репозитория */
 					
