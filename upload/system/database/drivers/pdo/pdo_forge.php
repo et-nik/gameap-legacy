@@ -86,7 +86,9 @@ class CI_DB_pdo_forge extends CI_DB_forge {
 
 		$sql .= $this->db->_escape_identifiers($table)." (";
 		$current_field_count = 0;
-
+		
+		$isSqlite = strpos($this->db->hostname,'sqlite') === 0;
+		
 		foreach ($fields as $field=>$attributes)
 		{
 			// Numeric field names aren't allowed in databases, so if the key is
@@ -101,7 +103,20 @@ class CI_DB_pdo_forge extends CI_DB_forge {
 				$attributes = array_change_key_case($attributes, CASE_UPPER);
 
 				$sql .= "\n\t".$this->db->_protect_identifiers($field);
-
+				
+				if($isSqlite && 
+					array_key_exists('AUTO_INCREMENT', $attributes) && $attributes['AUTO_INCREMENT'] === TRUE){
+					$sql .= ' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL';
+					
+					// don't add a comma on the end of the last field
+					if (++$current_field_count < count($fields))
+					{
+						$sql .= ',';
+					}
+					
+					continue;
+				}
+					
 				$sql .=  ' '.$attributes['TYPE'];
 
 				if (array_key_exists('CONSTRAINT', $attributes))
@@ -118,7 +133,8 @@ class CI_DB_pdo_forge extends CI_DB_forge {
 				{
 					$sql .= ' DEFAULT \''.$attributes['DEFAULT'].'\'';
 				}
-
+			
+				/*
 				if (array_key_exists('NULL', $attributes) && $attributes['NULL'] === TRUE)
 				{
 					$sql .= ' NULL';
@@ -127,7 +143,8 @@ class CI_DB_pdo_forge extends CI_DB_forge {
 				{
 					$sql .= ' NOT NULL';
 				}
-
+				*/
+				
 				if (array_key_exists('AUTO_INCREMENT', $attributes) && $attributes['AUTO_INCREMENT'] === TRUE)
 				{
 					$sql .= ' AUTO_INCREMENT';
@@ -141,13 +158,13 @@ class CI_DB_pdo_forge extends CI_DB_forge {
 			}
 		}
 
-		if (count($primary_keys) > 0)
+		if (count($primary_keys) > 0 && !$isSqlite)
 		{
 			$primary_keys = $this->db->_protect_identifiers($primary_keys);
 			$sql .= ",\n\tPRIMARY KEY (" . implode(', ', $primary_keys) . ")";
 		}
 
-		if (is_array($keys) && count($keys) > 0)
+		if (is_array($keys) && count($keys) > 0 && !$isSqlite)
 		{
 			foreach ($keys as $key)
 			{
@@ -179,12 +196,17 @@ class CI_DB_pdo_forge extends CI_DB_forge {
 	 */
 	function _drop_table($table)
 	{
-		// Not a supported PDO feature
+		$que = "DROP TABLE IF EXISTS ".$this->db->_escape_identifiers($table);
+		return $this->db->query($que);
+		
+		// Not a supported PDO feature // da ne pizdi, vse support
+		/*
 		if ($this->db->db_debug)
 		{
 			return $this->db->display_error('db_unsuported_feature');
 		}
 		return FALSE;
+		*/
 	}
 
 	// --------------------------------------------------------------------
