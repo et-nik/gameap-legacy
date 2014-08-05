@@ -190,6 +190,12 @@ class CI_DB_pdo_driver extends CI_DB {
 	{
 		$sql = $this->_prep_query($sql);
 		$result_id = $this->conn_id->prepare($sql);
+		
+		$err = $this->conn_id->errorInfo();
+		
+		if(!$result_id || $err[1])
+			return FALSE;
+		
 		$result_id->execute();
 		
 		if (is_object($result_id))
@@ -437,7 +443,10 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	function _list_tables($prefix_limit = FALSE)
 	{
-		$sql = "SHOW TABLES FROM `".$this->database."`";
+		if(strpos($this->hostname, 'sqlite') !== 0)
+			$sql = "SHOW TABLES FROM `".$this->database."`";
+		else
+			$sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
 
 		if ($prefix_limit !== FALSE AND $this->dbprefix != '')
 		{

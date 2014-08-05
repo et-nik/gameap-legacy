@@ -998,12 +998,20 @@ class CI_DB_driver {
 	function call_function($function)
 	{
 		$driver = ($this->dbdriver == 'postgre') ? 'pg_' : $this->dbdriver.'_';
+		
+		if($driver == 'pdo_'){ // PDO fix.
+			switch($function){
+				case 'insert_id':
+					return $this->conn_id->lastInsertId();
+				break;
+			}
+		}
 
 		if (FALSE === strpos($driver, $function))
 		{
 			$function = $driver.$function;
 		}
-
+		
 		if ( ! function_exists($function))
 		{
 			if ($this->db_debug)

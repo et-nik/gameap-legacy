@@ -226,18 +226,49 @@ switch($page) {
 		//~ !extension_loaded('sqlite3')	OR $db_driver_options['sqlite3'] = 'SQLite3';
 		!extension_loaded('sqlsrv') 	OR $db_driver_options['sqlsrv'] = 'SQLSRV';
 		
+		// строим список доступных PDO драйверов
+		if($db_driver_options['pdo']){
+			$pdoDrv = PDO::getAvailableDrivers();
+			
+			$pdoDriverNames = array(
+				'mysql' => 'MySQL',
+				'sqlite' => 'SQLite'
+			);
+			
+			foreach(PDO::getAvailableDrivers() as $pdoDriver){
+				if(!isset($pdoDriverNames[$pdoDriver]))
+					continue;
+				
+				$pdoDrivers[$pdoDriver] = $pdoDriverNames[$pdoDriver];
+			}
+		}
+		
 		$content .= '
-						<td>' . lang('install_db_dbdriver') . ':</td>
-						<td>' . form_dropdown('dbdriver', $db_driver_options, $db_driver_default) . '</td>
 					<tr>
+						<td>' . lang('install_db_dbdriver') . ':</td>
+						<td>' . form_dropdown('dbdriver', $db_driver_options, $db_driver_default, 'id="dbdrivers"') . '</td>
+					</tr>';
+		
+		if(isset($db_driver_options['pdo'])){ // выводим этот список
+			$content .= '
+						<tr id="pdodrivers_row" hidden>
+							<td>' . lang('install_db_pdo') . ':</td>
+							<td>' . form_dropdown('pdodriver', $pdoDrivers,array(),'id="pdodrivers"') . '</td>
+						</tr>';
+						
+			$content .= '<script src="http://localhost/gameap/themes/system/js/install.js"></script>';
+		}
+	
+		$content .= '
+					<tr class="noForSqlite">
 						<td>' . lang('install_db_hostname') . ':</td>
 						<td width="40%"><input type="text" name="hostname" value="localhost"/></td>
 					</tr>
-					<tr>
+					<tr class="noForSqlite">
 						<td>' . lang('install_db_username') . ':</td>
 						<td><input value="root" type="text" name="username" /></td>
 					</tr>
-					<tr>
+					<tr class="noForSqlite">
 						<td>' . lang('install_db_password') . ':</td>
 						<td><input type="text" name="password" /></td>
 					</tr>
@@ -309,14 +340,19 @@ switch($page) {
 		break;
 		
 	case '4':
+		// Определяем SQLite драйвер.	
+		$isSqlite = $this->input->post('dbdriver') == 'pdo' && $this->input->post('pdodriver') == 'sqlite';
+
 		$title = lang('install_title');
 		$content = '<h2>' . lang('install_end_stage') . '</h2>';
 		
-		$this->form_validation->set_rules('hostname', lang('install_db_hostname'), 'trim|required|xss_clean');
-		$this->form_validation->set_rules('username', lang('install_db_username'), 'trim|required|xss_clean');
-		$this->form_validation->set_rules('password', lang('install_db_password'), 'trim|xss_clean');
+		// Для SQLite базы некоторые данные можно опустить.
+		$isSqlite OR $this->form_validation->set_rules('hostname', lang('install_db_hostname'), 'trim|required|xss_clean');
+		$isSqlite OR $this->form_validation->set_rules('username', lang('install_db_username'), 'trim|required|xss_clean');
+		$isSqlite OR $this->form_validation->set_rules('password', lang('install_db_password'), 'trim|xss_clean');
 		$this->form_validation->set_rules('database', lang('install_db_database'), 'trim|required|xss_clean');
 		$this->form_validation->set_rules('dbdriver', lang('install_db_dbdriver'), 'trim|required|xss_clean');
+		$this->input->post('dbdriver') != 'pdo' OR $this->form_validation->set_rules('pdodriver', lang('install_pdo_dbdriver'), 'trim|required|xss_clean');
 		$this->form_validation->set_rules('dbprefix', lang('install_db_dbprefix'), 'trim|xss_clean');
 		
 		$this->form_validation->set_rules('base_url', lang('install_site_url'), 'trim|required|xss_clean');
@@ -349,7 +385,23 @@ switch($page) {
 		$db_cfg['dbdriver'] = $this->input->post('dbdriver');
 		$db_cfg['dbprefix'] = $this->input->post('dbprefix');
 		$db_cfg['db_debug'] = TRUE;
-
+		
+		// Обработка PDO данных
+		if($this->input->post('dbdriver') == 'pdo'){
+			switch($this->input->post('pdodriver')){
+				case 'mysql':
+					$db_cfg['hostname'] = 'mysql:host='.$db_cfg['hostname'].';dbname='.$db_cfg['database'];
+					//$db_cfg['database'] = '';
+				break;
+				case 'sqlite':
+					$db_cfg['hostname'] = 'sqlite:'.APPPATH.'db/'.$db_cfg['database'].'.db3';
+					$db_cfg['username'] = '';
+					$db_cfg['password'] = '';
+					$db_cfg['database'] = '';
+				break;
+			}
+		}
+		
 		if (!$this->load->database($db_cfg)) {
 			$this->_show_message(lang('install_db_error'));
 			return FALSE;
@@ -368,7 +420,8 @@ switch($page) {
 			foreach($db_variables as $variable) {
 				preg_match('/([\s]*)\$db\[\'default\'\]\[\'' . $variable . '\'\]([\s]*)([\']?)(.*)(\'?)(\\\\?)(.*)/si', $file_strings[$i], $matches);
 				
-				$value = $this->input->post($variable);
+				// ???
+				$value = $db_cfg[$variable]; //$this->input->post($variable);
 				
 				$value = str_replace('\\', '\\\\', $value);
 				$value = str_replace('\'', '\\\'', $value);
@@ -386,14 +439,15 @@ switch($page) {
 			$new_file_data .= $file_strings[$i] . "\n";
 			$i++;
 		}
-
+		
+		
 		if(@file_put_contents('application/config/database.php', $new_file_data)) {
 			/*
 			if(!unlink('../application/config/config_install.tmp')) {
 				$content .= '<p>Удалите файл "application/config/config_install.tmp"</p>';
 			}
 			*/
-			
+		
 			$content .= '<p>' . lang('install_database_saved') . '</p>';
 		} else {
 			//~ $content .= '<p>' . lang('install_manual_database') . ':</p>';
@@ -401,7 +455,7 @@ switch($page) {
 			$this->_show_message('File application/config/database.php create error');
 			return FALSE;
 		}
-		
+
 		/* 
 		 * КОСТЫЛЬ 
 		 * 
@@ -411,6 +465,7 @@ switch($page) {
 		//~ $this->load->database();
 
 		/* Структура базы данных */
+		
 		require_once 'install_gameap/db.php';
 		
 		/* Демо данные */
@@ -521,7 +576,7 @@ switch($page) {
 			$new_file_data .= $file_strings[$i] . "\n";
 			$i++;
 		}
-
+		
 		if(@file_put_contents('application/config/gameap_config.php', $new_file_data)) {
 			/*
 			if(!unlink('../application/config/config_install.tmp')) {

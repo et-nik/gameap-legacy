@@ -358,30 +358,37 @@ $fields = array(
 		
 		'script_start' => array(
 							'type' => 'TINYTEXT',
+							 'null' => true,
 		),
 		
 		'script_stop' => array(
 							'type' => 'TINYTEXT',
+							 'null' => true,
 		),
 		
 		'script_restart' => array(
 							'type' => 'TINYTEXT',
+							 'null' => true,
 		),
 		
 		'script_status' => array(
 							'type' => 'TINYTEXT',
+							 'null' => true,
 		),
 		
 		'script_update' => array(
 							'type' => 'TINYTEXT',
+							 'null' => true,
 		),
 		
 		'script_get_console' => array(
 							'type' => 'TINYTEXT',
+							 'null' => true,
 		),
 		
 		'script_send_command' => array(
 							 'type' => 'TINYTEXT',
+							 'null' => true,
 		),	
 		
 		'kick_cmd' => array(
