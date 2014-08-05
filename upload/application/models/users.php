@@ -428,9 +428,8 @@ class Users extends CI_Model {
 	{
 		$user_data = $this->get_user_data($user_id);
 		
-		if ($user_data['modules_data'] && !is_array($user_data['modules_data'])) {
-			$modules_data_array = json_decode($user_data['modules_data'], true);
-		}
+		// Данные уже декодированы из json
+		$modules_data_array = $user_data['modules_data'];
 		
 		$modules_data_array[$module_name] = $data;
 		$modules_data_json = json_encode($modules_data_array);
