@@ -364,7 +364,7 @@ switch($page) {
 		
 		$this->form_validation->set_rules('admin_login', lang('login'), 'trim|required|max_length[64]|xss_clean');
 		$this->form_validation->set_rules('admin_email', lang('email'), 'trim|required|valid_email|xss_clean');
-		$this->form_validation->set_rules('admin_password', lang('password'), 'trim|md5|required|min_length[6]|max_length[64]|xss_clean');
+		$this->form_validation->set_rules('admin_password', lang('password'), 'trim|required|min_length[6]|max_length[64]|xss_clean');
 		
 		if ($this->form_validation->run() == FALSE)
 		{
@@ -532,6 +532,9 @@ switch($page) {
 		));
 		
 		$user_data['is_admin'] = 1;
+		
+		print_r($user_data);
+		print_r($this->input->post('admin_password'));
 			
 		$this->users->add_user($user_data);
 
