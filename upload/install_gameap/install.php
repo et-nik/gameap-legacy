@@ -533,9 +533,6 @@ switch($page) {
 		
 		$user_data['is_admin'] = 1;
 		
-		print_r($user_data);
-		print_r($this->input->post('admin_password'));
-			
 		$this->users->add_user($user_data);
 
 		/*-------------------*/
