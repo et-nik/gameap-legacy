@@ -25,3 +25,8 @@ $lang['profile_servers_privileges'] 			= 'Привилегии на сервер
 $lang['profile_change_password'] 				= 'Сменить пароль';
 $lang['profile_view_privileges'] 				= 'Смотреть привилегии';
 $lang['profile_empty_servers_list'] 			= 'У Вас нет серверов';
+
+// 0.9.9
+$lang['profile_email_change_confirm_subject']	= 'Смена email';
+$lang['profile_email_change_confirm']			= 'Подтвердите смену email с %s на %s. Для этого перейдите по ссылке: %s';
+$lang['profile_email_changed'] 					= 'Email изменен';

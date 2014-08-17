@@ -16,6 +16,8 @@ class Profile extends CI_Controller {
 	var $tpl_data = array();
 	var $user_servers_count = 0;
 	
+	// -----------------------------------------------------------------
+	
 	public function __construct()
     {
         parent::__construct();
@@ -39,6 +41,8 @@ class Profile extends CI_Controller {
         }
     }
     
+    // -----------------------------------------------------------------
+    
     // Отображение информационного сообщения
     function _show_message($message = false, $link = false, $link_text = false)
     {
@@ -61,6 +65,8 @@ class Profile extends CI_Controller {
         $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
+    
+    // -----------------------------------------------------------------
 	
 	public function index()
     {
@@ -79,6 +85,8 @@ class Profile extends CI_Controller {
 
         $this->parser->parse('main.html', $this->tpl_data);
     }
+    
+    // -----------------------------------------------------------------
     
     /* Редактирование профиля */
     public function edit()
@@ -105,13 +113,51 @@ class Profile extends CI_Controller {
 					$user_new_data['name'] = $this->input->post('name', true);
 					$user_new_data['email'] = $this->input->post('email', true);
 					
-					$this->users->update_user($user_new_data, $this->users->auth_data['id']);
+					/* Подтверждение смены email, если разрешен в конфигурации
+					 * Пользователю на текущий email отправляется письмо, 
+					 * со ссылкой на подтверждение смены.
+					 * 
+					 * Текущий email возвращается обратно, а меняется при переходе
+					 * по ссылке, в методе change_email_confirm().
+					*/
+					if ($this->config->config['email_change_confirm'] && $this->users->auth_data['email'] != $user_new_data['email']) {
+						
+						$change_code = generate_code(20);
+						
+						$link = site_url('admin/profile/change_email_confirm/' . $change_code);
+						$this->users->send_mail(lang('profile_email_change_confirm_subject'), 
+												lang('profile_email_change_confirm', $this->users->auth_data['email'], $user_new_data['email'], $link), 
+												$this->users->auth_id
+						);
+						
+						$this->users->update_modules_data($this->users->auth_id, 
+															array('confirm_change_email' => 
+																array('code' => $change_code, 
+																'new_email' => $user_new_data['email'])
+															),
+															'gameap'
+						);
 
-					$local_tpl_data = array();
-					$local_tpl_data['message'] = lang('profile_data_changed');
-					$local_tpl_data['link'] = site_url() . 'admin/profile';
-					$local_tpl_data['back_link_txt'] = lang('profile');
-					$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+						$user_new_data['email'] = $this->users->auth_data['email'];
+					}
+					
+					if ($this->users->update_user($user_new_data, $this->users->auth_data['id'])) {
+						$log_data['msg'] = 'Profile edit success';
+						$this->_show_message(lang('profile_data_changed'), site_url('admin/profile'), lang('profile'));
+					} else {
+						$log_data['msg'] = 'Profile edit failed';
+						$this->_show_message('Error');
+					}
+					
+					/* Сохраняем логи */
+					$log_data['type'] = 'profile';
+					$log_data['command'] = 'save_profile';
+					$log_data['user_name'] = $this->users->auth_login;
+					$log_data['server_id'] = 0;
+					$log_data['log_data'] = "";
+					$this->panel_log->save_log($log_data);
+
+					return;
 				}
 				
 			}
@@ -120,6 +166,51 @@ class Profile extends CI_Controller {
 
         $this->parser->parse('main.html', $this->tpl_data);
 	}
+	
+	// -----------------------------------------------------------------
+	
+	/**
+	 * Подтверждение смены email
+	 */
+	public function change_email_confirm($confirm_code = false)
+	{
+		if (!$confirm_code) {
+			$this->_show_message('Empty code');
+			return;
+		}
+		
+		$modules_data =& $this->users->auth_data['modules_data'];
+		
+		if (isset($modules_data['gameap']['confirm_change_email']['code']) && $modules_data['gameap']['confirm_change_email']['code'] == $confirm_code) {
+			// Код подходит, меняем email
+			$sql_data['email'] = $modules_data['gameap']['confirm_change_email']['new_email'];
+			
+			if ($this->users->update_user($sql_data, $this->users->auth_id)) {
+				$log_data['msg'] = 'Profile email changed';
+				$this->_show_message(lang('profile_email_changed'), site_url('admin/profile'), lang('profile'));
+			} else {
+				$log_data['msg'] = 'Email change failed';
+				$this->_show_message('Error');
+			}
+			
+			// Опустошаем данные
+			$this->users->update_modules_data($this->users->auth_id, array('confirm_change_email' => array()),'gameap');
+			
+			/* Сохраняем логи */
+			$log_data['type'] 		= 'profile';
+			$log_data['command'] 	= 'change_email';
+			$log_data['user_name'] 	= $this->users->auth_login;
+			$log_data['server_id'] 	= 0;
+			$log_data['log_data'] 	= "";
+			$this->panel_log->save_log($log_data);
+			
+		} else {
+			$this->_show_message('Unknown code');
+			return;
+		}
+	}
+	
+	// -----------------------------------------------------------------
 	
 	/* Смена пароля */
 	public function change_password()
@@ -158,7 +249,21 @@ class Profile extends CI_Controller {
 					$new_password = $this->input->post('new_password', true);
 					$new_password = hash_password($new_password);
 					
-					$this->users->update_user(array('password' => $new_password), $this->users->auth_data['id']);
+					if ($this->users->update_user(array('password' => $new_password), $this->users->auth_data['id'])) {
+						$log_data['msg'] = 'Profile change password success';
+						$this->_show_message(lang('profile_password_changed'), site_url('admin/profile'), lang('profile'));
+					} else {
+						$log_data['msg'] = 'Profile change password failed';
+						$this->_show_message('Profile change password failed');
+					}
+					
+					/* Сохраняем логи */
+					$log_data['type'] = 'profile';
+					$log_data['command'] = 'change_password';
+					$log_data['user_name'] = $this->users->auth_login;
+					$log_data['server_id'] = 0;
+					$log_data['log_data'] = "";
+					$this->panel_log->save_log($log_data);
 					
 					$local_tpl_data = array();
 					$local_tpl_data['message'] = lang('profile_password_changed');
@@ -175,6 +280,7 @@ class Profile extends CI_Controller {
         $this->parser->parse('main.html', $this->tpl_data);
 	}
 	
+	// -----------------------------------------------------------------
 	
 	public function server_privileges($server_id = false)
     {
