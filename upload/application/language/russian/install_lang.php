@@ -41,7 +41,7 @@ $lang['install_end_stage'] 						= 'Завершающий этап';
 $lang['install_configuration_saved'] 			= 'Конфигурация данных сохранена';
 $lang['install_manual_configuration'] 			= 'Создайте файл <strong>"application/config/gameap_config.php"</strong> со следующим содержимым';
 $lang['install_end'] 							= '<h2>Благодарим Вас за установку АдминПанели</h2>
-													<p>Теперь Вы можете приступить к управлению игровыми серверами. Если что-то непонятно, <a href="http://wiki.hldm.org/index.php/%D0%9A%D0%B0%D1%82%D0%B5%D0%B3%D0%BE%D1%80%D0%B8%D1%8F:%D0%90%D0%B4%D0%BC%D0%B8%D0%BD%D0%9F%D0%B0%D0%BD%D0%B5%D0%BB%D1%8C" target="blank">попробуйте воспользоваться документацией</a>. И не забудьте удалить директорию <font color="red">install_gameap</font> из корневой директории с АдминПанелью!</p>
+													<p>Теперь Вы можете приступить к управлению игровыми серверами. Если что-то непонятно, <a href="http://wiki.hldm.org/%D0%94%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D1%8F_GameAP" target="blank">попробуйте воспользоваться документацией</a>. И не забудьте удалить директорию <font color="red">install_gameap</font> из корневой директории с АдминПанелью!</p>
 													<p>Для повторной установки удалите файл "application/config/gameap_config.php"</p>';
 													
 $lang['install_goto_adminpanel'] 				= 'Поехали';
