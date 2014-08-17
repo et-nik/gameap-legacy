@@ -40,7 +40,7 @@
  */
 if ( ! function_exists('lang'))
 {
-	function lang($line, $string1 = '', $string2 = '')
+	function lang($line, $string1 = '', $string2 = '', $string3 = '')
 	{
 		$CI =& get_instance();
 		$line = $CI->lang->line($line);
@@ -52,7 +52,7 @@ if ( ! function_exists('lang'))
 		
 		/* Заменяем %s в строке */
 		if ($string1 != '') {
-			$line = sprintf($line, $string1, $string2);
+			$line = sprintf($line, $string1, $string2, $string3);
 		}
 
 		//~ if ($id != '')
