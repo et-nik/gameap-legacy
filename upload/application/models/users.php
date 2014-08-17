@@ -901,9 +901,13 @@ class Users extends CI_Model {
 		$this->load->library('email');
 		
 		if ($user_id) {
-			$user_data = $this->get_user_data($user_id, false, true);
+			if ($user_id != $this->auth_id) {
+				$user_data = $this->get_user_data($user_id, false, true);
+			} else {
+				$user_data =& $this->auth_data;
+			}
 		} else {
-			$user_data = &$this->user_data;
+			$user_data =& $this->user_data;
 		}
 		
 		$user_name = isset($user_data['name']) ? $user_data['name']  : $user_data['login'];
@@ -918,7 +922,7 @@ class Users extends CI_Model {
 		if ($this->email->send()) {
 			return true;
 		} else {
-			//echo $this->email->print_debugger();
+			//~ echo $this->email->print_debugger();
 			return false;
 		}
 	}
