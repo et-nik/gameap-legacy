@@ -239,13 +239,13 @@ class Server_control extends CI_Controller {
 		/* Получение данных сервера и привилегий на сервер */
 		$this->servers->server_data = $this->servers->get_server_data($server_id);
 		$this->users->get_server_privileges($server_id);
-				
-		if(!$this->users->auth_servers_privileges['VIEW']) {
+		
+		if(!$this->servers->server_data) {
 			$this->_show_message(lang('server_control_server_not_found'));
 			return false;
 		}
 				
-		if(!$this->servers->server_data) {
+		if(!$this->users->auth_servers_privileges['VIEW']) {
 			$this->_show_message(lang('server_control_server_not_found'));
 			return false;
 		}
@@ -479,12 +479,12 @@ class Server_control extends CI_Controller {
 		}
 		
 		/* Правила для формы */
-		$this->form_validation->set_rules('name', 'имя', 'trim|required|max_length[64]|xss_clean');
-		$this->form_validation->set_rules('code', 'команда', 'trim|required|max_length[32]|xss_clean');
-		$this->form_validation->set_rules('command', 'параметры команды', 'trim|max_length[128]|xss_clean');
+		$this->form_validation->set_rules('name', lang('title'), 'trim|max_length[64]|xss_clean');
+		$this->form_validation->set_rules('code', lang('code'), 'trim|required|max_length[32]|xss_clean');
+		$this->form_validation->set_rules('command', lang('server_control_param_for_command'), 'trim|max_length[128]|xss_clean');
 		
-		$this->form_validation->set_rules('date_perform', 'дата выполнения', 'trim|required|max_length[19]|xss_clean');
-		$this->form_validation->set_rules('time_add', 'период повтора', 'trim|required|integer|max_length[16]|xss_clean');
+		$this->form_validation->set_rules('date_perform', lang('server_control_execution_date'), 'trim|required|max_length[19]|xss_clean');
+		$this->form_validation->set_rules('time_add', lang('server_control_repeat_period'), 'trim|required|integer|max_length[16]|xss_clean');
 		
 		$local_tpl_data['server_id'] 	= $server_id;
 		$local_tpl_data['date_perform'] = unix_to_human(time()+86400, false, 'eu');
@@ -504,10 +504,32 @@ class Server_control extends CI_Controller {
 			$sql_data['name'] 		= $this->input->post('name');
 			$sql_data['code'] 		= $this->input->post('code');
 			$sql_data['command'] 	= $this->input->post('command');
+			$sql_data['time_add'] = $this->input->post('time_add');
 			
+			if(!$sql_data['date_perform'] = human_to_unix($this->input->post('date_perform'))) {
+				$this->_show_message(lang('server_control_date_unavailable'));
+				return false;
+			}
+
+			// Проверка корректности задания
 			if (false == in_array($sql_data['code'], $this->_available_tasks)) {
 				$this->_show_message('Task code unavailable');
 				return false;
+			}
+			
+			if ($sql_data['code'] == 'server_rcon' && empty($sql_data['command'])) {
+				$this->_show_message(lang('server_control_empty_rcon_command'));
+				return;
+			}
+
+			if ($sql_data['time_add'] > 0 && $sql_data['time_add'] < 21600) {
+				$this->_show_message(lang('server_control_time_add_unavailable'));
+				return false;
+			}
+			
+			if (empty($sql_data['name'])) {
+				$ex = explode('_', $sql_data['code']);
+				$sql_data['name'] = lang($ex[1]);
 			}
 			
 			if ($sql_data['code'] == 'server_update') {
@@ -525,22 +547,22 @@ class Server_control extends CI_Controller {
 				}
 			} elseif ($sql_data['code'] == 'server_start' OR $sql_data['code'] == 'server_stop' OR $sql_data['code'] == 'server_restart') {
 				
-				$where = array('code' => $sql_data['code'], 'server_id' => $server_id);
-				$query = $this->db->get_where('cron', $where, 1);
+				$this->db->where(array('time_add' => $sql_data['code'], 'server_id' => $server_id));
 				
-				if ($query->num_rows >= 3) {
-					$this->_show_message(lang('server_command_max_tasks'), site_url('admin/server_control/' . $server_id));
+				if ($this->db->count_all_results('cron') >= 3) {
+					$this->_show_message(lang('server_command_max_tasks'), site_url('admin/server_control/main/' . $server_id));
 					return false;
 				}
-			}
+				
+				// Промежуток между заданиями запуска/остановки/перезапуска должен быть не менее 10 минут
+				$this->db->where(array('date_perform >' => $sql_data['date_perform']-300, 'date_perform <' => $sql_data['date_perform']+300));
+				
+				if ($this->db->count_all_results('cron') > 0) {
+					$this->_show_message(lang('server_control_interval_unavailable'), site_url('admin/server_control/main/' . $server_id));
+					return false;
+				}
 
-			
-			if(!$sql_data['date_perform'] = human_to_unix($this->input->post('date_perform'))) {
-				$this->_show_message(lang('server_control_date_unavailable'));
-				return false;
 			}
-			
-			$sql_data['time_add'] = $this->input->post('time_add');
 
 			$this->db->insert('cron', $sql_data);
 			
@@ -635,7 +657,7 @@ class Server_control extends CI_Controller {
 			$log_data['log_data'] = '';
 			$this->panel_log->save_log($log_data);
 			
-			$this->_show_message(lang('server_control_task_saved'), site_url('/admin/server_control/main/' . $task_list[0]['server_id']), 'Далее');
+			$this->_show_message(lang('server_control_task_deleted'), site_url('/admin/server_control/main/' . $task_list[0]['server_id']), 'Далее');
 			return true;
 		}
 		
@@ -700,15 +722,11 @@ class Server_control extends CI_Controller {
 		}
 		
 		/* Правила для формы */
-		$this->form_validation->set_rules('name', 'имя', 'trim|required|max_length[64]|xss_clean');
+		$this->form_validation->set_rules('name', lang('title'), 'trim|max_length[64]|xss_clean');
+		$this->form_validation->set_rules('command', lang('server_control_param_for_command'), 'trim|max_length[128]|xss_clean');
 		
-		// Код больше не редактируется
-		//~ $this->form_validation->set_rules('code', 'команда', 'trim|required|max_length[32]|xss_clean');
-		
-		$this->form_validation->set_rules('command', 'параметры команды', 'trim|max_length[128]|xss_clean');
-		
-		$this->form_validation->set_rules('date_perform', 'дата выполнения', 'trim|required|max_length[19]|xss_clean');
-		$this->form_validation->set_rules('time_add', 'период повтора', 'trim|required|integer|max_length[16]|xss_clean');
+		$this->form_validation->set_rules('date_perform', lang('server_control_execution_date'), 'trim|required|max_length[19]|xss_clean');
+		$this->form_validation->set_rules('time_add', lang('server_control_repeat_period'), 'trim|required|integer|max_length[16]|xss_clean');
 		
 		if($this->form_validation->run() == false) {
 			
@@ -727,6 +745,7 @@ class Server_control extends CI_Controller {
 			
 			$options['time_add'] = array(
 				'0' => 		 lang('server_control_never'),
+				'43200' =>	 lang('server_control_twelve_hours'),
 				'86400' =>	 lang('server_control_day'),
 				'172800' =>	 lang('server_control_two_day'),
 				'604800' =>	 lang('server_control_week'),
@@ -747,7 +766,7 @@ class Server_control extends CI_Controller {
 			
 			$this->tpl_data['content'] .= $this->parser->parse('servers/task_edit.html', $local_tpl_data, true);
 		} else {
-			$sql_data['name'] = $this->input->post('name');
+			$sql_data['name'] = $this->input->post('name') ? $this->input->post('name') : $task_list[0]['name'];
 			
 			// Код больше не редактируется
 			//~ $sql_data['code'] = $this->input->post('code');
@@ -758,6 +777,11 @@ class Server_control extends CI_Controller {
 			if(!$sql_data['date_perform'] = human_to_unix($this->input->post('date_perform'))) {
 				$this->_show_message(lang('server_control_date_unavailable'), 'javascript:history.back()');
 				return false;
+			}
+			
+			if ($task_list[0]['code'] == 'server_rcon' && empty($sql_data['command'])) {
+				$this->_show_message(lang('server_control_empty_rcon_command'));
+				return;
 			}
 			
 			// Сбрасываем, если заданание уже выполнялось
