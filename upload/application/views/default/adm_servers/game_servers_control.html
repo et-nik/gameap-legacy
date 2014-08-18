@@ -127,10 +127,28 @@
 					<td>{lang_adm_servers_server_dir}:<br /><span class="description">[ {lang_adm_servers_server_dir_desc} ]</span></td>
 					<td>{script_path}/<input type="text" name="dir" value="{server_dir}" /></td>
 				</tr>
+				
+				<script type="text/javascript">
+					function str_rand() {
+						var result       = '';
+						var words        = '0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
+						var max_position = words.length - 1;
+							for( i = 0; i < 10; ++i ) {
+								position = Math.floor ( Math.random() * max_position );
+								result = result + words.substring(position, position + 1);
+							}
+						return result;
+					}
+					
+					function generate_password() {
+						$("input[name='rcon']").val(str_rand());
+						return;
+					}
+				</script>
 
 				<tr>
 					<td>{lang_adm_servers_rcon_password}:<br /><span class="description">[ {lang_leave_blank} ]</span></td>
-					<td><input type="text" name="rcon" /></td>
+					<td><input type="text" name="rcon" />&nbsp;<a class="small awesome" href="#" onclick="generate_password();return false;"><span class="glyphicon glyphicon-refresh"></span>&nbsp;{lang_adm_servers_generate_rcon_password}</a></td>
 				</tr>
 
 				<tr>
