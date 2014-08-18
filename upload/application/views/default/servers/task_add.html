@@ -8,12 +8,7 @@
 <table width="50%" class="zebra">
 
 <tr>
-	<td>{lang_title}:</td>
-	<td><input type="text" name="name" /></td>
-</tr>
-
-<tr>
-	<td>Команда:</td>
+	<td width="50%">Команда:</td>
 	<td>
 		<select name="code">
 			<option value="server_start">{lang_server_control_start}</option>
@@ -25,10 +20,37 @@
 	</td>
 </tr>
 
-<tr>
+<tr id="param_for_command">
 	<td>{lang_server_control_param_for_command}:</td>
 	<td><input type="text" name="command" /></td>
 </tr>
+
+<script type="text/javascript">
+	
+	function show_hide_field() {
+		if ($("select[name='code']").val() == 'server_rcon') {
+			$('#param_for_command').show();
+		} else {
+			$('#param_for_command').hide();  
+		}
+	}
+	
+	$(document).ready(function() {
+		$("select[name='code']").change(function() {
+			show_hide_field();
+		});
+		
+		$("select[name='code']").keyup(function() {
+			show_hide_field();
+		});
+		
+		$("select[name='code']").keydown(function() {
+			show_hide_field();
+		});
+	});
+	
+	show_hide_field();
+</script>
 
 <tr>
 	<td>{lang_server_control_execution_date}:</td>
