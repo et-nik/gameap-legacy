@@ -227,7 +227,6 @@ if($this->users->auth_privileges['srv_restart'] == 1
 		<thead>
 		<tr>
 			<th><strong>{lang_time}</strong></th>
-			<th><strong>{lang_title}</strong></th>
 			<th><strong>{lang_action}</strong></th>
 			<th>&nbsp;</td>
 		</tr>
@@ -235,10 +234,9 @@ if($this->users->auth_privileges['srv_restart'] == 1
 	{task_list}
 		<tr>
 			<td width="20%">{task_date}</td>
-			<td width="20%">{task_name}</td>
 			<td width="20%">{task_action}</td>
 			<td>
-				<a class="green small awesome" title="{lang_edit}" href="{site_url}admin/server_control/edit_task/{task_id}">E<a/>&nbsp;
+				<a class="green small awesome" title="{lang_edit}" href="{site_url}admin/server_control/edit_task/{task_id}">{lang_edit}<a/>&nbsp;
 				<a class="red small awesome" title="{lang_delete}" href="{site_url}admin/server_control/delete_task/{task_id}">X<a/>&nbsp;
 			</td>
 		</tr>
