@@ -73,3 +73,11 @@ $lang['cvarname_players']								= 'Игроки';
 
 /* -- 0.9.3 -- */
 $lang['cvarname_joinlink']								= 'Подключиться к серверу';
+
+/* -- 0.9.9 -- */
+$lang['server_control_twelve_hours'] 					= '12 часов';
+$lang['server_control_time_add_unavailable'] 			= 'Период повтора введен некорректно';
+
+$lang['server_control_empty_rcon_command']				= 'Пустая RCON команда';
+$lang['server_control_task_deleted'] 					= 'Задание успешно удалено';
+$lang['server_control_interval_unavailable'] 			= 'Промежуток между заданиями должен быть не менее 10 минут';
