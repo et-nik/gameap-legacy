@@ -25,3 +25,8 @@ $lang['profile_servers_privileges'] 			= 'Server privileges';
 $lang['profile_change_password'] 				= 'Change password';
 $lang['profile_view_privileges'] 				= 'View';
 $lang['profile_empty_servers_list'] 			= 'You have no servers';
+
+// 0.9.9
+$lang['profile_email_change_confirm_subject']	= 'Email change';
+$lang['profile_email_change_confirm']			= 'Confirm change email from %s to %s. Follow the link: %s';
+$lang['profile_email_changed'] 					= 'Email changed';

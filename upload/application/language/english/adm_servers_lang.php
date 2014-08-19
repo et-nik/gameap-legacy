@@ -216,3 +216,6 @@ $lang['adm_servers_empty_ds_list']					= 'You need to <a href="%s">add</a> a ded
 // 0.9.3
 $lang['adm_servers_delete_files']					= 'Delete files.';
 $lang['adm_servers_send_command']					= 'Send command on console';
+
+// 0.9.9
+$lang['adm_servers_generate_rcon_password']			= 'Generate new';

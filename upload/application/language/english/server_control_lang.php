@@ -75,3 +75,10 @@ $lang['cvarname_players']								= 'Players';
 /* -- 0.9.3 -- */
 $lang['cvarname_joinlink']								= 'Connect to server';
 
+/* -- 0.9.9 -- */
+$lang['server_control_twelve_hours'] 					= '12 hours';
+$lang['server_control_time_add_unavailable'] 			= 'Task repeat time is invalid';
+
+$lang['server_control_empty_rcon_command']				= 'Empty RCON command';
+$lang['server_control_task_deleted'] 					= 'Task deleted';
+$lang['server_control_interval_unavailable'] 			= 'Interval between tasks must be more 10 minutes';

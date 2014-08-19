@@ -164,3 +164,6 @@ $lang['reset']									= 'Reset';
 
 /* -- 0.9.3 -- */
 $lang['administration']							= 'Admin';
+
+/* -- 0.9.9 -- */
+$lang['closed']									= 'Closed';
