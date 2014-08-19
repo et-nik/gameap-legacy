@@ -73,3 +73,11 @@ $lang['cvarname_players'] = 'Гравці';
 
 /* - 0.9.3 - */ 
 $lang['cvarname_joinlink'] = 'Підключитися до сервера';
+
+/* - 0.9.9 - */ 
+$lang['server_control_twelve_hours'] = '12 годин'; 
+$lang['server_control_time_add_unavailable'] = 'Період повтору введено некоректно'; 
+
+$lang['server_control_empty_rcon_command'] = 'Порожня RCON команда'; 
+$lang['server_control_task_deleted'] = 'Завдання успішно видалено'; 
+$lang['server_control_interval_unavailable'] = 'Проміжок між завданнями повинен бути не менше 10 хвилин';
