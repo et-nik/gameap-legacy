@@ -21,7 +21,8 @@ $config['disable_sftp_search']			= false;						// Отключить sftp пои
 
 $config['captcha_driver']				= 'codeigniter';				// Капча
 
-//~ $config['admin_ip']					= array('127.0.1.1', '127.0.0.1');	// IP с которых можно авторизоваться под администратором
+// IP с которых можно авторизоваться под администратором
+//~ $config['admin_ip']					= array('127.0.1.1', '127.0.0.1', '127.0.0.0/12', '133.7.0.0');
 
 /* End of file gameap_config.php */
 /* Location: ./application/config/gameap_config.php */
