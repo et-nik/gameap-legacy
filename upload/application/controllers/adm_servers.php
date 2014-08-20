@@ -2642,8 +2642,7 @@ class Adm_servers extends CI_Controller {
 					$this->highcharts->set_dimensions('', 200);
 					$this->highcharts->set_title($ds['name'] . ' stats');
 					
-					$credits->href = 'http://www.gameap.ru';
-					$credits->text = "GameAP";
+					$credits = (object) array('href' => 'http://www.gameap.ru', 'text' => 'GameAP');
 					$this->highcharts->set_credits($credits);
 					
 					$local_tpl_data['ds_stats'][$i]['graph'] = $this->highcharts->render();
