@@ -91,7 +91,7 @@ class Games extends CI_Model {
 		if (empty($games_list)) {
 			$this->servers->select_fields('game');
 			
-			if ($servers_list = $this->servers->get_list()) {
+			if ($servers_list = $this->servers->get_list(false, 'VIEW', array())) {
 				foreach($servers_list as $server) {
 					if (!in_array($server['game'], $games_array)) {
 						$games_array[] = $server['game'];
@@ -116,7 +116,7 @@ class Games extends CI_Model {
 		
 		if (is_array($where)) {
 			$this->db->where($where);
-		} else if($where) {
+		} else {
 			$this->db->where('code', $where);
 		}
 		
