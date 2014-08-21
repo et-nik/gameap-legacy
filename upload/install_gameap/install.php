@@ -74,7 +74,7 @@ switch($page) {
 		$(document).ready(function() {
 			$("select[name=\'language\']").change(function() {
 				language = $("select[name=\'language\']").val();
-				$("a#link").attr("href", "' . site_url('install/page/start/') . '/" + language);
+				$("a#link").attr("href", "' . site_url('install/page/start') . '/" + language);
 			});
 			
 		});
