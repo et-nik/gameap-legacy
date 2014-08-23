@@ -38,6 +38,8 @@ class Tpl_replace
 	var $l_delim;
 	var $r_delim;
 	
+	// -----------------------------------------------------------------
+	
 	public function __construct()
 	{
 		$this->CI =& get_instance();
@@ -47,12 +49,18 @@ class Tpl_replace
 		$this->r_delim = $this->CI->parser->r_delim;
 	}
 	
+	// -----------------------------------------------------------------
+	
 	function _get_lang_line($matches)
 	{
 		return $this->CI->lang->line($matches[1]);
 	}
 	
-	/* Замена языковых конструкций вида {lang_***} */
+	// -----------------------------------------------------------------
+	
+	/**
+	 *  Замена языковых конструкций вида {lang_***} 
+	 */
 	public function parse_lang()
 	{
 		$output = $this->CI->output->get_output();
@@ -61,7 +69,15 @@ class Tpl_replace
 		$this->CI->output->set_output($output);
 	}
 	
-	/* URL */
+	// -----------------------------------------------------------------
+	
+	/**
+	 * URL. 
+	 * Меняет {site_url} на http://example.com/ или http://example.com/index.php?
+	 * в зависимости от настроек.
+	 * {base_url} всегда меняется на http://example.com/
+	 * 
+	 */
 	public function parse_url()
 	{
 		$output = $this->CI->output->get_output();
@@ -79,7 +95,11 @@ class Tpl_replace
 		$this->CI->output->set_output($output);
 	}
 	
-	/* Templates */
+	// -----------------------------------------------------------------
+	
+	/**
+	 *  Templates 
+	 */
 	public function parse_template()
 	{
 		$output = $this->CI->output->get_output();
@@ -104,3 +124,6 @@ class Tpl_replace
 		$this->CI->output->set_output($output);
 	}
 }
+
+/* End of file tpl_replace.php */
+/* Location: ./application/hooks/tpl_replace.php */
