@@ -282,7 +282,7 @@ class Cron extends MX_Controller {
 				break;
 	
 			default:
-				$commands[] = 'cp -R ' . $link . ' ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'];
+				$commands[] = 'cp -R ' . $link . '/* ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . '/';
 				break;
 		}
 		
