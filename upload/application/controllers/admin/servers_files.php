@@ -369,7 +369,13 @@ class Servers_files extends CI_Controller {
 			 * сохраняем содержимое конфига на сервере
 			*/
 			
-			$cfg_data = $this->input->post('file_contents', true);
+			$cfg_data = $this->input->post('file_contents');
+			
+			// Дополнительная обработка для Windows
+			// Заменяет /n на /r/n
+			if (strtolower($this->servers->server_data['os']) == 'windows') {
+				$cfg_data = implode("\r\n", explode("\n", $cfg_data));
+			}
 
 			try {
 				$file_contents = write_ds_file($dir . $file, $cfg_data, $this->servers->server_data);
