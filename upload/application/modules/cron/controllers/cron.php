@@ -251,6 +251,259 @@ class Cron extends MX_Controller {
 	// ----------------------------------------------------------------
 	
 	/**
+	 * Установка/обновление игрового сервера. Общая функция.
+	 */
+	private function _install_server($server_id = 0)
+	{
+		if (!$server_id) {
+			return;
+		}
+		
+		$this->_cmd_output("--Server #" . $server_id . " install started");
+		$server_installed = false;
+		
+		// Данные лога установки
+		$log = '';
+		$this->_install_result = '';
+		$this->control->clear_commands();
+		
+		/* Получение данных об игровой модификации */
+		//~ $this->game_types->get_gametypes_list(array('id' => $this->servers_data[$server_id]['game_type']));
+
+		// Полю installed устанавливаем значение 2, что сервер начал устанавливаться
+		$this->servers->edit_game_server($server_id, array('installed' => '2'));
+		
+		/* Создание директории на выделенном сервере */
+		
+		try {
+			$this->_mkdir($server_id);
+		} catch (Exception $e) {
+			$this->_cmd_output('---Mkdir failed: '. $e->getMessage());
+			$server_installed = false;
+		}
+		
+		/* Операция установки игрового сервера
+		 * В зависимости от заданных данных сервер устанавливается
+		 * из локального репозитория, либо удаленного репозитория, либо 
+		 * через SteamCMD.
+		 * 
+		 * Наибольший приоритет имеет локальный репозиторий, после 
+		 * удаленный, а после SteamCMD.
+		*/
+		if ($this->games->games_list[0]['local_repository']) {
+			/* Установка из локального репозитория */
+			
+			$rep_info = pathinfo($this->games->games_list[0]['local_repository']);
+			
+			$this->_cmd_output("---Install from local repository");
+			
+			try {
+				if (isset($rep_info['extension'])) {
+					// Распаковка архива
+					$this->_wget_files($server_id, $this->games->games_list[0]['local_repository'], 'local');
+					$this->_unpack_files($server_id, $this->games->games_list[0]['local_repository']);
+				} else {
+					// Копирование директории
+					$this->_copy_files($server_id, $this->games->games_list[0]['local_repository']);
+				}
+				
+				$server_installed = true;
+			} catch (Exception $e) {
+				$this->_cmd_output("---Install from local repository failed. Message: " . $e->getMessage());
+				$server_installed = false;
+			}
+			
+		} elseif ($this->games->games_list[0]['remote_repository']) {
+			/* Установка из удаленного репозитория */
+			
+			$this->_cmd_output("---Install from remote repository");
+			
+			try {
+				$this->_wget_files($server_id, $this->games->games_list[0]['remote_repository'], 'remote');
+				$this->_unpack_files($server_id, $this->games->games_list[0]['remote_repository']);
+				$server_installed = true;
+			} catch (Exception $e) {
+				$this->_cmd_output("---Install from remote repository failed. Message: " . $e->getMessage());
+				$server_installed = false;
+			}
+
+		} elseif ($this->games->games_list[0]['app_id']) {
+			/* Установка через SteamCMD */
+			
+			$this->_cmd_output("---Install from SteamCMD");
+			
+			try {
+				$server_installed = $this->_install_from_steamcmd($server_id);
+			} catch (Exception $e) {
+				$this->_cmd_output("---Install from steamcmd failed. Message: " . $e->getMessage());
+				$server_installed = false;
+			}
+			
+		} else {
+			/* 
+			 * Не удалость выбрать тип установки 
+			 * отсутствуют данные локального репозитория, удаленного репозитория и steamcmd
+			 */
+			$log .= "App_id and Repository data not specified \n";
+			$this->_cmd_output("---Server #" . $server_id . " install failed. App_id and Repository data not specified");
+			$server_installed = false;
+		}
+		
+		/* 
+		 * Завершение установки.
+		 * Установка прав на директории, задание ркон пароля
+		*/
+		if ($server_installed == true) {
+			/* Загружаем дополнительный файлы игровой модификации */
+			$this->game_types->get_gametypes_list(array('id' => $this->servers_data[$server_id]['game_type']));
+			
+			if (isset($this->game_types->game_types_list[0]['local_repository'])
+				&& $this->game_types->game_types_list[0]['local_repository']
+			) {
+				
+				try {
+					$this->_wget_files($server_id, $this->game_types->game_types_list[0]['local_repository'], 'local');
+					$this->_unpack_files($server_id, $this->game_types->game_types_list[0]['local_repository']);
+				} catch (Exception $e) {
+					$this->_cmd_output('---Install modification from local repository failed. Message: ' . $e->getMessage());
+				}
+				
+			} elseif (isset($this->game_types->game_types_list[0]['remote_repository'])
+						&& $this->game_types->game_types_list[0]['remote_repository']
+			) {
+				
+				try {
+					$this->_wget_files($server_id, $this->game_types->game_types_list[0]['remote_repository'], 'remote');
+					$this->_unpack_files($server_id, $this->game_types->game_types_list[0]['remote_repository']);
+				} catch (Exception $e) {
+					$this->_cmd_output('---Install modification from remote repository failed. Message: ' . $e->getMessage());
+				}
+			}
+			
+			/* Устанавливаем 777 права на директории, в которые загружается контент (карты, модели и пр.)
+			* и 666 на конфиг файлы, которые можно редактировать через админпанель */
+			if(strtolower($this->servers_data[$server_id]['os']) != 'windows') {
+				$config_files 	= json_decode($this->servers_data[$server_id]['config_files'], true);
+				$content_dirs 	= json_decode($this->servers_data[$server_id]['content_dirs'], true);
+				$log_dirs 		= json_decode($this->servers_data[$server_id]['log_dirs'], true);
+				$command = array();
+
+				if($config_files) {
+					foreach($config_files as $file) {
+						$command[] = 'chmod 666 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $file['file'];
+						$log .= 'chmod 666 ' . './' . $this->servers_data[$server_id]['dir'] . '/' .  $file['file'] . "\n";
+					}
+				}
+				
+				if($content_dirs) {
+					foreach($content_dirs as $dir) {
+						$command[] = 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
+						$log .= 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
+					}
+				}
+				
+				if($log_dirs) {
+					foreach($log_dirs as $dir) {
+						$command[] = 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
+						$log .= 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
+					}
+				}
+				
+				if ($this->servers_data[$server_id]['su_user'] != '') {
+					$command[] = 'chown -R ' . $this->servers_data[$server_id]['su_user'] . ' ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'];
+					$log .= 'chown -R ' . $this->servers_data[$server_id]['su_user'] . ' ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . "\n";;
+				}
+				
+				try {
+					$log .= "\n---\nCHMOD\n" . $log . "\n" .  send_command($command, $this->servers_data[$server_id]);
+				} catch (Exception $e) {
+					$this->_cmd_output('---CHMOD failed. Message: ' . $e->getMessage());
+					$log .= $e->getMessage() . "\n";;
+				}
+			}
+
+
+			/* Устанавливаем серверу rcon пароль */
+			$this->load->helper('safety');
+			$new_rcon = generate_code(8);
+			
+			try {
+				$this->servers->change_rcon($new_rcon, $this->servers_data[$server_id]);
+			} catch (Exception $e) {
+				$this->_cmd_output('---Rcon set failed. Message: ' . $e->getMessage());
+			}
+			
+			/* Конфигурирование сервера 
+			 * Здесь задаются параметры запуска и различные базовые настройки */
+			$this->installer->set_game_variables($this->servers_data[$server_id]['start_code'], 
+											$this->servers_data[$server_id]['engine'],
+											$this->servers_data[$server_id]['engine_version']
+			);
+			
+			$this->installer->set_os($this->servers_data[$server_id]['os']);
+			$this->installer->server_data = $this->servers_data[$server_id];
+			
+			/* Правка конфигов. Здесь происходит редактирование параметров
+			 * в конфигурации.
+			 * Для некоторых игр такие параметры как порт, IP, RCON пароль
+			 * задаются в конфигах. */
+			try {
+				$this->installer->change_config();
+			} catch (Exception $e) {
+				$this->_cmd_output('---Change config failed. Message: ' . $e->getMessage());
+			}
+			
+			$aliases_values = array();
+			$aliases_values = json_decode($this->servers_data[$server_id]['aliases'], true);
+
+			$server_data['installed'] 		= 1;
+			$server_data['rcon']			= $new_rcon;
+			$server_data['aliases'] 		= json_encode($this->installer->get_default_parameters($aliases_values));
+			
+			if (!$this->servers_data[$server_id]['start_command']) {
+				$server_data['start_command'] 	= $this->installer->get_start_command();
+			}
+			
+			// Путь к картам
+			$server_data['maps_path'] = $this->installer->get_maps_path();
+			
+			// Список портов
+			$ports = $this->installer->get_ports();
+			
+			$server_data['query_port'] = $ports[1];
+			$server_data['rcon_port'] = $ports[2];
+			unset($ports);
+			
+			$this->servers->edit_game_server($server_id, $server_data);
+			
+			$log_data['type'] = 'server_command';
+			$log_data['command'] = 'install';
+			$log_data['server_id'] = $server_id;
+			$log_data['msg'] = 'Server install successful';
+			$log_data['log_data'] = "Results:" . PHP_EOL . var_export($this->control->get_commands_result(), true) . PHP_EOL;
+			$this->panel_log->save_log($log_data);
+			
+			$this->_cmd_output('---Server install #' . $server_id . ' success');
+
+		} else {
+			
+			$server_data = array('installed' => '0');
+			$this->servers->edit_game_server($server_id, $server_data);
+
+			$log_data['type'] = 'server_command';
+			$log_data['command'] = 'install';
+			$log_data['server_id'] = $server_id;
+			$log_data['msg'] = 'Server install failed';
+			$log_data['log_data'] = "Results:" . PHP_EOL . var_export($this->control->get_commands_result(), true) . PHP_EOL;
+			$this->panel_log->save_log($log_data);
+			
+			$this->_cmd_output('---Server install #' . $server_id . ' failed');
+		}
+	}
+	
+	// ----------------------------------------------------------------
+	
+	/**
 	 * Установка игрового сервера с помощью SteamCMD
 	*/
 	private function _install_from_steamcmd($server_id)
@@ -1167,232 +1420,7 @@ class Cron extends MX_Controller {
 				
 				if ($this->servers_data[$server_id]['installed'] == '0') {
 					// Сервер не установлен
-					$this->_cmd_output("--Server #" . $server_id . " install started");
-					$server_installed = false;
-					
-					// Данные лога установки
-					$log = '';
-					$this->_install_result = '';
-					$this->control->clear_commands();
-					
-					/* Получение данных об игровой модификации */
-					//~ $this->game_types->get_gametypes_list(array('id' => $this->servers_data[$server_id]['game_type']));
-
-					// Полю installed устанавливаем значение 2, что сервер начал устанавливаться
-					$this->servers->edit_game_server($server_id, array('installed' => '2'));
-					
-					try {
-						$this->_mkdir($server_id);
-					} catch (Exception $e) {
-						$this->_cmd_output('---Mkdir failed: '. $e->getMessage());
-						$server_installed = false;
-					}
-					
-					if ($this->games->games_list[0]['local_repository']) {
-						/* Установка из локального репозитория */
-						
-						$rep_info = pathinfo($this->games->games_list[0]['local_repository']);
-						
-						$this->_cmd_output("---Install from local repository");
-						
-						try {
-							if (isset($rep_info['extension'])) {
-								// Распаковка архива
-								$this->_wget_files($server_id, $this->games->games_list[0]['local_repository'], 'local');
-								$this->_unpack_files($server_id, $this->games->games_list[0]['local_repository']);
-							} else {
-								// Копирование директории
-								$this->_copy_files($server_id, $this->games->games_list[0]['local_repository']);
-							}
-							
-							$server_installed = true;
-						} catch (Exception $e) {
-							$this->_cmd_output("---Install from local repository failed. Message: " . $e->getMessage());
-							$server_installed = false;
-						}
-						
-					} elseif ($this->games->games_list[0]['remote_repository']) {
-						/* Установка из удаленного репозитория */
-						
-						$this->_cmd_output("---Install from remote repository");
-						
-						try {
-							$this->_wget_files($server_id, $this->games->games_list[0]['remote_repository'], 'remote');
-							$this->_unpack_files($server_id, $this->games->games_list[0]['remote_repository']);
-							$server_installed = true;
-						} catch (Exception $e) {
-							$this->_cmd_output("---Install from remote repository failed. Message: " . $e->getMessage());
-							$server_installed = false;
-						}
-
-					} elseif ($this->games->games_list[0]['app_id']) {
-						/* Установка через SteamCMD */
-						
-						$this->_cmd_output("---Install from SteamCMD");
-						
-						try {
-							$server_installed = $this->_install_from_steamcmd($server_id);
-						} catch (Exception $e) {
-							$this->_cmd_output("---Install from steamcmd failed. Message: " . $e->getMessage());
-							$server_installed = false;
-						}
-						
-					} else {
-						/* 
-						 * Не удалость выбрать тип установки 
-						 * отсутствуют данные локального репозитория, удаленного репозитория и steamcmd
-						 */
-						$log .= "App_id and Repository data not specified \n";
-						$this->_cmd_output("---Server #" . $server_id . " install failed. App_id and Repository data not specified");
-						$server_installed = false;
-					}
-					
-					/* 
-					 * Завершение установки.
-					 * Установка прав на директории, задание ркон пароля
-					*/
-					if ($server_installed == true) {
-						/* Загружаем дополнительный файлы игровой модификации */
-						$this->game_types->get_gametypes_list(array('id' => $this->servers_data[$server_id]['game_type']));
-						
-						if (isset($this->game_types->game_types_list[0]['local_repository'])
-							&& $this->game_types->game_types_list[0]['local_repository']
-						) {
-							
-							try {
-								$this->_wget_files($server_id, $this->game_types->game_types_list[0]['local_repository'], 'local');
-								$this->_unpack_files($server_id, $this->game_types->game_types_list[0]['local_repository']);
-							} catch (Exception $e) {
-								$this->_cmd_output('---Install modification from local repository failed. Message: ' . $e->getMessage());
-							}
-							
-						} elseif (isset($this->game_types->game_types_list[0]['remote_repository'])
-									&& $this->game_types->game_types_list[0]['remote_repository']
-						) {
-							
-							try {
-								$this->_wget_files($server_id, $this->game_types->game_types_list[0]['remote_repository'], 'remote');
-								$this->_unpack_files($server_id, $this->game_types->game_types_list[0]['remote_repository']);
-							} catch (Exception $e) {
-								$this->_cmd_output('---Install modification from remote repository failed. Message: ' . $e->getMessage());
-							}
-						}
-						
-						/* Устанавливаем 777 права на директории, в которые загружается контент (карты, модели и пр.)
-						* и 666 на конфиг файлы, которые можно редактировать через админпанель */
-						if(strtolower($this->servers_data[$server_id]['os']) != 'windows') {
-							$config_files 	= json_decode($this->servers_data[$server_id]['config_files'], true);
-							$content_dirs 	= json_decode($this->servers_data[$server_id]['content_dirs'], true);
-							$log_dirs 		= json_decode($this->servers_data[$server_id]['log_dirs'], true);
-							$command = array();
-
-							if($config_files) {
-								foreach($config_files as $file) {
-									$command[] = 'chmod 666 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $file['file'];
-									$log .= 'chmod 666 ' . './' . $this->servers_data[$server_id]['dir'] . '/' .  $file['file'] . "\n";
-								}
-							}
-							
-							if($content_dirs) {
-								foreach($content_dirs as $dir) {
-									$command[] = 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
-									$log .= 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
-								}
-							}
-							
-							if($log_dirs) {
-								foreach($log_dirs as $dir) {
-									$command[] = 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
-									$log .= 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
-								}
-							}
-							
-							if ($this->servers_data[$server_id]['su_user'] != '') {
-								$command[] = 'chown -R ' . $this->servers_data[$server_id]['su_user'] . ' ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'];
-								$log .= 'chown -R ' . $this->servers_data[$server_id]['su_user'] . ' ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . "\n";;
-							}
-							
-							try {
-								$log .= "\n---\nCHMOD\n" . $log . "\n" .  send_command($command, $this->servers_data[$server_id]);
-							} catch (Exception $e) {
-								$this->_cmd_output('---CHMOD failed. Message: ' . $e->getMessage());
-								$log .= $e->getMessage() . "\n";;
-							}
-						}
-
-
-						/* Устанавливаем серверу rcon пароль */
-						$this->load->helper('safety');
-						$new_rcon = generate_code(8);
-						
-						try {
-							$this->servers->change_rcon($new_rcon, $this->servers_data[$server_id]);
-						} catch (Exception $e) {
-							$this->_cmd_output('---Rcon set failed. Message: ' . $e->getMessage());
-						}
-						
-						/* Конфигурирование сервера */
-						$this->installer->set_game_variables($this->servers_data[$server_id]['start_code'], 
-														$this->servers_data[$server_id]['engine'],
-														$this->servers_data[$server_id]['engine_version']
-						);
-						
-						$this->installer->set_os($this->servers_data[$server_id]['os']);
-						$this->installer->server_data = $this->servers_data[$server_id];
-						
-						// Правка конфигов
-						try {
-							$this->installer->change_config();
-						} catch (Exception $e) {
-							$this->_cmd_output('---Change config failed. Message: ' . $e->getMessage());
-						}
-						
-						$aliases_values = array();
-						$aliases_values = json_decode($this->servers_data[$server_id]['aliases'], true);
-
-						$server_data['installed'] 		= 1;
-						$server_data['rcon']			= $new_rcon;
-						$server_data['aliases'] 		= json_encode($this->installer->get_default_parameters($aliases_values));
-						
-						if (!$this->servers_data[$server_id]['start_command']) {
-							$server_data['start_command'] 	= $this->installer->get_start_command();
-						}
-						
-						// Путь к картам
-						$server_data['maps_path'] = $this->installer->get_maps_path();
-						
-						// Список портов
-						$ports = $this->installer->get_ports();
-						
-						$server_data['query_port'] = $ports[1];
-						$server_data['rcon_port'] = $ports[2];
-						unset($ports);
-						
-						$this->servers->edit_game_server($server_id, $server_data);
-						
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'install';
-						$log_data['server_id'] = $server_id;
-						$log_data['msg'] = 'Server install successful';
-						$log_data['log_data'] = "Results:" . PHP_EOL . var_export($this->control->get_commands_result(), true) . PHP_EOL;
-						$this->panel_log->save_log($log_data);
-						
-						$this->_cmd_output('---Server install #' . $server_id . ' success');
-
-					} else {
-						
-						$server_data = array('installed' => '0');
-						$this->servers->edit_game_server($server_id, $server_data);
-
-						$log_data['type'] = 'server_command';
-						$log_data['command'] = 'install';
-						$log_data['server_id'] = $server_id;
-						$log_data['msg'] = 'Server install failed';
-						$log_data['log_data'] = "Results:" . PHP_EOL . var_export($this->control->get_commands_result(), true) . PHP_EOL;
-						$this->panel_log->save_log($log_data);
-						
-						$this->_cmd_output('---Server install #' . $server_id . ' failed');
-					}
+					$this->_install_server($server_id);
 				}
 
 				/*==================================================*/
