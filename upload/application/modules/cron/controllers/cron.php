@@ -1297,7 +1297,7 @@ class Cron extends MX_Controller {
 						// Команда удаления
 						switch(strtolower($this->servers->server_data['os'])) {
 							case 'windows':
-								$command = 'rmdir /S ' . $this->servers->server_data['dir'];
+								$command = 'rmdir /S /Q ' . str_replace('/', '\\', $this->servers->server_data['dir']);
 								break;
 							default:
 								// Linux
@@ -1578,6 +1578,7 @@ class Cron extends MX_Controller {
 		
 		$this->_cmd_output("Cron end");
 		
+		$log_data['server_id'] = 0;
 		$log_data['type'] = 'cron';
 		$log_data['command'] = 'cron work';
 		$log_data['msg'] = 'Cron end working';
