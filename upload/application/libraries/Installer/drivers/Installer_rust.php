@@ -37,7 +37,8 @@ class Installer_rust extends CI_Driver {
 		$game_code = strtolower($game_code);
 		
 		$default_maps = array(
-						'rust' 		=> 'rust_island_2013',
+						'rust' 			=> 'rust_island_2013',
+						'rust_exp' 		=> 'Procedural Map',
 		);
 		
 		return $default_maps[$game_code];
@@ -78,17 +79,39 @@ class Installer_rust extends CI_Driver {
 	*/
 	public function get_start_command($game_code = '', $os = 'linux')
 	{
-		switch(strtolower($os)) {
-			case 'windows':
-				$start_command = 'rust_server.exe ';
-				break;
+		switch ($this->_engine_version) {
+			//////
+			case 'legacy':
+			
+				switch(strtolower($os)) {
+					case 'windows':
+						$start_command = 'rust_server.exe ';
+						break;
+						
+					default:
+						$start_command = './rust_server_x32 ';
+						break;
+				}
 				
-			default:
-				$start_command = './rust_server_x32 ';
+				$start_command .= '-batchmode -hostname "Rust Server" -maxplayers {maxplayers} -port {port} -datadir "serverdata/" -oxidedir "save/oxide"';
+				break;
+			
+			/////
+			case 'experimental':
+			
+				switch(strtolower($os)) {
+					case 'windows':
+						$start_command = 'RustDedicated.exe ';
+						break;
+						
+					default:
+						$start_command = './RustDedicated ';
+						break;
+				}
+				
+				$start_command .= '-batchmode -server.hostname "{hostname}" -server.maxplayers {maxplayers} -server.port {port} +rcon.port {rcon_port} +rcon.password {rcon_password} +server.saveinterval {saveinterval}';
 				break;
 		}
-		
-		$start_command .= '-batchmode -hostname "Rust Server" -maxplayers {maxplayers} -port {port} -datadir "serverdata/" -oxidedir "save/oxide"';
 
 		return $start_command;
 	}
@@ -100,7 +123,15 @@ class Installer_rust extends CI_Driver {
 	*/
 	public function get_default_parameters($game_code = 'rust', $os = 'linux', $parameters = array())
 	{
-		$parameters['maxplayers'] 	= isset($parameters['maxplayers']) ? $parameters['maxplayers'] : 50;
+		if ($this->_engine_version == 'experimental') {
+			isset($parameters['hostname']) 			OR $parameters['hostname'] 			= 'Rust Server';
+			isset($parameters['port']) 				OR $parameters['port'] 				= $this->server_data['server_port'];
+			isset($parameters['rcon_port']) 		OR $parameters['rcon_port'] 		= $this->server_data['server_port']+1;
+			isset($parameters['rcon_password']) 	OR $parameters['rcon_password'] 	= random_string('alnum', 8);
+			isset($parameters['saveinterval']) 		OR $parameters['saveinterval'] 		= 300;
+		}
+		
+		isset($parameters['maxplayers']) OR $parameters['maxplayers'] = 50;
 
 		return $parameters;
 	}
