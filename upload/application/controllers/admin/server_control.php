@@ -429,6 +429,12 @@ class Server_control extends CI_Controller {
 		
 		$local_tpl_data['server_id'] = $server_id;
 		$local_tpl_data['server_name'] = $this->servers->server_data['name'];
+		
+		$local_tpl_data['server_ip'] 			= $this->servers->server_data['server_ip'];
+		$local_tpl_data['server_port'] 			= $this->servers->server_data['server_port'];
+		$local_tpl_data['server_rcon_port'] 	= $this->servers->server_data['rcon_port'];
+		$local_tpl_data['server_query_port'] 	= $this->servers->server_data['query_port'];
+		
 		$this->tpl_data['heading'] = lang('server_control_header') . ' "' . $this->servers->server_data['name'] . '"';
 
 		if (file_exists(APPPATH . 'views/' . $this->config->config['template'] . '/server_control/' . $this->servers->server_data['game'] . '.html')) {
