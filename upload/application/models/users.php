@@ -220,6 +220,7 @@ class Users extends CI_Model {
 			$this->auth_login 					= $this->auth_data['login'];
 			$this->auth_data['balance'] 		= (int)$this->encrypt->decode($this->auth_data['balance']);
 			$this->auth_data['modules_data'] 	= (isset($this->auth_data['modules_data'])) ? json_decode($this->auth_data['modules_data'], true) : array();
+			$this->auth_data['notices'] 		= (isset($this->auth_data['notices'])) ? json_decode($this->auth_data['notices'], true) : array();
 			
 			$this->auth_data['privileges'] 			= $this->_decode_base_privileges($this->auth_data['privileges']);
 			//~ $this->auth_data['servers_privileges'] 	= $this->_decode_servers_privileges($this->auth_data['servers_privileges']);
@@ -345,6 +346,7 @@ class Users extends CI_Model {
 		
 		$user_data['balance'] 				= (int)$this->encrypt->decode($user_data['balance']);
 		$user_data['modules_data'] 			= ($user_data['modules_data'] != '') ? json_decode($user_data['modules_data'], true) : array();
+		$user_data['notices'] 				= ($user_data['notices'] != '') ? json_decode($user_data['notices'], true) : array();
 		$user_data['privileges'] 			= $this->_decode_base_privileges($user_data['privileges']);
 		//~ $user_data['filters']				= json_decode($user_data['filters']);
 
@@ -412,6 +414,38 @@ class Users extends CI_Model {
             return true;
         }
     }
+    
+    //-----------------------------------------------------------
+    
+    /**
+     * Задать/обновить уведомление пользователю
+     * 
+     * @param string 	уникальное имя уведомления
+     * @param string 	текст уведомления
+     * @param array 	внутренние данные уведомления
+     * @param int		ID пользователя
+     */
+    public function set_notice($name, $text = '', $ntdata = array(), $user_id = 0)
+    {
+		if ($user_id) {
+			$this->get_user_data($user_id);
+			$user_data =& $this->user_data;
+		} else {
+			
+			if (!$this->auth_id) {
+				return false;
+			}
+			
+			$user_data =& $this->auth_data;
+		}
+		
+		$user_data['notices'][$name]['text'] = $text;
+		$user_data['notices'][$name]['data'] = $ntdata;
+		
+		$sql_data['notices'] = json_encode($user_data['notices']);
+		
+		return $this->update_user($sql_data, $user_data['id']);
+	}
     
     //-----------------------------------------------------------
 	
@@ -737,9 +771,11 @@ class Users extends CI_Model {
 			
 			$this->users_list = $query->result_array();
 			
-			/* Расшифровка баланса */
+			/* Конвертирование данных */
 			foreach($this->users_list as &$user) {
-				$user['balance'] = (int)$this->encrypt->decode($user['balance']);
+				$user['balance'] 		= (int)$this->encrypt->decode($user['balance']);
+				$user['modules_data'] 	= !empty($user['modules_data']) ? json_decode($user['modules_data'], true) : array();
+				$user['notices'] 		= !empty($user['notices']) ? json_decode($user['notices'], true) : array();
 			}
 			
 			return $this->users_list;
