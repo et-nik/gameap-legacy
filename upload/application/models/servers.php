@@ -808,6 +808,8 @@ class Servers extends CI_Model {
 			$tpl_data[$num]['server_name'] 			= $server_data['name'];
 			$tpl_data[$num]['server_ip'] 			= $server_data['server_ip'];
 			$tpl_data[$num]['server_port'] 			= $server_data['server_port'];
+			$tpl_data[$num]['server_query_port'] 	= $server_data['query_port'];
+			$tpl_data[$num]['server_rcon_port'] 	= $server_data['rcon_port'];
 		}
 		
 		return $tpl_data;
