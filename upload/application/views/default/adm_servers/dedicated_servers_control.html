@@ -78,6 +78,7 @@
 		<li><a href="#ftp_data">{lang_adm_servers_ftp_data}</a></li>
         <li><a href="#ssh_data">{lang_adm_servers_ssh_data}</a></li>
         <li><a href="#telnet_data">{lang_adm_servers_telnet_data}</a></li>
+        <li><a href="#start_parameters">{lang_adm_servers_start_parameters}</a></li>
     </ul>
     
     <div id="access_data" class="tab_content">
@@ -187,6 +188,49 @@
 			</tr>
 
 		</table>
+	</div>
+	
+	<div id="start_parameters" class="tab_content">
+		<table class="zebra" width="100%">
+			<tbody>
+				<tr>
+					<td width="45%"><p class="hr">{lang_adm_servers_start_parameters}</p></td>
+					<td></td>
+				</tr>
+			</tbody>
+			
+			<tr>
+				<td>{lang_adm_servers_command_start}:</td>
+				<td><textarea style="height:50px" rows="2" name="script_start">{script_start}</textarea></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_command_stop}:</td>
+				<td><textarea style="height:50px" name="script_stop">{script_stop}</textarea></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_command_restart}:</td>
+				<td><textarea style="height:50px" name="script_restart">{script_restart}</textarea></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_command_status}:</td>
+				<td><textarea style="height:50px" name="script_status">{script_status}</textarea></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_command_get_console}:</td>
+				<td><textarea style="height:50px" name="script_get_console">{script_get_console}</textarea></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_send_command}:</td>
+				<td><textarea style="height:50px" name="script_send_command">{script_send_command}</textarea></td>
+			</tr>
+			
+		</table>
+		
 	</div>
 	
 	<input class="button" type="submit" name="edit_access_ds" value="{lang_save}" />

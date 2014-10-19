@@ -1263,6 +1263,14 @@ class Adm_servers extends CI_Controller {
 				}
 				
 				$local_tpl_data['control_protocol'] = form_dropdown('control_protocol', $options, $this->dedicated_servers->ds_list['0']['control_protocol']);
+
+				// Скрипты
+				$local_tpl_data['script_start'] 		= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_start']);
+				$local_tpl_data['script_stop'] 			= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_stop']);
+				$local_tpl_data['script_restart'] 		= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_restart']);
+				$local_tpl_data['script_status'] 		= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_status']);
+				$local_tpl_data['script_get_console'] 	= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_get_console']);
+				$local_tpl_data['script_send_command'] 	= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_send_command']);
 				
 				$local_tpl_data['script_path'] 		= $this->dedicated_servers->ds_list['0']['script_path'];
 				$local_tpl_data['steamcmd_path'] 	= $this->dedicated_servers->ds_list['0']['steamcmd_path'];
@@ -1297,6 +1305,14 @@ class Adm_servers extends CI_Controller {
 				$this->form_validation->set_rules('ip', 'IP', 'trim|required|xss_clean');
 				$this->form_validation->set_rules('ram', 'RAM', 'trim|max_length[64]|xss_clean');
 				$this->form_validation->set_rules('cpu', 'CPU', 'trim|max_length[64]|xss_clean');
+				
+				// Скрипты
+				$this->form_validation->set_rules('script_start', lang('adm_servers_command_start'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('script_stop', lang('adm_servers_command_stop'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('script_restart', lang('adm_servers_command_restart'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('script_status', lang('adm_servers_command_status'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('script_get_console', lang('adm_servers_command_get_console'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('script_send_command', lang('adm_servers_send_command'), 'trim|max_length[256]|xss_clean');
 
 				// Редактирование данных доступа к серверу (пароли ftp, ssh)
 				$this->form_validation->set_rules('steamcmd_path', lang('adm_servers_steamcmd_path'), 'trim|max_length[256]|xss_clean');
@@ -1779,6 +1795,14 @@ class Adm_servers extends CI_Controller {
 					/* Обработка списка IP адресов */
 					$ip_list = explode(',', str_replace(' ', '', $this->input->post('ip')));
 					$sql_data['ip'] = json_encode($ip_list);
+					
+					// Скрипты
+					$sql_data['script_start'] 			= $this->input->post('script_start');
+					$sql_data['script_stop'] 			= $this->input->post('script_stop');
+					$sql_data['script_restart'] 		= $this->input->post('script_restart');
+					$sql_data['script_status'] 			= $this->input->post('script_status');
+					$sql_data['script_get_console'] 	= $this->input->post('script_get_console');
+					$sql_data['script_send_command'] 	= $this->input->post('script_send_command');
 					
 					// Редактирование данных доступа к серверу (пароли ftp, ssh)
 					$sql_data['steamcmd_path'] 		= $this->input->post('steamcmd_path');
