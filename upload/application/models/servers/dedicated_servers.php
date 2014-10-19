@@ -9,11 +9,30 @@ class Dedicated_servers extends CI_Model {
     private $_commands = array();
     private $_errors	= false;
     
+    private $_scripts_default = array(
+		'script_start' 			=> 'start {dir} {name} {ip} {port} "{command}" {user}',
+		'script_stop' 			=> 'stop {dir} {name} {ip} {port} "{command}" {user}',
+		'script_restart' 		=> 'restart {dir} {name} {ip} {port} "{command}" {user}',
+		'script_status' 		=> 'status {dir} {name} {ip} {port} "{command}" {user}',
+		'script_get_console' 	=> 'get_console {dir} {name} {user}',
+		'script_send_command' 	=> 'send_command {dir} {name} {ip} {port} "{command}" {user}',
+    );
+    
     //-----------------------------------------------------------
 
     public function __construct()
 	{
 		parent::__construct();
+	}
+	
+	//-----------------------------------------------------------
+	
+	/**
+	 * Дефолтные параметры
+	 */
+	private function _get_default_script($param = 'script_start')
+	{
+		return $this->_scripts_default[$param];
 	}
 	
 	//-----------------------------------------------------------
@@ -175,8 +194,10 @@ class Dedicated_servers extends CI_Model {
 					$this->ds_list[$i]['ip'] = array();
 					$this->ds_list[$i]['ip'][] = $ds_ip;
 				}
+				
 				unset($ds_ip);
 				
+				// SSH, TELNET, FTP
 				$this->ds_list[$i]['control_ip'] 		= 'localhost';
 				$this->ds_list[$i]['control_port'] 		= 0;
 				$this->ds_list[$i]['control_login']		= '';
@@ -190,6 +211,26 @@ class Dedicated_servers extends CI_Model {
 				
 				$this->ds_list[$i]['ftp_login']			= $this->encrypt->decode($this->ds_list[$i]['ftp_login']);
 				$this->ds_list[$i]['ftp_password']		= $this->encrypt->decode($this->ds_list[$i]['ftp_password']);
+				
+				// Скрипты запуска
+				$this->ds_list[$i]['script_start'] = $this->ds_list[$i]['script_start'] 
+					OR $this->ds_list[$i]['script_start'] = $this->_get_default_script('script_start');
+					
+				$this->ds_list[$i]['script_stop'] = $this->ds_list[$i]['script_stop'] 
+					OR $this->ds_list[$i]['script_stop'] = $this->_get_default_script('script_stop');
+					
+				$this->ds_list[$i]['script_restart'] = $this->ds_list[$i]['script_restart'] 
+					OR $this->ds_list[$i]['script_restart'] = $this->_get_default_script('script_restart');
+					
+				$this->ds_list[$i]['script_status'] = $this->ds_list[$i]['script_status'] 
+					OR $this->ds_list[$i]['script_status'] = $this->_get_default_script('script_status');
+					
+				$this->ds_list[$i]['script_get_console'] = $this->ds_list[$i]['script_get_console'] 
+					OR $this->ds_list[$i]['script_get_console'] = $this->_get_default_script('script_get_console');
+					
+				$this->ds_list[$i]['script_send_command'] = $this->ds_list[$i]['script_send_command'] 
+					OR $this->ds_list[$i]['script_send_command'] = $this->_get_default_script('script_send_command');
+					
 				
 				if (!in_array(strtolower($this->ds_list[$i]['control_protocol']), array('ssh', 'telnet', 'local'))) {
 					switch($this->ds_list[$i]['os']) {

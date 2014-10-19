@@ -33,6 +33,8 @@ class Servers extends CI_Model {
     public $server_settings 		= array();
     //~ public $commands			= array(); // Команды, которые отправлялись на сервер
     public $errors 					= ''; 	// Строка с ошибкой (если имеются)
+    
+    private $_exec_file				= array('linux' => 'server.sh', 'windows' => 'server.exe');
 
     function __construct()
     {
@@ -692,6 +694,19 @@ class Servers extends CI_Model {
 			$this->server_data['control_login'] 	= $this->server_ds_data['control_login'];
 			$this->server_data['control_password'] 	= $this->server_ds_data['control_password'];
 			
+			if (strtolower($this->server_data['os']) == 'windows') {
+				$execfile = $this->_exec_file['windows'];
+			} else {
+				$execfile = $this->_exec_file['linux'];
+			}
+			
+			$this->server_data['script_start'] 			= $execfile . ' ' . $this->server_ds_data['script_start'];
+			$this->server_data['script_stop'] 			= $execfile . ' ' . $this->server_ds_data['script_stop'];
+			$this->server_data['script_restart'] 		= $execfile . ' ' . $this->server_ds_data['script_restart'];
+			$this->server_data['script_status'] 		= $execfile . ' ' . $this->server_ds_data['script_status'];
+			$this->server_data['script_get_console'] 	= $execfile . ' ' . $this->server_ds_data['script_get_console'];
+			$this->server_data['script_send_command'] 	= $execfile . ' ' . $this->server_ds_data['script_send_command'];
+			
 			/* Определение пути до скрипта и до steamcmd */
 			switch ($this->server_data['control_protocol']) {
 				case 'local':
@@ -742,27 +757,6 @@ class Servers extends CI_Model {
 			$this->server_data['fast_rcon']		= $this->game_types->game_types_list['0']['fast_rcon'];
 			$this->server_data['aliases_list'] 	= $this->game_types->game_types_list['0']['aliases'];
 			$this->server_data['disk_size'] 	= $this->game_types->game_types_list['0']['disk_size'];
-			
-			if(strtolower($this->server_data['os']) == 'windows') {
-				$execfile_upd = 'steamcmd.exe';
-				$execfile = $this->game_types->game_types_list['0']['execfile_windows'];
-			} else {
-				$execfile_upd = './steamcmd.sh';
-				$execfile = $this->game_types->game_types_list['0']['execfile_linux'];
-				
-				/* Добавляем к линуксу ./ в случае необходимости */
-				if (stripos($execfile, './') === false) {
-					$execfile = './' . $execfile;
-				}
-			}
-			
-			$this->server_data['script_start'] 			= $execfile . ' ' . $this->game_types->game_types_list['0']['script_start'];
-			$this->server_data['script_stop'] 			= $execfile . ' ' . $this->game_types->game_types_list['0']['script_stop'];
-			$this->server_data['script_restart'] 		= $execfile . ' ' . $this->game_types->game_types_list['0']['script_restart'];
-			$this->server_data['script_status'] 		= $execfile . ' ' . $this->game_types->game_types_list['0']['script_status'];
-			$this->server_data['script_update'] 		= $execfile_upd . ' ' . $this->game_types->game_types_list['0']['script_update'];
-			$this->server_data['script_get_console'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_get_console'];
-			$this->server_data['script_send_command'] 	= $execfile . ' ' . $this->game_types->game_types_list['0']['script_send_command'];
 			
 			$this->server_data['kick_cmd'] 		= $this->game_types->game_types_list['0']['kick_cmd'];
 			$this->server_data['ban_cmd'] 		= $this->game_types->game_types_list['0']['ban_cmd'];
