@@ -287,16 +287,16 @@ class Adm_servers extends CI_Controller {
 		$this->installer->set_os($os);
 		$this->installer->server_data = $data;
 		
+		// Список портов
+		$ports = $this->installer->get_ports();
+		$data['query_port'] = $ports[1];
+		$data['rcon_port'] 	= $ports[2];
+		
 		$data['aliases'] = json_encode($this->installer->get_default_parameters());
 		$data['start_command'] 	= $this->installer->get_start_command();
 		
 		// Путь к картам
 		$data['maps_path'] = $this->installer->get_maps_path();
-		
-		// Список портов
-		$ports = $this->installer->get_ports();
-		$data['query_port'] = $ports[1];
-		$data['rcon_port'] 	= $ports[2];
 		
 		/* Присваиваем значения пути к картам и имя screen  */
 		$data['screen_name'] = $data['game'] . '_' . random_string('alnum', 6) . '_' . $data['server_port'];
@@ -325,8 +325,8 @@ class Adm_servers extends CI_Controller {
 				continue;
 			}
 					
-			/* Показываем только за последние 3 часа */
-			if((time() - $arr['date']) > 10800) {
+			/* Показываем только за последние сутки */
+			if((time() - $arr['date']) > 86400) {
 				continue;
 			}
 			
