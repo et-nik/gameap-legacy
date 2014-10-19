@@ -1087,6 +1087,9 @@ class Cron extends MX_Controller {
 				$i ++;
 				continue;
 			}
+			
+			// Получение данных сервера
+			$this->_get_server_data($server_id);
 
 			/* 
 			 * Отправляем данны о том, что задание начало выполняться 
@@ -1205,6 +1208,7 @@ class Cron extends MX_Controller {
 				case 'server_update':
 					try {
 						// Обновление - установка файлов поверх существующих
+						$this->servers->stop($this->servers_data[$server_id]);
 						$this->_install_server($server_id);
 						
 						$cron_success = true;
@@ -1374,6 +1378,15 @@ class Cron extends MX_Controller {
 		$start_microtime = microtime(true);
 		$log_data['user_name'] = 'System (cron)';
 		
+		// Получение данных о времени некоторых операций cron
+		if (file_exists(APPPATH . 'cache/cron_time.json')) {
+			$cron_time = json_decode(file_get_contents(APPPATH . 'cache/cron_time.json'), true);
+		} else {
+			$cron_time = array(
+				'stats' => 0,
+			);
+		}
+		
 		$this->_cmd_output('Cron started');
 		
 		// Получение списка выделенных серверов
@@ -1449,7 +1462,8 @@ class Cron extends MX_Controller {
 						$where = array('date >=' => now() - 780,  'type' => 'cron_check', 'command' => 'server_status', 'server_id' => $server_id, 'log_data' => 'Server is down');
 						$logs = $this->panel_log->get_log($where); // Логи сервера в админпанели
 
-						$response = false;
+						$response 		= false;
+						$console_data 	= '';
 
 						if(count($logs) >= 1) {
 							/* Перед запуском получаем консоль, чтобы знать от чего сервер упал */
@@ -1523,35 +1537,44 @@ class Cron extends MX_Controller {
 			/*    	СТАТИСТИКА ВЫДЕЛЕННОГО СЕРВЕРА  			*/
 			/*==================================================*/
 			$this->_cmd_output("--Get Stats");
-
-			if (!$stats = $this->_stats_processing($ds)) {
-				$this->_cmd_output('---Stats server #' . $ds['id'] . ' failed');
-				continue;
-			}
+		
+			// Статистика выполняется не чаще 1 раза в 30 минут
 			
-			if(isset($stats['cpu_usage']) && isset($stats['memory_usage'])) {
-				$this->_cmd_output('---Stats server #' . $ds['id'] . ' successful');
+			if ((now()-1800) > $cron_time['stats']) {
+				if (!$stats = $this->_stats_processing($ds)) {
+					$this->_cmd_output('---Stats server #' . $ds['id'] . ' failed');
+					continue;
+				}
+				
+				if(isset($stats['cpu_usage']) && isset($stats['memory_usage'])) {
+					$this->_cmd_output('---Stats server #' . $ds['id'] . ' successful');
+				} else {
+					$this->_cmd_output('---Stats server #' . $ds['id'] . ' failed');
+					continue;
+				}
+
+				/* 
+				 * Обновляем статистику
+				 * Добавляем новое значение в существующий массив
+				 * date - дата проверки (unix time)
+				 * cpu_usage - использование cpu (%)
+				 * memory_usage - использование памяти (%)
+				*/
+
+				$stats_array = json_decode($ds['stats'], true);
+				$stats_array OR $stats_array = array();
+				
+				$stats_array = array_slice($stats_array, -40);
+
+				$stats_array[] = array('date' => now(), 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
+				$data['stats'] = json_encode($stats_array);
+				$this->dedicated_servers->edit_dedicated_server($ds['id'], $data);
+				
+				$cron_time['stats'] = now();
 			} else {
-				$this->_cmd_output('---Stats server #' . $ds['id'] . ' failed');
+				$this->_cmd_output('---Stats server #' . $ds['id'] . ' missed');
 				continue;
 			}
-
-			/* 
-			 * Обновляем статистику
-			 * Добавляем новое значение в существующий массив
-			 * date - дата проверки (unix time)
-			 * cpu_usage - использование cpu (%)
-			 * memory_usage - использование памяти (%)
-			*/
-
-			$stats_array = json_decode($ds['stats'], true);
-			$stats_array OR $stats_array = array();
-			
-			$stats_array = array_slice($stats_array, -40);
-
-			$stats_array[] = array('date' => now(), 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
-			$data['stats'] = json_encode($stats_array);
-			$this->dedicated_servers->edit_dedicated_server($ds['id'], $data);
 
 			//
 			// END foreach ($this->dedicated_servers->ds_list as &$ds) {
@@ -1575,6 +1598,9 @@ class Cron extends MX_Controller {
 		$end_mircotime = microtime(true);
 		$this->_cmd_output('-Time elapsed: ' . round($end_mircotime - $start_microtime, 4) . ' seconds');
 		$this->_cmd_output('-Memory peak usage: ' . round(memory_get_peak_usage()/1024, 2) . ' Kb');
+		
+		// Запись информации о времени выполнения операций
+		file_put_contents(APPPATH . 'cache/cron_time.json', json_encode($cron_time));
 		
 		$this->_cmd_output("Cron end");
 		
