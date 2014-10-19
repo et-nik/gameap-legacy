@@ -1204,8 +1204,8 @@ class Cron extends MX_Controller {
 					
 				case 'server_update':
 					try {
-						$response = $this->servers->update($this->servers_data[$server_id]);
-						$message = $this->_get_message($response);
+						// Обновление - установка файлов поверх существующих
+						$this->_install_server($server_id);
 						
 						$cron_success = true;
 						$cron_stats['success'] ++;
