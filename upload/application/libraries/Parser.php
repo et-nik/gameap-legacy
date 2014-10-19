@@ -45,18 +45,25 @@ class CI_Parser {
 	public function parse($template, $data, $return = FALSE)
 	{
 		$CI =& get_instance();
+
+		$module = $CI->router->fetch_module();
 		
 		/* Modify by ET-NiK 
 		 * 
 		 * Директория шаблона
 		*/
 		if (isset($CI->config->config['template'])) {
-			$template = $CI->config->config['template'] . '/' . $template;
+			$full_template = $CI->config->config['template'] . '/' . $template;
 		} else {
-			$template = 'default/' . $template;
+			$full_template = 'default/' . $template;
 		}
 		
-		$template = $CI->load->view($template, $data, TRUE);
+		// Проверка наличия шаблона
+		if (!file_exists(APPPATH . 'modules/' . $module . '/views/' . $full_template) && !file_exists(APPPATH . '/views/' . $full_template)) {
+			$full_template = 'default/' . $template;
+		}
+		
+		$template = $CI->load->view($full_template, $data, TRUE);
 		
 		/* $template = str_replace('[IS_ADMIN]', '<?php if($this->users->auth_data[\'is_admin\']): ?>', $template);
 		$template = str_replace('[/IS_ADMIN]', '<?php endif; ?>', $template); */
