@@ -1,6 +1,0 @@
-; Bamcompile project file
-mainfile server.php
-embed server.php
-icon server.ico
-;extension php_sockets.dll
-compress

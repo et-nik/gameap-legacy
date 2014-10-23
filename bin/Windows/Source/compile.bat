@@ -1,2 +1,0 @@
-bamcompile server.bcp
-pause
