@@ -21,12 +21,25 @@
 # -u <user>			имя пользователя
 # -m <memory>		лимит оперативной памяти (Kb)
 # -p <percentage>	лимит на использование процессора
-# -s <max speed>	лимит на использование пропускной способности
+# -n <max speed>	лимит на использование пропускной способности
 # 
 # Examples:
 # ./server.sh -t start -d /home/hl_server -n screen_hldm -i 127.0.0.1 -p 27015 -c "hlds_run -game valve +ip 127.0.0.1 +port 27015 +map crossfire"
 # ./server.sh -t get_console -n hldm -u usver
 #
+
+# Версия
+VERSION=100
+
+# Загрузка конфигурации
+if [[ -s ./server.conf ]]; then
+	echo -e "Configuration loaded"
+	source ./server.conf
+fi
+
+# Переменные
+USER=$(whoami);
+NAME="";
 
 # ----------------------------------------------------------------------
 # Запуск сервера
@@ -44,21 +57,25 @@ function server_start()
 		return;
 	fi
 	
-	if [[ "$(status)" == 1 ]]
+	if [[ "$(server_status)" == 1 ]]
 		then
-		echo -e "Server is already running"
+		echo -e "Server is already running";
     else
-		su $USER -c "cd $DIR; screen -U -m -d -S $SNAME $COMMAND"
-		sleep 4
+		su $USER -c "cd $DIR; ${COMMAND_PARTS[0]} screen -U -m -d -S $SNAME ${COMMAND_PARTS[1]} $COMMAND";
+		PID=$!;
+		sleep 4;
 		
 		if [[ `su $USER -c "screen -U -ls | grep -i $SNAME"` ]]
 			then
-			echo -e "Server started"
+			echo -e "Server started";
+			# echo -e "Start command:\n cd $DIR; ${COMMAND_PARTS[0]} screen -U -m -d -S $SNAME ${COMMAND_PARTS[1]} $COMMAND";
 		else
-		   echo -e "Server not started \nStart command:"
-		   echo -e su $USER -c "cd $DIR; screen -U -m -d -S $SNAME $COMMAND"
+		   echo -e "Server not started";
+		   echo -e "Start command:\ncd $DIR; ${COMMAND_PARTS[0]} screen -U -m -d -S $SNAME ${COMMAND_PARTS[1]} $COMMAND";
 		fi
     fi
+    
+    cpu_limit;
 }
 
 # ----------------------------------------------------------------------
@@ -85,7 +102,13 @@ function server_stop()
 # Получение статуса сервера
 function server_status()
 {
-	if [ -e ${PIDFILE} ] && [ $(ps -p $(cat ${PIDFILE})|wc -l) = "2" ] ;
+	if [[ $NAME == '' ]]
+	then
+		echo 0;
+		return;
+	fi
+
+	if [[ `sudo su $USER -c "screen -ls |grep $NAME"` ]]
 		then
 		echo 1;
     else
@@ -93,8 +116,36 @@ function server_status()
     fi
 }
 
+# ----------------------------------------------------------------------
+# Получение частей команд
+function get_parts()
+{
+	if [[ $RAM_LIMIT && $allow_ram_limit ]]; then
+		COMMAND_PARTS[0]="ulimit -Hv $RAM_LIMIT ;";
+	fi
+	
+	if [[ $NET_LIMIT && $allow_net_limit ]]; then
+		COMMAND_PARTS[1]="trickle -d $NET_LIMIT -u $NET_LIMIT";
+	fi
+}
+
+# ----------------------------------------------------------------------
+# Применить ограничение CPU %
+function cpu_limit()
+{
+	if [[ $CPU_LIMIT && $allow_cpu_limit && $PID ]]; then
+		CPU_LIMIT=$(($CPU_LIMIT*$core_count))
+		
+		# PID
+		cpulimit --pid=$PID --limit=$CPU_LIMIT
+		
+		#EXE
+		#cpulimit --exe="$DIR/" --limit=$CPU_LIMIT
+	fi
+}
+
 # Получение опций
-while getopts "t:n:i:p:c:u:m:p:n" opt ;
+while getopts "t:d:n:i:p:c:u:m:f:s:" opt ;
 do
 	case $opt in
 		t)
@@ -119,9 +170,9 @@ do
 			USER=$OPTARG;
 			;;
 		m)
-			MEM_LIMIT=$OPTARG;
+			RAM_LIMIT=$OPTARG;
 			;;
-		p)
+		f)
 			CPU_LIMIT=$OPTARG;
 			;;
 		s)
@@ -130,35 +181,47 @@ do
 		esac
 done
 
+# DEBUG
 # -------------------
-echo -e "Type: $TYPE";
-echo -e "Dir: $DIR";
-echo -e "Screen name: $SNAME";
-echo -e "Ip: $IP";
-echo -e "Command: $OPTARG";
-echo -e "User: $USER";
-echo -e "Memory limit: $MEM_LIMIT";
-echo -e "Cpu limit: $CPU_LIMIT";
-echo -e "Net limit: $NET_LIMIT";
+#~ echo -e "Type: $TYPE";
+#~ echo -e "Dir: $DIR";
+#~ echo -e "Screen name: $SNAME";
+#~ echo -e "Ip: $IP";
+#~ echo -e "Port: $PORT";
+#~ echo -e "Command: $OPTARG";
+#~ echo -e "User: $USER";
+#~ echo -e "Memory limit: $RAM_LIMIT Kb";
+#~ echo -e "Cpu limit: $CPU_LIMIT %";
+#~ echo -e "Net limit: $NET_LIMIT Kb/s";
 # -------------------
 
+# Разбиение на программу и агрументы
+explode=$(echo $COMMAND | tr " " "\n")
+
+PROGRAM=${explode[0]};
+
+echo -e "$PROGRAM";
+
+exit;
 
 case "$TYPE" in
 	start)
-		start;
+		get_parts;
+		server_start;
 		;;
 
 	stop)
-		stop;
+		server_stop;
 		;;
 		
 	restart)
-		stop;
-		start;
+		get_parts;
+		server_stop;
+		server_start;
 		;;
 		
 	status)
-		if [ "$(status)" == 1 ] ;
+		if [ "$(server_status)" == 1 ] ;
 			then
 		   echo "Server is UP"
 		else
@@ -173,6 +236,12 @@ case "$TYPE" in
 		;;
 		
 	send_command)
+		# Screen version 4.00.03jw4 (FAU) 2-May-06
+		# su $USER "-c screen -p 0 -S $NAME -X stuff '$COMMAND'$'\n'"
+ 	
+ 		# Screen version 4.01.00devel (GNU) 2-May-06
+		#~ su $USER "-c screen -p 0 -S $NAME -X stuff '$COMMAND\n'"
+
 		su $USER "-c screen -U -p 0 -S $NAME -X stuff '$COMMAND
 		'"
 		;;
