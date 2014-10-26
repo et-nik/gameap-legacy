@@ -139,8 +139,8 @@ function cpu_limit()
 		# PID
 		cpulimit --pid=$PID --limit=$CPU_LIMIT
 		
-		#EXE
-		#cpulimit --exe="$DIR/" --limit=$CPU_LIMIT
+		# EXE
+		#cpulimit --exe="$DIR/$PROGRAM" --limit=$CPU_LIMIT
 	fi
 }
 
@@ -196,13 +196,17 @@ done
 # -------------------
 
 # Разбиение на программу и агрументы
-explode=$(echo $COMMAND | tr " " "\n")
-
+IFS=' ' read -a explode <<< "$COMMAND";
 PROGRAM=${explode[0]};
+unset explode[0];
 
-echo -e "$PROGRAM";
+ARGUMENTS="";
+for element in "${explode[@]}"
+do
+    ARGUMENTS=$ARGUMENTS" $element";
+done
 
-exit;
+unset explode;
 
 case "$TYPE" in
 	start)
