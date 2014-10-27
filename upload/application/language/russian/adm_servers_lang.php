@@ -134,7 +134,7 @@ $lang['adm_servers_server_dir']						= 'Директория сервера';
 $lang['adm_servers_server_dir_desc']				= 'Директория сервера используется для указания каталога, в котором находятся исполняемые файлы игрового сервера (hlds_run, srcds_run, hlds.exe и т.п.). Указывается относительно каталога с исполняемыми файлами админпанели (server.sh или server.exe).';
 $lang['adm_servers_absolute_path_to_server']		= 'Абсолютный путь к будущему серверу';
 $lang['adm_servers_server_enabled']					= 'Сервер активен';
-$lang['adm_servers_start_parameters']				= 'Параметры запуска';
+$lang['adm_servers_start_parameters']				= 'Параметры запуска серверов';
 $lang['adm_servers_dublicate_game_type']			= 'Создать дубликат';
 $lang['adm_servers_edit_start_parameters']			= 'Редактировать параметры запуска';
 $lang['adm_servers_start_parameters_desc']			= 'В параметрах к скрипту можно указать стандартные алиасы:<br /> {id} - ID сервера,<br /> {dir} - корневая директория со скриптом,<br /> {name} - имя screen,<br /> {ip} - IP,<br /> {port} - port,<br /> {game} - код игры,<br />{user} - пользователь, от которого будет запущен сервер.<br /><br /> Пример: "./server.sh start {dir} {name} {ip} {port} "hlds_run -game {game} +ip {ip} +port {port} +map crossfire" {user}<br /><br />Также можно добавить собственные алиасы и задать им значения в настройках сервера.<br /><br />';
@@ -220,3 +220,8 @@ $lang['adm_servers_send_command']					= 'Команда отправки в ко
 
 // 0.9.9
 $lang['adm_servers_generate_rcon_password']			= 'Сгенерировать новый';
+
+// 1.0
+$lang['adm_servers_cpu_limit']						= 'Лимит на CPU';
+$lang['adm_servers_ram_limit']						= 'Лимит на RAM';
+$lang['adm_servers_net_limit']						= 'Лимит на пропусную способность';
