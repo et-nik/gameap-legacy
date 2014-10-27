@@ -66,8 +66,12 @@ string exec(string command)
 {
 	string excmd;
 	
+#ifdef _WIN32
 	FILE * f = _popen( &command[0], "r" );
-    
+#else
+	FILE * f = popen( &command[0], "r" );
+#endif
+	
     if ( f == 0 ) {
         return "";
     }
@@ -79,7 +83,12 @@ string exec(string command)
         excmd = excmd + buf;
     }
     
-    _pclose( f );
+#ifdef _WIN32
+	_pclose( f );
+#else
+	pclose( f );
+#endif
+
     return excmd;
 }
 
