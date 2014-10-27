@@ -51,6 +51,10 @@ if ( ! function_exists('replace_shotcodes'))
 		isset($server_data['start_code']) 		OR $server_data['start_code'] 		= '';
 		isset($server_data['su_user']) 			OR $server_data['su_user'] 			= '';
 		
+		isset($server_data['cpu_limit']) 		OR $server_data['cpu_limit'] 		= '';
+		isset($server_data['ram_limit']) 		OR $server_data['ram_limit'] 		= '';
+		isset($server_data['net_limit']) 		OR $server_data['net_limit'] 		= '';
+		
 		// Команда запуска игрового сервера (напр. "hlds_run -game valve +ip 127.0.0.1 +port 27015 +map crossfire")
 		$command = str_replace('{command}', 	strip_quotes($server_data['start_command']) , $command);
 		// ID сервера

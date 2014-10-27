@@ -1378,6 +1378,10 @@ class Adm_servers extends CI_Controller {
 				$local_tpl_data['query_port'] 			= $this->servers->server_data['query_port'];
 				$local_tpl_data['rcon_port'] 			= $this->servers->server_data['rcon_port'];
 				
+				$local_tpl_data['cpu_limit'] 			= $this->servers->server_data['cpu_limit'];
+				$local_tpl_data['ram_limit'] 			= $this->servers->server_data['ram_limit'];
+				$local_tpl_data['net_limit'] 			= $this->servers->server_data['net_limit'];
+				
 				/* Получаем абсолютный путь к корневой директории с сервером и к исполняемым файлам */
 				$local_tpl_data['full_server_path'] = $this->servers->server_data['script_path'] . '/' . $this->servers->server_data['dir'];
 				$local_tpl_data['script_path'] = $this->servers->server_data['script_path'];
@@ -1557,7 +1561,6 @@ class Adm_servers extends CI_Controller {
 				$this->form_validation->set_rules('server_port', lang('port'), 'trim|required|integer|max_length[6]|min_length[2]|xss_clean');
 				$this->form_validation->set_rules('query_port', lang('adm_servers_query_port'), 'trim|integer|max_length[6]|min_length[2]|xss_clean');
 				$this->form_validation->set_rules('rcon_port', lang('adm_servers_rcon_port'), 'trim|integer|max_length[6]|min_length[2]|xss_clean');
-					
 				
 				$this->form_validation->set_rules('rcon', 'RCON password', 'trim|max_length[64]|min_length[3]|xss_clean');
 				$this->form_validation->set_rules('game_type', lang('adm_servers_game_type'), 'trim|required|integer|xss_clean');
@@ -1567,8 +1570,10 @@ class Adm_servers extends CI_Controller {
 				$this->form_validation->set_rules('su_user', lang('adm_servers_user_start'), 'trim|max_length[64]|xss_clean');
 				$this->form_validation->set_rules('start_command', lang('adm_servers_command_start'), 'trim|max_length[512]|xss_clean');
 				
-				
-				
+				$this->form_validation->set_rules('cpu_limit', lang('adm_servers_cpu_limit'), 'trim|integer|less_than[100]|xss_clean');
+				$this->form_validation->set_rules('ram_limit', lang('adm_servers_ram_limit'), 'trim|integer|xss_clean');
+				$this->form_validation->set_rules('net_limit', lang('adm_servers_net_limit'), 'trim|integer|xss_clean');
+
 				break;
 				
 			case 'games':
@@ -1943,6 +1948,10 @@ class Adm_servers extends CI_Controller {
 					$sql_data['screen_name'] = $this->input->post('screen_name');
 					$sql_data['su_user'] = $this->input->post('su_user');
 					$sql_data['start_command'] = $this->input->post('start_command');
+					
+					$sql_data['cpu_limit'] = $this->input->post('cpu_limit');
+					$sql_data['ram_limit'] = $this->input->post('ram_limit');
+					$sql_data['net_limit'] = $this->input->post('net_limit');
 
 					/* Чтобы ид модификации был правильный и подходил для выбранной игры */
 					$where = array('id' => $sql_data['game_type'], 'game_code' => $this->servers->server_data['game']);
