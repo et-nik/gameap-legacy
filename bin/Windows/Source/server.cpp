@@ -57,7 +57,7 @@ void show_help()
 	cout << "-c <command>  command (example 'hlds.exe -game valve +ip 127.0.0.1 +port 27015 +map crossfire')\n";
 	cout << "-u <user>\n";
 	cout << "-m <memory>	 RAM Limit (Kb)\n";
-	cout << "-p <percentage>	 CPU Limit (%)\n";
+	cout << "-f <percentage>	 CPU Limit (%)\n";
 	cout << "-s <max speed>	 NET Limit (Kb/s)\n\n";
 
 	cout << "Examples:\n";
@@ -213,7 +213,7 @@ void main(int argc, char *argv[])
 			// Memory
 			memory = argv[i+1];
 			i++;
-		} else if (string(argv[i]) == "-p") {
+		} else if (string(argv[i]) == "-f") {
 			// CPU
 			percentage = argv[i+1];
 			i++;
