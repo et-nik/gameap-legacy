@@ -64,10 +64,10 @@ class Settings extends CI_Controller {
 			$link_text = lang('back');
 		}
 
-        $local_tpl_data['message'] = $message;
-        $local_tpl_data['link'] = $link;
-        $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+        $local_tpl['message'] = $message;
+        $local_tpl['link'] = $link;
+        $local_tpl['back_link_txt'] = $link_text;
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
 	
@@ -110,8 +110,8 @@ class Settings extends CI_Controller {
 			foreach ($server_settings as $sett_id => $value) {
 				$num++;
 		
-				$local_tpl_data['settings'][$num]['input_field'] = form_checkbox($sett_id, '1', $value);
-				$local_tpl_data['settings'][$num]['human_name'] = $this->servers->all_settings[$sett_id];
+				$local_tpl['settings'][$num]['input_field'] = form_checkbox($sett_id, '1', $value);
+				$local_tpl['settings'][$num]['human_name'] = $this->servers->all_settings[$sett_id];
 			}
 			
 			/* Допустимые алиасы */
@@ -147,14 +147,14 @@ class Settings extends CI_Controller {
 						  'size'        => '30',
 						);
 
-					$local_tpl_data['settings'][$num]['input_field'] =  form_input($data);
-					$local_tpl_data['settings'][$num]['human_name'] = $alias['desc'];
+					$local_tpl['settings'][$num]['input_field'] =  form_input($data);
+					$local_tpl['settings'][$num]['human_name'] = $alias['desc'];
 				}
 			}
 			
-			$local_tpl_data['server_id'] = $server_id;
+			$local_tpl['server_id'] = $server_id;
 
-			$this->tpl_data['content'] .= $this->parser->parse('settings/server.html', $local_tpl_data, true);
+			$this->tpl_data['content'] .= $this->parser->parse('settings/server.html', $local_tpl, true);
 		} else {
 			/* Сохранение настроек */
 			

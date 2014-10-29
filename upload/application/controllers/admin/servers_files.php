@@ -57,10 +57,10 @@ class Servers_files extends CI_Controller {
 			$link_text = lang('back');
 		}
 
-        $local_tpl_data['message'] = $message;
-        $local_tpl_data['link'] = $link;
-        $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+        $local_tpl['message'] = $message;
+        $local_tpl['link'] = $link;
+        $local_tpl['back_link_txt'] = $link_text;
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
@@ -153,15 +153,15 @@ class Servers_files extends CI_Controller {
 		$this->load->helper('games');
 		
 		$filter = $this->users->get_filter('servers_list');
-		$local_tpl_data = $this->_get_tpl_filter($filter);
+		$local_tpl = $this->_get_tpl_filter($filter);
 		
 		$this->servers->set_filter($filter);
 		$this->servers->get_servers_list($this->users->auth_id);
 		
-		$local_tpl_data['url'] 			= site_url('admin/servers_files/server');
-		$local_tpl_data['games_list'] = servers_list_to_games_list($this->servers->servers_list);
+		$local_tpl['url'] 			= site_url('admin/servers_files/server');
+		$local_tpl['games_list'] = servers_list_to_games_list($this->servers->servers_list);
 			
-		$this->tpl_data['content'] .= $this->parser->parse('servers/select_server.html', $local_tpl_data, true);
+		$this->tpl_data['content'] .= $this->parser->parse('servers/select_server.html', $local_tpl, true);
 			
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
@@ -214,7 +214,7 @@ class Servers_files extends CI_Controller {
 		//~ }
 		
 		/* Получение данных сервера для шаблона */
-		$local_tpl_data['server_id'] = $this->servers->server_data['id'];
+		$local_tpl['server_id'] = $this->servers->server_data['id'];
 		
 		
 		/*
@@ -235,17 +235,17 @@ class Servers_files extends CI_Controller {
 			
 			if($cfg_files) {
 				$i = -1;
-				$local_tpl_data['cfg_files'] = $cfg_files;
+				$local_tpl['cfg_files'] = $cfg_files;
 				foreach($cfg_files as $array) {
 					$i ++;
-					$local_tpl_data['cfg_files'][$i]['id_cfg'] = $i;
+					$local_tpl['cfg_files'][$i]['id_cfg'] = $i;
 				}
 			
 			} else {
-				$local_tpl_data['cfg_files'] = array();
+				$local_tpl['cfg_files'] = array();
 			}
 
-			$this->tpl_data['content'] .= $this->parser->parse('servers/servers_files_cfg.html', $local_tpl_data, true);
+			$this->tpl_data['content'] .= $this->parser->parse('servers/servers_files_cfg.html', $local_tpl, true);
 		}
 
 		if($this->users->auth_servers_privileges['UPLOAD_CONTENTS']){
@@ -255,17 +255,17 @@ class Servers_files extends CI_Controller {
 			
 			if($content_dirs) {
 				$i = -1;
-				$local_tpl_data['content_dirs'] = $content_dirs;
+				$local_tpl['content_dirs'] = $content_dirs;
 				foreach($content_dirs as $array) {
 					$i ++;
-					$local_tpl_data['content_dirs'][$i]['id_dir'] = $i;
+					$local_tpl['content_dirs'][$i]['id_dir'] = $i;
 				}
 			
 			} else {
-				$local_tpl_data['content_dirs'] = array();
+				$local_tpl['content_dirs'] = array();
 			}
 			
-			$this->tpl_data['content'] .= $this->parser->parse('servers/servers_files_content_dirs.html', $local_tpl_data, true);
+			$this->tpl_data['content'] .= $this->parser->parse('servers/servers_files_content_dirs.html', $local_tpl, true);
 		}
 		
 		$this->parser->parse('main.html', $this->tpl_data);
@@ -334,13 +334,13 @@ class Servers_files extends CI_Controller {
 			try {
 				$file_contents = read_ds_file($dir . $file, $this->servers->server_data);
 				
-				$local_tpl_data['file_contents'] 		= $file_contents;
-				$local_tpl_data['file_name'] 			= basename($file);
-				$local_tpl_data['id_cfg'] 				= (int)$cfg_id;
-				$local_tpl_data['cfg_id']				= (int)$cfg_id;
-				$local_tpl_data['server_id'] 			= $server_id;
+				$local_tpl['file_contents'] 		= $file_contents;
+				$local_tpl['file_name'] 			= basename($file);
+				$local_tpl['id_cfg'] 				= (int)$cfg_id;
+				$local_tpl['cfg_id']				= (int)$cfg_id;
+				$local_tpl['server_id'] 			= $server_id;
 				
-				$this->tpl_data['content'] .= $this->parser->parse('servers/edit_file.html', $local_tpl_data, true);
+				$this->tpl_data['content'] .= $this->parser->parse('servers/edit_file.html', $local_tpl, true);
 				
 			} catch (Exception $e) {
 				$message = $e->getMessage();

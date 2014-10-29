@@ -93,10 +93,10 @@ class Users_control extends CI_Controller {
 			$link_text = lang('back');
 		}
 
-        $local_tpl_data['message'] = $message;
-        $local_tpl_data['link'] = $link;
-        $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+        $local_tpl['message'] = $message;
+        $local_tpl['link'] = $link;
+        $local_tpl['back_link_txt'] = $link_text;
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
@@ -123,7 +123,7 @@ class Users_control extends CI_Controller {
         $filter = $this->users->get_filter('users_list');
         $this->users->set_filter($filter);
         
-        $local_tpl_data = $this->_get_tpl_filter($filter);
+        $local_tpl = $this->_get_tpl_filter($filter);
         
         /* Постраничная навигация */
 		$config['base_url'] = site_url('admin/users_control/index');
@@ -134,10 +134,10 @@ class Users_control extends CI_Controller {
 		$config['full_tag_close'] = '</p>';
 		
 		$this->pagination->initialize($config); 
-		$local_tpl_data['pagination'] = $this->pagination->create_links();
+		$local_tpl['pagination'] = $this->pagination->create_links();
 
-		$local_tpl_data['users_list'] = $this->users->tpl_users_list($config['per_page'], $offset);
-		$this->tpl_data['content'] .= $this->parser->parse('web_users/web_users_list.html', $local_tpl_data, true);
+		$local_tpl['users_list'] = $this->users->tpl_users_list($config['per_page'], $offset);
+		$this->tpl_data['content'] .= $this->parser->parse('web_users/web_users_list.html', $local_tpl, true);
         
         $this->parser->parse('main.html', $this->tpl_data);
     }
@@ -170,11 +170,11 @@ class Users_control extends CI_Controller {
 				
 			/* Данные для шаблона */
 			if(strlen($key) > 3) {
-				$local_tpl_data['privileges_list'][$i]['privilege_name'] = $value;
-				$local_tpl_data['privileges_list'][$i]['privilege_option'] = form_checkbox($key, 1);
+				$local_tpl['privileges_list'][$i]['privilege_name'] = $value;
+				$local_tpl['privileges_list'][$i]['privilege_option'] = form_checkbox($key, 1);
 			} else {
-				$local_tpl_data['privileges_list'][$i]['privilege_name'] = '<p class="hr">' . $value . '</p>';
-				$local_tpl_data['privileges_list'][$i]['privilege_option'] = '&nbsp;';
+				$local_tpl['privileges_list'][$i]['privilege_name'] = '<p class="hr">' . $value . '</p>';
+				$local_tpl['privileges_list'][$i]['privilege_option'] = '&nbsp;';
 			}
 		}
 
@@ -186,7 +186,7 @@ class Users_control extends CI_Controller {
 			}
 			
 			//$this->tpl_data['content'] .= 'Ошибка добавления пользователя';
-			$this->tpl_data['content'] .= $this->parser->parse('web_users/web_users_add.html', $local_tpl_data, true);	
+			$this->tpl_data['content'] .= $this->parser->parse('web_users/web_users_add.html', $local_tpl, true);	
 		} else {
 			
 			foreach($this->users->all_user_privileges as $key => $value) {
@@ -256,9 +256,9 @@ class Users_control extends CI_Controller {
 				return false;
 			}
 			
-			$local_tpl_data = $this->users->tpl_userdata($user_id);
+			$local_tpl = $this->users->tpl_userdata($user_id);
 			
-			$this->tpl_data['heading'] .= '&nbsp;::&nbsp;' . $local_tpl_data['user_login'];
+			$this->tpl_data['heading'] .= '&nbsp;::&nbsp;' . $local_tpl['user_login'];
 			
 			/* 
 			 * Не указан ID сервера
@@ -269,9 +269,9 @@ class Users_control extends CI_Controller {
 				$this->load->model('servers');
 				
 				$this->servers->get_server_list(false, false, array('enabled' => '1'));
-				$local_tpl_data['servers_list'] = $this->servers->tpl_data();
+				$local_tpl['servers_list'] = $this->servers->tpl_data();
 
-				$this->tpl_data['content'] .= $this->parser->parse('web_users/select_server.html', $local_tpl_data, true);
+				$this->tpl_data['content'] .= $this->parser->parse('web_users/select_server.html', $local_tpl, true);
 				
 				$this->parser->parse('main.html', $this->tpl_data);
 				return false;
@@ -282,16 +282,16 @@ class Users_control extends CI_Controller {
 			$num = 0;
 			foreach ($user_privileges as $privilege_name => $privilege_value)
 			{
-				$local_tpl_data['privilege_list'][$num]['form_checkbox'] 	= form_checkbox($privilege_name, '1', $privilege_value);
-				$local_tpl_data['privilege_list'][$num]['human_name'] 		= $this->users->all_privileges[$privilege_name];
+				$local_tpl['privilege_list'][$num]['form_checkbox'] 	= form_checkbox($privilege_name, '1', $privilege_value);
+				$local_tpl['privilege_list'][$num]['human_name'] 		= $this->users->all_privileges[$privilege_name];
 				
 				$num ++;
 			}
 			
-			$local_tpl_data['user_id']		= $user_id;		// Костыль
-			$local_tpl_data['server_id'] 	= $server_id;
+			$local_tpl['user_id']		= $user_id;		// Костыль
+			$local_tpl['server_id'] 	= $server_id;
 			
-			$this->tpl_data['content'] .= $this->parser->parse('web_users/web_users_privileges.html', $local_tpl_data, true);
+			$this->tpl_data['content'] .= $this->parser->parse('web_users/web_users_privileges.html', $local_tpl, true);
 		}
             
         $this->parser->parse('main.html', $this->tpl_data);
@@ -323,12 +323,12 @@ class Users_control extends CI_Controller {
 			 /* В целях безопасности, редактировать администратора может только он сам */
 			if($user_data['is_admin'] && $user_data['id'] != $this->users->auth_id){
 				
-				$local_tpl_data['message'] = lang('users_edit_admin_denied');
+				$local_tpl['message'] = lang('users_edit_admin_denied');
 					
-				$local_tpl_data['link'] = site_url('admin/users_control');
-				$local_tpl_data['back_link_txt'] = 'Вернуться';
+				$local_tpl['link'] = site_url('admin/users_control');
+				$local_tpl['back_link_txt'] = 'Вернуться';
 					
-				$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+				$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
 				$this->parser->parse('main.html', $this->tpl_data);
 				return false;
 			}
@@ -343,8 +343,8 @@ class Users_control extends CI_Controller {
 				return false;
 			}
 
-			$local_tpl_data = $this->users->tpl_userdata($user_id);
-			$this->tpl_data['heading'] .= '&nbsp;::&nbsp;' . $local_tpl_data['user_login'];
+			$local_tpl = $this->users->tpl_userdata($user_id);
+			$this->tpl_data['heading'] .= '&nbsp;::&nbsp;' . $local_tpl['user_login'];
 			
 			// Сохранение привилегии
 			foreach ($this->users->all_privileges as $privilege_name => $privilege_human_name)
@@ -399,7 +399,7 @@ class Users_control extends CI_Controller {
 				return false;
 			}
 			
-			$local_tpl_data = array();
+			$local_tpl = array();
 			
 			/* Получаем данные редактируемого пользователя, но записываем их лишь в переменную $user_data */
 			$user_data = $this->users->get_user_data($user_id);
@@ -411,8 +411,8 @@ class Users_control extends CI_Controller {
 			}
 			
 			if(!$this->input->post('user_edit_submit')){
-				$local_tpl_data = $this->users->tpl_userdata($user_id, $user_data);
-				$this->tpl_data['content'] .= $this->parser->parse('web_users/user_edit.html', $local_tpl_data, true);
+				$local_tpl = $this->users->tpl_userdata($user_id, $user_data);
+				$this->tpl_data['content'] .= $this->parser->parse('web_users/user_edit.html', $local_tpl, true);
 			}else{
 				$this->load->library('form_validation');
 				
@@ -493,12 +493,12 @@ class Users_control extends CI_Controller {
 					/* В целях безопасности, администратора нельзя удалить */
 					if ($user_data['is_admin']) {
 						
-						$local_tpl_data['message'] = lang('users_delete_admin_denied');
+						$local_tpl['message'] = lang('users_delete_admin_denied');
 							
-						$local_tpl_data['link'] = site_url('admin/users_control');
-						$local_tpl_data['back_link_txt'] = lang('back');
+						$local_tpl['link'] = site_url('admin/users_control');
+						$local_tpl['back_link_txt'] = lang('back');
 							
-						$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+						$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
 						$this->parser->parse('main.html', $this->tpl_data);
 						return false;
 					}
@@ -562,8 +562,8 @@ class Users_control extends CI_Controller {
 		}
 
 		/* Задание переменных */
-		$local_tpl_data = array();
-		$local_tpl_data['user_id'] = $user_id;
+		$local_tpl = array();
+		$local_tpl['user_id'] = $user_id;
 		
 		/* Загрузка моделей, библиотек, хелперов */
 		$this->load->library('form_validation');
@@ -577,11 +577,11 @@ class Users_control extends CI_Controller {
 			
 			/* Данные для шаблона */
 			if(strlen($key) > 3) {
-				$local_tpl_data['privileges_list'][$i]['privilege_name'] = $value;
-				$local_tpl_data['privileges_list'][$i]['privilege_option'] = form_checkbox($key, 1, $this->users->user_privileges[$key]);
+				$local_tpl['privileges_list'][$i]['privilege_name'] = $value;
+				$local_tpl['privileges_list'][$i]['privilege_option'] = form_checkbox($key, 1, $this->users->user_privileges[$key]);
 			} else {
-				$local_tpl_data['privileges_list'][$i]['privilege_name'] = '<p class="hr">' . $value . '</p>';
-				$local_tpl_data['privileges_list'][$i]['privilege_option'] = '&nbsp;';
+				$local_tpl['privileges_list'][$i]['privilege_name'] = '<p class="hr">' . $value . '</p>';
+				$local_tpl['privileges_list'][$i]['privilege_option'] = '&nbsp;';
 			}
 		}
 		
@@ -592,7 +592,7 @@ class Users_control extends CI_Controller {
 				return false;
 			}
 			
-			$this->tpl_data['content'] = $this->parser->parse('web_users/base_privileges_edit.html', $local_tpl_data, true);
+			$this->tpl_data['content'] = $this->parser->parse('web_users/base_privileges_edit.html', $local_tpl, true);
 		} else {
 			foreach($this->users->all_user_privileges as $key => $value) {
 				

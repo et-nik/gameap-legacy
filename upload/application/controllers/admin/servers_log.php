@@ -68,10 +68,10 @@ class Servers_log extends CI_Controller {
 			$link_text = lang('back');
 		}
 
-        $local_tpl_data['message'] = $message;
-        $local_tpl_data['link'] = $link;
-        $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+        $local_tpl['message'] = $message;
+        $local_tpl['link'] = $link;
+        $local_tpl['back_link_txt'] = $link_text;
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
@@ -135,15 +135,15 @@ class Servers_log extends CI_Controller {
 		$this->load->helper('games');
 		
 		$filter = $this->users->get_filter('servers_list');
-		$local_tpl_data = $this->_get_tpl_filter($filter);
+		$local_tpl = $this->_get_tpl_filter($filter);
 		
 		$this->servers->set_filter($filter);
 		$this->servers->get_servers_list($this->users->auth_id);
 		
-		$local_tpl_data['url'] 			= site_url('/admin/servers_log/list_logs');
-		$local_tpl_data['games_list'] = servers_list_to_games_list($this->servers->servers_list);
+		$local_tpl['url'] 			= site_url('/admin/servers_log/list_logs');
+		$local_tpl['games_list'] = servers_list_to_games_list($this->servers->servers_list);
 			
-		$this->tpl_data['content'] .= $this->parser->parse('servers/select_server.html', $local_tpl_data, true);
+		$this->tpl_data['content'] .= $this->parser->parse('servers/select_server.html', $local_tpl, true);
 			
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
@@ -163,8 +163,8 @@ class Servers_log extends CI_Controller {
 			// Отображение списка серверов, доступных пользователю
 			
 			$this->servers->get_server_list($this->users->auth_id);
-			$local_tpl_data['servers_list'] = $this->servers->tpl_data();
-			$this->tpl_data['content'] .= $this->parser->parse('servers/log_select_server.html', $local_tpl_data, true);
+			$local_tpl['servers_list'] = $this->servers->tpl_data();
+			$this->tpl_data['content'] .= $this->parser->parse('servers/log_select_server.html', $local_tpl, true);
 			
 			$this->parser->parse('main.html', $this->tpl_data);
 			return false;
@@ -188,18 +188,18 @@ class Servers_log extends CI_Controller {
 			
 			if($ldir_list) {
 				$i = -1;
-				$local_tpl_data['ldir_list'] = $ldir_list;
+				$local_tpl['ldir_list'] = $ldir_list;
 				foreach($ldir_list as $array) {
 					$i ++;
-					$local_tpl_data['ldir_list'][$i]['id_dir'] = $i;
+					$local_tpl['ldir_list'][$i]['id_dir'] = $i;
 				}
 			} else {
-				$local_tpl_data['ldir_list'] = array();
+				$local_tpl['ldir_list'] = array();
 			}
 			
-			$local_tpl_data['server_id'] = $server_id;
+			$local_tpl['server_id'] = $server_id;
 			
-			$this->tpl_data['content'] .= $this->parser->parse('servers/select_log.html', $local_tpl_data, true);
+			$this->tpl_data['content'] .= $this->parser->parse('servers/select_log.html', $local_tpl, true);
 			$this->parser->parse('main.html', $this->tpl_data);
 			return false;
 		}
@@ -227,7 +227,7 @@ class Servers_log extends CI_Controller {
 			return false;
 		}
 		
-		$local_tpl_data['id_dir'] = $id_dir;		
+		$local_tpl['id_dir'] = $id_dir;		
 		$dir = $ldir_list[$id_dir]['path'];
 		
 		// Получаем массив с расширением файлов
@@ -251,14 +251,14 @@ class Servers_log extends CI_Controller {
 			return false;
 		}
 		
-		$local_tpl_data['log_list'] 	= $this->logs->filter_logs($log_sort, $log_limit, $log_date);
-		$local_tpl_data['server_id'] 	= $server_id;
-		$local_tpl_data['param'] 		= $id_dir;
+		$local_tpl['log_list'] 	= $this->logs->filter_logs($log_sort, $log_limit, $log_date);
+		$local_tpl['server_id'] 	= $server_id;
+		$local_tpl['param'] 		= $id_dir;
 			
-		$local_tpl_data['file_name'] = $file_name;
-		$local_tpl_data['log_limit'] = $log_limit;
+		$local_tpl['file_name'] = $file_name;
+		$local_tpl['log_limit'] = $log_limit;
 				
-		$this->tpl_data['content'] .= $this->parser->parse('servers/log_list.html', $local_tpl_data, true);
+		$this->tpl_data['content'] .= $this->parser->parse('servers/log_list.html', $local_tpl, true);
 		
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
@@ -276,10 +276,10 @@ class Servers_log extends CI_Controller {
 		
 		if(!$server_id){
 			$this->servers->get_server_list($this->users->auth_id);
-			$local_tpl_data['servers_list'] = $this->servers->tpl_data();
-			$local_tpl_data['param'] = $param;
+			$local_tpl['servers_list'] = $this->servers->tpl_data();
+			$local_tpl['param'] = $param;
 			
-			$this->tpl_data['content'] .= $this->parser->parse('servers/log_select_server.html', $local_tpl_data, true);
+			$this->tpl_data['content'] .= $this->parser->parse('servers/log_select_server.html', $local_tpl, true);
 			
 			$this->parser->parse('main.html', $this->tpl_data);
 			return false;
@@ -305,7 +305,7 @@ class Servers_log extends CI_Controller {
 			return false;
 		}
 		
-		$local_tpl_data['id_dir'] = $id_dir;		
+		$local_tpl['id_dir'] = $id_dir;		
 		$dir = $ldir_list[$id_dir]['path'];
 		$file_ext = $ldir_list[$id_dir]['allowed_types'];
 		
@@ -337,15 +337,15 @@ class Servers_log extends CI_Controller {
 			return false;
 		}
 		
-		$local_tpl_data['log_contents'] = $log_content;
+		$local_tpl['log_contents'] = $log_content;
 		
 		// Кодировка
-		//$local_tpl_data['log_contents'] = iconv('windows-1251', 'UTF-8', $local_tpl_data['log_contents']);
+		//$local_tpl['log_contents'] = iconv('windows-1251', 'UTF-8', $local_tpl['log_contents']);
 		
-		$local_tpl_data['server_id'] = $server_id;
-		//$local_tpl_data['param'] = $param;
+		$local_tpl['server_id'] = $server_id;
+		//$local_tpl['param'] = $param;
 				
-		$this->tpl_data['content'] .= $this->parser->parse('servers/view_log.html', $local_tpl_data, true);
+		$this->tpl_data['content'] .= $this->parser->parse('servers/view_log.html', $local_tpl, true);
 			
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
