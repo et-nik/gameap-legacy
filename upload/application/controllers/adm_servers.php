@@ -93,10 +93,10 @@ class Adm_servers extends CI_Controller {
 			$link_text = lang('back');
 		}
 
-        $local_tpl_data['message'] = $message;
-        $local_tpl_data['link'] = $link;
-        $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+        $local_tpl['message'] = $message;
+        $local_tpl['link'] = $link;
+        $local_tpl['back_link_txt'] = $link_text;
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
@@ -439,7 +439,7 @@ class Adm_servers extends CI_Controller {
 		if($this->users->auth_id){
 			// Пользователь авторизован
 			
-			$local_tpl_data = array();
+			$local_tpl = array();
 			$error_msg = false;
 
 			switch ($type) {
@@ -450,7 +450,7 @@ class Adm_servers extends CI_Controller {
 					$this->tpl_data['heading'] 	= lang('adm_servers_heading_ds');
 					
 					$parse_list_file = 'adm_servers/dedicated_servers_list.html';	// Шаблон списка
-					$local_tpl_data['ds_list'] = $this->dedicated_servers->tpl_data_ds();
+					$local_tpl['ds_list'] = $this->dedicated_servers->tpl_data_ds();
 					
 					break;
 					
@@ -463,14 +463,14 @@ class Adm_servers extends CI_Controller {
 					$parse_list_file = 'adm_servers/game_servers_list.html';	// Шаблон списка
 					
 					$filter = $this->users->get_filter('servers_list');
-					$local_tpl_data = $this->_get_gservers_tpl_filter();
+					$local_tpl = $this->_get_gservers_tpl_filter();
 					
 					$this->servers->set_filter($filter);
 					$this->servers->get_server_list(false, false, array());
 					
-					$local_tpl_data['games_list'] = servers_list_to_games_list($this->servers->servers_list);
+					$local_tpl['games_list'] = servers_list_to_games_list($this->servers->servers_list);
 					
-					//~ $local_tpl_data['servers_list'] = $this->servers->tpl_data();
+					//~ $local_tpl['servers_list'] = $this->servers->tpl_data();
 
 					break;
 					
@@ -506,7 +506,7 @@ class Adm_servers extends CI_Controller {
 									$num++;
 								}
 
-							$local_tpl_data['games_list'] = $tpl_data;
+							$local_tpl['games_list'] = $tpl_data;
 							
 						} else {
 							$error_msg .= '<p>' . lang('adm_servers_games_unavailable') . '</p>';
@@ -526,12 +526,12 @@ class Adm_servers extends CI_Controller {
 
 			// Верхняя оболочка, в качестве меню
 			if(isset($parse_file)){
-				$this->tpl_data['content'] .= $this->parser->parse($parse_file, $local_tpl_data, true);
+				$this->tpl_data['content'] .= $this->parser->parse($parse_file, $local_tpl, true);
 			}
 			
 			/* Если ошибок никаких, то отображаем список */
 			if(!$error_msg){
-				$this->tpl_data['content'] .= $this->parser->parse($parse_list_file, $local_tpl_data, true);
+				$this->tpl_data['content'] .= $this->parser->parse($parse_list_file, $local_tpl, true);
 			}else{
 				$this->tpl_data['content'] .= $error_msg;
 			}
@@ -569,7 +569,7 @@ class Adm_servers extends CI_Controller {
 		if($this->users->auth_id) {
 			// Пользователь авторизован
 			
-			$local_tpl_data = array();
+			$local_tpl = array();
 			$error_msg = false;
 			
 			/* Параметры для форм, задание правил проверки
@@ -666,7 +666,7 @@ class Adm_servers extends CI_Controller {
 					$this->form_validation->set_rules('name', 'название игры', 'trim|required|max_length[32]|min_length[2]|xss_clean');
 
 					if($tpl_list = $this->games->tpl_data_games()) {
-						$local_tpl_data['games_list'] = $tpl_list;
+						$local_tpl['games_list'] = $tpl_list;
 					}
 					
 					if(empty($this->games->games_list)) {
@@ -693,10 +693,10 @@ class Adm_servers extends CI_Controller {
 					$this->_show_message('', $link = 'javascript:history.back()');
 					return false;
 				} else {
-					$local_tpl_data['message'] = '';
-					$local_tpl_data['back_link_txt'] = lang('back');
-					$local_tpl_data['link'] = 'javascript:history.back()';
-					$this->tpl_data['content'] .= $this->parser->parse($tpl_file_add, $local_tpl_data, true);
+					$local_tpl['message'] = '';
+					$local_tpl['back_link_txt'] = lang('back');
+					$local_tpl['link'] = 'javascript:history.back()';
+					$this->tpl_data['content'] .= $this->parser->parse($tpl_file_add, $local_tpl, true);
 				}
 				
 					
@@ -712,7 +712,7 @@ class Adm_servers extends CI_Controller {
 				 * 
 				*/
 				
-				$local_tpl_data = array();
+				$local_tpl = array();
 
 				switch($type){
 					case 'dedicated_servers':
@@ -827,9 +827,9 @@ class Adm_servers extends CI_Controller {
 						
 						// Добавление сервера
 						if ($this->dedicated_servers->add_dedicated_server($sql_data)) {
-							$local_tpl_data['message'] = lang('adm_servers_add_server_successful');
+							$local_tpl['message'] = lang('adm_servers_add_server_successful');
 						} else {
-							$local_tpl_data['message'] = lang('adm_servers_add_server_failed');
+							$local_tpl['message'] = lang('adm_servers_add_server_failed');
 						}
 						
 						// Записываем логи
@@ -837,12 +837,12 @@ class Adm_servers extends CI_Controller {
 						$log_data['command'] 		= 'add_ds';
 						$log_data['server_id'] 		= 0;
 						$log_data['user_name'] 		= $this->users->auth_login;
-						$log_data['msg'] 			= $local_tpl_data['message'];
+						$log_data['msg'] 			= $local_tpl['message'];
 						$log_data['log_data'] 		= '';
 						$this->panel_log->save_log($log_data);
 						
-						$local_tpl_data['link'] = site_url('adm_servers/view/dedicated_servers');
-						$local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_servers');
+						$local_tpl['link'] = site_url('adm_servers/view/dedicated_servers');
+						$local_tpl['back_link_txt'] = lang('adm_servers_back_to_servers');
 						
 						break;
 
@@ -874,9 +874,9 @@ class Adm_servers extends CI_Controller {
 						$sql_data['app_set_config'] = str_replace('	', '', $sql_data['app_set_config']);
 						
 						if($this->games->add_game($sql_data)){
-							$local_tpl_data['message'] = lang('adm_servers_add_game_successful');
+							$local_tpl['message'] = lang('adm_servers_add_game_successful');
 						}else{
-							$local_tpl_data['message'] = lang('adm_servers_add_game_failed');
+							$local_tpl['message'] = lang('adm_servers_add_game_failed');
 						}
 						
 						// Записываем логи
@@ -884,12 +884,12 @@ class Adm_servers extends CI_Controller {
 						$log_data['command'] 		= 'add_game';
 						$log_data['server_id'] 		= 0;
 						$log_data['user_name'] 		= $this->users->auth_login;
-						$log_data['msg'] 			= $local_tpl_data['message'];
+						$log_data['msg'] 			= $local_tpl['message'];
 						$log_data['log_data'] 		= '';
 						$this->panel_log->save_log($log_data);
 						
-						$local_tpl_data['link'] = site_url('adm_servers/view/games');
-						$local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_games');
+						$local_tpl['link'] = site_url('adm_servers/view/games');
+						$local_tpl['back_link_txt'] = lang('adm_servers_back_to_games');
 						
 
 						break;
@@ -904,9 +904,9 @@ class Adm_servers extends CI_Controller {
 						$sql_data['name'] = $this->input->post('name');
 						
 						if($this->game_types->add_game_type($sql_data)) {
-							$local_tpl_data['message'] = lang('adm_servers_add_game_type_successful');
+							$local_tpl['message'] = lang('adm_servers_add_game_type_successful');
 						} else {
-							$local_tpl_data['message'] = lang('adm_servers_add_game_type_failed');
+							$local_tpl['message'] = lang('adm_servers_add_game_type_failed');
 						}
 						
 						// Записываем логи
@@ -914,18 +914,18 @@ class Adm_servers extends CI_Controller {
 						$log_data['command'] 		= 'add_game_type';
 						$log_data['server_id'] 		= 0;
 						$log_data['user_name'] 		= $this->users->auth_login;
-						$log_data['msg'] 			= $local_tpl_data['message'];
+						$log_data['msg'] 			= $local_tpl['message'];
 						$log_data['log_data'] 		= '';
 						$this->panel_log->save_log($log_data);
 
-						$local_tpl_data['link'] = site_url('adm_servers/edit/game_types/' . $this->db->insert_id());
-						$local_tpl_data['back_link_txt'] = 'Далее';
+						$local_tpl['link'] = site_url('adm_servers/edit/game_types/' . $this->db->insert_id());
+						$local_tpl['back_link_txt'] = 'Далее';
 						
 						break;
 						
 				}
 				
-				$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+				$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
 			
 			}
 
@@ -962,7 +962,7 @@ class Adm_servers extends CI_Controller {
 		if($this->users->auth_id){
 			// Пользователь авторизован
 			
-			$local_tpl_data = array();
+			$local_tpl = array();
 			$error_msg = false;
 			
 			if ($confirm == $this->security->get_csrf_hash()) {
@@ -989,9 +989,9 @@ class Adm_servers extends CI_Controller {
 						}
 
 						if ($this->dedicated_servers->del_dedicated_server($id)) {	
-							$local_tpl_data['message'] = lang('adm_servers_delete_server_successful');
+							$local_tpl['message'] = lang('adm_servers_delete_server_successful');
 						} else {
-							$local_tpl_data['message'] = lang('adm_servers_delete_server_failed');
+							$local_tpl['message'] = lang('adm_servers_delete_server_failed');
 						}
 						
 						// Записываем логи
@@ -999,12 +999,12 @@ class Adm_servers extends CI_Controller {
 						$log_data['command'] 		= 'delete_ds';
 						$log_data['server_id'] 		= 0;
 						$log_data['user_name'] 		= $this->users->auth_login;
-						$log_data['msg'] 			= $local_tpl_data['message'];
+						$log_data['msg'] 			= $local_tpl['message'];
 						$log_data['log_data'] 		= 'ID: ' . $id;
 						$this->panel_log->save_log($log_data);
 									
-						$local_tpl_data['link'] 			= site_url('adm_servers/view/dedicated_servers');
-						$local_tpl_data['back_link_txt'] 	= lang('adm_servers_back_to_servers');
+						$local_tpl['link'] 			= site_url('adm_servers/view/dedicated_servers');
+						$local_tpl['back_link_txt'] 	= lang('adm_servers_back_to_servers');
 						
 						break;
 						
@@ -1066,9 +1066,9 @@ class Adm_servers extends CI_Controller {
 						}
 
 						if ($this->servers->delete_game_server($id)) {
-							$local_tpl_data['message'] = lang('adm_servers_delete_server_successful');
+							$local_tpl['message'] = lang('adm_servers_delete_server_successful');
 						} else {
-							$local_tpl_data['message'] = lang('adm_servers_delete_server_failed');
+							$local_tpl['message'] = lang('adm_servers_delete_server_failed');
 						}
 						
 						// Записываем логи
@@ -1076,12 +1076,12 @@ class Adm_servers extends CI_Controller {
 						$log_data['command'] 		= 'delete_game_server';
 						$log_data['server_id'] 		= $id;
 						$log_data['user_name'] 		= $this->users->auth_login;
-						$log_data['msg'] 			= $local_tpl_data['message'];
+						$log_data['msg'] 			= $local_tpl['message'];
 						$log_data['log_data'] 		= 'ID: ' . $id . ' Files deleted: ' . $files_deleted;
 						$this->panel_log->save_log($log_data);
 							
-						$local_tpl_data['link'] = site_url('adm_servers/view/game_servers');
-						$local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_servers');
+						$local_tpl['link'] = site_url('adm_servers/view/game_servers');
+						$local_tpl['back_link_txt'] = lang('adm_servers_back_to_servers');
 						
 						break;
 						
@@ -1104,9 +1104,9 @@ class Adm_servers extends CI_Controller {
 						}
 						
 						if($this->games->delete_game($id)){
-							$local_tpl_data['message'] = lang('adm_servers_delete_game_successful');
+							$local_tpl['message'] = lang('adm_servers_delete_game_successful');
 						}else{
-							$local_tpl_data['message'] = lang('adm_servers_delete_game_failed');
+							$local_tpl['message'] = lang('adm_servers_delete_game_failed');
 						}
 						
 						// Записываем логи
@@ -1114,12 +1114,12 @@ class Adm_servers extends CI_Controller {
 						$log_data['command'] 		= 'delete_game';
 						$log_data['server_id'] 		= 0;
 						$log_data['user_name'] 		= $this->users->auth_login;
-						$log_data['msg'] 			= $local_tpl_data['message'];
+						$log_data['msg'] 			= $local_tpl['message'];
 						$log_data['log_data'] 		= 'ID: ' . $id;
 						$this->panel_log->save_log($log_data);
 							
-						$local_tpl_data['link'] 			= site_url('adm_servers/view/games');
-						$local_tpl_data['back_link_txt'] 	= lang('adm_servers_back_to_games');
+						$local_tpl['link'] 			= site_url('adm_servers/view/games');
+						$local_tpl['back_link_txt'] 	= lang('adm_servers_back_to_games');
 						
 						break;
 						
@@ -1143,9 +1143,9 @@ class Adm_servers extends CI_Controller {
 						
 						/* Удаление модификации */
 						if($this->game_types->delete_game_type($id)){
-							$local_tpl_data['message'] = lang('adm_servers_delete_game_type_successful');
+							$local_tpl['message'] = lang('adm_servers_delete_game_type_successful');
 						}else{
-							$local_tpl_data['message'] = lang('adm_servers_delete_game_type_failed');
+							$local_tpl['message'] = lang('adm_servers_delete_game_type_failed');
 						}
 						
 						// Записываем логи
@@ -1153,23 +1153,23 @@ class Adm_servers extends CI_Controller {
 						$log_data['command'] 		= 'delete_game_type';
 						$log_data['server_id'] 		= 0;
 						$log_data['user_name'] 		= $this->users->auth_login;
-						$log_data['msg'] 			= $local_tpl_data['message'];
+						$log_data['msg'] 			= $local_tpl['message'];
 						$log_data['log_data'] 		= 'ID: ' . $id;
 						$this->panel_log->save_log($log_data);
 							
-						$local_tpl_data['link'] 			= site_url('adm_servers/view/game_types');
-						$local_tpl_data['back_link_txt'] 	= lang('adm_servers_back_to_game_types');
+						$local_tpl['link'] 			= site_url('adm_servers/view/game_types');
+						$local_tpl['back_link_txt'] 	= lang('adm_servers_back_to_game_types');
 						
 						break;
 					default:
-						$local_tpl_data['message'] 			= lang('adm_servers_unknown_page');
-						$local_tpl_data['link'] 			= site_url('/adm_servers/view/game_types');
-						$local_tpl_data['back_link_txt'] 	= lang('adm_servers_back_to_game_types');
+						$local_tpl['message'] 			= lang('adm_servers_unknown_page');
+						$local_tpl['link'] 			= site_url('/adm_servers/view/game_types');
+						$local_tpl['back_link_txt'] 	= lang('adm_servers_back_to_game_types');
 						break;
 				}
 				
 				// Отображаем инфо сообщение
-				$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+				$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
 							
 			} else {
 				
@@ -1229,7 +1229,7 @@ class Adm_servers extends CI_Controller {
 	*/
 	public function edit($type = 'dedicated_servers', $id = false, $param_2 = false)
 	{
-		$local_tpl_data = array();
+		$local_tpl = array();
 		$error_msg = false;
 		
 		switch($type) {
@@ -1250,7 +1250,7 @@ class Adm_servers extends CI_Controller {
 				$tpl_file_edit = 'adm_servers/dedicated_servers_control.html';
 					
 				$tpl_list = $this->dedicated_servers->tpl_data_ds();
-				$local_tpl_data = $tpl_list[0];
+				$local_tpl = $tpl_list[0];
 				
 				//if(in_array('ssh2', get_loaded_extensions()));
 				$options = array('ssh' => 'SSH', 'telnet' => 'Telnet');
@@ -1262,34 +1262,34 @@ class Adm_servers extends CI_Controller {
 					$options['local'] = 'Local';
 				}
 				
-				$local_tpl_data['control_protocol'] = form_dropdown('control_protocol', $options, $this->dedicated_servers->ds_list['0']['control_protocol']);
+				$local_tpl['control_protocol'] = form_dropdown('control_protocol', $options, $this->dedicated_servers->ds_list['0']['control_protocol']);
 
 				// Скрипты
-				$local_tpl_data['script_start'] 		= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_start']);
-				$local_tpl_data['script_stop'] 			= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_stop']);
-				$local_tpl_data['script_restart'] 		= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_restart']);
-				$local_tpl_data['script_status'] 		= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_status']);
-				$local_tpl_data['script_get_console'] 	= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_get_console']);
-				$local_tpl_data['script_send_command'] 	= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_send_command']);
+				$local_tpl['script_start'] 		= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_start']);
+				$local_tpl['script_stop'] 			= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_stop']);
+				$local_tpl['script_restart'] 		= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_restart']);
+				$local_tpl['script_status'] 		= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_status']);
+				$local_tpl['script_get_console'] 	= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_get_console']);
+				$local_tpl['script_send_command'] 	= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_send_command']);
 				
-				$local_tpl_data['script_path'] 		= $this->dedicated_servers->ds_list['0']['script_path'];
-				$local_tpl_data['steamcmd_path'] 	= $this->dedicated_servers->ds_list['0']['steamcmd_path'];
-				$local_tpl_data['ssh_host'] 		= $this->dedicated_servers->ds_list['0']['ssh_host'];
-				$local_tpl_data['ssh_login'] 		= $this->dedicated_servers->ds_list['0']['ssh_login'];
-				$local_tpl_data['ssh_path'] 		= $this->dedicated_servers->ds_list['0']['ssh_path'];
+				$local_tpl['script_path'] 		= $this->dedicated_servers->ds_list['0']['script_path'];
+				$local_tpl['steamcmd_path'] 	= $this->dedicated_servers->ds_list['0']['steamcmd_path'];
+				$local_tpl['ssh_host'] 		= $this->dedicated_servers->ds_list['0']['ssh_host'];
+				$local_tpl['ssh_login'] 		= $this->dedicated_servers->ds_list['0']['ssh_login'];
+				$local_tpl['ssh_path'] 		= $this->dedicated_servers->ds_list['0']['ssh_path'];
 				
-				$local_tpl_data['telnet_host'] 		= $this->dedicated_servers->ds_list['0']['telnet_host'];
-				$local_tpl_data['telnet_login'] 	= $this->dedicated_servers->ds_list['0']['telnet_login'];
-				$local_tpl_data['telnet_path'] 		= $this->dedicated_servers->ds_list['0']['telnet_path'];
+				$local_tpl['telnet_host'] 		= $this->dedicated_servers->ds_list['0']['telnet_host'];
+				$local_tpl['telnet_login'] 	= $this->dedicated_servers->ds_list['0']['telnet_login'];
+				$local_tpl['telnet_path'] 		= $this->dedicated_servers->ds_list['0']['telnet_path'];
 				
-				$local_tpl_data['ftp_host'] 		= $this->dedicated_servers->ds_list['0']['ftp_host'];
-				$local_tpl_data['ftp_login'] 		= $this->dedicated_servers->ds_list['0']['ftp_login'];
-				$local_tpl_data['ftp_path'] 		= $this->dedicated_servers->ds_list['0']['ftp_path'];
+				$local_tpl['ftp_host'] 		= $this->dedicated_servers->ds_list['0']['ftp_host'];
+				$local_tpl['ftp_login'] 		= $this->dedicated_servers->ds_list['0']['ftp_login'];
+				$local_tpl['ftp_path'] 		= $this->dedicated_servers->ds_list['0']['ftp_path'];
 				
 				// Получаем список серверов на DS
 				$gs = $this->servers->get_game_servers_list(array('ds_id' => $id));
 				
-				$local_tpl_data['servers_list'] = $this->servers->tpl_data();
+				$local_tpl['servers_list'] = $this->servers->tpl_data();
 					
 				/* 
 				 * Правила для формы
@@ -1363,28 +1363,28 @@ class Adm_servers extends CI_Controller {
 
 				$servers_list = $this->servers->tpl_data();
 				
-				$local_tpl_data = $servers_list[0];
-				$local_tpl_data['information'] = array();
+				$local_tpl = $servers_list[0];
+				$local_tpl['information'] = array();
 
 				// Для tpl
-				$local_tpl_data['screen_name'] 			= $this->servers->server_data['screen_name'];
-				$local_tpl_data['su_user'] 				= $this->servers->server_data['su_user'];
-				$local_tpl_data['server_dir'] 			= $this->servers->server_data['dir'];
-				$local_tpl_data['game_type_id']			= $this->servers->server_data['game_type'];
-				$local_tpl_data['server_start_code']	= $this->servers->server_data['start_code'];
+				$local_tpl['screen_name'] 			= $this->servers->server_data['screen_name'];
+				$local_tpl['su_user'] 				= $this->servers->server_data['su_user'];
+				$local_tpl['server_dir'] 			= $this->servers->server_data['dir'];
+				$local_tpl['game_type_id']			= $this->servers->server_data['game_type'];
+				$local_tpl['server_start_code']	= $this->servers->server_data['start_code'];
 				
-				$local_tpl_data['start_command'] 		= $this->servers->server_data['start_command'];
+				$local_tpl['start_command'] 		= $this->servers->server_data['start_command'];
 				
-				$local_tpl_data['query_port'] 			= $this->servers->server_data['query_port'];
-				$local_tpl_data['rcon_port'] 			= $this->servers->server_data['rcon_port'];
+				$local_tpl['query_port'] 			= $this->servers->server_data['query_port'];
+				$local_tpl['rcon_port'] 			= $this->servers->server_data['rcon_port'];
 				
-				$local_tpl_data['cpu_limit'] 			= $this->servers->server_data['cpu_limit'];
-				$local_tpl_data['ram_limit'] 			= $this->servers->server_data['ram_limit'];
-				$local_tpl_data['net_limit'] 			= $this->servers->server_data['net_limit'];
+				$local_tpl['cpu_limit'] 			= $this->servers->server_data['cpu_limit'];
+				$local_tpl['ram_limit'] 			= $this->servers->server_data['ram_limit'];
+				$local_tpl['net_limit'] 			= $this->servers->server_data['net_limit'];
 				
 				/* Получаем абсолютный путь к корневой директории с сервером и к исполняемым файлам */
-				$local_tpl_data['full_server_path'] = $this->servers->server_data['script_path'] . '/' . $this->servers->server_data['dir'];
-				$local_tpl_data['script_path'] = $this->servers->server_data['script_path'];
+				$local_tpl['full_server_path'] = $this->servers->server_data['script_path'] . '/' . $this->servers->server_data['dir'];
+				$local_tpl['script_path'] = $this->servers->server_data['script_path'];
 				
 				// Модификация
 				$where = array('game_code' => $this->servers->server_data['game']);
@@ -1403,28 +1403,28 @@ class Adm_servers extends CI_Controller {
 					$i ++;
 				}
 				
-				$local_tpl_data['game_type_dropdown'] = array();
-				$local_tpl_data['aliases_list'] = array();
+				$local_tpl['game_type_dropdown'] = array();
+				$local_tpl['aliases_list'] = array();
 				
 				$server_aliases = json_decode($this->servers->server_data['aliases'], true);
 
-				$local_tpl_data['game_type_dropdown'] 		= form_dropdown('game_type', $options, $this->servers->server_data['game_type']);
-				$local_tpl_data['server_enabled_checkbox'] 	= form_checkbox('enabled', 'accept', $this->servers->server_data['enabled']);
+				$local_tpl['game_type_dropdown'] 		= form_dropdown('game_type', $options, $this->servers->server_data['game_type']);
+				$local_tpl['server_enabled_checkbox'] 	= form_checkbox('enabled', 'accept', $this->servers->server_data['enabled']);
 				
 				// Заменяем двойные кавычки на html символы
-				$local_tpl_data['start_command'] 	= str_replace('"', '&quot;', $local_tpl_data['start_command'] );
+				$local_tpl['start_command'] 	= str_replace('"', '&quot;', $local_tpl['start_command'] );
 				
 				/* Информация о DS */
 				if ($this->servers->server_data['ds_id']) {
 					
-					$local_tpl_data['ds_name'] 		= $this->dedicated_servers->ds_list[0]['name'];
-					$local_tpl_data['ds_id'] 		= $this->dedicated_servers->ds_list[0]['id'];
-					$local_tpl_data['ds_location'] 	= $this->dedicated_servers->ds_list[0]['location'];
-					$local_tpl_data['ds_provider'] 	= $this->dedicated_servers->ds_list[0]['provider'];
+					$local_tpl['ds_name'] 		= $this->dedicated_servers->ds_list[0]['name'];
+					$local_tpl['ds_id'] 		= $this->dedicated_servers->ds_list[0]['id'];
+					$local_tpl['ds_location'] 	= $this->dedicated_servers->ds_list[0]['location'];
+					$local_tpl['ds_provider'] 	= $this->dedicated_servers->ds_list[0]['provider'];
 				} else {
 					// Сервер локальный
-					$local_tpl_data['ds_name'] 	= lang('adm_servers_local_server');
-					$local_tpl_data['ds_id'] 	= 0;
+					$local_tpl['ds_name'] 	= lang('adm_servers_local_server');
+					$local_tpl['ds_id'] 	= 0;
 				}
 				
 				/* Получение последних действий с сервером
@@ -1439,7 +1439,7 @@ class Adm_servers extends CI_Controller {
 				$where = array('server_id' => $id);
 				$server_plogs = $this->panel_log->get_log($where, 100); // Логи сервера в админпанели
 				
-				$local_tpl_data['log_list'] = array();
+				$local_tpl['log_list'] = array();
 				
 				$log_num = 0;
 				$i = 0;
@@ -1450,47 +1450,47 @@ class Adm_servers extends CI_Controller {
 						break;
 					}
 					
-					$local_tpl_data['log_list'][$i]['log_id'] = $server_plogs[$i]['id'];
-					$local_tpl_data['log_list'][$i]['log_date'] = unix_to_human($server_plogs[$i]['date'], true, 'eu');
-					$local_tpl_data['log_list'][$i]['log_server_id'] = $server_plogs[$i]['server_id'];
-					$local_tpl_data['log_list'][$i]['log_user_name'] = $server_plogs[$i]['user_name'];
-					$local_tpl_data['log_list'][$i]['log_command'] = $server_plogs[$i]['command'];
+					$local_tpl['log_list'][$i]['log_id'] = $server_plogs[$i]['id'];
+					$local_tpl['log_list'][$i]['log_date'] = unix_to_human($server_plogs[$i]['date'], true, 'eu');
+					$local_tpl['log_list'][$i]['log_server_id'] = $server_plogs[$i]['server_id'];
+					$local_tpl['log_list'][$i]['log_user_name'] = $server_plogs[$i]['user_name'];
+					$local_tpl['log_list'][$i]['log_command'] = $server_plogs[$i]['command'];
 					
 					
 					/* Код действия на понятный язык */
 					switch($server_plogs[$i]['type']){
 						case 'server_rcon':
-							$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_rcon_send');
+							$local_tpl['log_list'][$i]['log_type'] = lang('server_control_rcon_send');
 							$log_num ++;
 							break;
 							
 						case 'server_command':
-							$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_command');
+							$local_tpl['log_list'][$i]['log_type'] = lang('server_control_command');
 							$log_num ++;
 							break;
 							
 						case 'server_update':
-							$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_update');
+							$local_tpl['log_list'][$i]['log_type'] = lang('server_control_update');
 							$log_num ++;
 							break;
 						case 'server_task':
-							$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_srv_task');
+							$local_tpl['log_list'][$i]['log_type'] = lang('server_control_srv_task');
 							$log_num ++;
 							break;
 							
 						case 'server_settings':
-							$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_settings');
+							$local_tpl['log_list'][$i]['log_type'] = lang('server_control_settings');
 							$log_num ++;
 							break;
 							
 						case 'server_files':
-							$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_file_operation');
+							$local_tpl['log_list'][$i]['log_type'] = lang('server_control_file_operation');
 							$log_num ++;
 							break;
 							
 						default:
 							// Тип лога неизвестен, удаляем его из списка (не из базы)
-							unset($local_tpl_data['log_list'][$i]);
+							unset($local_tpl['log_list'][$i]);
 							break;
 					}
 					
@@ -1503,11 +1503,11 @@ class Adm_servers extends CI_Controller {
 				
 				
 				if ($this->servers->server_data['installed'] == '0') {
-					$local_tpl_data['information'][]['text'] = lang('adm_servers_serv_not_installed') . '<br />';
+					$local_tpl['information'][]['text'] = lang('adm_servers_serv_not_installed') . '<br />';
 				} elseif ($this->servers->server_data['installed'] == '1') {
-					$local_tpl_data['information'][]['text'] = lang('adm_servers_serv_installed') . '<br />';
+					$local_tpl['information'][]['text'] = lang('adm_servers_serv_installed') . '<br />';
 				} elseif ($this->servers->server_data['installed'] == '2') {
-					$local_tpl_data['information'][]['text'] = lang('adm_servers_serv_installed_proccess') . '<br />';
+					$local_tpl['information'][]['text'] = lang('adm_servers_serv_installed_proccess') . '<br />';
 				}
 				
 				/* 
@@ -1532,14 +1532,14 @@ class Adm_servers extends CI_Controller {
 					/* Если параметр пуст, то выводим сообщение с предупреждением */
 					$i = 0;
 					foreach ($allowable_aliases as $alias) {
-						$local_tpl_data['aliases_list'][$i]['alias'] 		= $alias['alias'];
-						$local_tpl_data['aliases_list'][$i]['desc'] 		= $alias['desc'];
+						$local_tpl['aliases_list'][$i]['alias'] 		= $alias['alias'];
+						$local_tpl['aliases_list'][$i]['desc'] 		= $alias['desc'];
 						
 						if(!isset($server_aliases[$alias['alias']]) OR empty($server_aliases[$alias['alias']])) {
 							$empty_alias .= '"' . $alias['desc'] . '", ';
-							$local_tpl_data['aliases_list'][$i]['alias_value'] 	= '<' . lang('value_not_set') . '>';
+							$local_tpl['aliases_list'][$i]['alias_value'] 	= '<' . lang('value_not_set') . '>';
 						} else {
-							$local_tpl_data['aliases_list'][$i]['alias_value'] 	= $server_aliases[$alias['alias']];
+							$local_tpl['aliases_list'][$i]['alias_value'] 	= $server_aliases[$alias['alias']];
 						}
 						$i ++;
 					}
@@ -1547,7 +1547,7 @@ class Adm_servers extends CI_Controller {
 				
 				
 				if ($empty_alias != '') {
-					$local_tpl_data['information'][]['text'] = lang('adm_servers_gs_empty_settings') . ': ' . $empty_alias;
+					$local_tpl['information'][]['text'] = lang('adm_servers_gs_empty_settings') . ': ' . $empty_alias;
 				}
 
 				/* 
@@ -1594,10 +1594,10 @@ class Adm_servers extends CI_Controller {
 				$tpl_file_edit = 'adm_servers/games_control.html';
 
 				$tpl_list = $this->games->tpl_data_games();
-				$local_tpl_data = $tpl_list[0];
+				$local_tpl = $tpl_list[0];
 				
 				// Список модификаций
-				$local_tpl_data['gt_list'] = $this->game_types->tpl_data_game_types(array('game_code' => $id));
+				$local_tpl['gt_list'] = $this->game_types->tpl_data_game_types(array('game_code' => $id));
 
 				/* Правила для проверки формы */
 				$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
@@ -1633,8 +1633,8 @@ class Adm_servers extends CI_Controller {
 				$tpl_file_edit = 'adm_servers/game_types_control.html';
 					
 				$tpl_list = $this->game_types->tpl_data_game_types();
-				$local_tpl_data = $tpl_list[0];
-				$local_tpl_data['game_code'] = $gt_list[0]['game_code'];
+				$local_tpl = $tpl_list[0];
+				$local_tpl['game_code'] = $gt_list[0]['game_code'];
 				
 				/* Делаем список с играми */
 				$games_list = $this->games->get_games_list();
@@ -1643,75 +1643,75 @@ class Adm_servers extends CI_Controller {
 					$options[$list['code']] = $list['name'];
 				}
 				
-				$local_tpl_data['gt_code'] = form_dropdown('game_code', $options, $gt_list[0]['game_code']);
+				$local_tpl['gt_code'] = form_dropdown('game_code', $options, $gt_list[0]['game_code']);
 				
-				$local_tpl_data['cfg_list'] 	= array();
-				$local_tpl_data['cdir_list'] 	= array();
-				$local_tpl_data['ldir_list'] 	= array();
-				$local_tpl_data['frcon_list'] 	= array();
-				$local_tpl_data['aliases_list'] = array();
+				$local_tpl['cfg_list'] 	= array();
+				$local_tpl['cdir_list'] 	= array();
+				$local_tpl['ldir_list'] 	= array();
+				$local_tpl['frcon_list'] 	= array();
+				$local_tpl['aliases_list'] = array();
 				
 				if($json_decode = json_decode($gt_list[0]['config_files'], true)) {
 					
 					$i = 0;
 					foreach($json_decode as $array) {
-						$local_tpl_data['cfg_list'][$i]['id'] 			= $i;
-						$local_tpl_data['cfg_list'][$i]['desc'] 	= form_input('cfg_desc[]', $array['desc']);
-						$local_tpl_data['cfg_list'][$i]['file'] 	= form_input('cfg_file[]', $array['file']);
+						$local_tpl['cfg_list'][$i]['id'] 			= $i;
+						$local_tpl['cfg_list'][$i]['desc'] 	= form_input('cfg_desc[]', $array['desc']);
+						$local_tpl['cfg_list'][$i]['file'] 	= form_input('cfg_file[]', $array['file']);
 						$i ++;
 					}
 					
-					// $local_tpl_data['cfg_list'] = $json_decode;
+					// $local_tpl['cfg_list'] = $json_decode;
 				}
 				
 				if($json_decode = json_decode($gt_list[0]['content_dirs'], true)) {
 					
 					$i = 0;
 					foreach($json_decode as $array) {
-						$local_tpl_data['cdir_list'][$i]['id'] 				= $i;
-						$local_tpl_data['cdir_list'][$i]['desc'] 			= form_input('cdir_desc[]', $array['desc']);
-						$local_tpl_data['cdir_list'][$i]['path'] 			= form_input('cdir_path[]', $array['path']);
-						$local_tpl_data['cdir_list'][$i]['allowed_types'] 	= form_input('cdir_allowed_types[]', $array['allowed_types']);
+						$local_tpl['cdir_list'][$i]['id'] 				= $i;
+						$local_tpl['cdir_list'][$i]['desc'] 			= form_input('cdir_desc[]', $array['desc']);
+						$local_tpl['cdir_list'][$i]['path'] 			= form_input('cdir_path[]', $array['path']);
+						$local_tpl['cdir_list'][$i]['allowed_types'] 	= form_input('cdir_allowed_types[]', $array['allowed_types']);
 						$i ++;
 					}
 					
-					// $local_tpl_data['cdir_list'] = $json_decode;
+					// $local_tpl['cdir_list'] = $json_decode;
 				}
 				
 				if($json_decode = json_decode($gt_list[0]['log_dirs'], true)) {
 					
 					$i = 0;
 					foreach($json_decode as $array) {
-						$local_tpl_data['ldir_list'][$i]['id'] 				= $i;
-						$local_tpl_data['ldir_list'][$i]['desc'] 			= form_input('ldir_desc[]', $array['desc']);
-						$local_tpl_data['ldir_list'][$i]['path'] 			= form_input('ldir_path[]', $array['path']);
-						$local_tpl_data['ldir_list'][$i]['allowed_types'] 	= form_input('ldir_allowed_types[]', $array['allowed_types']);
+						$local_tpl['ldir_list'][$i]['id'] 				= $i;
+						$local_tpl['ldir_list'][$i]['desc'] 			= form_input('ldir_desc[]', $array['desc']);
+						$local_tpl['ldir_list'][$i]['path'] 			= form_input('ldir_path[]', $array['path']);
+						$local_tpl['ldir_list'][$i]['allowed_types'] 	= form_input('ldir_allowed_types[]', $array['allowed_types']);
 						$i ++;
 					}
 					
-					// $local_tpl_data['ldir_list'] = $json_decode;
+					// $local_tpl['ldir_list'] = $json_decode;
 				}
 				
 				if($json_decode = json_decode($gt_list[0]['fast_rcon'], true)) {
 					
 					$i = 0;
 					foreach($json_decode as $array) {
-						$local_tpl_data['frcon_list'][$i]['id'] 			= $i;
-						$local_tpl_data['frcon_list'][$i]['desc'] 			= form_input('frcon_desc[]', 	$array['desc']);
-						$local_tpl_data['frcon_list'][$i]['rcon_command'] 	= form_input('frcon_command[]', $array['rcon_command']);
+						$local_tpl['frcon_list'][$i]['id'] 			= $i;
+						$local_tpl['frcon_list'][$i]['desc'] 			= form_input('frcon_desc[]', 	$array['desc']);
+						$local_tpl['frcon_list'][$i]['rcon_command'] 	= form_input('frcon_command[]', $array['rcon_command']);
 						$i ++;
 					}
-					// $local_tpl_data['frcon_list'] = $json_decode;
+					// $local_tpl['frcon_list'] = $json_decode;
 				}
 				
 				if($json_decode = json_decode($gt_list[0]['aliases'], true)) {
 
 					$i = 0;
 					foreach($json_decode as $array) {
-						$local_tpl_data['aliases_list'][$i]['id'] 			= $i;
-						$local_tpl_data['aliases_list'][$i]['alias'] 		= form_input('alias_name[]', $array['alias']);
-						$local_tpl_data['aliases_list'][$i]['desc'] 		= form_input('alias_desc[]', $array['desc']);
-						$local_tpl_data['aliases_list'][$i]['only_admins'] 	= form_checkbox('alias_only_admins[' . $i . ']', 'accept', $array['only_admins']);
+						$local_tpl['aliases_list'][$i]['id'] 			= $i;
+						$local_tpl['aliases_list'][$i]['alias'] 		= form_input('alias_name[]', $array['alias']);
+						$local_tpl['aliases_list'][$i]['desc'] 		= form_input('alias_desc[]', $array['desc']);
+						$local_tpl['aliases_list'][$i]['only_admins'] 	= form_checkbox('alias_only_admins[' . $i . ']', 'accept', $array['only_admins']);
 						$i ++;
 					}
 
@@ -1777,7 +1777,7 @@ class Adm_servers extends CI_Controller {
 				return false;
 			}
 			
-			$this->tpl_data['content'] .= $this->parser->parse($tpl_file_edit, $local_tpl_data, true);
+			$this->tpl_data['content'] .= $this->parser->parse($tpl_file_edit, $local_tpl, true);
 		} else {
 			
 			// Форма проверена, все впорядке
@@ -1906,9 +1906,9 @@ class Adm_servers extends CI_Controller {
 					}
 					
 					if($this->dedicated_servers->edit_dedicated_server($id, $sql_data)){
-						$local_tpl_data['message'] = lang('adm_servers_server_data_changed');
+						$local_tpl['message'] = lang('adm_servers_server_data_changed');
 					}else{
-						$local_tpl_data['message'] = lang('adm_servers_error_server_edit');
+						$local_tpl['message'] = lang('adm_servers_error_server_edit');
 					}
 					
 					// Записываем логи
@@ -1916,12 +1916,12 @@ class Adm_servers extends CI_Controller {
 					$log_data['command'] 		= 'edit_ds';
 					$log_data['server_id'] 		= 0;
 					$log_data['user_name'] 		= $this->users->auth_login;
-					$log_data['msg'] 			= $local_tpl_data['message'];
+					$log_data['msg'] 			= $local_tpl['message'];
 					$log_data['log_data'] 		= 'ID: ' . $id;
 					$this->panel_log->save_log($log_data);
 							
-					$local_tpl_data['link'] = site_url('adm_servers/view/dedicated_servers');
-					$local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_servers');
+					$local_tpl['link'] = site_url('adm_servers/view/dedicated_servers');
+					$local_tpl['back_link_txt'] = lang('adm_servers_back_to_servers');
 					
 					
 					break;
@@ -1968,9 +1968,9 @@ class Adm_servers extends CI_Controller {
 					}
 				
 					if($this->servers->edit_game_server($id, $sql_data)){
-						$local_tpl_data['message'] = lang('adm_servers_server_data_changed');
+						$local_tpl['message'] = lang('adm_servers_server_data_changed');
 					}else{
-						$local_tpl_data['message'] = lang('adm_servers_error_server_edit');
+						$local_tpl['message'] = lang('adm_servers_error_server_edit');
 					}
 					
 					// Записываем логи
@@ -1978,12 +1978,12 @@ class Adm_servers extends CI_Controller {
 					$log_data['command'] 		= 'edit_game_server';
 					$log_data['server_id'] 		= $id;
 					$log_data['user_name'] 		= $this->users->auth_login;
-					$log_data['msg'] 			= $local_tpl_data['message'];
+					$log_data['msg'] 			= $local_tpl['message'];
 					$log_data['log_data'] 		= 'ID: ' . $id;
 					$this->panel_log->save_log($log_data);
 							
-					$local_tpl_data['link'] = site_url('adm_servers/view/game_servers');
-					$local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_servers');
+					$local_tpl['link'] = site_url('adm_servers/view/game_servers');
+					$local_tpl['back_link_txt'] = lang('adm_servers_back_to_servers');
 
 					
 					break;
@@ -2011,9 +2011,9 @@ class Adm_servers extends CI_Controller {
 					$sql_data['app_set_config'] = str_replace('	', '', $sql_data['app_set_config']);
 				
 					if($this->games->edit_game($id, $sql_data)){
-						$local_tpl_data['message'] = lang('adm_servers_game_data_changed');
+						$local_tpl['message'] = lang('adm_servers_game_data_changed');
 					}else{
-						$local_tpl_data['message'] = lang('adm_servers_error_game_edit');
+						$local_tpl['message'] = lang('adm_servers_error_game_edit');
 					}
 					
 					// Записываем логи
@@ -2021,12 +2021,12 @@ class Adm_servers extends CI_Controller {
 					$log_data['command'] 		= 'edit_game';
 					$log_data['server_id'] 		= 0;
 					$log_data['user_name'] 		= $this->users->auth_login;
-					$log_data['msg'] 			= $local_tpl_data['message'];
+					$log_data['msg'] 			= $local_tpl['message'];
 					$log_data['log_data'] 		= 'ID: ' . $id;
 					$this->panel_log->save_log($log_data);
 							
-					$local_tpl_data['link'] 			= site_url('adm_servers/view/games');
-					$local_tpl_data['back_link_txt'] 	= lang('adm_servers_back_to_games');
+					$local_tpl['link'] 			= site_url('adm_servers/view/games');
+					$local_tpl['back_link_txt'] 	= lang('adm_servers_back_to_games');
 
 					break;
 				
@@ -2273,9 +2273,9 @@ class Adm_servers extends CI_Controller {
 					}
 
 					if($this->game_types->edit_game_type($id, $sql_data)){
-						$local_tpl_data['message'] = lang('adm_servers_game_type_data_changed');
+						$local_tpl['message'] = lang('adm_servers_game_type_data_changed');
 					}else{
-						$local_tpl_data['message'] = lang('adm_servers_error_game_type_edit');
+						$local_tpl['message'] = lang('adm_servers_error_game_type_edit');
 					}
 					
 					// Записываем логи
@@ -2283,16 +2283,16 @@ class Adm_servers extends CI_Controller {
 					$log_data['command'] 		= 'edit_game_type';
 					$log_data['server_id'] 		= 0;
 					$log_data['user_name'] 		= $this->users->auth_login;
-					$log_data['msg'] 			= $local_tpl_data['message'];
+					$log_data['msg'] 			= $local_tpl['message'];
 					$log_data['log_data'] 		= 'ID: ' . $id;
 					$this->panel_log->save_log($log_data);
 
-					$local_tpl_data['link'] = site_url('adm_servers/edit/game_types/' . $id);
-					$local_tpl_data['back_link_txt'] = lang('adm_servers_back_to_game_types');
+					$local_tpl['link'] = site_url('adm_servers/edit/game_types/' . $id);
+					$local_tpl['back_link_txt'] = lang('adm_servers_back_to_game_types');
 					break;
 			}
 			
-			$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+			$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
 		}
 		
 		$this->parser->parse('main.html', $this->tpl_data);
@@ -2321,7 +2321,7 @@ class Adm_servers extends CI_Controller {
 		/* Хелпер работы со строками, нужен для генерации случайной строки */
 		$this->load->helper('string');
 
-		$local_tpl_data = array();
+		$local_tpl = array();
 
 		if(false == $this->dedicated_servers->get_ds_list()) {
 			$this->_show_message(lang('adm_servers_empty_ds_list', site_url('adm_servers/add/dedicated_servers')));
@@ -2329,7 +2329,7 @@ class Adm_servers extends CI_Controller {
 		}
 		
 		// Получаем данные игр для шаблона
-		$local_tpl_data['games_list'] = $this->games->tpl_data_games();
+		$local_tpl['games_list'] = $this->games->tpl_data_games();
 		
 		if(empty($this->games->games_list)) {
 			$this->_show_message(lang('adm_servers_empty_games_list', site_url('adm_servers/add/games')));
@@ -2357,9 +2357,9 @@ class Adm_servers extends CI_Controller {
 			}
 
 			// Получаем данные DS для шаблона
-			$local_tpl_data['ds_list'] = $this->dedicated_servers->tpl_data_ds();
+			$local_tpl['ds_list'] = $this->dedicated_servers->tpl_data_ds();
 			
-			$this->tpl_data['content'] = $this->parser->parse('adm_servers/install_game_server.html', $local_tpl_data, true);
+			$this->tpl_data['content'] = $this->parser->parse('adm_servers/install_game_server.html', $local_tpl, true);
 		} else {
 			
 			$new_gs['name'] 		= $this->input->post('name');
@@ -2469,7 +2469,7 @@ class Adm_servers extends CI_Controller {
 		$this->load->model('servers/games');
 		$this->load->model('servers/game_types');
 		
-		$local_tpl_data['content'] = '';
+		$local_tpl['content'] = '';
 		
 		if(!$this->servers->get_server_data($id)){
 			$this->_show_message(lang('adm_servers_server_not_found'), site_url('adm_servers/view/game_servers'));
@@ -2554,11 +2554,11 @@ class Adm_servers extends CI_Controller {
 		$this->load->model('servers/games');
 		$this->load->model('servers/game_types');
 		
-		$local_tpl_data['content'] = '';
-		$local_tpl_data['gt_id'] = (int)$id;
+		$local_tpl['content'] = '';
+		$local_tpl['gt_id'] = (int)$id;
 		
 		// Получаем данные игр для шаблона
-		$local_tpl_data['games_list'] = $this->games->tpl_data_games();
+		$local_tpl['games_list'] = $this->games->tpl_data_games();
 					
 		if(empty($this->games->games_list)) {
 			$this->_show_message(lang('adm_servers_empty_games_list', base_url() . 'adm_servers/add/games'));
@@ -2586,7 +2586,7 @@ class Adm_servers extends CI_Controller {
 				$this->_show_message();
 				return false;
 			} else {
-				$this->tpl_data['content'] = $this->parser->parse('adm_servers/dublicate_game_type.html', $local_tpl_data, true);
+				$this->tpl_data['content'] = $this->parser->parse('adm_servers/dublicate_game_type.html', $local_tpl, true);
 			}
 			
 		} else {
@@ -2596,9 +2596,9 @@ class Adm_servers extends CI_Controller {
 			$sql_data['name'] = $this->input->post('name');
 
 			if($this->game_types->add_game_type($sql_data)) {
-				$local_tpl_data['message'] = lang('adm_servers_add_game_type_successful');
+				$local_tpl['message'] = lang('adm_servers_add_game_type_successful');
 			} else {
-				$local_tpl_data['message'] = lang('adm_servers_add_game_type_failed');
+				$local_tpl['message'] = lang('adm_servers_add_game_type_failed');
 			}
 			
 			$new_game_type_id = $this->db->insert_id();
@@ -2608,11 +2608,11 @@ class Adm_servers extends CI_Controller {
 			$log_data['command'] 		= 'clone_game_type';
 			$log_data['server_id'] 		= 0;
 			$log_data['user_name'] 		= $this->users->auth_login;
-			$log_data['msg'] 			= $local_tpl_data['message'];
+			$log_data['msg'] 			= $local_tpl['message'];
 			$log_data['log_data'] 		= 'ID: ' . $id . ' CloneID: ' . $this->db->insert_id();
 			$this->panel_log->save_log($log_data);
 			
-			$this->_show_message($local_tpl_data['message'], site_url('adm_servers/edit/game_types/' . $new_game_type_id), lang('next')); 
+			$this->_show_message($local_tpl['message'], site_url('adm_servers/edit/game_types/' . $new_game_type_id), lang('next')); 
 			return true;
 		}
 		
@@ -2631,8 +2631,8 @@ class Adm_servers extends CI_Controller {
 		$this->load->library('highcharts');
 		$this->load->helper('date');
 		
-		$local_tpl_data = array();
-		$local_tpl_data['ds_stats'] = array();
+		$local_tpl = array();
+		$local_tpl['ds_stats'] = array();
 		
 		$this->dedicated_servers->get_ds_list();
 		
@@ -2655,8 +2655,8 @@ class Adm_servers extends CI_Controller {
 					$credits = (object) array('href' => 'http://www.gameap.ru', 'text' => 'GameAP');
 					$this->highcharts->set_credits($credits);
 					
-					$local_tpl_data['ds_stats'][$i]['graph'] = $this->highcharts->render();
-					$local_tpl_data['ds_stats'][$i]['ds_name'] = $ds['name'];
+					$local_tpl['ds_stats'][$i]['graph'] = $this->highcharts->render();
+					$local_tpl['ds_stats'][$i]['ds_name'] = $ds['name'];
 				}
 				
 				$i++;
@@ -2665,7 +2665,7 @@ class Adm_servers extends CI_Controller {
 			
 		}
 
-		$this->tpl_data['content'] = $this->parser->parse('adm_servers/dedicated_servers_stats.html', $local_tpl_data, true);
+		$this->tpl_data['content'] = $this->parser->parse('adm_servers/dedicated_servers_stats.html', $local_tpl, true);
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 

@@ -59,10 +59,10 @@ class Profile extends CI_Controller {
 			$link_text = lang('back');
 		}
 
-        $local_tpl_data['message'] = $message;
-        $local_tpl_data['link'] = $link;
-        $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+        $local_tpl['message'] = $message;
+        $local_tpl['link'] = $link;
+        $local_tpl['back_link_txt'] = $link_text;
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
@@ -75,13 +75,13 @@ class Profile extends CI_Controller {
 		
 		// Получение списка серверов юзера
 		$this->servers->get_server_list($this->users->auth_id);
-		$local_tpl_data['servers_list'] = $this->servers->tpl_data();
+		$local_tpl['servers_list'] = $this->servers->tpl_data();
 		
-		if($local_tpl_data['servers_list']){
+		if($local_tpl['servers_list']){
 			$this->user_servers_count = 1;
 		}
 		
-		$this->tpl_data['content'] .= $this->parser->parse('profile/profile_main.html', array_merge($this->tpl_data, $local_tpl_data), true);
+		$this->tpl_data['content'] .= $this->parser->parse('profile/profile_main.html', array_merge($this->tpl_data, $local_tpl), true);
 
         $this->parser->parse('main.html', $this->tpl_data);
     }
@@ -265,11 +265,11 @@ class Profile extends CI_Controller {
 					$log_data['log_data'] = "";
 					$this->panel_log->save_log($log_data);
 					
-					$local_tpl_data = array();
-					$local_tpl_data['message'] = lang('profile_password_changed');
-					$local_tpl_data['link'] = site_url();
-					$local_tpl_data['back_link_txt'] = lang('profile');
-					$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+					$local_tpl = array();
+					$local_tpl['message'] = lang('profile_password_changed');
+					$local_tpl['link'] = site_url();
+					$local_tpl['back_link_txt'] = lang('profile');
+					$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
 					//Смена пароля закончена
 				}
 				
@@ -314,15 +314,15 @@ class Profile extends CI_Controller {
 		{
 			$num++;
 			if($privilege_value == 1){
-				$local_tpl_data['privilege_list'][$num]['privilege_value'] = '<img src="' . base_url('themes/' . $this->config->config['template'] . '/' . $this->config->config['style'] . '/images/yes.png') . '">';
+				$local_tpl['privilege_list'][$num]['privilege_value'] = '<img src="' . base_url('themes/' . $this->config->config['template'] . '/' . $this->config->config['style'] . '/images/yes.png') . '">';
 			}else{
-				$local_tpl_data['privilege_list'][$num]['privilege_value'] = '<img src="' . base_url('themes/' . $this->config->config['template'] . '/' . $this->config->config['style'] . '/images/yes.png') . '">';
+				$local_tpl['privilege_list'][$num]['privilege_value'] = '<img src="' . base_url('themes/' . $this->config->config['template'] . '/' . $this->config->config['style'] . '/images/yes.png') . '">';
 			}
 			
-			$local_tpl_data['privilege_list'][$num]['human_name'] = $this->users->all_privileges[$privilege_name];
+			$local_tpl['privilege_list'][$num]['human_name'] = $this->users->all_privileges[$privilege_name];
 		}
 		
-		$this->tpl_data['content'] .= $this->parser->parse('profile/server_privileges.html', $local_tpl_data, true);
+		$this->tpl_data['content'] .= $this->parser->parse('profile/server_privileges.html', $local_tpl, true);
 		
         $this->parser->parse('main.html', $this->tpl_data);
     }

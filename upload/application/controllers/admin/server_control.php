@@ -92,10 +92,10 @@ class Server_control extends CI_Controller {
 			$link_text = lang('back');
 		}
 
-        $local_tpl_data['message'] = $message;
-        $local_tpl_data['link'] = $link;
-        $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+        $local_tpl['message'] = $message;
+        $local_tpl['link'] = $link;
+        $local_tpl['back_link_txt'] = $link_text;
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
@@ -272,25 +272,25 @@ class Server_control extends CI_Controller {
 		
 		if ($this->servers->server_data['server_status']) {
 			
-			$local_tpl_data['users_list'] 	= array();
-			$local_tpl_data['players_list'] = array();
+			$local_tpl['users_list'] 	= array();
+			$local_tpl['players_list'] = array();
 			
 			if($users_list = $this->rcon->get_players()){
-				$local_tpl_data['users_list'] = $users_list;
-				$local_tpl_data['players_list'] = $users_list;
+				$local_tpl['users_list'] = $users_list;
+				$local_tpl['players_list'] = $users_list;
 			}
 			
-			if ($local_tpl_data['users_list']) {
+			if ($local_tpl['users_list']) {
 				$this->players = 1;
 			}
 			
 			// Костыль
-			$local_tpl_data['users_list1'] =& $local_tpl_data['users_list'];
-			$local_tpl_data['users_list2'] =& $local_tpl_data['users_list'];
+			$local_tpl['users_list1'] =& $local_tpl['users_list'];
+			$local_tpl['users_list2'] =& $local_tpl['users_list'];
 
-			$local_tpl_data['maps_list']	= $this->_get_maps_list();
-			$local_tpl_data['frcon_list'] 	= $this->_get_frcon_list();
-			$local_tpl_data['base_cvars'] 	= $this->_get_base_cvars();
+			$local_tpl['maps_list']	= $this->_get_maps_list();
+			$local_tpl['frcon_list'] 	= $this->_get_frcon_list();
+			$local_tpl['base_cvars'] 	= $this->_get_base_cvars();
 			
 		} else {
 			// Ошибка соединения с сервером
@@ -309,7 +309,7 @@ class Server_control extends CI_Controller {
 		$where = array('server_id' => $server_id);
 		$server_plogs = $this->panel_log->get_log($where, 50); // Логи сервера в админпанели
 		
-		$local_tpl_data['log_list'] = array();
+		$local_tpl['log_list'] = array();
 		
 		$log_num = 0;
 		$i = 0;
@@ -320,47 +320,47 @@ class Server_control extends CI_Controller {
 				break;
 			}
 			
-			$local_tpl_data['log_list'][$i]['log_id'] = $server_plogs[$i]['id'];
-			$local_tpl_data['log_list'][$i]['log_date'] = unix_to_human($server_plogs[$i]['date'], true, 'eu');
-			$local_tpl_data['log_list'][$i]['log_server_id'] = $server_plogs[$i]['server_id'];
-			$local_tpl_data['log_list'][$i]['log_user_name'] = $server_plogs[$i]['user_name'];
-			$local_tpl_data['log_list'][$i]['log_command'] = $server_plogs[$i]['command'];
+			$local_tpl['log_list'][$i]['log_id'] = $server_plogs[$i]['id'];
+			$local_tpl['log_list'][$i]['log_date'] = unix_to_human($server_plogs[$i]['date'], true, 'eu');
+			$local_tpl['log_list'][$i]['log_server_id'] = $server_plogs[$i]['server_id'];
+			$local_tpl['log_list'][$i]['log_user_name'] = $server_plogs[$i]['user_name'];
+			$local_tpl['log_list'][$i]['log_command'] = $server_plogs[$i]['command'];
 			
 			
 			/* Код действия на понятный язык */
 			switch($server_plogs[$i]['type']){
 				case 'server_rcon':
-					$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_rcon_send');
+					$local_tpl['log_list'][$i]['log_type'] = lang('server_control_rcon_send');
 					$log_num ++;
 					break;
 					
 				case 'server_command':
-					$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_command');
+					$local_tpl['log_list'][$i]['log_type'] = lang('server_control_command');
 					$log_num ++;
 					break;
 					
 				case 'server_update':
-					$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_update');
+					$local_tpl['log_list'][$i]['log_type'] = lang('server_control_update');
 					$log_num ++;
 					break;
 				case 'server_task':
-					$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_srv_task');
+					$local_tpl['log_list'][$i]['log_type'] = lang('server_control_srv_task');
 					$log_num ++;
 					break;
 					
 				case 'server_settings':
-					$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_settings');
+					$local_tpl['log_list'][$i]['log_type'] = lang('server_control_settings');
 					$log_num ++;
 					break;
 					
 				case 'server_files':
-					$local_tpl_data['log_list'][$i]['log_type'] = lang('server_control_file_operation');
+					$local_tpl['log_list'][$i]['log_type'] = lang('server_control_file_operation');
 					$log_num ++;
 					break;
 					
 				default:
 					// Тип лога неизвестен, удаляем его из списка (не из базы)
-					unset($local_tpl_data['log_list'][$i]);
+					unset($local_tpl['log_list'][$i]);
 					break;
 			}
 			
@@ -368,7 +368,7 @@ class Server_control extends CI_Controller {
 		}
 		
 		/* Крон задания */
-		$local_tpl_data['task_list'] = array();
+		$local_tpl['task_list'] = array();
 		
 		if($this->users->auth_servers_privileges['TASK_MANAGE']) {
 			
@@ -393,54 +393,54 @@ class Server_control extends CI_Controller {
 
 				switch($task_list[$i]['code']) {
 					case 'server_start':
-						$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_start');
+						$local_tpl['task_list'][$i]['task_action'] = lang('server_control_start');
 						break;
 						
 					case 'server_stop':
-						$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_stop');
+						$local_tpl['task_list'][$i]['task_action'] = lang('server_control_stop');
 						break;
 						
 					case 'server_restart':
-						$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_restart');
+						$local_tpl['task_list'][$i]['task_action'] = lang('server_control_restart');
 						break;
 						
 					case 'server_update':
-						$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_update');
+						$local_tpl['task_list'][$i]['task_action'] = lang('server_control_update');
 						break;
 						
 					case 'server_rcon':
-						$local_tpl_data['task_list'][$i]['task_action'] = lang('server_control_rcon_send');
+						$local_tpl['task_list'][$i]['task_action'] = lang('server_control_rcon_send');
 						break;
 						
 					default:
 						break;
 				}
 				
-				$local_tpl_data['task_list'][$i]['task_id'] = $task_list[$i]['id'];
-				$local_tpl_data['task_list'][$i]['task_name'] = $task_list[$i]['name'];
-				$local_tpl_data['task_list'][$i]['task_date'] = unix_to_human($task_list[$i]['date_perform'], true, 'eu');
+				$local_tpl['task_list'][$i]['task_id'] = $task_list[$i]['id'];
+				$local_tpl['task_list'][$i]['task_name'] = $task_list[$i]['name'];
+				$local_tpl['task_list'][$i]['task_date'] = unix_to_human($task_list[$i]['date_perform'], true, 'eu');
 
 				$i ++;
 			}
 			
 		}
 		
-		//~ $local_tpl_data['test'] = array(array('test1' => 'test1'), array('test1' => 'test1'), array('test1' => 'test1'), array('test1' => 'test1'),);
+		//~ $local_tpl['test'] = array(array('test1' => 'test1'), array('test1' => 'test1'), array('test1' => 'test1'), array('test1' => 'test1'),);
 		
-		$local_tpl_data['server_id'] = $server_id;
-		$local_tpl_data['server_name'] = $this->servers->server_data['name'];
+		$local_tpl['server_id'] = $server_id;
+		$local_tpl['server_name'] = $this->servers->server_data['name'];
 		
-		$local_tpl_data['server_ip'] 			= $this->servers->server_data['server_ip'];
-		$local_tpl_data['server_port'] 			= $this->servers->server_data['server_port'];
-		$local_tpl_data['server_rcon_port'] 	= $this->servers->server_data['rcon_port'];
-		$local_tpl_data['server_query_port'] 	= $this->servers->server_data['query_port'];
+		$local_tpl['server_ip'] 			= $this->servers->server_data['server_ip'];
+		$local_tpl['server_port'] 			= $this->servers->server_data['server_port'];
+		$local_tpl['server_rcon_port'] 	= $this->servers->server_data['rcon_port'];
+		$local_tpl['server_query_port'] 	= $this->servers->server_data['query_port'];
 		
 		$this->tpl_data['heading'] = lang('server_control_header') . ' "' . $this->servers->server_data['name'] . '"';
 
 		if (file_exists(APPPATH . 'views/' . $this->config->config['template'] . '/server_control/' . $this->servers->server_data['game'] . '.html')) {
-			$this->tpl_data['content'] .= $this->parser->parse('server_control/' . $this->servers->server_data['game'] . '.html', $local_tpl_data, true);
+			$this->tpl_data['content'] .= $this->parser->parse('server_control/' . $this->servers->server_data['game'] . '.html', $local_tpl, true);
 		} else {
-			$this->tpl_data['content'] .= $this->parser->parse('server_control/default.html', $local_tpl_data, true);
+			$this->tpl_data['content'] .= $this->parser->parse('server_control/default.html', $local_tpl, true);
 		}
 
         $this->parser->parse('main.html', $this->tpl_data);
@@ -459,7 +459,7 @@ class Server_control extends CI_Controller {
 		$this->load->library('form_validation');
 		$this->load->helper('date');
 		
-		$local_tpl_data = array();
+		$local_tpl = array();
 		
 		if(!$server_id) {
 			$this->_show_message(lang('server_control_empty_server_id'));
@@ -492,8 +492,8 @@ class Server_control extends CI_Controller {
 		$this->form_validation->set_rules('date_perform', lang('server_control_execution_date'), 'trim|required|max_length[19]|xss_clean');
 		$this->form_validation->set_rules('time_add', lang('server_control_repeat_period'), 'trim|required|integer|max_length[16]|xss_clean');
 		
-		$local_tpl_data['server_id'] 	= $server_id;
-		$local_tpl_data['date_perform'] = unix_to_human(time()+86400, false, 'eu');
+		$local_tpl['server_id'] 	= $server_id;
+		$local_tpl['date_perform'] = unix_to_human(time()+86400, false, 'eu');
 		
 		if($this->form_validation->run() == false) {
 			
@@ -502,7 +502,7 @@ class Server_control extends CI_Controller {
 				return false;
 			}
 			
-			$this->tpl_data['content'] .= $this->parser->parse('servers/task_add.html', $local_tpl_data, true);
+			$this->tpl_data['content'] .= $this->parser->parse('servers/task_add.html', $local_tpl, true);
 		} else {
 
 			$sql_data['server_id'] = $server_id;
@@ -608,7 +608,7 @@ class Server_control extends CI_Controller {
 		
 		$this->load->helper('date');
 		
-		$local_tpl_data = array();
+		$local_tpl = array();
 		
 		// Получение информации об удаляемом задании
 		$where = array('id' => $task_id);
@@ -692,7 +692,7 @@ class Server_control extends CI_Controller {
 		$this->load->helper('form');
 		$this->load->helper('date');
 		
-		$local_tpl_data = array();
+		$local_tpl = array();
 		
 		// Получение информации о редактируемом задании
 		$where = array('id' => $task_id);
@@ -758,19 +758,19 @@ class Server_control extends CI_Controller {
 				'2592000' => lang('server_control_month'),
 			);
 			
-			$local_tpl_data['human_code'] = $options['code'][ $task_list[0]['code'] ];
+			$local_tpl['human_code'] = $options['code'][ $task_list[0]['code'] ];
 			
 			/* Создание форм */
 
-			$local_tpl_data['input_time_add'] = form_dropdown('time_add', $options['time_add'], $task_list[0]['time_add']);
+			$local_tpl['input_time_add'] = form_dropdown('time_add', $options['time_add'], $task_list[0]['time_add']);
 
-			$local_tpl_data['code'] = $task_list[0]['code'];	
-			$local_tpl_data['command'] = $task_list[0]['command'];	
-			$local_tpl_data['task_id'] = $task_list[0]['id'];
-			$local_tpl_data['name'] = $task_list[0]['name'];
-			$local_tpl_data['date_perform'] = unix_to_human($task_list[0]['date_perform'], false, 'eu');
+			$local_tpl['code'] = $task_list[0]['code'];	
+			$local_tpl['command'] = $task_list[0]['command'];	
+			$local_tpl['task_id'] = $task_list[0]['id'];
+			$local_tpl['name'] = $task_list[0]['name'];
+			$local_tpl['date_perform'] = unix_to_human($task_list[0]['date_perform'], false, 'eu');
 			
-			$this->tpl_data['content'] .= $this->parser->parse('servers/task_edit.html', $local_tpl_data, true);
+			$this->tpl_data['content'] .= $this->parser->parse('servers/task_edit.html', $local_tpl, true);
 		} else {
 			$sql_data['name'] = $this->input->post('name') ? $this->input->post('name') : $task_list[0]['name'];
 			

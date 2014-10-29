@@ -82,10 +82,10 @@ class Adm_modules extends CI_Controller {
 			$link_text = lang('back');
 		}
 
-        $local_tpl_data['message'] = $message;
-        $local_tpl_data['link'] = $link;
-        $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+        $local_tpl['message'] = $message;
+        $local_tpl['link'] = $link;
+        $local_tpl['back_link_txt'] = $link_text;
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
 	
@@ -159,9 +159,9 @@ class Adm_modules extends CI_Controller {
 	
 	public function index()
 	{
-		$local_tpl_data['modules_list'] = ($this->gameap_modules->modules_data) ? $this->gameap_modules->modules_data : array();
+		$local_tpl['modules_list'] = ($this->gameap_modules->modules_data) ? $this->gameap_modules->modules_data : array();
 		
-		$this->tpl_data['content'] = $this->parser->parse('adm_modules/modules_list.html', $local_tpl_data, true);
+		$this->tpl_data['content'] = $this->parser->parse('adm_modules/modules_list.html', $local_tpl, true);
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 	
@@ -175,7 +175,7 @@ class Adm_modules extends CI_Controller {
 			return false;
 		}
 		
-		$local_tpl_data = array();
+		$local_tpl = array();
 		$module_found = false;
 		
 		/*
@@ -187,14 +187,14 @@ class Adm_modules extends CI_Controller {
 			if ($module_id == $module['short_name']) {
 				$module_found = true;
 				
-				$local_tpl_data['module_name'] 			= $module['name'];
-				$local_tpl_data['module_description'] 	= $module['description'];
-				$local_tpl_data['module_version'] 		= $module['version'];
-				$local_tpl_data['module_copyright'] 	= $module['copyright'];
-				$local_tpl_data['module_license'] 		= auto_link($module['license']);
-				$local_tpl_data['module_developer'] 	= $module['developer'];
-				$local_tpl_data['module_email'] 		= $module['email'];
-				$local_tpl_data['module_site'] 			= $module['site'];
+				$local_tpl['module_name'] 			= $module['name'];
+				$local_tpl['module_description'] 	= $module['description'];
+				$local_tpl['module_version'] 		= $module['version'];
+				$local_tpl['module_copyright'] 	= $module['copyright'];
+				$local_tpl['module_license'] 		= auto_link($module['license']);
+				$local_tpl['module_developer'] 	= $module['developer'];
+				$local_tpl['module_email'] 		= $module['email'];
+				$local_tpl['module_site'] 			= $module['site'];
 				
 				break;
 			}
@@ -205,7 +205,7 @@ class Adm_modules extends CI_Controller {
 			return false;
 		}
 
-		$this->tpl_data['content'] = $this->parser->parse('adm_modules/module_info.html', $local_tpl_data, true);
+		$this->tpl_data['content'] = $this->parser->parse('adm_modules/module_info.html', $local_tpl, true);
 		
 		$this->parser->parse('main.html', $this->tpl_data);
 	}

@@ -96,10 +96,10 @@ class Server_command extends CI_Controller {
 			$link_text = lang('back');
 		}
 	
-		$local_tpl_data['message'] = $message;
-		$local_tpl_data['link'] = $link;
-		$local_tpl_data['back_link_txt'] = $link_text;
-		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+		$local_tpl['message'] = $message;
+		$local_tpl['link'] = $link;
+		$local_tpl['back_link_txt'] = $link_text;
+		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 	
@@ -276,8 +276,8 @@ class Server_command extends CI_Controller {
 			// Получение прав на сервер
 			$this->users->get_server_privileges($this->servers->server_data['id']);
 			
-			$local_tpl_data['server_id'] = $server_id;
-			$local_tpl_data['custom_id'] = $custom_id;
+			$local_tpl['server_id'] = $server_id;
+			$local_tpl['custom_id'] = $custom_id;
 				
 			/**
 			 * Проверки на права
@@ -316,9 +316,9 @@ class Server_command extends CI_Controller {
 						return false;
 					}
 					
-					$local_tpl_data['nickname'] 	= $player_data['user_name'];
-					$local_tpl_data['steam_id'] 	= $player_data['steam_id'];
-					$local_tpl_data['user_ip'] 		= $player_data['user_ip'];
+					$local_tpl['nickname'] 	= $player_data['user_name'];
+					$local_tpl['steam_id'] 	= $player_data['steam_id'];
+					$local_tpl['user_ip'] 		= $player_data['user_ip'];
 
 					$submit_name = 'submit_changename';
 					$template_file = 'player_changename.html';
@@ -383,7 +383,7 @@ class Server_command extends CI_Controller {
 				if(!$no_submit_name && !$this->input->post($submit_name)) {
 						
 					if($template_file){
-						$this->tpl_data['content'] .= $this->parser->parse($template_file, $local_tpl_data, true);
+						$this->tpl_data['content'] .= $this->parser->parse($template_file, $local_tpl, true);
 					}
 						
 				} else {
@@ -714,7 +714,7 @@ class Server_command extends CI_Controller {
 		/* Получены ли необходимые данные о сервере */
 		if($this->servers->get_server_data($id)) {
 			
-			$local_tpl_data['server_id'] = $id;
+			$local_tpl['server_id'] = $id;
 			
 			// Получение прав на сервер
 			$this->users->get_server_privileges($this->servers->server_data['id']);
@@ -744,7 +744,7 @@ class Server_command extends CI_Controller {
 			}
 			
 			$response = $this->_crop_console($response);
-			$local_tpl_data['console_content_original'] = $response;
+			$local_tpl['console_content_original'] = $response;
 			
 			if (version_compare(phpversion(), '5.4.0') == -1) {
 				$console_content = str_replace("\n", "<br />\n", htmlspecialchars($response));
@@ -752,9 +752,9 @@ class Server_command extends CI_Controller {
 				$console_content = str_replace("\n", "<br />\n", htmlspecialchars($response, ENT_SUBSTITUTE));
 			}
 			
-			$local_tpl_data['console_content'] = $console_content;
+			$local_tpl['console_content'] = $console_content;
 			
-			$this->tpl_data['content'] = $this->parser->parse('servers/console_view.html', $local_tpl_data, true);
+			$this->tpl_data['content'] = $this->parser->parse('servers/console_view.html', $local_tpl, true);
 			
 		} else {
 			$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), lang('next'));

@@ -59,10 +59,10 @@ class Auth extends CI_Controller {
 			$link_text = lang('back');
 		}
 
-		$local_tpl_data['message'] = $message;
-		$local_tpl_data['link'] = $link;
-		$local_tpl_data['back_link_txt'] = $link_text;
-		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+		$local_tpl['message'] = $message;
+		$local_tpl['link'] = $link;
+		$local_tpl['back_link_txt'] = $link_text;
+		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 	
@@ -345,10 +345,10 @@ class Auth extends CI_Controller {
 
 		$this->input->set_cookie($cookie);
 		
-		$local_tpl_data['message'] 			= lang('auth_quit_success');
-		$local_tpl_data['link'] 			= site_url();
-		$local_tpl_data['back_link_txt'] 	= lang('auth_goto_main');
-		$this->tpl_data['content'] 			= $this->parser->parse('info.html', $local_tpl_data, true);
+		$local_tpl['message'] 			= lang('auth_quit_success');
+		$local_tpl['link'] 			= site_url();
+		$local_tpl['back_link_txt'] 	= lang('auth_goto_main');
+		$this->tpl_data['content'] 			= $this->parser->parse('info.html', $local_tpl, true);
 
 		$this->parser->parse('main.html', $this->tpl_data);
 	}

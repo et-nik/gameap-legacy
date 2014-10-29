@@ -56,10 +56,10 @@ class Log_view extends CI_Controller {
 			$link_text = lang('back');
 		}
 	
-		$local_tpl_data['message'] = $message;
-		$local_tpl_data['link'] = $link;
-		$local_tpl_data['back_link_txt'] = $link_text;
-		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+		$local_tpl['message'] = $message;
+		$local_tpl['link'] = $link;
+		$local_tpl['back_link_txt'] = $link_text;
+		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 	
@@ -155,7 +155,7 @@ class Log_view extends CI_Controller {
 		$filter = $this->users->get_filter('panel_log');
 		$this->panel_log->set_filter($filter);
 		
-		$local_tpl_data = $this->_get_tpl_filter($filter);
+		$local_tpl = $this->_get_tpl_filter($filter);
 		
 		/* Постраничная навигация */
 		$config['base_url'] = site_url('log_view/page');
@@ -165,12 +165,12 @@ class Log_view extends CI_Controller {
 		$config['full_tag_close'] = '</p>';
 		
 		$this->pagination->initialize($config); 
-		$local_tpl_data['pagination'] = $this->pagination->create_links();
+		$local_tpl['pagination'] = $this->pagination->create_links();
 		
 		/* Список логов */
-		$local_tpl_data['log_list'] = $this->_list_log(100, $offset);
+		$local_tpl['log_list'] = $this->_list_log(100, $offset);
 
-		$this->tpl_data['content'] .= $this->parser->parse('log_list.html', $local_tpl_data, true);
+		$this->tpl_data['content'] .= $this->parser->parse('log_list.html', $local_tpl, true);
 		
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
@@ -237,18 +237,18 @@ class Log_view extends CI_Controller {
 		/* Получаем данные сервера, если лог относится к серверу */
 		if ($log_list[0]['server_id']) { $this->servers->get_server_data($log_list[0]['server_id']);}
 		
-		$local_tpl_data['log_id'] = $log_list[0]['id'];
-		$local_tpl_data['log_date'] = unix_to_human($log_list[0]['date'], true, 'eu');
-		$local_tpl_data['log_type'] = $log_list[0]['type'];
-		$local_tpl_data['log_command'] = $log_list[0]['command'];
-		$local_tpl_data['log_user'] = $log_list[0]['user_name'];
-		$local_tpl_data['log_user_name'] = $log_list[0]['user_name'];
-		$local_tpl_data['server_id'] = $log_list[0]['server_id'];
-		if ($this->servers->server_data) { $local_tpl_data['server_name'] = $this->servers->server_data['name'];}
-		$local_tpl_data['log_msg'] = $log_list[0]['msg'];
-		$local_tpl_data['log_data'] = $log_list[0]['log_data'];
+		$local_tpl['log_id'] = $log_list[0]['id'];
+		$local_tpl['log_date'] = unix_to_human($log_list[0]['date'], true, 'eu');
+		$local_tpl['log_type'] = $log_list[0]['type'];
+		$local_tpl['log_command'] = $log_list[0]['command'];
+		$local_tpl['log_user'] = $log_list[0]['user_name'];
+		$local_tpl['log_user_name'] = $log_list[0]['user_name'];
+		$local_tpl['server_id'] = $log_list[0]['server_id'];
+		if ($this->servers->server_data) { $local_tpl['server_name'] = $this->servers->server_data['name'];}
+		$local_tpl['log_msg'] = $log_list[0]['msg'];
+		$local_tpl['log_data'] = $log_list[0]['log_data'];
 		
-		$this->tpl_data['content'] .= $this->parser->parse('log_info.html', $local_tpl_data, true);
+		$this->tpl_data['content'] .= $this->parser->parse('log_info.html', $local_tpl, true);
 		
 		$this->parser->parse('main.html', $this->tpl_data);
 	}

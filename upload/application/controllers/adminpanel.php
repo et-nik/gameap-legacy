@@ -71,10 +71,10 @@ class Adminpanel extends CI_Controller {
 			$link_text = lang('back');
 		}
 
-        $local_tpl_data['message'] = $message;
-        $local_tpl_data['link'] = $link;
-        $local_tpl_data['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl_data, true);
+        $local_tpl['message'] = $message;
+        $local_tpl['link'] = $link;
+        $local_tpl['back_link_txt'] = $link_text;
+        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
@@ -274,8 +274,8 @@ class Adminpanel extends CI_Controller {
 				$this->tpl_data['content'] .= '<p align="center"><a class="small awesome" href="' . $version_info['download_url'] . '">' . lang('ap_goto_download_page') . '</a></p>';
 				
 				// Проверка модулей
-				$local_tpl_data['modules_list'] = $this->_check_modules_updates();
-				$this->tpl_data['content'] 		.= $this->parser->parse('adminpanel/update.html', $local_tpl_data, true);
+				$local_tpl['modules_list'] = $this->_check_modules_updates();
+				$this->tpl_data['content'] 		.= $this->parser->parse('adminpanel/update.html', $local_tpl, true);
 				
 				break;
 		}
@@ -293,7 +293,7 @@ class Adminpanel extends CI_Controller {
 		$this->tpl_data['title'] = lang('ap_title_report_error');
 		$this->tpl_data['heading'] = lang('ap_heading_report_error');
 		
-		$local_tpl_data = array();
+		$local_tpl = array();
 		$this->load->library('form_validation');
 		
 		$this->form_validation->set_rules('description', 'описание', 'trim|required|min_length[3]|xss_clean');
@@ -306,7 +306,7 @@ class Adminpanel extends CI_Controller {
 				return false;
 			}
 			
-			$this->tpl_data['content'] = $this->parser->parse('adminpanel/send_error.html', $local_tpl_data, true);
+			$this->tpl_data['content'] = $this->parser->parse('adminpanel/send_error.html', $local_tpl, true);
 		} else {
 			$upload_config['upload_path'] = sys_get_temp_dir();
 			$upload_config['overwrite'] = true;

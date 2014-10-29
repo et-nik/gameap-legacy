@@ -108,13 +108,13 @@ class Index extends CI_Controller {
 		$this->load->helper('games');
 		$this->load->model('servers/games');
 		
-		$local_tpl_data = array();
+		$local_tpl = array();
 	
 		$this->games->get_active_games_list();
-		$local_tpl_data['games_list'] = $this->games->tpl_data_games();
+		$local_tpl['games_list'] = $this->games->tpl_data_games();
 
 		$filter 		= $this->users->get_filter('servers_list');
-		$local_tpl_data += $this->_get_tpl_filter($filter);
+		$local_tpl += $this->_get_tpl_filter($filter);
 
 		$this->servers->set_filter($filter);
 
@@ -182,16 +182,16 @@ class Index extends CI_Controller {
 																'commands' => $server_commands);
 						
 					// Вставляем данные сервера в массив								
-					$local_tpl_data['games_list'] = game_server_insert($gs_data, $local_tpl_data['games_list']);
+					$local_tpl['games_list'] = game_server_insert($gs_data, $local_tpl['games_list']);
 						
 			}
 				
-			$local_tpl_data['games_list'] = clean_games_list($local_tpl_data['games_list']);
+			$local_tpl['games_list'] = clean_games_list($local_tpl['games_list']);
 		} else {
-			$local_tpl_data['games_list'] = array();
+			$local_tpl['games_list'] = array();
 		}
 		
-		$this->tpl_data['content'] = $this->parser->parse('servers/servers_list_main.html', $local_tpl_data, true);	
+		$this->tpl_data['content'] = $this->parser->parse('servers/servers_list_main.html', $local_tpl, true);	
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 }
