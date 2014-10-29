@@ -1,48 +1,51 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
-<a class="awesome" id="filter" href="#">{lang_filter}</a>
 
-<script>
-$(document).ready(function() {
-	$('div#filter').hide();
-});
+<?php if ($this->users->auth_data['is_admin']): ?>
+	<a class="awesome" id="filter" href="#">{lang_filter}</a>
 
-$("a#filter" ).click(function() {
-	$("div#filter").toggle('fast');
-});
-</script>
+	<script>
+	$(document).ready(function() {
+		$('div#filter').hide();
+	});
 
-<div id="filter">
-	<br />
-	<form action="{site_url}admin/settings/set_filter" method="post" accept-charset="utf-8">
-		<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
-		
-		<table class="zebra" width="100%">
-			<tr>
-				<td width="30%">{lang_name}:</td>
-				<td><input type="text" name="filter_name" value="{filter_name}"/></td>
-			</tr>
+	$("a#filter" ).click(function() {
+		$("div#filter").toggle('fast');
+	});
+	</script>
+
+	<div id="filter">
+		<br />
+		<form action="{site_url}admin/settings/set_filter" method="post" accept-charset="utf-8">
+			<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
 			
-			<tr>
-				<td width="30%">{lang_ip}:</td>
-				<td>{filter_ip_dropdown}</td>
-			</tr>
-			
-			<tr>
-				<td width="30%">{lang_game}:</td>
-				<td>{filter_games_dropdown}</td>
-			</tr>
+			<table class="zebra" width="100%">
+				<tr>
+					<td width="30%">{lang_name}:</td>
+					<td><input type="text" name="filter_name" value="{filter_name}"/></td>
+				</tr>
+				
+				<tr>
+					<td width="30%">{lang_ip}:</td>
+					<td>{filter_ip_dropdown}</td>
+				</tr>
+				
+				<tr>
+					<td width="30%">{lang_game}:</td>
+					<td>{filter_games_dropdown}</td>
+				</tr>
 
-		</table>
-			<p align="center">
-				<input class="button" type="submit" name="submit_filter" value="{lang_apply}" />
-				<input class="button" type="submit" name="reset" value="{lang_reset}" />
-			</p>
-	</form>
-</div>
+			</table>
+				<p align="center">
+					<input class="button" type="submit" name="submit_filter" value="{lang_apply}" />
+					<input class="button" type="submit" name="reset" value="{lang_reset}" />
+				</p>
+		</form>
+	</div>
 
-<script>
-	$('select[multiple="multiple"]').multipleSelect({width:200});
-</script>
+	<script>
+		$('select[multiple="multiple"]').multipleSelect({width:200});
+	</script>
+<?php endif; ?>
 
 <p align="center" class="hr"><strong>{lang_main_you_servers}</strong></p>
 
