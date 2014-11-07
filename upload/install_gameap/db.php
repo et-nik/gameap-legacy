@@ -172,7 +172,6 @@ $fields = array(
 		
 		'stats' => array(
 							 'type' => 'TEXT',
-							 'default' => '',
 		),
 		
 		'steamcmd_path' => array(
@@ -278,12 +277,10 @@ $fields = array(
 		
 		'remote_repository' => array(
 							'type' => 'TEXT',
-							'default' => '',
 		),
 				  
 		'local_repository' => array(
 							'type' => 'TEXT',
-							'default' => '',
 		),
 );
 
@@ -338,12 +335,10 @@ $fields = array(
 		
 		'remote_repository' => array(
 							'type' => 'TEXT',
-							'default' => '',
 		),
 				  
 		'local_repository' => array(
 							'type' => 'TEXT',
-							'default' => '',
 		),
 		
 		'execfile_windows' => array(
@@ -358,37 +353,30 @@ $fields = array(
 		
 		'script_start' => array(
 							'type' => 'TINYTEXT',
-							 'null' => true,
 		),
 		
 		'script_stop' => array(
 							'type' => 'TINYTEXT',
-							 'null' => true,
 		),
 		
 		'script_restart' => array(
 							'type' => 'TINYTEXT',
-							 'null' => true,
 		),
 		
 		'script_status' => array(
 							'type' => 'TINYTEXT',
-							 'null' => true,
 		),
 		
 		'script_update' => array(
 							'type' => 'TINYTEXT',
-							 'null' => true,
 		),
 		
 		'script_get_console' => array(
 							'type' => 'TINYTEXT',
-							 'null' => true,
 		),
 		
 		'script_send_command' => array(
 							 'type' => 'TINYTEXT',
-							 'null' => true,
 		),	
 		
 		'kick_cmd' => array(
@@ -661,7 +649,6 @@ $fields = array(
 		
 		'start_command' => array(
 								 'type' => 'TEXT',
-								 'default' => '',
 						  ),
 		
 		'aliases' => array(
