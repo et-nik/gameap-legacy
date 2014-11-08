@@ -521,8 +521,14 @@ class Cron extends MX_Controller {
 		}
 
 		$cmd['app'] .= '+app_update ' . $this->servers_data[$server_id]['app_id'];
-
-		$cmd['login'] = '+login anonymous';
+		
+		
+		if (isset($this->config->config['steamcmd_login']) && isset($this->config->config['steamcmd_password'])) {
+			$cmd['login'] = '+login ' . $this->config->config['steamcmd_login'] . ' ' . $this->config->config['steamcmd_password'];
+		} else {
+			$cmd['login'] = '+login anonymous';
+		}
+		
 		$cmd['install_dir'] = '+force_install_dir ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'];
 
 		switch(strtolower($this->servers_data[$server_id]['os'])) {
