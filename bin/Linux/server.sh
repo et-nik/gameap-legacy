@@ -33,7 +33,7 @@ VERSION=100
 
 # Загрузка конфигурации
 if [[ -s ./server.conf ]]; then
-	echo -e "Configuration loaded"
+	# echo -e "Configuration loaded"
 	source ./server.conf
 fi
 
@@ -88,7 +88,7 @@ function server_stop()
 		exit;
 	fi
 	
-	if [[ "$(status)" == 1 ]]
+	if [[ "$(server_status)" == 1 ]]
        then
        kill -TERM `ps aux | grep -v grep | grep -i screen | grep -i $SNAME | awk '{print $2}'`
        su $USER -c  "screen -U -X -S $SNAME kill"
@@ -102,13 +102,13 @@ function server_stop()
 # Получение статуса сервера
 function server_status()
 {
-	if [[ $NAME == '' ]]
+	if [[ $SNAME == '' ]]
 	then
 		echo 0;
 		return;
 	fi
 
-	if [[ `sudo su $USER -c "screen -ls |grep $NAME"` ]]
+	if [[ `sudo su $USER -c "screen -ls |grep $SNAME"` ]]
 		then
 		echo 1;
     else
