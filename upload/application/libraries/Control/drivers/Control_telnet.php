@@ -72,6 +72,7 @@ class Control_telnet extends CI_Driver {
 				 * */
 				if (preg_match('/\"\%[A-Z]*\%.*$/s', $file, $matches)) {
 					$matches[0] = str_replace('"', '', $matches[0]);
+					$matches[0] = str_replace('\\', '/', $matches[0]);
 					
 					/* Для виндовых слешей \ */
 					//~ $explode = explode('\\', $matches[0]);
@@ -187,6 +188,7 @@ class Control_telnet extends CI_Driver {
 		}
 		
 		$this->_connection = @fsockopen($this->ip, $this->port, $errno, $errstr, 10);
+		stream_set_blocking($this->_connection, 1);
 		//~ @stream_set_timeout($this->_connection, 30);
 
 		if (!$this->_connection) {
@@ -247,24 +249,42 @@ class Control_telnet extends CI_Driver {
 			throw new Exception(lang('server_command_empty_command') . ' (Telnet)');
 		}
 		
-		$this->_write($command . "\r\n");
-		$result = explode("\n", $this->_read_till($this->_prompt));
+		/* После отправки команды ищем ++CMDEND++, это означает, что команда
+		 * завершилась
+		 */
+		$command = $command . " && echo ++CMDEND++";
 		
-		$last_element = count($result)-1;
-		unset($result[0]);
-		
-		if ($last_element && strpos($result[$last_element], '>') !== false) {
-			unset($result[$last_element]);
-		} elseif ($last_element && strpos($result[$last_element], '~$') !== false) {
-			unset($result[$last_element]);
+		if ($this->os == 'windows') {
+			$this->_write($command  . "\r\n");
+			$result = explode("\r\n", $this->_read_till("++CMDEND++"));
+		} else {
+			$this->_write($command . "\n");
+			$result = explode("\n", $this->_read_till("++CMDEND++"));
 		}
 		
+		/* Удаляем первые значения массива, если они пусты */
+		foreach ($result as $key => $str) {
+			if ($str == '') {
+				unset($result[$key]);
+			} else {
+				break;
+			}
+		}
+		
+		$result = array_values($result);
+		
+		/* Удаляем первый и последний элементы массива, т.к. в них
+		 * находятся команда и ++CMDEND++, которые нам не нужны */
+		$last_element = count($result)-1;
+		unset($result[0]);
+		unset($result[$last_element]);
+
 		$result = trim(implode("\n", $result));
 		
 		if ($this->os == 'windows') {
 			$result = iconv('CP866', 'UTF-8//TRANSLIT', $result);
 		}
-
+		
 		return $result;
 	}
 	
@@ -356,13 +376,24 @@ class Control_telnet extends CI_Driver {
 
 			if ($c != $IAC) {
 				$buf .= $c;
-
+				
 				foreach($what as &$stop_symbols) {
-					if ($stop_symbols == substr($buf,strlen($buf)-strlen($stop_symbols))) {
+					
+					/*
+					 * Если в тексте найден символ prompt, то команда считается выполненной. Обычно это >
+					 * Но некоторые програамы используют символы, например wget, пример:
+					 * 	==> TYPE I ... done.  ==> CWD /Files/RE01 ... done.
+					 *	==> SIZE main.zip ... 156
+					 *	==> PASV ... done.    ==> RETR main.zip ... done.
+					 *	Length: 156
+					 */
+					if ($stop_symbols == substr($buf,strlen($buf)-strlen($stop_symbols))
+						&& 'echo ++CMDEND++' != substr($buf, strlen($buf)-15)
+					) {
 						return $buf;
 					}
 				}
-
+					
 				continue;
             }
 
