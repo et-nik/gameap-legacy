@@ -308,10 +308,14 @@ class Users_control extends CI_Controller {
     {
 		$user_id = (int)$user_id;
 		$server_id = (int)$server_id;
+
+		if (!is_array($this->input->post())) {
+			redirect('admin/users_control/servers_privileges/' . $user_id . '/' . $server_id);
+		}
 		
 		//Проверка, есть ли права на редактирование привилегий
 		if (!$this->users->auth_privileges['usr_edit_privileges']) {
-				$this->tpl_data['content'] .= lang('users_no_privileges_for_edit_privileges');
+			$this->tpl_data['content'] .= lang('users_no_privileges_for_edit_privileges');
 		} else {
 			
 			/* Получаем данные редактируемого пользователя, но записываем их лишь в переменную $user_data */
