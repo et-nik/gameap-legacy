@@ -241,13 +241,14 @@ case "$TYPE" in
 		
 	send_command)
 		# Screen version 4.00.03jw4 (FAU) 2-May-06
-		# su $USER "-c screen -p 0 -S $NAME -X stuff '$COMMAND'$'\n'"
+		#~ su $USER "-c screen -p 0 -S $SNAME -X stuff '$COMMAND'$'\n'"
  	
  		# Screen version 4.01.00devel (GNU) 2-May-06
-		#~ su $USER "-c screen -p 0 -S $NAME -X stuff '$COMMAND\n'"
+		#~ su $USER "-c screen -p 0 -S $SNAME -X stuff '$COMMAND\n'"
 
-		su $USER "-c screen -U -p 0 -S $NAME -X stuff '$COMMAND
+		su $USER "-c screen -U -p 0 -S $SNAME -X stuff '$COMMAND
 		'"
+		
 		;;
 	*)
 		echo "Unknown type"
