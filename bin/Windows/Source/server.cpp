@@ -132,7 +132,6 @@ int server_status()
 
 int server_start()
 {
-	cout << "PROGRAM:" << program << endl;
 	fast_exec(str(boost::format("%s \"%s\\%s\" %s") % psexec % dir % program % arguments));
 
 	// Sleep
@@ -179,7 +178,7 @@ void main(int argc, char *argv[])
 {	
 	//setlocale(LC_CTYPE, "rus");
 
-	for (int i = 0; i < argc; i++) {
+	for (int i = 0; i < argc-1; i++) {
 
 		if (string(argv[i]) == "-t") {
 			// Тип
