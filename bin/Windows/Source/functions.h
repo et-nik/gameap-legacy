@@ -38,4 +38,6 @@ int get_cores_count();
 
 // ---------------------------------------------------------------------
 
+bool in_array(const std::string &needle, const std::vector< std::string > &haystack);
+
 #endif

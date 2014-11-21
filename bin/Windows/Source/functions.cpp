@@ -165,3 +165,17 @@ int get_cores_count() {
     return sysconf(_SC_NPROCESSORS_ONLN);
 #endif
 }
+
+// ---------------------------------------------------------------------
+
+bool in_array(const std::string &needle, const std::vector< std::string > &haystack)
+{
+    int max=haystack.size();
+ 
+    if (max==0) return false;
+ 
+    for(int i=0; i<max; i++)
+        if (haystack[i]==needle)
+            return true;
+    return false;
+}
