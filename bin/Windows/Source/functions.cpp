@@ -20,18 +20,16 @@
 
 #include "functions.h"
 
-using namespace std;
-
 // ---------------------------------------------------------------------
 
-int substr_count(string source, string substring)
+int substr_count(std::string source, std::string substring)
 {
 	int count = 0;
 	
 	for (size_t pos = 0; pos < source.size(); pos += substring.size())
 	{
 		pos = source.find(substring, pos);
-		if (pos != string::npos)
+		if (pos != std::string::npos)
 		{
 			++count;
 		}
@@ -46,7 +44,7 @@ int substr_count(string source, string substring)
 
 // ---------------------------------------------------------------------
 
-string trim(string& str)
+std::string trim(std::string& str)
 {
 	str.erase(0, str.find_first_not_of(' '));	//prefixing spaces
 	str.erase(str.find_last_not_of(' ') + 1);	//surfixing spaces
@@ -55,16 +53,16 @@ string trim(string& str)
 
 // ---------------------------------------------------------------------
 
-void fast_exec(string command)
+void fast_exec(std::string command)
 {
 	boost::thread bthrd(boost::bind(exec, command));
 }
 
 // ---------------------------------------------------------------------
 
-string exec(string command)
+std::string exec(std::string command)
 {
-	string excmd;
+	std::string excmd;
 	
 #ifdef _WIN32
 	FILE * f = _popen( &command[0], "r" );
@@ -94,12 +92,12 @@ string exec(string command)
 
 // ---------------------------------------------------------------------
 
-vector<string> explode(string delimiter, string inputstring){
-    vector<string> explodes;
+std::vector<std::string> explode(std::string delimiter, std::string inputstring){
+    std::vector<std::string> explodes;
     
     inputstring.append(delimiter);
     
-    while(inputstring.find(delimiter)!=string::npos){
+    while(inputstring.find(delimiter)!=std::string::npos){
         explodes.push_back(inputstring.substr(0, inputstring.find(delimiter)));
         inputstring.erase(inputstring.begin(), inputstring.begin()+inputstring.find(delimiter)+delimiter.size());
     }
@@ -109,11 +107,11 @@ vector<string> explode(string delimiter, string inputstring){
 
 // ---------------------------------------------------------------------
 
-string implode(string delimiter, vector<string> & elements)
+std::string implode(std::string delimiter, std::vector<std::string> & elements)
 {
-    string full;
+    std::string full;
     
-    for (vector<string>::iterator it = elements.begin(); it != elements.end(); ++it)
+    for (std::vector<std::string>::iterator it = elements.begin(); it != elements.end(); ++it)
     {
         full += (*it);
         if (it != elements.end()-1)
@@ -125,7 +123,7 @@ string implode(string delimiter, vector<string> & elements)
 
 // ---------------------------------------------------------------------
 
-bool file_exists(string file_name) 
+bool file_exists(std::string file_name) 
 {
     std::ifstream f(file_name.c_str());
     
