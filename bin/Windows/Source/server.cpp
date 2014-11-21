@@ -11,6 +11,9 @@
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -132,6 +135,7 @@ int server_status()
 
 int server_start()
 {
+	cout << "PROGRAM:" << program << endl;
 	fast_exec(str(boost::format("%s \"%s\\%s\" %s") % psexec % dir % program % arguments));
 
 	// Sleep
@@ -174,11 +178,14 @@ int server_stop()
 
 // ---------------------------------------------------------------------
 
-void main(int argc, char *argv[]) 
+int main(int argc, char *argv[]) 
 {	
 	//setlocale(LC_CTYPE, "rus");
+	
+	boost::property_tree::ptree pt;
+	boost::property_tree::ini_parser::read_ini("server.cfg", pt);
 
-	for (int i = 0; i < argc-1; i++) {
+	for (int i = 0; i < argc; i++) {
 
 		if (string(argv[i]) == "-t") {
 			// Тип
