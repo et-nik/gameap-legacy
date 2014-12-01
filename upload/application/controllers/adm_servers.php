@@ -868,6 +868,12 @@ class Adm_servers extends CI_Controller {
 						$sql_data['local_repository'] 	= $this->input->post('local_repository');
 						$sql_data['remote_repository'] 	= $this->input->post('remote_repository');
 						
+						// Проверяем наличие Query класса
+						if (!file_exists(APPPATH . 'libraries/gameq/protocols/' . strtolower($sql_data['engine']) . '.php')) {
+							$this->_show_message('adm_servers_unknown_engine');
+							return false;
+						}
+						
 						/* Убираем кавычки из app_set_config */
 						$sql_data['app_set_config'] = str_replace('\'', '', $sql_data['app_set_config']);
 						$sql_data['app_set_config'] = str_replace('"', '', $sql_data['app_set_config']);
@@ -1274,17 +1280,20 @@ class Adm_servers extends CI_Controller {
 				
 				$local_tpl['script_path'] 		= $this->dedicated_servers->ds_list['0']['script_path'];
 				$local_tpl['steamcmd_path'] 	= $this->dedicated_servers->ds_list['0']['steamcmd_path'];
-				$local_tpl['ssh_host'] 		= $this->dedicated_servers->ds_list['0']['ssh_host'];
+				$local_tpl['ssh_host'] 			= $this->dedicated_servers->ds_list['0']['ssh_host'];
 				$local_tpl['ssh_login'] 		= $this->dedicated_servers->ds_list['0']['ssh_login'];
-				$local_tpl['ssh_path'] 		= $this->dedicated_servers->ds_list['0']['ssh_path'];
+				$local_tpl['ssh_path'] 			= $this->dedicated_servers->ds_list['0']['ssh_path'];
 				
 				$local_tpl['telnet_host'] 		= $this->dedicated_servers->ds_list['0']['telnet_host'];
-				$local_tpl['telnet_login'] 	= $this->dedicated_servers->ds_list['0']['telnet_login'];
+				$local_tpl['telnet_login'] 		= $this->dedicated_servers->ds_list['0']['telnet_login'];
 				$local_tpl['telnet_path'] 		= $this->dedicated_servers->ds_list['0']['telnet_path'];
 				
-				$local_tpl['ftp_host'] 		= $this->dedicated_servers->ds_list['0']['ftp_host'];
+				$local_tpl['ftp_host'] 			= $this->dedicated_servers->ds_list['0']['ftp_host'];
 				$local_tpl['ftp_login'] 		= $this->dedicated_servers->ds_list['0']['ftp_login'];
-				$local_tpl['ftp_path'] 		= $this->dedicated_servers->ds_list['0']['ftp_path'];
+				$local_tpl['ftp_path'] 			= $this->dedicated_servers->ds_list['0']['ftp_path'];
+				
+				$local_tpl['disabled_checkbox'] = form_checkbox('disabled', 'accept', $this->dedicated_servers->ds_list['0']['disabled']);
+				
 				
 				// Получаем список серверов на DS
 				$gs = $this->servers->get_game_servers_list(array('ds_id' => $id));
@@ -1796,6 +1805,7 @@ class Adm_servers extends CI_Controller {
 					$sql_data['provider'] = $this->input->post('provider');
 					$sql_data['ram'] = (int)$this->input->post('ram');
 					$sql_data['cpu'] = (int)$this->input->post('cpu');
+					$sql_data['disabled'] = (int)(bool)$this->input->post('disabled');
 					
 					/* Обработка списка IP адресов */
 					$ip_list = explode(',', str_replace(' ', '', $this->input->post('ip')));
@@ -2004,6 +2014,12 @@ class Adm_servers extends CI_Controller {
 					
 					$sql_data['local_repository'] 	= $this->input->post('local_repository');
 					$sql_data['remote_repository'] 	= $this->input->post('remote_repository');
+					
+					// Проверяем наличие Query класса
+					if (!file_exists(APPPATH . 'libraries/gameq/protocols/' . strtolower($sql_data['engine']) . '.php')) {
+						$this->_show_message('adm_servers_unknown_engine');
+						return false;
+					}
 					
 					/* Убираем кавычки из app_set_config */
 					$sql_data['app_set_config'] = str_replace('\'', '', $sql_data['app_set_config']);

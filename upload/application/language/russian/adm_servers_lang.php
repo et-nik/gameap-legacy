@@ -225,3 +225,6 @@ $lang['adm_servers_generate_rcon_password']			= 'Сгенерировать но
 $lang['adm_servers_cpu_limit']						= 'Лимит на CPU';
 $lang['adm_servers_ram_limit']						= 'Лимит на RAM';
 $lang['adm_servers_net_limit']						= 'Лимит на пропусную способность';
+
+$lang['adm_servers_disable_ds']						= 'Отключить выделенный сервер';
+$lang['adm_servers_unknown_engine']					= 'Неизвестный движок игры';
