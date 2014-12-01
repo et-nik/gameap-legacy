@@ -58,12 +58,12 @@ function server_start()
 	fi
 	
 	if [[ "$(server_status)" == 1 ]]
-		then
+       then
 		echo -e "Server is already running";
     else
 		su $USER -c "cd $DIR; ${COMMAND_PARTS[0]} screen -U -m -d -S $SNAME ${COMMAND_PARTS[1]} $COMMAND";
 		PID=$!;
-		sleep 4;
+		sleep 3;
 		
 		if [[ `su $USER -c "screen -U -ls | grep -i $SNAME"` ]]
 			then
@@ -221,7 +221,14 @@ case "$TYPE" in
 	restart)
 		get_parts;
 		server_stop;
-		server_start;
+		
+		if [ "$(server_start)" == "Server started" ] ;
+			then
+			echo -e "Server restarted"
+		else
+			echo -e "Server not restarted"
+		fi
+		
 		;;
 		
 	status)
