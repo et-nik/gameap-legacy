@@ -1,43 +1,42 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
 // ---------------------------------------------------------------------
 
-int substr_count(std::string source, std::string substring);
+int substr_count(string source, string substring);
 
 // ---------------------------------------------------------------------
 
-std::string trim(std::string& str);
+string trim(string& str);
 
 // ---------------------------------------------------------------------
 
-void fast_exec(std::string command);
+void fast_exec(string command);
 
 // ---------------------------------------------------------------------
 
-std::string exec(std::string command);
+string exec(string command);
 
 // ---------------------------------------------------------------------
 
-std::vector<std::string> explode(std::string delimiter, std::string inputstring);
+vector<string> explode(string delimiter, string inputstring);
 
 // ---------------------------------------------------------------------
 
-std::string implode(std::string delimiter, std::vector<std::string> & elements);
+string implode(string delimiter, vector<string> & elements);
 
 // ---------------------------------------------------------------------
 
-bool file_exists(std::string file_name);
+bool file_exists(string file_name);
 
 // ---------------------------------------------------------------------
 
 int get_cores_count();
 
-// ---------------------------------------------------------------------
-
-bool in_array(const std::string &needle, const std::vector< std::string > &haystack);
 
 #endif

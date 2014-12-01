@@ -20,16 +20,18 @@
 
 #include "functions.h"
 
+using namespace std;
+
 // ---------------------------------------------------------------------
 
-int substr_count(std::string source, std::string substring)
+int substr_count(string source, string substring)
 {
 	int count = 0;
 	
 	for (size_t pos = 0; pos < source.size(); pos += substring.size())
 	{
 		pos = source.find(substring, pos);
-		if (pos != std::string::npos)
+		if (pos != string::npos)
 		{
 			++count;
 		}
@@ -44,7 +46,7 @@ int substr_count(std::string source, std::string substring)
 
 // ---------------------------------------------------------------------
 
-std::string trim(std::string& str)
+string trim(string& str)
 {
 	str.erase(0, str.find_first_not_of(' '));	//prefixing spaces
 	str.erase(str.find_last_not_of(' ') + 1);	//surfixing spaces
@@ -53,16 +55,16 @@ std::string trim(std::string& str)
 
 // ---------------------------------------------------------------------
 
-void fast_exec(std::string command)
+void fast_exec(string command)
 {
 	boost::thread bthrd(boost::bind(exec, command));
 }
 
 // ---------------------------------------------------------------------
 
-std::string exec(std::string command)
+string exec(string command)
 {
-	std::string excmd;
+	string excmd;
 	
 #ifdef _WIN32
 	FILE * f = _popen( &command[0], "r" );
@@ -92,12 +94,12 @@ std::string exec(std::string command)
 
 // ---------------------------------------------------------------------
 
-std::vector<std::string> explode(std::string delimiter, std::string inputstring){
-    std::vector<std::string> explodes;
+vector<string> explode(string delimiter, string inputstring){
+    vector<string> explodes;
     
     inputstring.append(delimiter);
     
-    while(inputstring.find(delimiter)!=std::string::npos){
+    while(inputstring.find(delimiter)!=string::npos){
         explodes.push_back(inputstring.substr(0, inputstring.find(delimiter)));
         inputstring.erase(inputstring.begin(), inputstring.begin()+inputstring.find(delimiter)+delimiter.size());
     }
@@ -107,11 +109,11 @@ std::vector<std::string> explode(std::string delimiter, std::string inputstring)
 
 // ---------------------------------------------------------------------
 
-std::string implode(std::string delimiter, std::vector<std::string> & elements)
+string implode(string delimiter, vector<string> & elements)
 {
-    std::string full;
+    string full;
     
-    for (std::vector<std::string>::iterator it = elements.begin(); it != elements.end(); ++it)
+    for (vector<string>::iterator it = elements.begin(); it != elements.end(); ++it)
     {
         full += (*it);
         if (it != elements.end()-1)
@@ -123,7 +125,7 @@ std::string implode(std::string delimiter, std::vector<std::string> & elements)
 
 // ---------------------------------------------------------------------
 
-bool file_exists(std::string file_name) 
+bool file_exists(string file_name) 
 {
     std::ifstream f(file_name.c_str());
     
@@ -164,18 +166,4 @@ int get_cores_count() {
 #else
     return sysconf(_SC_NPROCESSORS_ONLN);
 #endif
-}
-
-// ---------------------------------------------------------------------
-
-bool in_array(const std::string &needle, const std::vector< std::string > &haystack)
-{
-    int max=haystack.size();
- 
-    if (max==0) return false;
- 
-    for(int i=0; i<max; i++)
-        if (haystack[i]==needle)
-            return true;
-    return false;
 }
