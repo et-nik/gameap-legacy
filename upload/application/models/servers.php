@@ -139,9 +139,7 @@ class Servers extends CI_Model {
 			$this->errors = 'Error: ' . $file . ' file not executable';
 			return false;
 		}
-		
-		
-		
+
 		return true;
 	}
 	
@@ -354,11 +352,7 @@ class Servers extends CI_Model {
 		/* Присваиваем имя screen  */
 		$data['screen_name'] = (!isset($data['screen_name'])) ? $data['game'] . '_' . random_string('alnum', 6) . '_' . $data['server_port'] : $data['screen_name'];
 		
-		if ($id = $this->db->insert('servers', $data)) {
-			return true;
-		} else {
-			return false;
-		}
+		return (bool)$this->db->insert('servers', $data);
 	}
 
 	//-----------------------------------------------------------	
@@ -834,8 +828,8 @@ class Servers extends CI_Model {
      * 
      * @return bool
     */	
-	function ds_server_live($server_id){
-		
+	function ds_server_live($server_id)
+	{
 		$this->db->where('id', $server_id);
 		return (bool)($this->db->count_all_results('dedicated_servers') > 0);
 	}
@@ -952,7 +946,7 @@ class Servers extends CI_Model {
 	 * Получение количества игровых серверов в зависимости от условия
 	 * 
 	 * @param array 	условие
-	 * @return integer
+	 * @return int
 	 */
 	function get_servers_count($where = array())
 	{
