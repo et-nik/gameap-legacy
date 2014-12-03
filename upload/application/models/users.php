@@ -405,14 +405,7 @@ class Users extends CI_Model {
 			 $this->db->where($user_id);
 		}
 
-		$query = $this->db->update('users', $user_data); 
-        
-        
-        if(!$query){
-            return false;
-        }else{
-            return true;
-        }
+        return (bool)$this->db->update('users', $user_data);
     }
     
     //-----------------------------------------------------------
@@ -813,13 +806,8 @@ class Users extends CI_Model {
 				return false;
 				break;
         }
-
-        if ($this->db->count_all_results('users') > 0) {
-            return true;
-        } else {
-            return false;
-        }
         
+        return (bool)($this->db->count_all_results('users') > 0);
     }
     
     // ----------------------------------------------------------------
