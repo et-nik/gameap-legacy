@@ -813,31 +813,6 @@ class Users extends CI_Model {
     // ----------------------------------------------------------------
     
     /**
-     * Проверяет привилегию
-     * 
-     * @param int - id пользователя
-     * @param int - id сервера
-     * @param string - имя привилегии
-     * 
-    */  
-    function check_privilege($user_id = false, $server_id = false, $privilege = false){
-        
-        if(!$user_id){
-            $user_id = $this->user_data['id'];
-        }else{
-            $user_id  = (int)$user_id;
-        }
-        
-        if (!$privilege) {
-            $query = $this->db->get_where('users', array('login' => $string));
-        } else {
-			
-        }
-    }
-    
-    // ----------------------------------------------------------------
-    
-    /**
      * Получаем hash пользователя, случайной строки
      * @return string
      * 
