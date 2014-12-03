@@ -34,7 +34,7 @@ class Servers extends CI_Model {
     //~ public $commands			= array(); // Команды, которые отправлялись на сервер
     public $errors 					= ''; 	// Строка с ошибкой (если имеются)
     
-    private $_exec_file				= array('linux' => 'server.sh', 'windows' => 'server.exe');
+    private $_exec_file				= array('linux' => './server.sh', 'windows' => 'server.exe');
 
     function __construct()
     {
@@ -375,11 +375,7 @@ class Servers extends CI_Model {
 			$data['rcon'] = $this->encrypt->encode($data['rcon']);
 		}
 		
-		if($this->db->update('servers', $data)){
-			return true;
-		}else{
-			return false;
-		}
+		return (bool)$this->db->update('servers', $data);
 	}
 
 	//-----------------------------------------------------------	
@@ -669,6 +665,8 @@ class Servers extends CI_Model {
 			// Данные для игрового сервера из машины
 			$this->server_data['os'] 			= strtolower($this->server_ds_data['os']);
 			$this->server_data['local_server'] 	= $this->server_ds_data['local_server'];
+			
+			$this->server_data['ds_disabled'] 	= $this->server_ds_data['disabled'];
 
 			$this->server_data['ftp_host']		= $this->server_ds_data['ftp_host'];
 			$this->server_data['ftp_login'] 	= $this->server_ds_data['ftp_login'];
