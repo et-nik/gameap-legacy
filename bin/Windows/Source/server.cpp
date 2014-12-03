@@ -7,12 +7,11 @@
 
 #include <map>
 
+#include <jsoncpp/json/json.h>
+
 #include <boost/regex.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/ini_parser.hpp>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -105,6 +104,8 @@ int server_status()
 	 * C:\servers\rust_02\rust_server.exe  	2240
 	*/
 	
+#ifdef _WIN32
+	// Windows
 	string output = exec(str(boost::format("wmic process where description=\"%s\" get executablepath, processid") % program));
 	vector<string> expl = explode("\n", output);
 	
@@ -121,6 +122,10 @@ int server_status()
 			break;
 		}
 	}
+#else
+	// Linux
+	//string output = exec();
+#endif
 	
 	if (pid) {
 		string output = exec(str(boost::format("echo %d > %s/pid.txt") % pid % dir));
@@ -137,6 +142,8 @@ int server_start()
 {
 	cout << "PROGRAM:" << program << endl;
 	fast_exec(str(boost::format("%s \"%s\\%s\" %s") % psexec % dir % program % arguments));
+
+	std::cout << "CmdLine: " << str(boost::format("%s \"%s\\%s\" %s") % psexec % dir % program % arguments) << std::endl;
 
 	// Sleep
 #ifdef _WIN32
@@ -178,14 +185,11 @@ int server_stop()
 
 // ---------------------------------------------------------------------
 
-int main(int argc, char *argv[]) 
+void main(int argc, char *argv[]) 
 {	
 	//setlocale(LC_CTYPE, "rus");
-	
-	boost::property_tree::ptree pt;
-	boost::property_tree::ini_parser::read_ini("server.cfg", pt);
 
-	for (int i = 0; i < argc; i++) {
+	for (int i = 0; i < argc-1; i++) {
 
 		if (string(argv[i]) == "-t") {
 			// Тип
@@ -256,7 +260,8 @@ int main(int argc, char *argv[])
 		psexec = str( boost::format("paexec.exe \\\\localhost -s -d -w  \"%s\" -a %s ") % dir % cpu_affinity() );
 	} else {
 		cout << "psexec.exe and paexec.exe not found" << endl;
-		psexec = str( boost::format("start /D \"%s\" /I /affinity -a %s ") % dir % cpu_affinity() );
+		// psexec = str( boost::format("start /D \"%s\" /I /affinity -a %s ") % dir % cpu_affinity() );
+		psexec = str(boost::format("screen -t start -S %s -c ") % screen_name);
 	}
     
     /* Разъединение программы и аргумента в команде запуска сервера */
@@ -304,13 +309,15 @@ int main(int argc, char *argv[])
 			cout << "Server is already running" << endl;
 		}
 		
-	} else if (string(type) == "stop") {
+	} 
+	else if (string(type) == "stop") {
 		if (server_stop() == 1) {
 			cout << "Server stopped" << endl;
 		} else {
 			cout << "Server not stopped" << endl;
 		}
-	} else if (string(type) == "restart") {
+	} 
+	else if (string(type) == "restart") {
 		
 		if (server_status() != 0) {
 			server_stop();
@@ -329,7 +336,8 @@ int main(int argc, char *argv[])
 			cout << "Server not restarted" << endl;
 		}
 
-	} else if (string(type) == "status") {
+	} 
+	else if (string(type) == "status") {
 		int pid = server_status();
 		
 		if(pid != 0) {
@@ -338,9 +346,28 @@ int main(int argc, char *argv[])
 			cout << "Server is Down" << endl;
 		}
 		
-	} else if (string(type) == "get_console") {
-		// Coming soon
-	} else {
+	} 
+	else if (string(type) == "get_console") {
+		string output = "";
+#ifdef _WIN32
+		output = exec(str(boost::format("screen -t get_console -S %s") % screen_name));
+#else
+
+#endif
+		// Вывод команды
+		cout << output << endl;
+	}
+	else if (string(type) == "send_command") {
+		string output = "";
+#ifdef _WIN32
+		output = exec(str(boost::format("screen -t get_console -S %s -c %s") % screen_name % command));
+#else
+
+#endif
+		// Вывод команды
+		cout << output << endl;
+	}
+	else {
 		show_help();
 	}
 }
