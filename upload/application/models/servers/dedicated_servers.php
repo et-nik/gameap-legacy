@@ -106,12 +106,7 @@ class Dedicated_servers extends CI_Model {
 	function add_dedicated_server($data)
 	{
 		$data = $this->_encrypt_passwords($data);
-		
-		if ($this->db->insert('dedicated_servers', $data)) {
-			return true;
-		} else {
-			return false;
-		}
+		return (bool)$this->db->insert('dedicated_servers', $data);
 	}
 	
 	//-----------------------------------------------------------
@@ -139,11 +134,7 @@ class Dedicated_servers extends CI_Model {
     */
 	function del_dedicated_server($id)
 	{
-		if($this->db->delete('dedicated_servers', array('id' => $id))){
-			return true;
-		}else{
-			return false;
-		}
+		return (bool)$this->db->delete('dedicated_servers', array('id' => $id);
 	}
 	
 	//-----------------------------------------------------------
@@ -309,13 +300,8 @@ class Dedicated_servers extends CI_Model {
 		} else {
 			$this->db->where(array('id' => $id));
 		}
-
-        if ($this->db->count_all_results('dedicated_servers') > 0) {
-            return true;
-        } else {
-            return false;
-        }
-        
+		
+		return (bool)($this->db->count_all_results('dedicated_servers') > 0);
     }
     
     // ----------------------------------------------------------------
@@ -356,12 +342,8 @@ class Dedicated_servers extends CI_Model {
 		$data = $this->_encrypt_passwords($data);
 		
 		$this->db->where('id', $id);
-
-		if($this->db->update('dedicated_servers', $data)){
-			return true;
-		}else{
-			return false;
-		}
+		
+		return (bool)$this->db->update('dedicated_servers', $data);
 	}
 	
 	//-----------------------------------------------------------
@@ -385,11 +367,7 @@ class Dedicated_servers extends CI_Model {
 		
 		$sql_data['modules_data'] = $modules_data_json;
 		
-		if ($this->edit_dedicated_server($id, $sql_data)) {
-			return true;
-		} else {
-			return false;
-		}
+		return (bool)$this->edit_dedicated_server($id, $sql_data);
 	}
 	
 	//-----------------------------------------------------------
@@ -457,12 +435,7 @@ class Dedicated_servers extends CI_Model {
 		
 		$query = $this->db->get('servers');
 		
-		if($query->num_rows > 0) {
-			return false;
-		} else {
-			return true;
-		}
-		
+		return (bool)($query->num_rows > 0);
 	}
 
 	//-----------------------------------------------------------
