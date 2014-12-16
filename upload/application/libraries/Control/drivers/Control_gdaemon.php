@@ -98,10 +98,16 @@ class Control_gdaemon extends CI_Driver {
 			// Разрываем соединение со старым сервером
 			$this->disconnect();
 		}
+
+		$port OR $port = 31707;
 		
 		if (!$ip OR !$port) {
+			exit($port);
 			throw new Exception(lang('server_command_empty_connect_data') . ' (GDaemon)');
 		}
+		
+		$this->ip = $ip;
+		$this->port = $port;
 		
 		// Соединение с сервером
 		$this->_connection = @fsockopen($this->ip, $this->port, $errno, $errstr, 10); 
@@ -121,15 +127,17 @@ class Control_gdaemon extends CI_Driver {
 		if ($this->_auth == true) {
 			return true;
 		}
-		
-		if(!$login OR !$password) {
+
+		if(!$password) {
 			throw new Exception(lang('server_command_empty_auth_data') . ' (GDaemon)');
 		}
 		
 		fwrite($this->_connection, "getkey\n");
 
 		$this->crypt_key 	= $password;
-		$this->client_key 	= $this->_decode($this->_read(), $this->crypt_key);
+		$this->client_key 	= $this->_read();
+		
+		$this->_auth = true;
 		
 		return true;
 	}
@@ -137,10 +145,15 @@ class Control_gdaemon extends CI_Driver {
 	private function _read()
 	{
 		$buffer = "";
-		while (@!$this->client_key[strlen($this->client_key)-1] == "\n" & !feof($this->_connection)) {
-			$buffer .= fgets($this->_connection, 128);
+		//~ while (@!$this->client_key[strlen($this->client_key)-1] == "\n" & !feof($this->_connection)) {
+			//~ $buffer .= fgets($this->_connection, 128);
+		//~ }
+		
+		while (@!$buffer[strlen($buffer)-1] == "\n" & !feof($this->_connection)) {
+			$buffer .= fgets($this->_connection, 4096);
 		}
-		return $buffer;
+		
+		return $this->_decode($buffer, $this->crypt_key);
 	}
 	
 	// -----------------------------------------------------------------
@@ -159,6 +172,7 @@ class Control_gdaemon extends CI_Driver {
 		}
 		
 		$send_array = array(
+			'key' 		=> $this->client_key,
 			'commands' 	=> array(
 								$command,
 							),
@@ -166,15 +180,13 @@ class Control_gdaemon extends CI_Driver {
 		);
 		
 		$encode_string = $this->_encode(json_encode($send_array), $this->crypt_key);
-		fwrite($fp, "command {$encode_string}\n");
+		fwrite($this->_connection, "command {$encode_string}\n");
 		
 		if (!$contents = json_decode($this->_read(), true)) {
 			return false;
 		}
 		
-		
-		
-		return implode("\n", $output);
+		return implode("\n", $contents['command_results']);
 	}
 	
 	// ----------------------------------------------------------------
