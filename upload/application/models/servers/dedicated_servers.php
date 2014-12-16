@@ -48,6 +48,10 @@ class Dedicated_servers extends CI_Model {
 		
 		$this->load->library('encrypt');
 		
+		if (isset($data['gdaemon_key'])) {
+			$data['gdaemon_key']	= $this->encrypt->encode($data['gdaemon_key']);
+		}
+		
 		if (isset($data['ssh_login'])) {
 			$data['ssh_login']	= $this->encrypt->encode($data['ssh_login']);
 			if ($data['ssh_password'] == '') {
@@ -188,11 +192,13 @@ class Dedicated_servers extends CI_Model {
 				
 				unset($ds_ip);
 				
-				// SSH, TELNET, FTP
+				// GDAEMON, SSH, TELNET, FTP
 				$this->ds_list[$i]['control_ip'] 		= 'localhost';
 				$this->ds_list[$i]['control_port'] 		= 0;
 				$this->ds_list[$i]['control_login']		= '';
 				$this->ds_list[$i]['control_password']	= '';
+				
+				$this->ds_list[$i]['gdaemon_key']		= $this->encrypt->decode($this->ds_list[$i]['gdaemon_key']);
 				
 				$this->ds_list[$i]['ssh_login']			= $this->encrypt->decode($this->ds_list[$i]['ssh_login']);
 				$this->ds_list[$i]['ssh_password']		= $this->encrypt->decode($this->ds_list[$i]['ssh_password']);
