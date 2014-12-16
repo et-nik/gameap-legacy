@@ -116,6 +116,11 @@ class Migration_Version_100 extends CI_Migration {
 			$this->dbforge->create_table('actions');
 		}
 		
+		// GameAP Daemon поля
+		$this->db->field_exists('gdaemon_host', 'dedicated_servers') OR $fields['gdaemon_host'] = array('type' => 'TINYTEXT');
+		$this->db->field_exists('gdaemon_key', 'dedicated_servers') OR $fields['gdaemon_key'] = array('type' => 'TINYTEXT');
+		empty($fields) OR $this->dbforge->add_column('dedicated_servers', $fields, 'steamcmd_path');
+		
 	}
 	
 	// -----------------------------------------------------------------
