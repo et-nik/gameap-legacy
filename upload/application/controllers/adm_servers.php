@@ -741,6 +741,9 @@ class Adm_servers extends CI_Controller {
 						
 						$sql_data['steamcmd_path'] = $this->input->post('steamcmd_path');
 						
+						$sql_data['gdaemon_host'] = $this->input->post('gdaemon_host');
+						$sql_data['gdaemon_key'] = $this->input->post('gdaemon_key');
+						
 						$sql_data['ssh_host'] = $this->input->post('ssh_host');
 						$sql_data['ssh_login'] = $this->input->post('ssh_login');
 						$sql_data['ssh_password'] = $this->input->post('ssh_password');
@@ -757,9 +760,12 @@ class Adm_servers extends CI_Controller {
 						$sql_data['ftp_path'] = $this->input->post('ftp_path');
 
 						/* 
-						 * Проверка указандых данных ssh, telnet, ftp
+						 * Проверка указандых данных gdaemon, ssh, telnet, ftp
 						 * чтобы пароль подходил
 						*/
+						
+						// GDaemon
+						// ...
 						
 						// Проверка данных SSH
 						if (!empty($sql_data['ssh_host'])) {
@@ -1276,7 +1282,7 @@ class Adm_servers extends CI_Controller {
 				$local_tpl['control_protocol'] = form_dropdown('control_protocol', $options, $this->dedicated_servers->ds_list['0']['control_protocol']);
 
 				// Скрипты
-				$local_tpl['script_start'] 		= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_start']);
+				$local_tpl['script_start'] 			= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_start']);
 				$local_tpl['script_stop'] 			= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_stop']);
 				$local_tpl['script_restart'] 		= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_restart']);
 				$local_tpl['script_status'] 		= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_status']);
@@ -1285,6 +1291,10 @@ class Adm_servers extends CI_Controller {
 				
 				$local_tpl['script_path'] 		= $this->dedicated_servers->ds_list['0']['script_path'];
 				$local_tpl['steamcmd_path'] 	= $this->dedicated_servers->ds_list['0']['steamcmd_path'];
+				
+				$local_tpl['gdaemon_host'] 		= $this->dedicated_servers->ds_list['0']['gdaemon_host'];
+				$local_tpl['gdaemon_key'] 		= $this->dedicated_servers->ds_list['0']['gdaemon_key'];
+				
 				$local_tpl['ssh_host'] 			= $this->dedicated_servers->ds_list['0']['ssh_host'];
 				$local_tpl['ssh_login'] 		= $this->dedicated_servers->ds_list['0']['ssh_login'];
 				$local_tpl['ssh_path'] 			= $this->dedicated_servers->ds_list['0']['ssh_path'];
@@ -1830,6 +1840,10 @@ class Adm_servers extends CI_Controller {
 					// Редактирование данных доступа к серверу (пароли ftp, ssh)
 					$sql_data['steamcmd_path'] 		= $this->input->post('steamcmd_path');
 					$sql_data['control_protocol'] 	= $this->input->post('control_protocol');
+					
+					$sql_data['gdaemon_host'] 		= $this->input->post('gdaemon_host');
+					$sql_data['gdaemon_key'] 		= $this->input->post('gdaemon_key');
+					
 					$sql_data['ssh_host'] 			= $this->input->post('ssh_host');
 					$sql_data['ssh_login'] 			= $this->input->post('ssh_login');
 					$sql_data['ssh_password'] 		= $this->input->post('ssh_password');

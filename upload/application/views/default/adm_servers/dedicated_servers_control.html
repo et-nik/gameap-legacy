@@ -34,6 +34,11 @@
 			<td>{lang_ip}:<br /><span class="description">{lang_adm_servers_ip_description}</span></td>
 			<td><input type="text" name="ip" value="{ds_ip}" /></td>
 		</tr>
+		
+		<tr>
+			<td>{lang_adm_servers_disable_ds}:</td>
+			<td>{disabled_checkbox}</td>
+		</tr>
 
 		<tr>
 		<tr>
@@ -75,6 +80,7 @@
 
 	<ul class="tabs">
 		<li><a href="#access_data">{lang_adm_servers_ds_access}</a></li>
+		<li><a href="#gdaemon_data">{lang_adm_servers_gdaemon_access}</a></li>
 		<li><a href="#ftp_data">{lang_adm_servers_ftp_data}</a></li>
         <li><a href="#ssh_data">{lang_adm_servers_ssh_data}</a></li>
         <li><a href="#telnet_data">{lang_adm_servers_telnet_data}</a></li>
@@ -103,6 +109,27 @@
 			<td width="40%">{lang_adm_servers_control_protocol}:</td>
 			<td>{control_protocol}</td>
 			</tr>
+		</table>
+	</div>
+	
+	<div id="gdaemon_data" class="tab_content">
+		<table class="zebra" width="100%">
+			<tbody>
+				<tr>
+					<td colspan="2"><p class="hr">{lang_adm_servers_gdaemon_data}</p></td>
+				</tr>
+			</tbody>
+			
+			<tr>
+				<td width="30%">{lang_adm_servers_gdaemon_host}:</td>
+				<td><input type="text" name="gdaemon_host" value="{gdaemon_host}" /></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_gdaemon_key}:</td>
+				<td><input type="text" name="gdaemon_key" /></td>
+			</tr>
+
 		</table>
 	</div>
 	
