@@ -136,6 +136,40 @@ class Adm_servers extends CI_Controller {
 			return false;
 		}
 	}
+	
+	// -----------------------------------------------------------------
+	
+	/**
+	 * Проверка GameAP Daemon
+	 * 
+	 * @param string
+	 * @param string
+	 * @param string
+	 * @return bool
+	*/
+	private function _check_gdaemon($host, $key)
+	{
+		$this->load->driver('control');
+
+		if ($host == '' OR $key == '') {
+			return false;
+		}
+
+		// Разделяем на Host:Port
+		$host = explode(':', $host);
+		$host[1] = (isset($host[1])) ? (int)$host[1] : 31707;
+		
+		$this->control->set_driver('gdaemon');
+		//~ $this->control->set_data(array('os' => $os));
+		
+		try {
+			$this->control->connect($host[0], $host[1]);
+			$this->control->auth("NULL", $key);
+			return true;
+		} catch (Exception $e) {
+			return false;
+		}
+	}
     
     // -----------------------------------------------------------
 	
@@ -765,7 +799,12 @@ class Adm_servers extends CI_Controller {
 						*/
 						
 						// GDaemon
-						// ...
+						if (!empty($sql_data['gdaemon_host'])) {
+							if (false == $this->_check_gdaemon($sql_data['gdaemon_host'], $sql_data['gdaemon_key'])) {
+								$this->_show_message(lang('adm_servers_gdaemon_data_unavailable'), 'javascript:history.back()');
+								return false;
+							}
+						}
 						
 						// Проверка данных SSH
 						if (!empty($sql_data['ssh_host'])) {
@@ -1839,6 +1878,7 @@ class Adm_servers extends CI_Controller {
 					
 					// Редактирование данных доступа к серверу (пароли ftp, ssh)
 					$sql_data['steamcmd_path'] 		= $this->input->post('steamcmd_path');
+					//~ $sql_data['script_path'] 		= $this->input->post('script_path');
 					$sql_data['control_protocol'] 	= $this->input->post('control_protocol');
 					
 					$sql_data['gdaemon_host'] 		= $this->input->post('gdaemon_host');
@@ -1858,15 +1898,27 @@ class Adm_servers extends CI_Controller {
 					$sql_data['ftp_login'] 			= $this->input->post('ftp_login');
 					$sql_data['ftp_password'] 		= $this->input->post('ftp_password');
 					$sql_data['ftp_path'] 			= $this->input->post('ftp_path');	
+
 					/* 
 					 * Проверка указандых данных ssh, telnet, ftp
 					 * чтобы пароль подходил
 					*/
 					
-					/* 
-					 * Проверка указандых данных ssh, telnet, ftp
-					 * чтобы пароль подходил
-					*/
+					// GDaemon
+					if (!empty($sql_data['gdaemon_host'])) {
+						
+						/* Ключ не задан, берем из базы */
+						if (empty($sql_data['gdaemon_key'])) {
+							$gdaemon_key = $this->dedicated_servers->ds_list['0']['gdaemon_key'];
+						} else {
+							$gdaemon_key = $sql_data['gdaemon_key'];
+						}
+
+						if (false == $this->_check_gdaemon($sql_data['gdaemon_host'], $gdaemon_key)) {
+							$this->_show_message(lang('adm_servers_gdaemon_data_unavailable'), 'javascript:history.back()');
+							return false;
+						}
+					}
 					
 					// SSH
 					if (!empty($sql_data['ssh_host'])) {
