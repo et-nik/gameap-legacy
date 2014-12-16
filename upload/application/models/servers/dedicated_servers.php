@@ -243,6 +243,19 @@ class Dedicated_servers extends CI_Model {
 				}
 				
 				switch(strtolower($this->ds_list[$i]['control_protocol'])) {
+					case 'gdaemon':
+						$this->ds_list[$i]['local_server'] 	= false;
+						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
+						
+						$explode = explode(':', $this->ds_list[$i]['ssh_host']);
+						$this->ds_list[$i]['control_ip'] 		= $explode[0];
+						$this->ds_list[$i]['control_port'] 		= isset($explode[1]) ? $explode[1] : 31707;
+
+						$this->ds_list[$i]['control_login']			= "NULL";
+						$this->ds_list[$i]['control_password'] 		= $this->ds_list[$i]['gdaemon_key'];
+						
+						break;
+						
 					case 'ssh':
 						$this->ds_list[$i]['local_server'] 	= false;
 						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
