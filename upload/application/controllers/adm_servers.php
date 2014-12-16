@@ -33,6 +33,8 @@
  
 class Adm_servers extends CI_Controller {
 	
+	var $available_control_protocols = array('gdaemon', 'ssh', 'telnet', 'local');
+	
 	public function __construct()
     {
         parent::__construct();
@@ -601,6 +603,9 @@ class Adm_servers extends CI_Controller {
 					$this->form_validation->set_rules('cpu', lang('adm_servers_cpu'), 'trim|max_length[64]|xss_clean');
 					$this->form_validation->set_rules('steamcmd_path', lang('adm_servers_steamcmd_path'), 'trim|max_length[256]|xss_clean');
 					$this->form_validation->set_rules('script_path', lang('adm_servers_script_path'), 'trim|max_length[256]|xss_clean');
+					
+					$this->form_validation->set_rules('gdaemon_host', lang('adm_servers_gdaemon_host'), 'trim|max_length[64]|xss_clean');
+					$this->form_validation->set_rules('gdaemon_key', lang('adm_servers_gdaemon_key'), 'trim|max_length[64]|xss_clean');
 					
 					$this->form_validation->set_rules('ssh_host', lang('adm_servers_ssh_host'), 'trim|max_length[64]|xss_clean');
 					$this->form_validation->set_rules('ssh_login', 'SSH login', 'trim|max_length[64]|xss_clean');
@@ -1259,7 +1264,7 @@ class Adm_servers extends CI_Controller {
 				$local_tpl = $tpl_list[0];
 				
 				//if(in_array('ssh2', get_loaded_extensions()));
-				$options = array('ssh' => 'SSH', 'telnet' => 'Telnet');
+				$options = array('gdaemon' => 'GameAP Daemon', 'ssh' => 'SSH', 'telnet' => 'Telnet');
 				
 				if ($this->dedicated_servers->ds_list['0']['control_protocol'] == 'local') {
 					// Поле Local отображается лишь для локального сервера
@@ -1326,6 +1331,9 @@ class Adm_servers extends CI_Controller {
 				// Редактирование данных доступа к серверу (пароли ftp, ssh)
 				$this->form_validation->set_rules('steamcmd_path', lang('adm_servers_steamcmd_path'), 'trim|max_length[256]|xss_clean');
 				$this->form_validation->set_rules('script_path', lang('adm_servers_script_path'), 'trim|max_length[256]|xss_clean');
+				
+				$this->form_validation->set_rules('gdaemon_host', lang('adm_servers_gdaemon_host'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('gdaemon_key', lang('adm_servers_gdaemon_key'), 'trim|max_length[64]|xss_clean');
 				
 				$this->form_validation->set_rules('ssh_host', 'SSH хост', 'trim|max_length[64]|xss_clean');
 				$this->form_validation->set_rules('ssh_login', 'SSH логин', 'trim|max_length[64]|xss_clean');
