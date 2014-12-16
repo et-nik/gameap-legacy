@@ -137,18 +137,18 @@ class Control_gdaemon extends CI_Driver {
 		$this->crypt_key 	= $password;
 		$this->client_key 	= $this->_read();
 		
-		$this->_auth = true;
+		if (!preg_match("/^[a-zA-Z0-9]{16}$/", $this->client_key)) {
+			throw new Exception(lang('server_command_login_failed') . ' (GDaemon)');
+		}
 		
+		$this->_auth = true;
 		return true;
 	}
 	
 	private function _read()
 	{
 		$buffer = "";
-		//~ while (@!$this->client_key[strlen($this->client_key)-1] == "\n" & !feof($this->_connection)) {
-			//~ $buffer .= fgets($this->_connection, 128);
-		//~ }
-		
+
 		while (@!$buffer[strlen($buffer)-1] == "\n" & !feof($this->_connection)) {
 			$buffer .= fgets($this->_connection, 4096);
 		}
@@ -183,7 +183,7 @@ class Control_gdaemon extends CI_Driver {
 		fwrite($this->_connection, "command {$encode_string}\n");
 		
 		if (!$contents = json_decode($this->_read(), true)) {
-			return false;
+			throw new Exception(lang('server_command_get_response_failed') . ' (GDaemon)');
 		}
 		
 		return implode("\n", $contents['command_results']);
