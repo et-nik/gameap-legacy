@@ -1032,7 +1032,7 @@ class Server_command extends CI_Controller {
 					// Обращаться к перезапуску можно не чаще 1 раза в минуту
 					if (!$this->users->auth_data['is_admin']) {
 						$this->panel_log->set_filter(array(	'type' => null, 
-															'command' => 'start',
+															'command' => 'restart',
 															'user_name' => $this->users->auth_data['login'],
 															'contents' => null,
 															'server_id' => $server_id,
