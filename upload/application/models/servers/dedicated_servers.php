@@ -18,6 +18,8 @@ class Dedicated_servers extends CI_Model {
 		'script_send_command' 	=> '-t send_command -d {dir} -n {name} -c "{command}" -u {user}',
     );
     
+    public $available_control_protocols = array('gdaemon', 'ssh', 'telnet', 'local');
+    
     //-----------------------------------------------------------
 
     public function __construct()
@@ -170,7 +172,7 @@ class Dedicated_servers extends CI_Model {
 			$query = $this->db->get('dedicated_servers');
 		}
 
-		if($query->num_rows > 0) {
+		if ($query->num_rows > 0) {
 			
 			$this->ds_list = $query->result_array();
 			
@@ -228,8 +230,7 @@ class Dedicated_servers extends CI_Model {
 				$this->ds_list[$i]['script_send_command'] = $this->ds_list[$i]['script_send_command'] 
 					OR $this->ds_list[$i]['script_send_command'] = $this->_get_default_script('script_send_command');
 					
-				
-				if (!in_array(strtolower($this->ds_list[$i]['control_protocol']), array('ssh', 'telnet', 'local'))) {
+				if (!in_array(strtolower($this->ds_list[$i]['control_protocol']), $this->available_control_protocols)) {
 					switch($this->ds_list[$i]['os']) {
 						case 'windows':
 							$this->ds_list[$i]['control_protocol'] = 'telnet';
