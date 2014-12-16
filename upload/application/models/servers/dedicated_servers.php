@@ -50,8 +50,10 @@ class Dedicated_servers extends CI_Model {
 		
 		$this->load->library('encrypt');
 		
-		if (isset($data['gdaemon_key'])) {
+		if (isset($data['gdaemon_key']) && $data['gdaemon_key'] != '') {
 			$data['gdaemon_key']	= $this->encrypt->encode($data['gdaemon_key']);
+		} else {
+			unset($data['gdaemon_key']);
 		}
 		
 		if (isset($data['ssh_login'])) {
