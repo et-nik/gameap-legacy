@@ -228,3 +228,8 @@ $lang['adm_servers_net_limit']						= 'Лимит на пропусную спо
 
 $lang['adm_servers_disable_ds']						= 'Отключить выделенный сервер';
 $lang['adm_servers_unknown_engine']					= 'Неизвестный движок игры';
+
+$lang['adm_servers_gdaemon_access']					= 'GameAP Daemon';
+$lang['adm_servers_gdaemon_data']					= 'Данные GameAP Daemon';
+$lang['adm_servers_gdaemon_host']					= 'Хост (IP:порт)';
+$lang['adm_servers_gdaemon_key']					= 'Ключ GDaemon';

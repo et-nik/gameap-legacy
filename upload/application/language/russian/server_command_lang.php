@@ -86,3 +86,8 @@ $lang['server_command_player_not_found']					= 'Игрок не найден.';
 $lang['server_command_wait_one_minute_to_restart']			= 'С момента последнего перезапуска должна пройти одна минута.';
 $lang['server_command_wait_one_minute_to_start']			= 'С момента последнего запуска должна пройти одна минута.';
 
+// 1.0
+$lang['server_command_gs_disabled']							= 'Игровой сервер деактивирован. Обратитесь к администратору.';
+$lang['server_command_ds_disabled']							= 'Выделенный сервер отключен. Обратитесь к администратору.';
+
+$lang['server_command_get_response_failed']					= 'Ответ на запрос не получен.';
