@@ -38,17 +38,28 @@ class Control extends CI_Driver_Library {
 	
 	private $_no_sudo			= false;		// Не добавлять sudo
 	
+	// Лимиты (работают только в Linux)
+	private $_limits			= array(
+		'ram'		=> 0, 		// RAM limit
+		'cpu'		=> 0, 		// CPU Load limit
+		'dnet'		=> 0, 		// Download speed limit
+		'unet'		=> 0, 		// Upload speed limit
+	);
+	
 	public function __construct()
 	{
 		$this->CI =& get_instance();
 		$this->CI->load->helper('string');
 		$this->CI->lang->load('server_command');
 		
-		$this->valid_drivers = array('control_ssh', 'control_telnet', 'control_local');
+		$this->valid_drivers = array('control_gdaemon', 'control_ssh', 'control_telnet', 'control_local');
 	}
 	
 	// ---------------------------------------------------------------------
 	
+	/**
+	 * Добавляет cd к команде
+	 */
 	private function _path_proccess($path) 
 	{
 		$path = reduce_double_slashes($path);
@@ -116,6 +127,23 @@ class Control extends CI_Driver_Library {
 				//$command = $command;
 				break;
 		}
+		
+		return $command;
+	}
+	
+	// ---------------------------------------------------------------------
+	
+	/**
+	 * Добавляет лимиты к команде
+	 */
+	private function _add_limits($command = '')
+	{
+		if ($this->os == 'windows') {
+			return $command;
+		}
+		
+		// Оперативная память
+		$command = $this->_limit['ram'] ? "ulimit -v {$this->_limit['ram']} && " . $command : $command;
 		
 		return $command;
 	}
@@ -192,9 +220,20 @@ class Control extends CI_Driver_Library {
 		
 		return $command;
 	}
+	
+	private function _reset_limits()
+	{
+		$this->_limits			= array(
+			'ram'	=> 0, 		// RAM limit
+			'cpu'	=> 0, 		// CPU Load limit
+		);
+	}
 
 	// ---------------------------------------------------------------------
 	
+	/**
+	 * Отправка команды на сервер
+	 */
 	private function _single_command($command = '', $path = false) 
 	{
 		if (!$this->driver) {
@@ -231,6 +270,7 @@ class Control extends CI_Driver_Library {
 
 		if ($this->ip != $ip && $this->port != $port) {
 			$this->clear_commands();
+			$this->_reset_limits();
 		}
 		
 		$this->ip 	= $ip;
@@ -269,6 +309,26 @@ class Control extends CI_Driver_Library {
 	// ---------------------------------------------------------------------
 	
 	/**
+	 * Ограничение на использование оперативной памяти
+	 */
+	public function set_ram_limit()
+	{
+		
+	}
+	
+	// ---------------------------------------------------------------------
+	
+	/**
+	 * Ограничение на использование процессорного времени
+	 */
+	public function set_cpu_limit()
+	{
+		
+	}
+	
+	// ---------------------------------------------------------------------
+	
+	/**
 	 * Отправляет команду на сервер. Аргумент command может принимать
 	 * как строковое значение, так и массив
 	 */
@@ -300,6 +360,9 @@ class Control extends CI_Driver_Library {
 	
 	// ---------------------------------------------------------------------
 	
+	/**
+	 * Алиас command
+	 */
 	public function exec($command = '', $path = false)
 	{
 		return $this->command($command, $path);
