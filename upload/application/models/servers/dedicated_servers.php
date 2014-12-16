@@ -134,7 +134,7 @@ class Dedicated_servers extends CI_Model {
     */
 	function del_dedicated_server($id)
 	{
-		return (bool)$this->db->delete('dedicated_servers', array('id' => $id);
+		return (bool)$this->db->delete('dedicated_servers', array('id' => $id));
 	}
 	
 	//-----------------------------------------------------------
