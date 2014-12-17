@@ -41,8 +41,10 @@ class Control_gdaemon extends CI_Driver {
 	{
 		if (strlen($value)%16) {
 			$value = $value . str_repeat(chr(16-strlen($value)%16), 16-strlen($value)%16);
+		} else {
+			$value = $value . str_repeat(chr(16), 16);
 		}
-		
+
 		return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $secret_key, $value, MCRYPT_MODE_ECB));
 	}
 	
@@ -152,7 +154,7 @@ class Control_gdaemon extends CI_Driver {
 		while (@!$buffer[strlen($buffer)-1] == "\n" & !feof($this->_connection)) {
 			$buffer .= fgets($this->_connection, 4096);
 		}
-		
+
 		return $this->_decode($buffer, $this->crypt_key);
 	}
 	
@@ -171,18 +173,21 @@ class Control_gdaemon extends CI_Driver {
 			throw new Exception(lang('server_command_not_connected') . ' (GDaemon)');
 		}
 		
-		$send_array = array(
+		$send_json = json_encode(array(
 			'key' 		=> $this->client_key,
 			'commands' 	=> array(
 								$command,
 							),
 			'type' 		=> "commands"
-		);
+		));
 		
-		$encode_string = $this->_encode(json_encode($send_array), $this->crypt_key);
+		$encode_string = $this->_encode($send_json, $this->crypt_key);
+
 		fwrite($this->_connection, "command {$encode_string}\n");
 		
-		if (!$contents = json_decode($this->_read(), true)) {
+		$read = $this->_read();
+
+		if (!$contents = json_decode($read, true)) {
 			throw new Exception(lang('server_command_get_response_failed') . ' (GDaemon)');
 		}
 		
