@@ -21,59 +21,59 @@
 
 #include "functions.h"
 
-using namespace std;
+// using namespace std;
 
-string type 		= "help";
-string dir  		= "";
-string screen_name 	= "";
-string ip			= "0.0.0.0";
-string port			= "";
-string command		= "";
-string user			= "";
-string memory		= "";
-string percentage	= "";
-string max_speed	= "";
+std::string type 		= "help";
+std::string dir = "";
+std::string screen_name = "";
+std::string ip = "0.0.0.0";
+std::string port = "";
+std::string command = "";
+std::string user = "";
+std::string memory = "";
+std::string percentage = "";
+std::string max_speed = "";
 
-string program 		= "";
-string arguments 	= "";
+std::string program = "";
+std::string arguments = "";
 
-string psexec	= "";
+std::string psexec = "";
 
 // ---------------------------------------------------------------------
 
 void show_help()
 {
-	cout << "**************************************\n";
-	cout << "* Welcome to GameAP Console Launcher *\n";
-	cout << "**************************************\n\n";
+	std::cout << "**************************************\n";
+	std::cout << "* Welcome to GameAP Console Launcher *\n";
+	std::cout << "**************************************\n\n";
 		
-	cout << "Program created by ET-NiK \n";
-	cout << "Site: http://www.gameap.ru \n\n";
+	std::cout << "Program created by ET-NiK \n";
+	std::cout << "Site: http://www.gameap.ru \n\n";
 	
-	cout << "Parameters\n";
-	cout << "-t <type>	(start|stop|restart|status|get_console|send_command)\n";
-	cout << "-d <dir>	base directory\n";
-	cout << "-n <screen_name> name screen\n";
-	cout << "-i <ip>\n";
-	cout << "-p <port>\n";
-	cout << "-c <command>  command (example 'hlds.exe -game valve +ip 127.0.0.1 +port 27015 +map crossfire')\n";
-	cout << "-u <user>\n";
-	cout << "-m <memory>	 RAM Limit (Kb)\n";
-	cout << "-f <percentage>	 CPU Limit (%)\n";
-	cout << "-s <max speed>	 NET Limit (Kb/s)\n\n";
+	std::cout << "Parameters\n";
+	std::cout << "-t <type>	(start|stop|restart|status|get_console|send_command)\n";
+	std::cout << "-d <dir>	base directory\n";
+	std::cout << "-n <screen_name> name screen\n";
+	std::cout << "-i <ip>\n";
+	std::cout << "-p <port>\n";
+	std::cout << "-c <command>  command (example 'hlds.exe -game valve +ip 127.0.0.1 +port 27015 +map crossfire')\n";
+	std::cout << "-u <user>\n";
+	std::cout << "-m <memory>	 RAM Limit (Kb)\n";
+	std::cout << "-f <percentage>	 CPU Limit (%)\n";
+	std::cout << "-s <max speed>	 NET Limit (Kb/s)\n\n";
 
-	cout << "Examples:\n";
-	cout << "./server.sh -t start -d /home/hl_server -n screen_hldm -i 127.0.0.1 -p 27015 -c \"hlds.exe -game valve +ip 127.0.0.1 +port 27015 +map crossfire\"\n";
-	cout << "./server.sh -t get_console -n hldm -u usver\n";
+	std::cout << "Examples:\n";
+	std::cout << "./server.sh -t start -d /home/hl_server -n screen_hldm -i 127.0.0.1 -p 27015 -c \"hlds.exe -game valve +ip 127.0.0.1 +port 27015 +map crossfire\"\n";
+	std::cout << "./server.sh -t get_console -n hldm -u usver\n";
 }
 
 // ---------------------------------------------------------------------
 
-string cpu_affinity()
+std::string cpu_affinity()
 {
 	int cores = get_cores_count();
 
-	vector<string> vcores;
+	std::vector<std::string> vcores;
 	std::stringstream ss;
 
 	for (int i = 0; i < cores; i++) {
@@ -106,14 +106,14 @@ int server_status()
 	
 #ifdef _WIN32
 	// Windows
-	string output = exec(str(boost::format("wmic process where description=\"%s\" get executablepath, processid") % program));
-	vector<string> expl = explode("\n", output);
+	std::string output = exec(str(boost::format("wmic process where description=\"%s\" get executablepath, processid") % program));
+	std::vector<std::string> expl = explode("\n", output);
 	
 	for (int i = 1; i < expl.size(); i++) {
 		boost::regex xregex("\\s+");
-		string str = boost::regex_replace(expl[i], xregex, " ", boost::match_default | boost::format_perl);
+		std::string str = boost::regex_replace(expl[i], xregex, " ", boost::match_default | boost::format_perl);
 		
-		vector<string> expl_str = explode(" ", str);
+		std::vector<std::string> expl_str = explode(" ", str);
 		
 		expl_str[0] = expl_str[0].substr(0, expl_str[0].length()-program.length()-1);
 		
@@ -128,9 +128,9 @@ int server_status()
 #endif
 	
 	if (pid) {
-		string output = exec(str(boost::format("echo %d > %s/pid.txt") % pid % dir));
+		std::string output = exec(str(boost::format("echo %d > %s/pid.txt") % pid % dir));
 	} else {
-		string output = exec(str(boost::format("echo NOT FOUND > %s/pid.txt") % dir));
+		std::string output = exec(str(boost::format("echo NOT FOUND > %s/pid.txt") % dir));
 	}
 	
 	return pid;
@@ -140,7 +140,7 @@ int server_status()
 
 int server_start()
 {
-	cout << "PROGRAM:" << program << endl;
+	std::cout << "PROGRAM:" << program << std::endl;
 	fast_exec(str(boost::format("%s \"%s\\%s\" %s") % psexec % dir % program % arguments));
 
 	std::cout << "CmdLine: " << str(boost::format("%s \"%s\\%s\" %s") % psexec % dir % program % arguments) << std::endl;
@@ -185,49 +185,58 @@ int server_stop()
 
 // ---------------------------------------------------------------------
 
-void main(int argc, char *argv[]) 
+int main(int argc, char *argv[]) 
 {	
 	//setlocale(LC_CTYPE, "rus");
 
 	for (int i = 0; i < argc-1; i++) {
 
-		if (string(argv[i]) == "-t") {
+		if (std::string(argv[i]) == "-t") {
 			// Тип
 			type = argv[i+1];
 			i++;
-		} else if (string(argv[i]) == "-d") {
+		} 
+		else if (std::string(argv[i]) == "-d") {
 			// Директория
 			dir = argv[i+1];
 			i++;
-		} else if (string(argv[i]) == "-n") {
+		} 
+		else if (std::string(argv[i]) == "-n") {
 			// Screen name
 			screen_name = argv[i+1];
 			i++;
-		} else if (string(argv[i]) == "-i") {
+		}
+		else if (std::string(argv[i]) == "-i") {
 			// IP
 			ip = argv[i+1];
 			i++;
-		} else if (string(argv[i]) == "-p") {
+		}
+		else if (std::string(argv[i]) == "-p") {
 			// Port
 			port = argv[i+1];
 			i++;
-		} else if (string(argv[i]) == "-c") {
+		}
+		else if (std::string(argv[i]) == "-c") {
 			// Start Command
 			command = argv[i+1];
 			i++;
-		} else if (string(argv[i]) == "-u") {
+		}
+		else if (std::string(argv[i]) == "-u") {
 			// User
 			user = argv[i+1];
 			i++;
-		} else if (string(argv[i]) == "-m") {
+		}
+		else if (std::string(argv[i]) == "-m") {
 			// Memory
 			memory = argv[i+1];
 			i++;
-		} else if (string(argv[i]) == "-f") {
+		}
+		else if (std::string(argv[i]) == "-f") {
 			// CPU
 			percentage = argv[i+1];
 			i++;
-		} else if (string(argv[i]) == "-s") {
+		}
+		else if (std::string(argv[i]) == "-s") {
 			// Speed Limit
 			max_speed = argv[i+1];
 			i++;
@@ -255,17 +264,17 @@ void main(int argc, char *argv[])
 #endif
 
 	if (file_exists("psexec.exe")) {
-		psexec = str( boost::format("psexec.exe -s -i -d -w \"%s\" -a %s ") % dir % cpu_affinity() );
+		psexec = str( boost::format("psexec.exe -accepteula -s -i -d -w \"%s\" -a %s ") % dir % cpu_affinity() );
 	} else if(file_exists("paexec.exe")) {
 		psexec = str( boost::format("paexec.exe \\\\localhost -s -d -w  \"%s\" -a %s ") % dir % cpu_affinity() );
 	} else {
-		cout << "psexec.exe and paexec.exe not found" << endl;
-		// psexec = str( boost::format("start /D \"%s\" /I /affinity -a %s ") % dir % cpu_affinity() );
+		std::cout << "psexec.exe and paexec.exe not found" << std::endl;
+		//psexec = str( boost::format("start /D \"%s\" /I ") % dir );
 		psexec = str(boost::format("screen -t start -S %s -c ") % screen_name);
 	}
     
     /* Разъединение программы и аргумента в команде запуска сервера */
-    vector<string> explodes = explode(" ", command);
+	std::vector<std::string> explodes = explode(" ", command);
 
     program 	= explodes[0];
     
@@ -295,29 +304,30 @@ void main(int argc, char *argv[])
 	cout << "psexec:" << psexec << endl;
 	*/
 
-	if (string(type) == "start") {
+	if (std::string(type) == "start") {
 		
 		if(server_status() == 0) {
 			
 			if(server_start() != 0) {
-				cout << "Server started" << endl;
+				std::cout << "Server started" << std::endl;
 			} else {
-				cout << "Server not started" << endl;
+				std::cout << "Server not started" << std::endl;
 			}
 				
 		} else {
-			cout << "Server is already running" << endl;
+			std::cout << "Server is already running" << std::endl;
 		}
 		
 	} 
-	else if (string(type) == "stop") {
+	else if (std::string(type) == "stop" || std::string(type) == "kill") {
+		Sleep(3000);
 		if (server_stop() == 1) {
-			cout << "Server stopped" << endl;
+			std::cout << "Server stopped" << std::endl;
 		} else {
-			cout << "Server not stopped" << endl;
+			std::cout << "Server not stopped" << std::endl;
 		}
 	} 
-	else if (string(type) == "restart") {
+	else if (std::string(type) == "restart") {
 		
 		if (server_status() != 0) {
 			server_stop();
@@ -331,41 +341,41 @@ void main(int argc, char *argv[])
 		}
 
 		if (server_start() != 0) {
-			cout << "Server restarted" << endl;
+			std::cout << "Server restarted" << std::endl;
 		} else {
-			cout << "Server not restarted" << endl;
+			std::cout << "Server not restarted" << std::endl;
 		}
 
 	} 
-	else if (string(type) == "status") {
+	else if (std::string(type) == "status") {
 		int pid = server_status();
 		
 		if(pid != 0) {
-			cout << "Server is UP" << endl;
+			std::cout << "Server is UP" << std::endl;
 		} else {
-			cout << "Server is Down" << endl;
+			std::cout << "Server is Down" << std::endl;
 		}
 		
 	} 
-	else if (string(type) == "get_console") {
-		string output = "";
+	else if (std::string(type) == "get_console") {
+		std::string output = "";
 #ifdef _WIN32
 		output = exec(str(boost::format("screen -t get_console -S %s") % screen_name));
 #else
 
 #endif
 		// Вывод команды
-		cout << output << endl;
+		std::cout << output << std::endl;
 	}
-	else if (string(type) == "send_command") {
-		string output = "";
+	else if (std::string(type) == "send_command") {
+		std::string output = "";
 #ifdef _WIN32
 		output = exec(str(boost::format("screen -t get_console -S %s -c %s") % screen_name % command));
 #else
 
 #endif
 		// Вывод команды
-		cout << output << endl;
+		std::cout << output << std::endl;
 	}
 	else {
 		show_help();
