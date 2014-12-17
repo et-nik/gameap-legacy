@@ -12,6 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{215B8F81-5636-3C30-F703-F6A259688831}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -21,6 +22,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -34,18 +36,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Documents and Settings\Nik\Мои документы\Visual Studio 2010\Libs\boost_1_56_0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Documents and Settings\Nik\Мои документы\Visual Studio 2010\Libs\boost_1_56_0\libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)\..\..\Libs\boost;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)\..\..\Libs\boost\libs;$(IncludePath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Documents and Settings\Nik\Мои документы\Visual Studio 2010\Libs\boost_1_56_0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Documents and Settings\Nik\Мои документы\Visual Studio 2010\Libs\boost_1_56_0\libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)\..\..\Libs\boost;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)\..\..\Libs\boost\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
@@ -54,14 +56,14 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\Documents and Settings\Nik\Мои документы\Visual Studio 2010\Libs\boost_1_56_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libboost_atomic-vc100-mt-gd-1_56.lib;libboost_chrono-vc100-mt-gd-1_56.lib;libboost_context-vc100-mt-gd-1_56.lib;libboost_coroutine-vc100-mt-gd-1_56.lib;libboost_date_time-vc100-mt-gd-1_56.lib;libboost_exception-vc100-mt-gd-1_56.lib;libboost_filesystem-vc100-mt-gd-1_56.lib;libboost_graph-vc100-mt-gd-1_56.lib;libboost_iostreams-vc100-mt-gd-1_56.lib;libboost_locale-vc100-mt-gd-1_56.lib;libboost_log-vc100-mt-gd-1_56.lib;libboost_log_setup-vc100-mt-gd-1_56.lib;libboost_math_c99-vc100-mt-gd-1_56.lib;libboost_math_c99f-vc100-mt-gd-1_56.lib;libboost_math_c99l-vc100-mt-gd-1_56.lib;libboost_math_tr1-vc100-mt-gd-1_56.lib;libboost_math_tr1f-vc100-mt-gd-1_56.lib;libboost_math_tr1l-vc100-mt-gd-1_56.lib;libboost_prg_exec_monitor-vc100-mt-gd-1_56.lib;libboost_program_options-vc100-mt-gd-1_56.lib;libboost_random-vc100-mt-gd-1_56.lib;libboost_regex-vc100-mt-gd-1_56.lib;libboost_serialization-vc100-mt-gd-1_56.lib;libboost_signals-vc100-mt-gd-1_56.lib;libboost_system-vc100-mt-gd-1_56.lib;libboost_test_exec_monitor-vc100-mt-gd-1_56.lib;libboost_thread-vc100-mt-gd-1_56.lib;libboost_timer-vc100-mt-gd-1_56.lib;libboost_unit_test_framework-vc100-mt-gd-1_56.lib;libboost_wave-vc100-mt-gd-1_56.lib;libboost_wserialization-vc100-mt-gd-1_56.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\Libs\boost\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cryptlib.lib;lib_json.lib;libboost_chrono-vc120-mt-s-1_57.lib;libboost_date_time-vc120-mt-s-1_57.lib;libboost_regex-vc120-mt-s-1_57.lib;libboost_system-vc120-mt-s-1_57.lib;libboost_thread-vc120-mt-s-1_57.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -71,8 +73,8 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Documents and Settings\Nik\Мои документы\Visual Studio 2010\Libs\boost_1_56_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libboost_atomic-vc100-mt-1_56.lib;libboost_chrono-vc100-mt-1_56.lib;libboost_context-vc100-mt-1_56.lib;libboost_coroutine-vc100-mt-1_56.lib;libboost_date_time-vc100-mt-1_56.lib;libboost_exception-vc100-mt-1_56.lib;libboost_filesystem-vc100-mt-1_56.lib;libboost_graph-vc100-mt-1_56.lib;libboost_iostreams-vc100-mt-1_56.lib;libboost_locale-vc100-mt-1_56.lib;libboost_log_setup-vc100-mt-1_56.lib;libboost_log-vc100-mt-1_56.lib;libboost_math_c99f-vc100-mt-1_56.lib;libboost_math_c99l-vc100-mt-1_56.lib;libboost_math_c99-vc100-mt-1_56.lib;libboost_math_tr1f-vc100-mt-1_56.lib;libboost_math_tr1l-vc100-mt-1_56.lib;libboost_math_tr1-vc100-mt-1_56.lib;libboost_prg_exec_monitor-vc100-mt-1_56.lib;libboost_program_options-vc100-mt-1_56.lib;libboost_random-vc100-mt-1_56.lib;libboost_regex-vc100-mt-1_56.lib;libboost_serialization-vc100-mt-1_56.lib;libboost_signals-vc100-mt-1_56.lib;libboost_system-vc100-mt-1_56.lib;libboost_test_exec_monitor-vc100-mt-1_56.lib;libboost_thread-vc100-mt-1_56.lib;libboost_timer-vc100-mt-1_56.lib;libboost_unit_test_framework-vc100-mt-1_56.lib;libboost_wave-vc100-mt-1_56.lib;libboost_wserialization-vc100-mt-1_56.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\Libs\boost\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cryptlib.lib;lib_json.lib;libboost_chrono-vc120-mt-s-1_57.lib;libboost_date_time-vc120-mt-s-1_57.lib;libboost_regex-vc120-mt-s-1_57.lib;libboost_system-vc120-mt-s-1_57.lib;libboost_thread-vc120-mt-s-1_57.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
