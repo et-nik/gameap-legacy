@@ -159,12 +159,13 @@ class Control_telnet extends CI_Driver {
 		}
 		
 		$this->_connection = @fsockopen($this->ip, $this->port, $errno, $errstr, 10);
-		stream_set_blocking($this->_connection, 1);
-		//~ @stream_set_timeout($this->_connection, 30);
 
 		if (!$this->_connection) {
 			throw new Exception(lang('server_command_connection_failed') . ' (Telnet)');
 		}
+		
+		stream_set_blocking($this->_connection, 1);
+		//~ @stream_set_timeout($this->_connection, 30);
 		
 		$this->_auth = false;
 		return $this->_connection;
