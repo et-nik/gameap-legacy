@@ -114,7 +114,7 @@ class Control_gdaemon extends CI_Driver {
 	{
 		if (strlen($this->crypt_key) < 16) {
 			$this->crypt_key = $this->crypt_key . str_repeat('*', 16-strlen($this->crypt_key));
-		} else if (crypt_key.size() > 16) {
+		} else if (strlen($this->crypt_key) > 16) {
 			$this->crypt_key = substr($this->crypt_key, 0, 16);
 		}
 	}
