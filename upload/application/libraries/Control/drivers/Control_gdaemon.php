@@ -91,6 +91,36 @@ class Control_gdaemon extends CI_Driver {
 	
 	// -----------------------------------------------------------------
 	
+	/**
+	 * Чтение данных из потока
+	 */
+	private function _read()
+	{
+		$buffer = "";
+
+		while (@!$buffer[strlen($buffer)-1] == "\n" & !feof($this->_connection)) {
+			$buffer .= fgets($this->_connection, 16384);
+		}
+
+		return $this->_decode($buffer, $this->crypt_key);
+	}
+	
+	// -----------------------------------------------------------------
+	
+	/**
+	 * Ключ дополняется, либо урезается до 16 байт
+	 */
+	private function _fix_crypt_key()
+	{
+		if (strlen($this->crypt_key) < 16) {
+			$this->crypt_key = $this->crypt_key . str_repeat('*', 16-strlen($this->crypt_key));
+		} else if (crypt_key.size() > 16) {
+			$this->crypt_key = substr($this->crypt_key, 0, 16);
+		}
+	}
+	
+	// -----------------------------------------------------------------
+	
 	function connect($ip = false, $port = 0)
 	{
 		if ($this->_connection && $this->ip == $ip) {
@@ -137,6 +167,8 @@ class Control_gdaemon extends CI_Driver {
 		fwrite($this->_connection, "getkey\n");
 
 		$this->crypt_key 	= $password;
+		$this->_fix_crypt_key();
+		
 		$this->client_key 	= $this->_read();
 		
 		if (!preg_match("/^[a-zA-Z0-9]{16}$/", $this->client_key)) {
@@ -146,18 +178,7 @@ class Control_gdaemon extends CI_Driver {
 		$this->_auth = true;
 		return true;
 	}
-	
-	private function _read()
-	{
-		$buffer = "";
 
-		while (@!$buffer[strlen($buffer)-1] == "\n" & !feof($this->_connection)) {
-			$buffer .= fgets($this->_connection, 4096);
-		}
-
-		return $this->_decode($buffer, $this->crypt_key);
-	}
-	
 	// -----------------------------------------------------------------
 	
 	/**
