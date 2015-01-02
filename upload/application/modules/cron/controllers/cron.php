@@ -1358,8 +1358,15 @@ class Cron extends MX_Controller {
 			// Устанавливаем дату выполнения
 			$sql_data[$a]['date_performed'] = now();
 
-			// Устанавливаем дату следующего выполнения
-			$sql_data[$a]['date_perform'] = $task_list[$i]['date_perform'] + $task_list[$i]['time_add'];
+			if ($task_list[$i]['time_add']) {
+				// Устанавливаем дату следующего выполнения
+				$sql_data[$a]['date_perform'] = $task_list[$i]['date_perform'] + $task_list[$i]['time_add'];
+			} 
+			else {
+				// Удаление задания, т.к. даты следующего выполнения нет
+				$this->db->where('id', $task_list[$i]['id']);
+				$this->db->delete('cron'); 
+			}
 
 			$i ++;
 			$a ++;
