@@ -1137,12 +1137,6 @@ class Server_command extends CI_Controller {
 					return false;
 				}
 
-				/* Заданы ли параметры запуска */
-				if (!$this->servers->server_data['script_update']) {
-					$this->_show_message(lang('server_command_update_not_param'));
-					return false;
-				}
-
 				/* Подтверждение 
 				 * Чтобы избежать случаев случайного обновления
 				*/
