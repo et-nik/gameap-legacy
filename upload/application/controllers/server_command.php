@@ -1164,7 +1164,7 @@ class Server_command extends CI_Controller {
 					// Сохраняем логи
 					$log_data['type'] = 'server_task';
 					$log_data['command'] = 'add_task';
-					$log_data['user_name'] = $this->users->user_login;
+					$log_data['user_name'] = $this->users->auth_login;
 					$log_data['server_id'] = $server_id;
 					$log_data['msg'] = 'Add new task';
 					$log_data['log_data'] = 'Name: ' . $sql_data['name'];
