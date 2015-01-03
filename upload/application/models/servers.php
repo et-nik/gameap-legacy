@@ -145,9 +145,14 @@ class Servers extends CI_Model {
 	
 	//-----------------------------------------------------------
 	
-	public function replace_shotcodes($command, $server_data) 
+	public function replace_shotcodes($command, &$server_data) 
 	{
-		return $this->_replace_shotcodes_in_array($command, $server_data);
+		if (is_array($command)) {
+			return $this->_replace_shotcodes_in_array($command, $server_data);
+		}
+		else {
+			return $this->_replace_shotcodes_in_string($command, $server_data);
+		}
 	}
 	
 	//-----------------------------------------------------------
@@ -155,7 +160,7 @@ class Servers extends CI_Model {
 	/*
 	 * Замена шоткодов в команде
 	*/
-	private function _replace_shotcodes_in_string($command, $server_data)
+	private function _replace_shotcodes_in_string($command, &$server_data)
 	{
 		$this->load->helper('ds');
 		return replace_shotcodes($command, $server_data);
@@ -166,16 +171,12 @@ class Servers extends CI_Model {
 	/*
 	 * Замена шоткодов в команде
 	*/
-	private function _replace_shotcodes_in_array($command, $server_data)
+	private function _replace_shotcodes_in_array($command, &$server_data)
 	{
-		if (is_array($command)) {
-			foreach($command as &$str) { 
-				$str = $this->_replace_shotcodes_in_string($str, $server_data); 
-			}
-		} else {
-			$command = $this->_replace_shotcodes_in_string($command, $server_data);
+		foreach($command as &$str) { 
+			$str = $this->_replace_shotcodes_in_string($str, $server_data); 
 		}
-		
+
 		return $command;
 	}
 	
