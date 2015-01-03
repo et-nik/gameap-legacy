@@ -235,12 +235,13 @@ class Servers_files extends CI_Controller {
 			
 			if($cfg_files) {
 				$i = -1;
-				$local_tpl['cfg_files'] = $cfg_files;
+				
 				foreach($cfg_files as $array) {
 					$i ++;
-					$local_tpl['cfg_files'][$i]['id_cfg'] = $i;
+					$cfg_files[$i]['id_cfg'] 	= $i;
+					$cfg_files[$i]['file'] 	= $this->servers->replace_shotcodes($cfg_files[$i]['file'], $this->servers->server_data);
 				}
-			
+				$local_tpl['cfg_files'] = $cfg_files;
 			} else {
 				$local_tpl['cfg_files'] = array();
 			}
@@ -249,18 +250,16 @@ class Servers_files extends CI_Controller {
 		}
 
 		if($this->users->auth_servers_privileges['UPLOAD_CONTENTS']){
-			/* Чтобы шоткод отображался нормально*/
-
 			$content_dirs = json_decode($this->servers->server_data['content_dirs'], true);
 			
 			if($content_dirs) {
 				$i = -1;
-				$local_tpl['content_dirs'] = $content_dirs;
 				foreach($content_dirs as $array) {
 					$i ++;
-					$local_tpl['content_dirs'][$i]['id_dir'] = $i;
+					$content_dirs[$i]['id_dir'] = $i;
+					$content_dirs[$i]['path'] 	= $this->servers->replace_shotcodes($content_dirs[$i]['path'], $this->servers->server_data);
 				}
-			
+				$local_tpl['content_dirs'] = $content_dirs;
 			} else {
 				$local_tpl['content_dirs'] = array();
 			}
@@ -321,7 +320,7 @@ class Servers_files extends CI_Controller {
 			return false;
 		}
 
-		$file =& $s_cfg_files[$cfg_id]['file'];
+		$file =& $this->servers->replace_shotcodes($s_cfg_files[$cfg_id]['file'], $this->servers->server_data);
 		$dir = $this->_get_path($this->servers->server_data);
 		
 		if(!$this->input->post('submit')) {
@@ -472,7 +471,9 @@ class Servers_files extends CI_Controller {
 		}
 		
 		$tmp_dir = $this->files->_get_tmp_dir();
-		$remdir = $this->_get_path($this->servers->server_data) . $s_content_dirs[$dir_id]['path'] . '/';
+		$remdir = $this->_get_path($this->servers->server_data) 
+						. $this->servers->replace_shotcodes($s_content_dirs[$dir_id]['path'], $this->servers->server_data)
+						. '/';
 
 		$upload_config['upload_path'] 	= $tmp_dir;
 		$upload_config['overwrite'] 	= true;

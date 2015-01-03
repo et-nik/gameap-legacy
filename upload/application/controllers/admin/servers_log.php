@@ -188,11 +188,12 @@ class Servers_log extends CI_Controller {
 			
 			if($ldir_list) {
 				$i = -1;
-				$local_tpl['ldir_list'] = $ldir_list;
 				foreach($ldir_list as $array) {
 					$i ++;
-					$local_tpl['ldir_list'][$i]['id_dir'] = $i;
+					$ldir_list[$i]['id_dir'] = $i;
+					$ldir_list[$i]['path'] 	= $this->servers->replace_shotcodes($ldir_list[$i]['path'], $this->servers->server_data);
 				}
+				$local_tpl['ldir_list'] = $ldir_list;
 			} else {
 				$local_tpl['ldir_list'] = array();
 			}
@@ -228,7 +229,7 @@ class Servers_log extends CI_Controller {
 		}
 		
 		$local_tpl['id_dir'] = $id_dir;		
-		$dir = $ldir_list[$id_dir]['path'];
+		$dir = $this->servers->replace_shotcodes($ldir_list[$id_dir]['path'], $this->servers->server_data);
 		
 		// Получаем массив с расширением файлов
 		$allowed_types = explode('|', $ldir_list[$id_dir]['allowed_types']);
