@@ -152,7 +152,7 @@
 				<tr>
 					<td>{alias}</td>
 					<td>{desc}</td>
-					<td align="center">{default_value}</td>
+					<td>{default_value}</td>
 					<td align="center">{only_admins}</td>
 					<td align="center"><input type="checkbox" name="alias_delete[{id}]" value="accept"  /></td>
 				</tr>
@@ -260,7 +260,7 @@
 		}
 		
 		if(id == 'aliases_list') {
-			$('<tr><td><input type="text" name="alias_name[]" /></td><td><input type="text" name="alias_desc[]" /></td><td align="center"><input type="checkbox" name="alias_only_admins[]" value="accept"  /></td><td>&nbsp;</td></tr>').fadeIn('slow').appendTo('#aliases_list');
+			$('<tr><td><input type="text" name="alias_name[]" /></td><td><input type="text" name="alias_desc[]" /></td><td><input type="text" name="default_value[]" /></td><td align="center"><input type="checkbox" name="alias_only_admins[]" value="accept"  /></td><td>&nbsp;</td></tr>').fadeIn('slow').appendTo('#aliases_list');
 		}
 	}
 		
