@@ -2176,7 +2176,7 @@ class Adm_servers extends CI_Controller {
 						}
 
 						if(isset($config_files)) {
-							$sql_data['config_files'] = json_encode($config_files);
+							$sql_data['config_files'] = json_encode(array_values($config_files));
 						}
 					}
 					
@@ -2221,7 +2221,7 @@ class Adm_servers extends CI_Controller {
 						}
 						
 						if(isset($content_dirs)) {
-							$sql_data['content_dirs'] = json_encode($content_dirs);
+							$sql_data['content_dirs'] = json_encode(array_values($content_dirs));
 						}
 					}
 
@@ -2266,7 +2266,7 @@ class Adm_servers extends CI_Controller {
 						}
 						
 						if(isset($log_dirs)) {
-							$sql_data['log_dirs'] = json_encode($log_dirs);
+							$sql_data['log_dirs'] = json_encode(array_values($log_dirs));
 						}
 					}
 					
@@ -2304,7 +2304,7 @@ class Adm_servers extends CI_Controller {
 						}
 
 						if(isset($fast_rcon)) {
-							$sql_data['fast_rcon'] = json_encode($fast_rcon);
+							$sql_data['fast_rcon'] = json_encode(array_values($fast_rcon));
 						}
 					}
 					
@@ -2358,7 +2358,7 @@ class Adm_servers extends CI_Controller {
 						}
 						
 						if(isset($aliases)) {
-							$sql_data['aliases'] = json_encode($aliases);
+							$sql_data['aliases'] = json_encode(array_values($aliases));
 						}
 					}
 
