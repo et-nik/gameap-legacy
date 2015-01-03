@@ -118,7 +118,7 @@ class Settings extends CI_Controller {
 			$allowable_aliases = json_decode($this->servers->server_data['aliases_list'], true);
 			
 			/* Значения алиасов на сервере */
-			$server_aliases = json_decode($this->servers->server_data['aliases'], true);
+			$aliases_values =& $this->servers->server_data['aliases_values'];
 			
 			/* Отображение алиасов */
 			if($allowable_aliases && !empty($allowable_aliases)) {
@@ -134,8 +134,8 @@ class Settings extends CI_Controller {
 					// Задаем правила проверки для алиаса
 					$this->form_validation->set_rules('alias_' . $alias['alias'], $alias['desc'], 'trim|max_length[32]|xss_clean');
 					
-					if(isset($server_aliases[$alias['alias']])) {
-						$value_alias = $server_aliases[$alias['alias']];
+					if(isset($aliases_values[$alias['alias']])) {
+						$value_alias = $aliases_values[$alias['alias']];
 					} else {
 						$value_alias = '';
 					}
@@ -173,7 +173,7 @@ class Settings extends CI_Controller {
 			$allowable_aliases = json_decode($this->servers->server_data['aliases_list'], true);
 			
 			/* Значения алиасов на сервере */
-			$server_aliases = json_decode($this->servers->server_data['aliases'], true);
+			$aliases_values =& $this->servers->server_data['aliases_values'];
 			
 			/* Прогон по алиасам */
 			if($allowable_aliases && !empty($allowable_aliases)) {
@@ -186,17 +186,17 @@ class Settings extends CI_Controller {
 					
 					/* Для безопасности запрещаем пробелы, табы и кавычки */
 					$alias_arr = explode(' ', $this->input->post('alias_' . $alias['alias'], true));
-					$server_aliases[$alias['alias']] = $alias_arr[0];
-					$server_aliases[$alias['alias']] = str_replace('\'', '', $server_aliases[$alias['alias']]);
-					$server_aliases[$alias['alias']] = str_replace('"', '', $server_aliases[$alias['alias']]);
-					$server_aliases[$alias['alias']] = str_replace('	', '', $server_aliases[$alias['alias']]);
+					$aliases_values[$alias['alias']] = $alias_arr[0];
+					$aliases_values[$alias['alias']] = str_replace('\'', '', $aliases_values[$alias['alias']]);
+					$aliases_values[$alias['alias']] = str_replace('"', '', $aliases_values[$alias['alias']]);
+					$aliases_values[$alias['alias']] = str_replace('	', '', $aliases_values[$alias['alias']]);
 					
-					$log_data['log_data'] .= 'alias_' . $alias['alias'] . ' : ' . $server_aliases[$alias['alias']] . "\n";
+					$log_data['log_data'] .= 'alias_' . $alias['alias'] . ' : ' . $aliases_values[$alias['alias']] . "\n";
 				}
 			}
 			
 			// Отправляем алиасы на сервер
-			$sql_data['aliases'] = json_encode($server_aliases);
+			$sql_data['aliases'] = json_encode($aliases_values);
 			$this->servers->edit_game_server($server_id, $sql_data);
 
             // Сохраняем логи
