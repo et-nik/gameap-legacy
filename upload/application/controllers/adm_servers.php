@@ -1774,9 +1774,13 @@ class Adm_servers extends CI_Controller {
 
 					$i = 0;
 					foreach($json_decode as $array) {
+						
+						isset($array['default_value']) OR $array['default_value'] = '';
+						
 						$local_tpl['aliases_list'][$i]['id'] 			= $i;
 						$local_tpl['aliases_list'][$i]['alias'] 		= form_input('alias_name[]', $array['alias']);
-						$local_tpl['aliases_list'][$i]['desc'] 		= form_input('alias_desc[]', $array['desc']);
+						$local_tpl['aliases_list'][$i]['desc'] 			= form_input('alias_desc[]', $array['desc']);
+						$local_tpl['aliases_list'][$i]['default_value'] = form_input('default_value[]', $array['default_value']);
 						$local_tpl['aliases_list'][$i]['only_admins'] 	= form_checkbox('alias_only_admins[' . $i . ']', 'accept', $array['only_admins']);
 						$i ++;
 					}
@@ -2313,10 +2317,11 @@ class Adm_servers extends CI_Controller {
 					 * 	Перебор алиасов
 					 * ----------------------------
 					*/
-					$aliases_list['alias'] 		= $this->input->post('alias_name');
-					$aliases_list['desc'] 		= $this->input->post('alias_desc');
-					$aliases_list['only_admins'] = $this->input->post('alias_only_admins');
-					$aliases_list['delete'] 	= $this->input->post('alias_delete');
+					$aliases_list['alias'] 				= $this->input->post('alias_name');
+					$aliases_list['desc'] 				= $this->input->post('alias_desc');
+					$aliases_list['default_value'] 		= $this->input->post('default_value');
+					$aliases_list['only_admins'] 		= $this->input->post('alias_only_admins');
+					$aliases_list['delete'] 			= $this->input->post('alias_delete');
 					
 					/* Массив с системными алиасами. Их использовать нельзя */
 					$sys_aliases = array('id', 'script_path', 'command', 'game_dir', 'dir', 'name', 'ip', 'port', 'game', 'user');
@@ -2354,6 +2359,7 @@ class Adm_servers extends CI_Controller {
 							
 							$aliases[$i]['alias'] 			= $alias;
 							$aliases[$i]['desc'] 			= $aliases_list['desc'][$i];
+							$aliases[$i]['default_value'] 	= $aliases_list['default_value'][$i];
 							$aliases[$i]['only_admins'] 	= (bool)$aliases_list['only_admins'][$i];
 						}
 						

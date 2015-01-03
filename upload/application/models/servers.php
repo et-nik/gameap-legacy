@@ -632,6 +632,9 @@ class Servers extends CI_Model {
 		/* Расшифровываем RCON пароль */
 		$this->server_data['rcon'] = $this->encrypt->decode($this->server_data['rcon']);
 		
+		/* Данные алиасов в массив */
+		$this->server_data['aliases_values'] = json_decode($this->server_data['aliases'], true);
+		
 		/* Получаем query и rcon порты */
 		if (!$this->server_data['query_port']) {
 			$this->server_data['query_port'] = $this->server_data['server_port'];
@@ -757,8 +760,18 @@ class Servers extends CI_Model {
 			$this->server_data['chmap_cmd'] 	= $this->game_types->game_types_list['0']['chmap_cmd'];
 			$this->server_data['sendmsg_cmd'] 	= $this->game_types->game_types_list['0']['sendmsg_cmd'];
 			$this->server_data['passwd_cmd'] 	= $this->game_types->game_types_list['0']['passwd_cmd'];
-
 			
+			$aliases_list 	= json_decode($this->server_data['aliases_list'], true);
+			
+			// Задаем дефолтные значения для пустых алиасов
+			foreach ($aliases_list as $alias) {
+				if (!isset($this->server_data['aliases_values'][$alias['alias']]) OR empty($this->server_data['aliases_values'][$alias['alias']])) {
+					$this->server_data['aliases_values'][$alias['alias']] = $alias['default_value'];
+				}
+			}
+			
+			$this->server_data['aliases'] = json_encode($this->server_data['aliases_values']);
+
 		} else {
 			/* Информация о модификации игры не найдена */
 		}
