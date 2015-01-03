@@ -1361,10 +1361,10 @@ class Adm_servers extends CI_Controller {
 				 * http://cidocs.ru/213/libraries/form_validation.html
 				 * 
 				*/
-				$this->form_validation->set_rules('name', 'название', 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('os', 'операционная система', 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('location', 'расположение', 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('provider', 'провайдер', 'trim|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('name', lang('title'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('os', lang('operationg_system'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('location', lang('adm_servers_location'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('provider', 'adm_servers_provider', 'trim|max_length[64]|min_length[3]|xss_clean');
 				$this->form_validation->set_rules('ip', 'IP', 'trim|required|xss_clean');
 				$this->form_validation->set_rules('ram', 'RAM', 'trim|max_length[64]|xss_clean');
 				$this->form_validation->set_rules('cpu', 'CPU', 'trim|max_length[64]|xss_clean');
@@ -1384,22 +1384,22 @@ class Adm_servers extends CI_Controller {
 				$this->form_validation->set_rules('gdaemon_host', lang('adm_servers_gdaemon_host'), 'trim|max_length[64]|xss_clean');
 				$this->form_validation->set_rules('gdaemon_key', lang('adm_servers_gdaemon_key'), 'trim|max_length[64]|xss_clean');
 				
-				$this->form_validation->set_rules('ssh_host', 'SSH хост', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('ssh_login', 'SSH логин', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('ssh_password', 'SSH пароль', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('ssh_path', 'Путь SSH', 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('ssh_host', lang('adm_servers_ftp_host'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('ssh_login', 'SSH login', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('ssh_password', 'SSH password', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('ssh_path', 'Path SSH', 'trim|max_length[256]|xss_clean');
 					
-				$this->form_validation->set_rules('telnet_host', 'Telnet хост', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('telnet_login', 'Telnet логин', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('telnet_password', 'Telnet пароль', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('telnet_path', 'Путь Telnet', 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('telnet_host', lang('adm_servers_telnet_host'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('telnet_login', 'Telnet login', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('telnet_password', 'Telnet password', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('telnet_path', 'Path Telnet', 'trim|max_length[256]|xss_clean');
 					
-				$this->form_validation->set_rules('ftp_host', 'FTP хост', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('ftp_login', 'FTP логин', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('ftp_password', 'FTP пароль', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('ftp_path', 'Путь FTP', 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('ftp_host', lang('adm_servers_ftp_host'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('ftp_login', 'FTP login', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('ftp_password', 'FTP password', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('ftp_path', 'Path FTP', 'trim|max_length[256]|xss_clean');
 					
-				$this->form_validation->set_rules('control_protocol', 'Протокол управления', 'trim|min_length[3]|max_length[16]|xss_clean');
+				$this->form_validation->set_rules('control_protocol', lang('adm_servers_control_protocol'), 'trim|min_length[3]|max_length[16]|xss_clean');
 					
 				break;
 				
