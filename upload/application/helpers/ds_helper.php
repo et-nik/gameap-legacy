@@ -82,14 +82,12 @@ if ( ! function_exists('replace_shotcodes'))
 		/* Допустимые алиасы */
 		if (isset($server_data['aliases_list']) && isset($server_data['aliases'])) {
 			$allowable_aliases 	= json_decode($server_data['aliases_list'], true);
-			/* Значения алиасов на сервере */
-			$server_aliases 	= json_decode($server_data['aliases'], true);
-			
+
 			/* Прогон по алиасам */
 			if($allowable_aliases && !empty($allowable_aliases)){
 				foreach ($allowable_aliases as $alias) {
-					if(isset($server_aliases[$alias['alias']]) && !empty($server_aliases[$alias['alias']])) {
-						$command = str_replace('{' . $alias['alias'] . '}', $server_aliases[$alias['alias']] , $command);	
+					if(isset($server_data['aliases_values'][$alias['alias']]) && !empty($server_data['aliases_values'][$alias['alias']])) {
+						$command = str_replace('{' . $alias['alias'] . '}', $server_data['aliases_values'][$alias['alias']] , $command);	
 					}
 				}
 			}
@@ -111,6 +109,14 @@ if ( ! function_exists('send_command'))
     {
 		$CI =& get_instance();
 		$CI->load->driver('control');
+		
+		if (isset($server_data['enabled']) && !$server_data['enabled']) {
+			throw new Exception(lang('server_command_gs_disabled'));
+		}
+		
+		if (isset($server_data['ds_disabled']) && $server_data['ds_disabled']) {
+			throw new Exception(lang('server_command_ds_disabled'));
+		}
 		
 		$command = $CI->servers->replace_shotcodes($command, $server_data);
 		
