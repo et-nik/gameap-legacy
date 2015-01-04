@@ -82,6 +82,7 @@ class Installer_rust extends CI_Driver {
 		switch ($this->_engine_version) {
 			//////
 			case 'legacy':
+			default:
 			
 				switch(strtolower($os)) {
 					case 'windows':
@@ -109,7 +110,7 @@ class Installer_rust extends CI_Driver {
 						break;
 				}
 				
-				$start_command .= '-batchmode -server.hostname "{hostname}" -server.maxplayers {maxplayers} -server.port {port} +rcon.port {rcon_port} +rcon.password {rcon_password} +server.saveinterval {saveinterval}';
+				$start_command .= '-batchmode -server.hostname "{hostname}" -load -server.maxplayers {maxplayers} -server.ip {ip} -server.port {port} +rcon.ip {ip} +rcon.port {rcon_port} +rcon.password {rcon_password} +server.saveinterval {saveinterval} -autoupdate';
 				break;
 		}
 
