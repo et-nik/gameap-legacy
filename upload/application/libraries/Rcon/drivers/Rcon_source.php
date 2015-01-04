@@ -28,10 +28,11 @@ class Rcon_source extends CI_Driver {
 	
 	function connect() 
 	{
-		$this->fp = @fsockopen($this->host, $this->port, $errno, $errstr, 2);
-
+		$this->fp = @fsockopen($this->host, $this->port, $errno, $errstr, 5);
+		
 		if ($this->fp) {
-			$this->_set_timeout($this->fp, 1, 500);
+			stream_set_blocking($this->fp, 0);
+			$this->_set_timeout($this->fp, 5);
 			$this->auth();
 			return true;
 		} else {
@@ -63,7 +64,6 @@ class Rcon_source extends CI_Driver {
 
 	function _set_timeout(&$res, $s, $m = 0) 
 	{
-		
 		if (version_compare(phpversion(),'4.3.0','<')) {
 			return socket_set_timeout($res,$s,$m);
 		}
@@ -87,8 +87,8 @@ class Rcon_source extends CI_Driver {
 		$data = pack("V",strlen($data)).$data;
 
 		// Send packet
-		fwrite($this->fp, $data,strlen($data));
-
+		@fwrite($this->fp, $data,strlen($data));
+		sleep(1);
 		// In case we want it later we'll return the packet id
 		return $id;
 	}
@@ -154,8 +154,12 @@ class Rcon_source extends CI_Driver {
 		$ret = $this->read();
 
 		//ATM: Source servers don't return the request id, but if they fix this the code below should read as
-		return @$ret[$this->_id]['S1'];
-		//return $ret[0]['S1'];
+		if (isset($ret[$this->_id]['S1'])) {
+			return $ret[$this->_id]['S1'];
+		}
+		else {
+			return $ret[0]['S1'];
+		}
 	}
 	
 	// ----------------------------------------------------------------
