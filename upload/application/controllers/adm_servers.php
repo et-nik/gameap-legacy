@@ -1076,11 +1076,11 @@ class Adm_servers extends CI_Controller {
 						
 						// Остановка сервера
 						try {
-							send_command($this->servers->command_generate($this->servers->server_data, 'stop'), $server_data);
+							send_command($this->servers->command_generate($this->servers->server_data, 'stop'), $this->servers->server_data);
 						} catch (Exception $e) {
 							// Не удалось остановить сервер
 						}
-						
+
 						// Для логов
 						$files_deleted = 'false';
 						
