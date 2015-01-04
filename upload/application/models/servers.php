@@ -767,7 +767,7 @@ class Servers extends CI_Model {
 			// Задаем дефолтные значения для пустых алиасов
 			foreach ($aliases_list as $alias) {
 				if (!isset($this->server_data['aliases_values'][$alias['alias']]) OR empty($this->server_data['aliases_values'][$alias['alias']])) {
-					$this->server_data['aliases_values'][$alias['alias']] = $alias['default_value'];
+					!isset($alias['default_value']) OR $this->server_data['aliases_values'][$alias['alias']] = $alias['default_value'];
 				}
 			}
 			
