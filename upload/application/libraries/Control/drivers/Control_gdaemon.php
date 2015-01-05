@@ -99,7 +99,7 @@ class Control_gdaemon extends CI_Driver {
 		$buffer = "";
 
 		while (@!$buffer[strlen($buffer)-1] == "\n" & !feof($this->_connection)) {
-			$buffer .= fgets($this->_connection, 16384);
+			$buffer .= fgets($this->_connection);
 		}
 
 		return $this->_decode($buffer, $this->crypt_key);
