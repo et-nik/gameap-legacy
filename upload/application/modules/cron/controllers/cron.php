@@ -260,7 +260,8 @@ class Cron extends MX_Controller {
 		}
 		
 		$this->_cmd_output("--Server #" . $server_id . " install started");
-		$server_installed = false;
+		$server_installed 	= false;
+		$stop_install 		= false;
 		
 		// Данные лога установки
 		$log = '';
@@ -269,6 +270,14 @@ class Cron extends MX_Controller {
 		
 		/* Получение данных об игровой модификации */
 		//~ $this->game_types->get_gametypes_list(array('id' => $this->servers_data[$server_id]['game_type']));
+		
+		/* Получение данных об игре */
+		$this->games->get_games_list(array('code' => $this->servers_data[$server_id]['game']));
+		
+		if ($this->games->games_list[0]['code'] != $this->servers_data[$server_id]['game']) {
+			$this->_cmd_output('---Game code not doesn\'t match');
+			$stop_install = false;
+		}
 
 		// Полю installed устанавливаем значение 2, что сервер начал устанавливаться
 		$this->servers->edit_game_server($server_id, array('installed' => '2'));
@@ -279,74 +288,76 @@ class Cron extends MX_Controller {
 			$this->_mkdir($server_id);
 		} catch (Exception $e) {
 			$this->_cmd_output('---Mkdir failed: '. $e->getMessage());
-			$server_installed = false;
+			$stop_install = false;
 		}
 		
-		/* Операция установки игрового сервера
-		 * В зависимости от заданных данных сервер устанавливается
-		 * из локального репозитория, либо удаленного репозитория, либо 
-		 * через SteamCMD.
-		 * 
-		 * Наибольший приоритет имеет локальный репозиторий, после 
-		 * удаленный, а после SteamCMD.
-		*/
-		if ($this->games->games_list[0]['local_repository']) {
-			/* Установка из локального репозитория */
-			
-			$rep_info = pathinfo($this->games->games_list[0]['local_repository']);
-			
-			$this->_cmd_output("---Install from local repository");
-			
-			try {
-				if (isset($rep_info['extension'])) {
-					// Распаковка архива
-					$this->_wget_files($server_id, $this->games->games_list[0]['local_repository'], 'local');
-					$this->_unpack_files($server_id, $this->games->games_list[0]['local_repository']);
-				} else {
-					// Копирование директории
-					$this->_copy_files($server_id, $this->games->games_list[0]['local_repository']);
+		if (!$stop_install) {
+			/* Операция установки игрового сервера
+			 * В зависимости от заданных данных сервер устанавливается
+			 * из локального репозитория, либо удаленного репозитория, либо 
+			 * через SteamCMD.
+			 * 
+			 * Наибольший приоритет имеет локальный репозиторий, после 
+			 * удаленный, а после SteamCMD.
+			*/
+			if ($this->games->games_list[0]['local_repository']) {
+				/* Установка из локального репозитория */
+				
+				$rep_info = pathinfo($this->games->games_list[0]['local_repository']);
+				
+				$this->_cmd_output("---Install from local repository");
+				
+				try {
+					if (isset($rep_info['extension'])) {
+						// Распаковка архива
+						$this->_wget_files($server_id, $this->games->games_list[0]['local_repository'], 'local');
+						$this->_unpack_files($server_id, $this->games->games_list[0]['local_repository']);
+					} else {
+						// Копирование директории
+						$this->_copy_files($server_id, $this->games->games_list[0]['local_repository']);
+					}
+					
+					$server_installed = true;
+				} catch (Exception $e) {
+					$this->_cmd_output("---Install from local repository failed. Message: " . $e->getMessage());
+					$server_installed = false;
 				}
 				
-				$server_installed = true;
-			} catch (Exception $e) {
-				$this->_cmd_output("---Install from local repository failed. Message: " . $e->getMessage());
-				$server_installed = false;
-			}
-			
-		} elseif ($this->games->games_list[0]['remote_repository']) {
-			/* Установка из удаленного репозитория */
-			
-			$this->_cmd_output("---Install from remote repository");
-			
-			try {
-				$this->_wget_files($server_id, $this->games->games_list[0]['remote_repository'], 'remote');
-				$this->_unpack_files($server_id, $this->games->games_list[0]['remote_repository']);
-				$server_installed = true;
-			} catch (Exception $e) {
-				$this->_cmd_output("---Install from remote repository failed. Message: " . $e->getMessage());
-				$server_installed = false;
-			}
+			} elseif ($this->games->games_list[0]['remote_repository']) {
+				/* Установка из удаленного репозитория */
+				
+				$this->_cmd_output("---Install from remote repository");
+				
+				try {
+					$this->_wget_files($server_id, $this->games->games_list[0]['remote_repository'], 'remote');
+					$this->_unpack_files($server_id, $this->games->games_list[0]['remote_repository']);
+					$server_installed = true;
+				} catch (Exception $e) {
+					$this->_cmd_output("---Install from remote repository failed. Message: " . $e->getMessage());
+					$server_installed = false;
+				}
 
-		} elseif ($this->games->games_list[0]['app_id']) {
-			/* Установка через SteamCMD */
-			
-			$this->_cmd_output("---Install from SteamCMD");
-			
-			try {
-				$server_installed = $this->_install_from_steamcmd($server_id);
-			} catch (Exception $e) {
-				$this->_cmd_output("---Install from steamcmd failed. Message: " . $e->getMessage());
+			} elseif ($this->games->games_list[0]['app_id']) {
+				/* Установка через SteamCMD */
+				
+				$this->_cmd_output("---Install from SteamCMD");
+				
+				try {
+					$server_installed = $this->_install_from_steamcmd($server_id);
+				} catch (Exception $e) {
+					$this->_cmd_output("---Install from steamcmd failed. Message: " . $e->getMessage());
+					$server_installed = false;
+				}
+				
+			} else {
+				/* 
+				 * Не удалость выбрать тип установки 
+				 * отсутствуют данные локального репозитория, удаленного репозитория и steamcmd
+				 */
+				$log .= "App_id and Repository data not specified \n";
+				$this->_cmd_output("---Server #" . $server_id . " install failed. App_id and Repository data not specified");
 				$server_installed = false;
 			}
-			
-		} else {
-			/* 
-			 * Не удалость выбрать тип установки 
-			 * отсутствуют данные локального репозитория, удаленного репозитория и steamcmd
-			 */
-			$log .= "App_id and Repository data not specified \n";
-			$this->_cmd_output("---Server #" . $server_id . " install failed. App_id and Repository data not specified");
-			$server_installed = false;
 		}
 		
 		/* 
@@ -806,7 +817,8 @@ class Cron extends MX_Controller {
 		
 		switch (strtolower($this->servers_data[$server_id]['os'])) {
 			case 'windows':
-				$commands[] = '"%PROGRAMFILES%/7-Zip/7z.exe" x ' . basename($pack_file) . ' -aoa -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($pack_file);
+				//~ $commands[] = '"%PROGRAMFILES%\\7-Zip\\7z.exe" x ' . basename($pack_file) . ' -aoa -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($pack_file);
+				$commands[] = '"C:\\Program Files\\7-Zip\\7z.exe" x ' . basename($pack_file) . ' -aoa -o' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . ' && del /F ' . basename($pack_file);
 				break;
 
 			default:
@@ -1054,7 +1066,7 @@ class Cron extends MX_Controller {
 		$where = array('date_perform >' => now() - 3600, 'date_perform <' => now(), 'started' => 0);
 		$this->db->where_in('server_id', $servers_id_list);
 		$query = $this->db->get_where('cron', $where);
-
+		
 		$task_list = $query->result_array();
 
 		$i = 0;
@@ -1379,6 +1391,7 @@ class Cron extends MX_Controller {
 
 		// Отображаем статистику заданий
 		//~ $this->_cmd_output("---Success: {$cron_stats['success']} Failed: {$cron_stats['failed']} Skipped: {$cron_stats['skipped']}");
+		$this->_cmd_output('-- End Task manager');
 	}
 	
 	// -----------------------------------------------------------------
@@ -1433,7 +1446,7 @@ class Cron extends MX_Controller {
 			}
 			
 			$this->_tasks($tasks_servers_id);
-			
+
 			foreach ($this->servers->servers_list as &$server) {
 				$server_id = &$server['id'];
 
@@ -1540,6 +1553,8 @@ class Cron extends MX_Controller {
 					
 					// END if($this->servers->server_settings['SERVER_AUTOSTART']) {
 				}
+				
+				unset($server_id);
 
 				//
 				// END foreach ($this->servers->servers_list as &$server) {
@@ -1588,6 +1603,9 @@ class Cron extends MX_Controller {
 				$this->_cmd_output('---Stats server #' . $ds['id'] . ' missed');
 				continue;
 			}
+			
+			$this->control->disconnect();
+			usleep(200000);
 
 			//
 			// END foreach ($this->dedicated_servers->ds_list as &$ds) {
