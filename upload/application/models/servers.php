@@ -465,6 +465,10 @@ class Servers extends CI_Model {
 		 * а после выбираем серверы только этих игр 
 		 */
 		$games = array();
+		
+		// Обнуление массива
+		$this->servers_list = array();
+
 		if ($engine) {
 			$this->db->where('engine', $engine);
 			if ($engine_version) {$this->db->where('engine_version', $engine_version);}
@@ -559,28 +563,7 @@ class Servers extends CI_Model {
 				$query = $this->db->get('servers');
 			}
 			
-			if ($query->num_rows > 0) {
-
-				$a = 0;
-				foreach ($query->result_array() as $server_data) {
-					
-					$server_list[$a] = $server_data;
-					
-					if (isset($server_data['server_port']) && !$server_data['query_port']) {
-						$server_list[$a]['query_port'] = $server_data['server_port'];
-					}
-					
-					if (isset($server_data['server_port']) && !$server_data['rcon_port']) {
-						$server_list[$a]['rcon_port'] = $server_data['server_port'];
-					}
-					
-					$a++;
-				}
-				
-				$this->servers_list = $server_list;
-				return $this->servers_list;
-				
-			} else {
+			if ($query->num_rows <= 0) {
 				/* Количество серверов = 0 */
 				
 				/* 
@@ -590,6 +573,26 @@ class Servers extends CI_Model {
 				$this->servers_list = array();
 				return NULL;
 			}
+
+			$server_list = array();
+			$i = 0;
+			foreach ($query->result_array() as $server_data) {
+				
+				$server_list[$i] = $server_data;
+				
+				if (isset($server_data['server_port']) && !$server_data['query_port']) {
+					$server_list[$i]['query_port'] = $server_data['server_port'];
+				}
+				
+				if (isset($server_data['server_port']) && !$server_data['rcon_port']) {
+					$server_list[$i]['rcon_port'] = $server_data['server_port'];
+				}
+				
+				$i++;
+			}
+
+			$this->servers_list = $server_list;
+			return $this->servers_list;
 	}
 
 	
@@ -628,7 +631,7 @@ class Servers extends CI_Model {
 		}
 		
 		/* Записываем переменную в список */
-		$this->servers_list['0'] = $this->server_data;
+		//~ $this->servers_list['0'] = $this->server_data;
 		
 		/* Расшифровываем RCON пароль */
 		$this->server_data['rcon'] = $this->encrypt->decode($this->server_data['rcon']);
@@ -765,9 +768,11 @@ class Servers extends CI_Model {
 			$aliases_list 	= json_decode($this->server_data['aliases_list'], true);
 			
 			// Задаем дефолтные значения для пустых алиасов
-			foreach ($aliases_list as $alias) {
-				if (!isset($this->server_data['aliases_values'][$alias['alias']]) OR empty($this->server_data['aliases_values'][$alias['alias']])) {
-					!isset($alias['default_value']) OR $this->server_data['aliases_values'][$alias['alias']] = $alias['default_value'];
+			if (is_array($aliases_list)) {
+				foreach ($aliases_list as $alias) {
+					if (!isset($this->server_data['aliases_values'][$alias['alias']]) OR empty($this->server_data['aliases_values'][$alias['alias']])) {
+						!isset($alias['default_value']) OR $this->server_data['aliases_values'][$alias['alias']] = $alias['default_value'];
+					}
 				}
 			}
 			
@@ -797,6 +802,18 @@ class Servers extends CI_Model {
 		
 		if (!isset($this->servers_list)) {
 			$this->get_game_servers_list();
+		}
+		
+		if (!empty($this->server_data)) {
+			$num++;
+			$tpl_data[$num]['server_id'] 			= $this->server_data['id'];
+			$tpl_data[$num]['server_game_code'] 	= $this->server_data['game'];
+			$tpl_data[$num]['server_game'] 			= $this->games->game_name_by_code($this->server_data['game']);
+			$tpl_data[$num]['server_name'] 			= $this->server_data['name'];
+			$tpl_data[$num]['server_ip'] 			= $this->server_data['server_ip'];
+			$tpl_data[$num]['server_port'] 			= $this->server_data['server_port'];
+			$tpl_data[$num]['server_query_port'] 	= $this->server_data['query_port'];
+			$tpl_data[$num]['server_rcon_port'] 	= $this->server_data['rcon_port'];
 		}
 		
 		foreach ($this->servers_list as $server_data){
