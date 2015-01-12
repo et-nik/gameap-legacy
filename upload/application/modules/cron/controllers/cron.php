@@ -1426,7 +1426,7 @@ class Cron extends MX_Controller {
 			
 			// Получение списка серверов для этого DS
 			$this->servers->select_fields('id');
-			$this->servers->get_server_list(false, false, array('enabled' => '1', 'ds_id' => $ds['id']));
+			$this->servers->get_servers_list(false, false, array('enabled' => '1', 'ds_id' => $ds['id']));
 			
 			$this->control->set_data(array('os' => $ds['os'], 'path' => $ds['script_path']));
 			$this->control->set_driver($ds['control_protocol']);
