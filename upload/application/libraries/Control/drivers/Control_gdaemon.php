@@ -148,6 +148,8 @@ class Control_gdaemon extends CI_Driver {
 			throw new Exception(lang('server_command_connection_failed') . ' (GDaemon)');
 		}
 		
+		stream_set_timeout($this->_connection, 600);
+		
 		$this->_auth = false;
 		return $this->_connection;
 	}
@@ -231,6 +233,10 @@ class Control_gdaemon extends CI_Driver {
 	{
 		$this->crypt_key		= "";
 		$this->client_key		= "";
+		
+		if (!$this->_connection && is_resource($this->_connection)) {
+			return;
+		}
 	
 		fwrite($this->_connection, "exit\n");
 		fclose($this->_connection);
