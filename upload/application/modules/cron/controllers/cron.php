@@ -1333,14 +1333,16 @@ class Cron extends MX_Controller {
 						
 						try {
 							// Остановка сервера
-							$response = $this->servers->stop($this->servers_data[$server_id]);
+							$stop_response = $this->servers->stop($this->servers_data[$server_id]);
 							
 							// Отправка команды удаления
-							$result = send_command($command, $this->servers_data[$server_id]);
+							$delete_response = send_command($command, $this->servers_data[$server_id]);
 							
 							$this->_cmd_output('---Task: server #' . $server_id . '  delete success');
 							$cron_stats['success'] ++;
 							$log_data['msg'] = 'Delete successful';
+							$log_data['log_data'] = 'Stop response:' . var_export($stop_response, true) . "\n" 
+													. 'Delete response: ' . var_export($delete_response, true);
 							
 							// Удаление задания
 							$this->db->delete('cron', array('id' => $task_list[$i]['id'])); 
@@ -1430,7 +1432,7 @@ class Cron extends MX_Controller {
 			
 			$this->control->set_data(array('os' => $ds['os'], 'path' => $ds['script_path']));
 			$this->control->set_driver($ds['control_protocol']);
-			
+
 			try {
 				// Соединение с машиной
 				$this->control->connect($ds['control_ip'], $ds['control_port']);
@@ -1444,7 +1446,7 @@ class Cron extends MX_Controller {
 			foreach ($this->servers->servers_list as &$server) {
 				$tasks_servers_id[] = $server['id'];
 			}
-			
+
 			$this->_tasks($tasks_servers_id);
 
 			foreach ($this->servers->servers_list as &$server) {
