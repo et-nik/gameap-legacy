@@ -53,8 +53,9 @@ class Panel_log extends CI_Model {
 			return false;
 		}
 		
-		isset($data['log_data']) OR $data['log_data'] = '';
-		isset($data['server_id']) OR $data['server_id'] = 0;
+		isset($data['log_data']) 	OR $data['log_data'] = '';
+		isset($data['msg']) 		OR $data['msg'] = '';
+		isset($data['server_id']) 	OR $data['server_id'] = 0;
 		
 		$data['log_data'] = (is_array($data['log_data'])) ? json_encode($data['log_data']) : $data['log_data'];
 		
