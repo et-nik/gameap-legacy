@@ -165,6 +165,7 @@ class Adm_servers extends CI_Controller {
 		try {
 			$this->control->connect($host[0], $host[1]);
 			$this->control->auth("NULL", $key);
+			
 			return true;
 		} catch (Exception $e) {
 			return false;
@@ -1711,11 +1712,17 @@ class Adm_servers extends CI_Controller {
 				
 				$local_tpl['gt_code'] = form_dropdown('game_code', $options, $gt_list[0]['game_code']);
 				
-				$local_tpl['cfg_list'] 	= array();
+				$local_tpl['cfg_list'] 		= array();
 				$local_tpl['cdir_list'] 	= array();
 				$local_tpl['ldir_list'] 	= array();
 				$local_tpl['frcon_list'] 	= array();
-				$local_tpl['aliases_list'] = array();
+				$local_tpl['aliases_list'] 	= array();
+				
+				$local_tpl['cfg_count']			= 0;
+				$local_tpl['cdir_count']		= 0;
+				$local_tpl['ldir_count']		= 0;
+				$local_tpl['frcon_count']		= 0;
+				$local_tpl['aliases_count']		= 0;
 				
 				if($json_decode = json_decode($gt_list[0]['config_files'], true)) {
 					
@@ -1727,7 +1734,7 @@ class Adm_servers extends CI_Controller {
 						$i ++;
 					}
 					
-					// $local_tpl['cfg_list'] = $json_decode;
+					$local_tpl['cfg_count'] = $i;
 				}
 				
 				if($json_decode = json_decode($gt_list[0]['content_dirs'], true)) {
@@ -1741,7 +1748,7 @@ class Adm_servers extends CI_Controller {
 						$i ++;
 					}
 					
-					// $local_tpl['cdir_list'] = $json_decode;
+					$local_tpl['cdir_count'] = $i;
 				}
 				
 				if($json_decode = json_decode($gt_list[0]['log_dirs'], true)) {
@@ -1755,7 +1762,7 @@ class Adm_servers extends CI_Controller {
 						$i ++;
 					}
 					
-					// $local_tpl['ldir_list'] = $json_decode;
+					$local_tpl['ldir_count'] = $i;
 				}
 				
 				if($json_decode = json_decode($gt_list[0]['fast_rcon'], true)) {
@@ -1767,7 +1774,8 @@ class Adm_servers extends CI_Controller {
 						$local_tpl['frcon_list'][$i]['rcon_command'] 	= form_input('frcon_command[]', $array['rcon_command']);
 						$i ++;
 					}
-					// $local_tpl['frcon_list'] = $json_decode;
+					
+					$local_tpl['frcon_count'] = $i;
 				}
 				
 				if($json_decode = json_decode($gt_list[0]['aliases'], true)) {
@@ -1784,6 +1792,8 @@ class Adm_servers extends CI_Controller {
 						$local_tpl['aliases_list'][$i]['only_admins'] 	= form_checkbox('alias_only_admins[' . $i . ']', 'accept', $array['only_admins']);
 						$i ++;
 					}
+					
+					$local_tpl['aliases_count'] = $i;
 
 				}
 				

@@ -47,10 +47,10 @@
 				<th>{lang_delete}</th>
 			</tr>
 		{cfg_list}
-			<tr>
+			<tr id="cfg_list{id}">
 				<td>{desc}</td>
 				<td>{file}</td>
-				<td align="center"><input type="checkbox" name="cfg_delete[{id}]" value="accept"  /></td>
+				<td align="center"><a class="smal red awesome" onclick="delete_item('cfg_list', {id})">&#10008;</a></td>
 			</tr>
 		{/cfg_list}
 
@@ -72,11 +72,11 @@
 				<th>{lang_delete}</th>
 			</tr>
 		{cdir_list}
-			<tr>
+			<tr id="cdir_list{id}">
 				<td>{desc}</td>
 				<td>{path}</td>
 				<td>{allowed_types}</td>
-				<td align="center"><input type="checkbox" name="cdir_delete[{id}]" value="accept"  /></td>
+				<td align="center"><a class="smal red awesome" onclick="delete_item('cdir_list', {id})">&#10008;</a></td>
 			</tr>
 		{/cdir_list}
 
@@ -98,11 +98,11 @@
 				<th>{lang_delete}</th>
 			</tr>
 		{ldir_list}
-			<tr>
+			<tr id="ldir_list{id}">
 				<td>{desc}</td>
 				<td>{path}</td>
 				<td>{allowed_types}</td>
-				<td align="center"><input type="checkbox" name="ldir_delete[{id}]" value="accept"  /></td>
+				<td align="center"><a class="smal red awesome" onclick="delete_item('ldir_list', {id})">&#10008;</a></td>
 			</tr>
 		{/ldir_list}
 
@@ -122,10 +122,10 @@
 				<th>{lang_delete}</th>
 			</tr>
 		{frcon_list}
-			<tr>
+			<tr id="frcon_list{id}">
 				<td>{desc}</td>
 				<td>{rcon_command}</td>
-				<td align="center"><input type="checkbox" name="frcon_delete[{id}]" value="accept"  /></td>
+				<td align="center"><a class="smal red awesome" onclick="delete_item('frcon_list', {id})">&#10008;</a></td>
 			</tr>
 		{/frcon_list}
 
@@ -149,12 +149,12 @@
 				</tr>
 
 			{aliases_list}
-				<tr>
+				<tr id="aliases_list{id}">
 					<td>{alias}</td>
 					<td>{desc}</td>
 					<td>{default_value}</td>
 					<td align="center">{only_admins}</td>
-					<td align="center"><input type="checkbox" name="alias_delete[{id}]" value="accept"  /></td>
+					<td align="center"><a class="smal red awesome" onclick="delete_item('aliases_list', {id})">&#10008;</a></td>
 				</tr>
 			{/aliases_list}
 		</table>
@@ -232,6 +232,14 @@
 
 	<script type="text/javascript">
 		
+	var counts = { 
+		cfg: {cfg_count}, 
+		cdir: {cdir_count},
+		ldir: {ldir_count},
+		frcon: {frcon_count},
+		aliases: {aliases_count},
+	};
+		
 	$(document).ready(function(){
 
 		$('#hide').hide();
@@ -242,26 +250,50 @@
 		$(this).html('');});
 	})
 		
-	function add_new_item(id) {
-		if(id == 'cfg_list') {
-			$('<tr><td><input type="text" name="cfg_desc[]" /></td><td><input type="text" name="cfg_file[]" /></td><td>&nbsp;</td><td>&nbsp;</td></tr>').fadeIn('slow').appendTo('#cfg_list');
+	function add_new_item(tab) {
+		if(tab == 'cfg_list') {
+			$('<tr id="'+tab+counts['cfg']+'"><td><input type="text" name="cfg_desc[]" /></td>\
+			<td><input type="text" name="cfg_file[]" /></td>\
+			<td align="center"><a class="smal red awesome" onclick="delete_item(\''+tab+'\', '+counts['cfg']+')">&#10008;</a></td></tr>').fadeIn('slow').appendTo('#cfg_list');
+			counts['cfg']++;
 		}
 		
-		if(id == 'cdir_list') {
-			$('<tr><td><input type="text" name="cdir_desc[]" /></td><td><input type="text" name="cdir_path[]" /></td><td><input type="text" name="cdir_allowed_types[]" /></td></td><td>&nbsp;</td></tr>').fadeIn('slow').appendTo('#cdir_list');
+		if(tab == 'cdir_list') {
+			$('<tr id="'+tab+counts['cdir']+'"><td><input type="text" name="cdir_desc[]" /></td>\
+			<td><input type="text" name="cdir_path[]" /></td>\
+			<td><input type="text" name="cdir_allowed_types[]" /></td>\
+			<td align="center"><a class="smal red awesome" onclick="delete_item(\''+tab+'\', '+counts['cdir']+')">&#10008;</a></td></tr>').fadeIn('slow').appendTo('#cdir_list');
+			counts['cdir']++;
 		}
 		
-		if(id == 'ldir_list') {
-			$('<tr><td><input type="text" name="ldir_desc[]" /></td><td><input type="text" name="ldir_path[]" /></td><td><input type="text" name="ldir_allowed_types[]" /></td></td><td>&nbsp;</td></tr>').fadeIn('slow').appendTo('#ldir_list');
+		if(tab == 'ldir_list') {
+			$('<tr id="'+tab+counts['ldir']+'"><td><input type="text" name="ldir_desc[]" /></td>\
+			<td><input type="text" name="ldir_path[]" /></td>\
+			<td><input type="text" name="ldir_allowed_types[]" /></td>\
+			<td align="center"><a class="smal red awesome" onclick="delete_item(\''+tab+'\', '+counts['ldir']+')">&#10008;</a></td></tr>').fadeIn('slow').appendTo('#ldir_list');
+			counts['ldir']++;
 		}
 		
-		if(id == 'frcon_list') {
-			$('<tr><td><input type="text" name="frcon_desc[]" /></td><td><input type="text" name="frcon_command[]" /></td><td>&nbsp;</td><td>&nbsp;</td></tr>').fadeIn('slow').appendTo('#frcon_list');
+		if(tab == 'frcon_list') {
+			$('<tr id="'+tab+counts['frcon']+'"><td><input type="text" name="frcon_desc[]" /></td>\
+			<td><input type="text" name="frcon_command[]" /></td>\
+			<td align="center"><a class="smal red awesome" onclick="delete_item(\''+tab+'\', '+counts['frcon']+')">&#10008;</a></td></tr>').fadeIn('slow').appendTo('#frcon_list');
+			counts['frcon']++;
 		}
 		
-		if(id == 'aliases_list') {
-			$('<tr><td><input type="text" name="alias_name[]" /></td><td><input type="text" name="alias_desc[]" /></td><td><input type="text" name="default_value[]" /></td><td align="center"><input type="checkbox" name="alias_only_admins[]" value="accept"  /></td><td>&nbsp;</td></tr>').fadeIn('slow').appendTo('#aliases_list');
+		if(tab == 'aliases_list') {
+			$('<tr id="'+tab+counts['aliases']+'"><td><input type="text" name="alias_name[]" /></td>\
+			<td><input type="text" name="alias_desc[]" /></td>\
+			<td><input type="text" name="default_value[]" /></td>\
+			<td align="center"><input type="checkbox" name="alias_only_admins[]" value="accept"  /></td>\
+			<td align="center"><a class="smal red awesome" onclick="delete_item(\''+tab+'\', '+counts['aliases']+')">&#10008;</a></td></tr>').fadeIn('slow').appendTo('#aliases_list');
+			counts['aliases']++;
 		}
+	}
+	
+	function delete_item(tab, id) {
+		$("#" + tab + id ).fadeOut('slow', function(){ $(this).remove();});
+		counts['cfg']--;
 	}
 		
 	</script>
