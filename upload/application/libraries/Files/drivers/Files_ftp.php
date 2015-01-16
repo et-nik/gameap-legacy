@@ -149,6 +149,21 @@ class Files_ftp extends CI_Driver {
 		}
 		return TRUE;
 	}
+	
+	// --------------------------------------------------------------------
+
+	/**
+	 * Размер файла
+	 */
+	function file_size($file)
+	{
+		if ($this->_is_conn())
+		{
+			return FALSE;
+		}
+
+		return ftp_size($this->conn_id, $file);
+	}
 
 	// --------------------------------------------------------------------
 

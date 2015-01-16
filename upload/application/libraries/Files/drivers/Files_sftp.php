@@ -199,6 +199,17 @@ class Files_sftp extends CI_Driver {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Размер файла
+	 */
+	function file_size($file)
+	{
+		$sftp = $this->conn_sftp;
+		return filesize("ssh2.sftp://$sftp$file");
+	}
+	
+	// --------------------------------------------------------------------
+
+	/**
 	 * Существует ли файл
 	 */
 	function file_exists($file)
@@ -456,7 +467,7 @@ class Files_sftp extends CI_Driver {
 		foreach($list_files as &$file) {
 			
 			$pathinfo = pathinfo($file);
-			
+
 			/* Если файл не имеет расширения, а нам нужны файлы с определенным
 			 * расширением и не нужны нотисы */
 			if (!empty($extensions) && !isset($pathinfo['extension'])) {
@@ -469,11 +480,14 @@ class Files_sftp extends CI_Driver {
 				continue;
 			}
 			
-			$file_stat = stat($dir . '/' . $file);
+			$file_stat = @stat($dir . '/' . $file);
+			
+			//~ $type = is_dir($dir . '/' . $file) ? 'd' : 'f';
 			
 			$return_list[] = array('file_name' => basename($file),
 									'file_time' => $file_stat['mtime'],
 									'file_size' => $file_stat['size'],
+									'type' => is_dir($dir . '/' . $file) ? 'd' : 'f',
 			);
 		}
 

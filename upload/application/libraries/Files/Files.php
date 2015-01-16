@@ -238,6 +238,21 @@ class Files extends CI_Driver_Library {
 		return $this->{$this->driver}->move($old_file, $new_file);
 	}
 	
+	
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Чтение файла
+	 */
+	public function file_size($remfile)
+	{
+		if (!$this->driver) {
+			throw new Exception(lang('server_files_driver_not_set'));
+		}
+		
+		return $this->{$this->driver}->file_size($remfile);
+	}
+	
 	// --------------------------------------------------------------------
 	
 	/**

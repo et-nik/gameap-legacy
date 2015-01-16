@@ -25,7 +25,7 @@
  */
 class Files_local extends CI_Driver {
 	
-		// --------------------------------------------------------------------
+	// --------------------------------------------------------------------
 	
 	/**
 	 * Соединение с сервером
@@ -200,6 +200,16 @@ class Files_local extends CI_Driver {
 	}
 	
 	// --------------------------------------------------------------------
+
+	/**
+	 * Размер файла
+	 */
+	function file_size($file)
+	{
+		return filesize($file);
+	}
+	
+	// --------------------------------------------------------------------
 	
 	/**
 	 * Список файлов
@@ -252,9 +262,12 @@ class Files_local extends CI_Driver {
 			
 			$file_stat = stat($path . '/' . $file);
 			
+			//~ $type = is_dir($dir . '/' . $file) ? 'd' : 'f';
+			
 			$return_list[] = array('file_name' => basename($file),
 									'file_time' => $file_stat['mtime'],
 									'file_size' => $file_stat['size'],
+									'type' => is_dir($dir . '/' . $file) ? 'd' : 'f',
 			);
 		}
 
