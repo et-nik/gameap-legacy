@@ -750,9 +750,6 @@ class Servers extends CI_Model {
 			$this->game_types->get_gametypes_list($where, 1);
 
 			$this->server_data['mod_name'] 		= $this->game_types->game_types_list['0']['name'];
-			$this->server_data['config_files'] 	= $this->game_types->game_types_list['0']['config_files'];
-			$this->server_data['content_dirs'] 	= $this->game_types->game_types_list['0']['content_dirs'];
-			$this->server_data['log_dirs'] 		= $this->game_types->game_types_list['0']['log_dirs'];
 			$this->server_data['fast_rcon']		= $this->game_types->game_types_list['0']['fast_rcon'];
 			$this->server_data['aliases_list'] 	= $this->game_types->game_types_list['0']['aliases'];
 			$this->server_data['disk_size'] 	= $this->game_types->game_types_list['0']['disk_size'];
