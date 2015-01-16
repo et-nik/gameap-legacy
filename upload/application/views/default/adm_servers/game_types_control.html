@@ -25,89 +25,12 @@
 
 	<br />
 	<ul class="tabs">
-		<li><a href="#config_files" onclick="return false;">{lang_adm_servers_config_files}</a></li>
-		<li><a href="#game_directories" onclick="return false;">{lang_adm_servers_game_directories}</a></li>
-		<li><a href="#log_directories" onclick="return false;">{lang_adm_servers_log_directories}</a></li>
 		<li><a href="#fast_rcon" onclick="return false;">Fast Rcon</a></li>
 		<li><a href="#aliases" onclick="return false;">{lang_adm_servers_aliases}</a></li>
 		<li><a href="#rcon_control_parameters" onclick="return false;">{lang_adm_servers_rcon_commands}</a></li>
 		<li><a href="#repositories" onclick="return false;">{lang_adm_servers_repository_parameters}</a></li>
 	</ul>
 
-	<div id="config_files" class="tab_content">
-		<p class="hr">{lang_adm_servers_config_files}</p>
-		<table class="zebra" id="cfg_list" width="100%">
-			<tr>
-				<td colspan="4"><a class="small awesome" href="#" onclick="add_new_item('cfg_list'); return false;" id="add">{lang_add}</a></td>
-			</tr>
-
-			<tr>
-				<th>{lang_description}</th>
-				<th>{lang_file}</th>
-				<th>{lang_delete}</th>
-			</tr>
-		{cfg_list}
-			<tr id="cfg_list{id}">
-				<td>{desc}</td>
-				<td>{file}</td>
-				<td align="center"><a class="smal red awesome" onclick="delete_item('cfg_list', {id})">&#10008;</a></td>
-			</tr>
-		{/cfg_list}
-
-		</table>
-	</div>
-
-	<div id="game_directories" class="tab_content">
-		<p class="hr">{lang_adm_servers_game_directories}</p>
-			<tr>
-				<td colspan="4"><a class="small awesome" href="#" onclick="add_new_item('cdir_list'); return false;" id="add">{lang_add}</a></td>
-			</tr>
-
-		<table class="zebra" id="cdir_list" width="100%">
-
-			<tr>
-				<th>{lang_description}</th>
-				<th>{lang_directory}</th>
-				<th>{lang_files_extension}</th>
-				<th>{lang_delete}</th>
-			</tr>
-		{cdir_list}
-			<tr id="cdir_list{id}">
-				<td>{desc}</td>
-				<td>{path}</td>
-				<td>{allowed_types}</td>
-				<td align="center"><a class="smal red awesome" onclick="delete_item('cdir_list', {id})">&#10008;</a></td>
-			</tr>
-		{/cdir_list}
-
-		</table>
-	</div>
-
-	<div id="log_directories" class="tab_content">
-		<p class="hr">{lang_adm_servers_log_directories}</p>
-		<table class="zebra" id="ldir_list" width="100%">
-			
-			<tr>
-				<td colspan="4"><a class="small awesome" href="#" onclick="add_new_item('ldir_list'); return false;" id="add">{lang_add}</a></td>
-			</tr>
-
-			<tr>
-				<th>{lang_description}</th>
-				<th>{lang_directory}</th>
-				<th>{lang_files_extension}</th>
-				<th>{lang_delete}</th>
-			</tr>
-		{ldir_list}
-			<tr id="ldir_list{id}">
-				<td>{desc}</td>
-				<td>{path}</td>
-				<td>{allowed_types}</td>
-				<td align="center"><a class="smal red awesome" onclick="delete_item('ldir_list', {id})">&#10008;</a></td>
-			</tr>
-		{/ldir_list}
-
-		</table>
-	</div>
 
 	<div id="fast_rcon" class="tab_content">
 		<p class="hr">Fast RCON</p>

@@ -1712,59 +1712,12 @@ class Adm_servers extends CI_Controller {
 				
 				$local_tpl['gt_code'] = form_dropdown('game_code', $options, $gt_list[0]['game_code']);
 				
-				$local_tpl['cfg_list'] 		= array();
-				$local_tpl['cdir_list'] 	= array();
-				$local_tpl['ldir_list'] 	= array();
 				$local_tpl['frcon_list'] 	= array();
 				$local_tpl['aliases_list'] 	= array();
 				
-				$local_tpl['cfg_count']			= 0;
-				$local_tpl['cdir_count']		= 0;
-				$local_tpl['ldir_count']		= 0;
 				$local_tpl['frcon_count']		= 0;
 				$local_tpl['aliases_count']		= 0;
-				
-				if($json_decode = json_decode($gt_list[0]['config_files'], true)) {
-					
-					$i = 0;
-					foreach($json_decode as $array) {
-						$local_tpl['cfg_list'][$i]['id'] 			= $i;
-						$local_tpl['cfg_list'][$i]['desc'] 	= form_input('cfg_desc[]', $array['desc']);
-						$local_tpl['cfg_list'][$i]['file'] 	= form_input('cfg_file[]', $array['file']);
-						$i ++;
-					}
-					
-					$local_tpl['cfg_count'] = $i;
-				}
-				
-				if($json_decode = json_decode($gt_list[0]['content_dirs'], true)) {
-					
-					$i = 0;
-					foreach($json_decode as $array) {
-						$local_tpl['cdir_list'][$i]['id'] 				= $i;
-						$local_tpl['cdir_list'][$i]['desc'] 			= form_input('cdir_desc[]', $array['desc']);
-						$local_tpl['cdir_list'][$i]['path'] 			= form_input('cdir_path[]', $array['path']);
-						$local_tpl['cdir_list'][$i]['allowed_types'] 	= form_input('cdir_allowed_types[]', $array['allowed_types']);
-						$i ++;
-					}
-					
-					$local_tpl['cdir_count'] = $i;
-				}
-				
-				if($json_decode = json_decode($gt_list[0]['log_dirs'], true)) {
-					
-					$i = 0;
-					foreach($json_decode as $array) {
-						$local_tpl['ldir_list'][$i]['id'] 				= $i;
-						$local_tpl['ldir_list'][$i]['desc'] 			= form_input('ldir_desc[]', $array['desc']);
-						$local_tpl['ldir_list'][$i]['path'] 			= form_input('ldir_path[]', $array['path']);
-						$local_tpl['ldir_list'][$i]['allowed_types'] 	= form_input('ldir_allowed_types[]', $array['allowed_types']);
-						$i ++;
-					}
-					
-					$local_tpl['ldir_count'] = $i;
-				}
-				
+
 				if($json_decode = json_decode($gt_list[0]['fast_rcon'], true)) {
 					
 					$i = 0;
@@ -1804,20 +1757,6 @@ class Adm_servers extends CI_Controller {
 				$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
 				$this->form_validation->set_rules('game_code', lang('adm_servers_game_code'), 'trim|required|max_length[32]|min_length[2]|xss_clean');
 				
-				/* Сведения о cfg файлах */
-				$this->form_validation->set_rules('cfg_desc[]', 'описание конф. файла', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('cfg_file[]', 'конф. файл', 'trim|xss_clean');
-				
-				/* Сведения о контент директориях */
-				$this->form_validation->set_rules('cdir_desc[]', 'описание контент директории', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('cdir_path[]', 'путь к контент директории', 'trim|xss_clean');
-				$this->form_validation->set_rules('cdir_allowed_types[]', 'разрешенные типы файлов контент директории', 'trim|max_length[64||xss_clean');
-				
-				/* Сведения о лог директориях */
-				$this->form_validation->set_rules('ldir_desc[]', 'описание лог директории', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('ldir_path[]', 'путь к лог директории', 'trim|xss_clean');
-				$this->form_validation->set_rules('ldir_allowed_types[]', 'разрешенные типы файлов лог директории', 'trim|max_length[64]|xss_clean');
-			
 				/* Сведения о fast rcon командах */
 				$this->form_validation->set_rules('frcon_desc[]', 'описание fast rcon команды', 'trim|max_length[64]|xss_clean');
 				$this->form_validation->set_rules('frcon_command[]', 'fast rcon команда', 'trim|max_length[64]|xss_clean');
@@ -2153,136 +2092,6 @@ class Adm_servers extends CI_Controller {
 					
 					$sql_data['local_repository'] 	= $this->input->post('local_repository');
 					$sql_data['remote_repository'] 	= $this->input->post('remote_repository');
-					
-					/*
-					 * ----------------------------
-					 * 	Перебор конф. файлов
-					 * ----------------------------
-					*/
-					$cfg_list['desc'] 			= $this->input->post('cfg_desc');
-					$cfg_list['file'] 			= $this->input->post('cfg_file');
-					$cfg_list['delete'] 		= $this->input->post('cfg_delete');
-					
-					$config_files 				= array();
-					
-					if(!empty($cfg_list['file'])) {
-						$i = -1;
-						foreach($cfg_list['file'] as $file) {
-							$i ++;
-							
-							/* Пустые значения выкидываем */
-							if($file == '') {
-								continue;
-							}
-							
-							/* Пустые значения выкидываем */
-							if($cfg_list['desc'][$i] == '') {
-								continue;
-							}
-							
-							/* Значение должно быть удалено */
-							if(isset($cfg_list['delete'][$i])) {
-								continue;
-							}
-							
-							$config_files[$i]['desc'] = $cfg_list['desc'][$i];
-							$config_files[$i]['file'] = str_replace('..' , '', $file); // Двойные точки заменяем для безопасности (чтобы не перебраться в директорию выше)
-						}
-
-						if(isset($config_files)) {
-							$sql_data['config_files'] = json_encode(array_values($config_files));
-						}
-					}
-					
-					/*
-					 * ----------------------------
-					 * 	Перебор контент директорий
-					 * ----------------------------
-					*/
-					$cdir_list['desc'] 			= $this->input->post('cdir_desc');
-					$cdir_list['path'] 			= $this->input->post('cdir_path');
-					$cdir_list['allowed_types'] = $this->input->post('cdir_allowed_types');
-					$cdir_list['delete'] 		= $this->input->post('cdir_delete');
-					
-					if(!empty($cdir_list['path'])) {
-						$i = -1;
-						foreach($cdir_list['path'] as $path) {
-							$i ++;
-							
-							/* Пустые значения выкидываем */
-							if($path == '') {
-								continue;
-							}
-							
-							/* Пустые значения выкидываем */
-							if($cdir_list['desc'][$i] == '') {
-								continue;
-							}
-							
-							/* Пустые значения выкидываем */
-							if($cdir_list['allowed_types'][$i] == '') {
-								continue;
-							}
-							
-							/* Значение должно быть удалено */
-							if(isset($cdir_list['delete'][$i])) {
-								continue;
-							}
-							
-							$content_dirs[$i]['desc'] 			= $cdir_list['desc'][$i];
-							$content_dirs[$i]['path'] 			= str_replace('..' , '', $path); // Двойные точки заменяем для безопасности (чтобы не перебраться в директорию выше)
-							$content_dirs[$i]['allowed_types'] 	= $cdir_list['allowed_types'][$i];
-						}
-						
-						if(isset($content_dirs)) {
-							$sql_data['content_dirs'] = json_encode(array_values($content_dirs));
-						}
-					}
-
-					/*
-					 * ----------------------------
-					 * 	Перебор лог директорий
-					 * ----------------------------
-					*/
-					$ldir_list['desc'] 			= $this->input->post('ldir_desc');
-					$ldir_list['path'] 			= $this->input->post('ldir_path');
-					$ldir_list['allowed_types'] = $this->input->post('ldir_allowed_types');
-					$ldir_list['delete'] 		= $this->input->post('ldir_delete');
-					
-					if(!empty($ldir_list['path'])) {
-						$i = -1;
-						foreach($ldir_list['path'] as $path) {
-							$i ++;
-							
-							/* Пустые значения выкидываем */
-							if($path == '') {
-								continue;
-							}
-							
-							/* Пустые значения выкидываем */
-							if($ldir_list['desc'][$i] == '') {
-								continue;
-							}
-							
-							/* Пустые значения выкидываем */
-							if($ldir_list['allowed_types'][$i] == '') {
-								continue;
-							}
-							
-							/* Значение должно быть удалено */
-							if(isset($ldir_list['delete'][$i])) {
-								continue;
-							}
-							
-							$log_dirs[$i]['desc'] 			= $ldir_list['desc'][$i];
-							$log_dirs[$i]['path'] 			= str_replace('..' , '', $path); // Двойные точки заменяем для безопасности (чтобы не перебраться в директорию выше)
-							$log_dirs[$i]['allowed_types'] 	= $ldir_list['allowed_types'][$i];
-						}
-						
-						if(isset($log_dirs)) {
-							$sql_data['log_dirs'] = json_encode(array_values($log_dirs));
-						}
-					}
 					
 					/*
 					 * ----------------------------
