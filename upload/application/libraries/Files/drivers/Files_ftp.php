@@ -523,10 +523,13 @@ class Files_ftp extends CI_Driver {
 			if (!empty($extensions) && !in_array($pathinfo['extension'], $extensions)) {
 				continue;
 			}
+			
+			$file_size = ftp_size($this->conn_id, $file);
 
 			$return_list[] = array('file_name' => basename($file),
 									'file_time' => ftp_mdtm($this->conn_id, $file),
-									'file_size' => ftp_size($this->conn_id, $file),
+									'file_size' => $file_size,
+									'type' => ($file_size == -1) ? 'd' : 'f',
 			);
 		}
 
