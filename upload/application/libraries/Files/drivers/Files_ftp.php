@@ -157,7 +157,7 @@ class Files_ftp extends CI_Driver {
 	 */
 	function file_size($file)
 	{
-		if ($this->_is_conn())
+		if (!$this->_is_conn())
 		{
 			return FALSE;
 		}
