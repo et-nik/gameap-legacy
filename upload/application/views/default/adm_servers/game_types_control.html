@@ -156,9 +156,6 @@
 	<script type="text/javascript">
 		
 	var counts = { 
-		cfg: {cfg_count}, 
-		cdir: {cdir_count},
-		ldir: {ldir_count},
 		frcon: {frcon_count},
 		aliases: {aliases_count},
 	};
@@ -174,29 +171,6 @@
 	})
 		
 	function add_new_item(tab) {
-		if(tab == 'cfg_list') {
-			$('<tr id="'+tab+counts['cfg']+'"><td><input type="text" name="cfg_desc[]" /></td>\
-			<td><input type="text" name="cfg_file[]" /></td>\
-			<td align="center"><a class="smal red awesome" onclick="delete_item(\''+tab+'\', '+counts['cfg']+')">&#10008;</a></td></tr>').fadeIn('slow').appendTo('#cfg_list');
-			counts['cfg']++;
-		}
-		
-		if(tab == 'cdir_list') {
-			$('<tr id="'+tab+counts['cdir']+'"><td><input type="text" name="cdir_desc[]" /></td>\
-			<td><input type="text" name="cdir_path[]" /></td>\
-			<td><input type="text" name="cdir_allowed_types[]" /></td>\
-			<td align="center"><a class="smal red awesome" onclick="delete_item(\''+tab+'\', '+counts['cdir']+')">&#10008;</a></td></tr>').fadeIn('slow').appendTo('#cdir_list');
-			counts['cdir']++;
-		}
-		
-		if(tab == 'ldir_list') {
-			$('<tr id="'+tab+counts['ldir']+'"><td><input type="text" name="ldir_desc[]" /></td>\
-			<td><input type="text" name="ldir_path[]" /></td>\
-			<td><input type="text" name="ldir_allowed_types[]" /></td>\
-			<td align="center"><a class="smal red awesome" onclick="delete_item(\''+tab+'\', '+counts['ldir']+')">&#10008;</a></td></tr>').fadeIn('slow').appendTo('#ldir_list');
-			counts['ldir']++;
-		}
-		
 		if(tab == 'frcon_list') {
 			$('<tr id="'+tab+counts['frcon']+'"><td><input type="text" name="frcon_desc[]" /></td>\
 			<td><input type="text" name="frcon_command[]" /></td>\
