@@ -102,6 +102,10 @@ class Web_ftp extends CI_Controller {
 			if ($file['type'] != 'd' && (!isset($pathinfo['extension']) OR in_array($pathinfo['extension'], $this->forbidden_types))) {
 				return false;
 			}
+		} else {
+			if (!isset($pathinfo['extension']) OR in_array($pathinfo['extension'], $this->forbidden_types)) {
+				return false;
+			}
 		}
 		
 		return true;
@@ -176,14 +180,9 @@ class Web_ftp extends CI_Controller {
 	
 	// -----------------------------------------------------------------
 	
-	public function _two_point_check($str)
+	private function _two_point_delete($str)
 	{
-		if (strpos($str, '..') !== false) {
-			$this->form_validation->set_message('two point check', 'Two poind found');
-			return false;
-		}
-		
-		return true;
+		return preg_replace('/\.{2,}/si', '', $str);
 	}
 
 	// -----------------------------------------------------------------
@@ -198,7 +197,7 @@ class Web_ftp extends CI_Controller {
 			return;
 		}
 		
-		$this->form_validation->set_rules('dir', lang('directory'), 'trim|callback__two_point_check|xss_clean');
+		$this->form_validation->set_rules('dir', lang('directory'), 'trim|xss_clean');
 		
 		if($this->form_validation->run() == false) {
 			if (validation_errors()) {
@@ -207,7 +206,7 @@ class Web_ftp extends CI_Controller {
 			}
 		}
 
-		$loc_dir = $this->input->post('dir', true);
+		$loc_dir = $this->_two_point_delete($this->input->post('dir', true));
 		$loc_dir = empty($loc_dir) ? '/' : $loc_dir;
 
 		$dir = get_ds_file_path($this->servers->server_data) . '/' . $loc_dir;
@@ -261,8 +260,8 @@ class Web_ftp extends CI_Controller {
 			return;
 		}
 		
-		$this->form_validation->set_rules('dir', lang('directory'), 'trim|callback__two_point_check|xss_clean');
-		$this->form_validation->set_rules('file', lang('file'), 'trim|callback__two_point_check|required|xss_clean');
+		$this->form_validation->set_rules('dir', lang('directory'), 'trim|xss_clean');
+		$this->form_validation->set_rules('file', lang('file'), 'trim|required|xss_clean');
 		
 		if($this->form_validation->run() == false) {
 			if (validation_errors()) {
@@ -271,8 +270,13 @@ class Web_ftp extends CI_Controller {
 			}
 		}
 
-		$loc_dir = $this->input->post('dir', true);
-		$loc_file = $this->input->post('file', true);
+		$loc_dir = $this->_two_point_delete($this->input->post('dir', true));
+		$loc_file = $this->_two_point_delete($this->input->post('file', true));
+		
+		if (!$this->_check_file_ext(array('file_name' => $loc_file))) {
+			$this->_send_error('Forbidden type');
+			return false;
+		}
 		
 		$loc_dir = empty($loc_dir) ? '/' : $loc_dir;
 		
@@ -285,7 +289,7 @@ class Web_ftp extends CI_Controller {
 			$this->files->set_driver($config['driver']);
 			$this->files->connect($config);
 			
-			if ($this->files->file_size($file) > 1000000) {
+			if ($this->files->file_size($file) > 5000000) {
 				$this->_send_error(lang('web_ftp_file_big'));
 				return;
 			}
@@ -311,9 +315,9 @@ class Web_ftp extends CI_Controller {
 			return;
 		}
 		
-		$this->form_validation->set_rules('dir', lang('directory'), 'trim|callback__two_point_check|xss_clean');
-		$this->form_validation->set_rules('file', lang('file'), 'trim|callback__two_point_check|required|xss_clean');
-		$this->form_validation->set_rules('contents', lang('contents'), 'trim|callback__two_point_check|xss_clean');
+		$this->form_validation->set_rules('dir', lang('directory'), 'trim|xss_clean');
+		$this->form_validation->set_rules('file', lang('file'), 'trim|required|xss_clean');
+		$this->form_validation->set_rules('contents', lang('contents'), 'trim');
 		
 		if($this->form_validation->run() == false) {
 			if (validation_errors()) {
@@ -322,9 +326,14 @@ class Web_ftp extends CI_Controller {
 			}
 		}
 		
-		$loc_dir = $this->input->post('dir', true);
-		$loc_file = $this->input->post('file', true);
-		$file_contents = $this->input->post('file_contents', true);
+		$loc_dir = $this->_two_point_delete($this->input->post('dir', true));
+		$loc_file = $this->_two_point_delete($this->input->post('file', true));
+		$file_contents = $this->input->post('file_contents');
+		
+		if (!$this->_check_file_ext(array('file_name' => $loc_file))) {
+			$this->_send_error('Forbidden type');
+			return false;
+		}
 		
 		$file = get_ds_file_path($this->servers->server_data) . '/' . $loc_dir . '/' . $loc_file;
 		
@@ -355,9 +364,9 @@ class Web_ftp extends CI_Controller {
 			return;
 		}
 		
-		$this->form_validation->set_rules('dir', lang('directory'), 'trim|callback__two_point_check|xss_clean');
-		$this->form_validation->set_rules('file', lang('file'), 'trim|callback__two_point_check|required|xss_clean');
-		$this->form_validation->set_rules('new_name', lang('new_name'), 'trim|callback__two_point_check|required|xss_clean');
+		$this->form_validation->set_rules('dir', lang('directory'), 'trim|xss_clean');
+		$this->form_validation->set_rules('file', lang('file'), 'trim|required|xss_clean');
+		$this->form_validation->set_rules('new_name', lang('new_name'), 'trim|required|xss_clean');
 		
 		if($this->form_validation->run() == false) {
 			if (validation_errors()) {
@@ -366,9 +375,9 @@ class Web_ftp extends CI_Controller {
 			}
 		}
 		
-		$loc_dir = $this->input->post('dir', true);
-		$loc_file = $this->input->post('file', true);
-		$new_name = $this->input->post('new_name', true);
+		$loc_dir = $this->_two_point_delete($this->input->post('dir', true));
+		$loc_file = $this->_two_point_delete($this->input->post('file', true));
+		$new_name = $this->_two_point_delete($this->input->post('new_name', true));
 		
 		$file 		= get_ds_file_path($this->servers->server_data) . '/' . $loc_dir . '/' . $loc_file;
 		$new_file 	= get_ds_file_path($this->servers->server_data) . '/' . $loc_dir . '/' . $new_name;
@@ -400,8 +409,8 @@ class Web_ftp extends CI_Controller {
 			return;
 		}
 		
-		$this->form_validation->set_rules('dir', lang('directory'), 'trim|callback__two_point_check|xss_clean');
-		$this->form_validation->set_rules('file', lang('file'), 'trim|required|callback__two_point_check|xss_clean');
+		$this->form_validation->set_rules('dir', lang('directory'), 'trim|xss_clean');
+		$this->form_validation->set_rules('file', lang('file'), 'trim|required|xss_clean');
 
 		if($this->form_validation->run() == false) {
 			if (validation_errors()) {
@@ -410,8 +419,8 @@ class Web_ftp extends CI_Controller {
 			}
 		}
 		
-		$loc_dir = $this->input->post('dir', true);
-		$loc_file = $this->input->post('file', true);
+		$loc_dir = $this->_two_point_delete($this->input->post('dir', true));
+		$loc_file = $this->_two_point_delete($this->input->post('file', true));
 
 		$file 		= get_ds_file_path($this->servers->server_data) . '/' . $loc_dir . '/' . $loc_file;
 
@@ -448,7 +457,7 @@ class Web_ftp extends CI_Controller {
 			return;
 		}
 		
-		$this->form_validation->set_rules('dir', lang('directory'), 'trim|callback__two_point_check|xss_clean');
+		$this->form_validation->set_rules('dir', lang('directory'), 'trim|xss_clean');
 
 		if($this->form_validation->run() == false) {
 			if (validation_errors()) {
@@ -457,9 +466,8 @@ class Web_ftp extends CI_Controller {
 			}
 		}
 
-		$loc_dir = $this->input->post('dir', true);
-		//~ $loc_dir = "..";
-		
+		$loc_dir = $this->_two_point_delete($this->input->post('dir', true));
+
 		$tmp_dir = $this->files->_get_tmp_dir();
 		$remdir = $this->_get_path($this->servers->server_data) 
 						. $loc_dir
@@ -479,6 +487,11 @@ class Web_ftp extends CI_Controller {
 			/* Файл загружен, делаем необходимые дальнейшие правки */
 			
 			$file_data = $this->upload->data();
+			
+			if (!$this->_check_file_ext($file_data)) {
+				$this->_send_error('Forbidden type');
+				return false;
+			}
 			
 			$config = get_file_protocol_config($this->servers->server_data);
 			
