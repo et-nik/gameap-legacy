@@ -26,37 +26,14 @@
 
 <script type="text/javascript" src="{site_url}themes/system/js/web_ftp.js"></script>
 
-<script type="text/javascript">
-	GetList();
-	
-	function progressHandlingFunction(e){
-		if(e.lengthComputable){
-			$('progress').attr({value:e.loaded,max:e.total});
-		}
-	}
-
-	$(document).ready(function() {
-
-		$('#up').click(function() {
-			current_dir = current_dir.substr(0, current_dir.lastIndexOf("/"));
-			current_dir = current_dir.replace(/\/+/, '/');
-			
-			GetList();
-		});
-		
-		$('#current_dir').keyup(function(e) {
-			if(e.keyCode == 13){
-				current_dir = $('#current_dir').val();
-				GetList();
-			}
-		});
-
-	});
-</script>
-
 <a class="awesome" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>&nbsp;
 <a class="awesome" href="#" onclick="$('#upload_file').arcticmodal();">Загрузить файл</a>
+
 <hr />
+<strong>Недавние файлы:</strong>
+<div id="last_files">
+</div><br />
+
 <form action="#" accept-charset="utf-8"><input id="current_dir" type="text" value="" style="width:90%"></form>
 
 <table class="zebra" id="files" width="100%">
@@ -125,3 +102,31 @@
 	</div>
 </div>
 
+<script type="text/javascript">
+	GetList();
+	GetLastFiles();
+	
+	function progressHandlingFunction(e){
+		if(e.lengthComputable){
+			$('progress').attr({value:e.loaded,max:e.total});
+		}
+	}
+
+	$(document).ready(function() {
+
+		$('#up').click(function() {
+			current_dir = current_dir.substr(0, current_dir.lastIndexOf("/"));
+			current_dir = current_dir.replace(/\/+/, '/');
+			
+			GetList();
+		});
+		
+		$('#current_dir').keyup(function(e) {
+			if(e.keyCode == 13){
+				current_dir = $('#current_dir').val();
+				GetList();
+			}
+		});
+
+	});
+</script>

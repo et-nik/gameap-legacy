@@ -184,6 +184,66 @@ class Web_ftp extends CI_Controller {
 	{
 		return preg_replace('/\.{2,}/si', '', $str);
 	}
+	
+	// -----------------------------------------------------------------
+	
+	private function _update_last_files($dir, $file)
+	{
+		$ntdata['last_files'] = isset($this->users->auth_data['notices']['web_ftp']['data']['last_files']) 
+					? $this->users->auth_data['notices']['web_ftp']['data']['last_files']
+					: array();
+				
+		$add = true;
+		foreach ($ntdata['last_files'] as &$ntfile) {
+			if ($ntfile['dir'] == $dir && $ntfile['name'] == $file) {
+				$add = false;
+				break;
+			}
+		}
+		
+		if ($add) {
+			$ntdata['last_files'][] = array(
+				'dir' => $dir,
+				'name' => $file,
+				'server_id' => $this->servers->server_data['id'],
+				'game' => $this->servers->server_data['game'],
+			);
+			
+			if (count($ntdata['last_files']) > 7) {
+				$ntdata['last_files'] = array_slice($ntdata['last_files'], -7);
+			}
+
+			$this->users->set_notice('web_ftp', 'Last files', $ntdata);
+		}
+	}
+	
+	// -----------------------------------------------------------------
+    
+    /**
+     * Получение списка последних редактируемых файлов
+    */
+    public function get_last_files($server_id = 0)
+    {
+		if (!$this->_check_server($server_id)) {
+			$this->_send_error($this->_error);
+			return;
+		}
+		
+		$last_files =& $this->users->auth_data['notices']['web_ftp']['data']['last_files'];
+		$return = array();
+		
+		if (!empty($last_files)) {
+			foreach ($last_files as &$file) {
+				if ($this->servers->server_data['game'] != $file['game']) {
+					continue;
+				}
+				
+				$return[] = array('file' => $file['name'], 'dir' => $file['dir']);
+			}
+		}
+		
+		$this->_send_response(array('status' => 1, 'files' => $return));
+	}
 
 	// -----------------------------------------------------------------
     
@@ -299,6 +359,8 @@ class Web_ftp extends CI_Controller {
 			$this->_send_error($e->getMessage());
 			return;
 		}
+		
+		$this->_update_last_files($loc_dir, $loc_file);
 		
 		$this->_send_response(array('status' => 1, 'file_contents' => base64_encode($file_content)));
 	}

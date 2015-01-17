@@ -6,8 +6,43 @@ var last = true;
 	
 var csrf_token_name = page.csrf_token_name;
 
-function GetList() { 
+function ChangeDirAndRead(dir, file)
+{
+	current_dir = dir;
+	GetList();
+	ReadFile(file);
+}
+
+function GetLastFiles()
+{
+	$('#last_files').html("");
 	
+	$.ajax({ 
+		url:     sprintf("%sajax/web_ftp/get_last_files/%s", page.site_url, page.server_id),
+		type:     "GET",
+		dataType: "json",
+		success: function(response) {
+			
+			if (response.status == '0') {
+				noty({layout: 'bottomCenter', type: 'error', text: response.error_text});
+				return;
+			}
+			
+			$.each(response.files, function(key, val) {
+				$('#last_files').append('<a href="#" onclick="ChangeDirAndRead(\''+response.files[key].dir+'\', \''+response.files[key].file+'\')">'+response.files[key].file+'</a>&nbsp;&bull;&nbsp;');
+			});
+		}, 
+		error: function() {
+			noty({layout: 'bottomCenter', type: 'error', text: "unknown error"});
+		},
+		complete: function() {
+			HideLoad();
+		}
+	}); 
+}
+
+function GetList() 
+{ 
 	ShowLoad();
 	
 	$('#files > tbody').each(function() {
@@ -62,10 +97,15 @@ function GetList() {
 }
 
 function ReadFile(file) {
+	ShowLoad();
+	
 	if (current_file == file & file_contents != '') {
 		$("textarea[name='file_contents']").val(file_contents);
 		$('#edit_file').arcticmodal();
 		$('#edit_file h3').html(page.lang_server_files_edit + ' ' + file);
+		
+		HideLoad();
+
 		return;
 	}
 	
@@ -85,15 +125,19 @@ function ReadFile(file) {
 			}
 			
 			current_file = file;
-			file_contents = response.file_contents;
+			file_contents = utf8_decode(base64_decode(response.file_contents));
 			
-			$("textarea[name='file_contents']").val(response.file_contents);
+			$("textarea[name='file_contents']").val(file_contents);
 			$('#edit_file').arcticmodal();
 			$('#edit_file h3').html(page.lang_server_files_edit + ' ' + file);
 		}, 
 		error: function() {
 			noty({layout: 'bottomCenter', type: 'error', text: "unknown error"});
-		} 
+		},
+		complete: function() {
+			GetLastFiles();
+			HideLoad();
+		}
 	}); 
 }
 
@@ -160,8 +204,11 @@ function RenameFile() {
 }
 
 function WriteFile() {
+	ShowLoad();
+	
 	if (current_file == '') {
 		noty({layout: 'bottomCenter', type: 'error', text: "empty file"});
+		HideLoad();
 		return;
 	}
 
@@ -186,7 +233,10 @@ function WriteFile() {
 		}, 
 		error: function() {
 			noty({layout: 'bottomCenter', type: 'error', text: "unknown error"});
-		} 
+		},
+		complete: function() {
+			HideLoad();
+		}
 	});
 }
 

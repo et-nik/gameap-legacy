@@ -195,7 +195,7 @@ class Web_ftp extends CI_Controller {
 		/* Получение данных сервера для шаблона */
 		$local_tpl['server_id'] = $this->servers->server_data['id'];
 
-		$this->tpl_data['content'] .= $this->parser->parse('web_ftp/web_ftp.html', $local_tpl, true);
+		$this->tpl_data['content'] .= $this->parser->parse('web_ftp.html', $local_tpl, true);
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 
