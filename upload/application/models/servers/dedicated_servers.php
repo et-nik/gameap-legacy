@@ -196,6 +196,8 @@ class Dedicated_servers extends CI_Model {
 				
 				unset($ds_ip);
 				
+				$this->ds_list[$i]['modules_data'] 		= json_decode($this->ds_list[$i]['modules_data'], true);
+				
 				// GDAEMON, SSH, TELNET, FTP
 				$this->ds_list[$i]['control_ip'] 		= 'localhost';
 				$this->ds_list[$i]['control_port'] 		= 0;
@@ -249,7 +251,7 @@ class Dedicated_servers extends CI_Model {
 						$this->ds_list[$i]['local_server'] 	= false;
 						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
 						
-						$explode = explode(':', $this->ds_list[$i]['ssh_host']);
+						$explode = explode(':', $this->ds_list[$i]['gdaemon_host']);
 						$this->ds_list[$i]['control_ip'] 		= $explode[0];
 						$this->ds_list[$i]['control_port'] 		= isset($explode[1]) ? $explode[1] : 31707;
 
