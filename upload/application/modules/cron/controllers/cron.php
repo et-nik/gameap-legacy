@@ -394,42 +394,7 @@ class Cron extends MX_Controller {
 			/* Устанавливаем 777 права на директории, в которые загружается контент (карты, модели и пр.)
 			* и 666 на конфиг файлы, которые можно редактировать через админпанель */
 			if(strtolower($this->servers_data[$server_id]['os']) != 'windows') {
-				
-				$config_files 	= isset($this->servers_data[$server_id]['config_files']) 
-									? json_decode($this->servers_data[$server_id]['config_files'], true)
-									: array();
-				
-				$content_dirs 	= isset($this->servers_data[$server_id]['content_dirs']) 
-									? json_decode($this->servers_data[$server_id]['content_dirs'], true)
-									: array();
-									
-				$log_dirs 		= isset($this->servers_data[$server_id]['log_dirs'])
-									? json_decode($this->servers_data[$server_id]['log_dirs'], true)
-									: array();
-									
-				$command = array();
 
-				if (!empty($config_files)) {
-					foreach($config_files as $file) {
-						$command[] = 'chmod 666 ' . './' . $this->servers_data[$server_id]['dir'] . '/' . $file['file'];
-						$log .= 'chmod 666 ' . './' . $this->servers_data[$server_id]['dir'] . '/' .  $file['file'] . "\n";
-					}
-				}
-				
-				if (!empty($content_dirs)) {
-					foreach($content_dirs as $dir) {
-						$command[] = 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
-						$log .= 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
-					}
-				}
-				
-				if (!empty($log_dirs)) {
-					foreach($log_dirs as $dir) {
-						$command[] = 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
-						$log .= 'find ' . $this->servers_data[$server_id]['dir'] . '/' . $dir['path'] . ' -type d -exec chmod 777 {} \\;';
-					}
-				}
-				
 				if ($this->servers_data[$server_id]['su_user'] != '') {
 					$command[] = 'chown -R ' . $this->servers_data[$server_id]['su_user'] . ' ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'];
 					$log .= 'chown -R ' . $this->servers_data[$server_id]['su_user'] . ' ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . "\n";;
