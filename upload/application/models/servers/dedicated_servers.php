@@ -384,13 +384,10 @@ class Dedicated_servers extends CI_Model {
 	function update_modules_data($id, $data, $module_name)
 	{
 		$ds_data = $this->get_ds_data($id);
-		
-		$modules_data_array = json_decode($ds_data['modules_data'], true);
-		$modules_data_array[$module_name] = $data;
-		$modules_data_json = json_encode($modules_data_array);
-		
-		$sql_data['modules_data'] = $modules_data_json;
-		
+
+		$ds_data['modules_data'][$module_name] = $data;
+		$sql_data['modules_data'] = json_encode($ds_data['modules_data']);
+
 		return (bool)$this->edit_dedicated_server($id, $sql_data);
 	}
 	
