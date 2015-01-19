@@ -62,7 +62,7 @@
 
     <ul class="tabs">
         <li><a href="#base_parameters">{lang_base_parameters}</a></li>
-        <?php if ($this->servers->server_data['os'] != 'Windows'): ?>
+        <?php if (strtolower($this->servers->server_data['os']) != 'windows'): ?>
 			<li><a href="#limites">{lang_limites}</a></li>
 		<?php endif; ?>
         <li><a href="#start_parameters">{lang_adm_servers_start_parameters}</a></li>
@@ -161,7 +161,7 @@
 				</table>
         </div>
         
-        <?php if ($this->servers->server_data['os'] != 'Windows'): ?>
+        <?php if (strtolower($this->servers->server_data['os']) != 'windows'): ?>
 			<div id="limites" class="tab_content">
 				<table class="zebra" width="100%">
 					<tr>
