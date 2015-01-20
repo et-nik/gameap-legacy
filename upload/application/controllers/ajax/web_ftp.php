@@ -49,7 +49,7 @@ class Web_ftp extends CI_Controller {
 			show_404();
         }
 
-        $this->lang->load('server_files');
+        $this->lang->load('web_ftp');
         $this->lang->load('server_command');
         $this->lang->load('server_control');
         

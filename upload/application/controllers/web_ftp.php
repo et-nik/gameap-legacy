@@ -27,7 +27,7 @@ class Web_ftp extends CI_Controller {
 		
 		$this->load->database();
         $this->load->model('users');
-        $this->lang->load('server_files');
+        $this->lang->load('web_ftp');
         $this->lang->load('server_command');
         $this->lang->load('server_control');
 

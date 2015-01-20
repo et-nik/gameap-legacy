@@ -59,7 +59,7 @@ class Server_control extends CI_Controller {
 			$this->load->model('servers');
 			$this->lang->load('server_control');
 			$this->lang->load('server_command');
-			$this->lang->load('server_files');
+			$this->lang->load('web_ftp');
 			$this->lang->load('servers_log');
 			
 			//Base Template
