@@ -67,6 +67,7 @@ $lang['server_name'] 					= 'Имя сервера';
 $lang['server_ip'] 						= 'IP сервера';
 $lang['steamid'] 						= 'STEAM ID';
 $lang['stop'] 							= 'Остановка';
+$lang['success'] 						= 'Успех';
 $lang['tasks'] 							= 'Задания';
 $lang['title'] 							= 'Название';
 $lang['time'] 							= 'Время';
