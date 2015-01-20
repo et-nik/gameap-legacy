@@ -334,7 +334,7 @@ class Web_ftp extends CI_Controller {
 		$loc_file = $this->_two_point_delete($this->input->post('file', true));
 		
 		if (!$this->_check_file_ext(array('file_name' => $loc_file))) {
-			$this->_send_error('Forbidden type');
+			$this->_send_error(lang('web_ftp_forbidden_type');
 			return false;
 		}
 		
@@ -393,7 +393,7 @@ class Web_ftp extends CI_Controller {
 		$file_contents = $this->input->post('file_contents');
 		
 		if (!$this->_check_file_ext(array('file_name' => $loc_file))) {
-			$this->_send_error('Forbidden type');
+			$this->_send_error(lang('web_ftp_forbidden_type');
 			return false;
 		}
 		
@@ -551,7 +551,7 @@ class Web_ftp extends CI_Controller {
 			$file_data = $this->upload->data();
 			
 			if (!$this->_check_file_ext($file_data)) {
-				$this->_send_error('Forbidden type');
+				$this->_send_error(lang('web_ftp_forbidden_type');
 				return false;
 			}
 			
