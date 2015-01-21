@@ -27,10 +27,10 @@
 <script type="text/javascript" src="{site_url}themes/system/js/web_ftp.js"></script>
 
 <a class="awesome" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>&nbsp;
-<a class="awesome" href="#" onclick="$('#upload_file').arcticmodal();">Загрузить файл</a>
+<a class="awesome" href="#" onclick="$('#upload_file').arcticmodal();">{lang_web_ftp_upload}</a>
 
 <hr />
-<strong>Недавние файлы:</strong>
+<strong>{lang_web_ftp_recent_files}:</strong>
 <div id="last_files">
 </div><br />
 
@@ -40,9 +40,9 @@
 	
 	<tr id="head">
 		<th width="5%">&nbsp;</th>
-		<th width="25%">Имя файла</th>
-		<th width="10%">Размер</th>
-		<th>Действия</th>
+		<th width="25%">{lang_file_name}</th>
+		<th width="10%">{lang_size}</th>
+		<th>{lang_action}</th>
 	</tr>
 	
 	<tr id="up">
@@ -69,7 +69,7 @@
 
 <div style="display: none;">
 	<div class="box-modal" id="rename" style="width: 90%;">
-		<div class="box-modal_close arcticmodal-close">close</div>
+		<div class="box-modal_close arcticmodal-close">{lang_close}</div>
 		<h3>New name</h3>
 		<p>
 		<form action="#" accept-charset="utf-8" onsubmit="RenameFile();return false;">
