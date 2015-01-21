@@ -34,7 +34,7 @@ class Files extends CI_Driver_Library {
 		$this->CI =& get_instance();
 		$this->CI->load->helper('string');
 		$this->CI->lang->load('server_command');
-		$this->CI->lang->load('server_files');
+		$this->CI->lang->load('web_ftp');
 		$this->CI->lang->load('ftp');
 		$this->CI->lang->load('sftp');
 		
