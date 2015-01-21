@@ -161,7 +161,7 @@ class Web_ftp extends CI_Controller {
 		 * страницу выбора 
 		*/
 		if(!$server_id){
-			redirect('admin/servers_files');
+			redirect('admin/web_ftp');
 		}
 		
 		/* Преобразование id в числовое значение */
