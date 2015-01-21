@@ -38,3 +38,6 @@ $lang['server_files_content'] 									= 'Контент';
 $lang['web_ftp_form_error']										= 'Ошибка формы';
 $lang['web_ftp_forbidden_type']									= 'Запрещенный тип файла';
 $lang['web_ftp_file_big']										= 'Файл слишком большой';
+
+$lang['web_ftp_upload']											= 'Загрузить файл';
+$lang['web_ftp_recent_files']									= 'Недавние файлы';

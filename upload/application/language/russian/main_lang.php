@@ -178,3 +178,6 @@ $lang['closed']									= 'Закрыто';
 $lang['files']									= 'Файлы';
 $lang['limites']								= 'Лимиты';
 $lang['default_value']							= 'Значение по умолчанию';
+
+$lang['close']									= 'Закрыть';
+$lang['size'] 									= 'Размер';
