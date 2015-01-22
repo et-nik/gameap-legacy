@@ -1575,7 +1575,6 @@ class Cron extends MX_Controller {
 				$data['stats'] = json_encode($stats_array);
 				$this->dedicated_servers->edit_dedicated_server($ds['id'], $data);
 				
-				$cron_time['stats'] = now();
 			} else {
 				$this->_cmd_output('---Stats server #' . $ds['id'] . ' missed');
 				continue;
@@ -1606,6 +1605,10 @@ class Cron extends MX_Controller {
 		$end_mircotime = microtime(true);
 		$this->_cmd_output('-Time elapsed: ' . round($end_mircotime - $start_microtime, 4) . ' seconds');
 		$this->_cmd_output('-Memory peak usage: ' . round(memory_get_peak_usage()/1024, 2) . ' Kb');
+		
+		if ((now()-1800) > $cron_time['stats']) {
+			$cron_time['stats'] = now();
+		}
 		
 		// Запись информации о времени выполнения операций
 		file_put_contents(APPPATH . 'cache/cron_time.json', json_encode($cron_time));
