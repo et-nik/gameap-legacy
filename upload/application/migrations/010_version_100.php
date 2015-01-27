@@ -58,6 +58,7 @@ class Migration_Version_100 extends CI_Migration {
 		!$this->db->field_exists('execfile_linux', 'game_types') 		OR $this->dbforge->drop_column('game_types', 'execfile_linux');
 		
 		// Данные пользователей
+		$fields = array();
 		if (!$this->db->field_exists('notices', 'users')) {
 			$fields = array(
 				'notices' => array('type' => 'MEDIUMTEXT'),	
@@ -67,6 +68,7 @@ class Migration_Version_100 extends CI_Migration {
 		}
 		
 		// Сессии
+		$fields = array();
 		if (!$this->db->table_exists('sessions')) {
 			$fields = array(
 					'user_id' => array(
@@ -96,6 +98,7 @@ class Migration_Version_100 extends CI_Migration {
 		}
 		
 		// Подтверждение действий
+		$fields = array();
 		if (!$this->db->table_exists('actions')) {
 			$fields = array(
 				'id' => array(
@@ -117,8 +120,9 @@ class Migration_Version_100 extends CI_Migration {
 		}
 		
 		// GameAP Daemon поля
-		$this->db->field_exists('gdaemon_host', 'dedicated_servers') OR $fields['gdaemon_host'] = array('type' => 'TINYTEXT');
-		$this->db->field_exists('gdaemon_key', 'dedicated_servers') OR $fields['gdaemon_key'] = array('type' => 'TINYTEXT');
+		$fields = array();
+		$this->db->field_exists('gdaemon_host', 'dedicated_servers') 	OR $fields['gdaemon_host'] = array('type' => 'TINYTEXT');
+		$this->db->field_exists('gdaemon_key', 'dedicated_servers') 	OR $fields['gdaemon_key'] = array('type' => 'TINYTEXT');
 		empty($fields) OR $this->dbforge->add_column('dedicated_servers', $fields, 'steamcmd_path');
 		
 	}
