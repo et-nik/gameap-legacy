@@ -385,7 +385,10 @@ class Dedicated_servers extends CI_Model {
 	{
 		$ds_data = $this->get_ds_data($id);
 
-		$ds_data['modules_data'][$module_name] = $data;
+		$ds_data['modules_data'][$module_name] = isset($ds_data['modules_data'][$module_name]) && is_array($ds_data['modules_data'][$module_name])
+												 ? array_merge($ds_data['modules_data'][$module_name], $data)
+												 : $data;
+												 
 		$sql_data['modules_data'] = json_encode($ds_data['modules_data']);
 
 		return (bool)$this->edit_dedicated_server($id, $sql_data);
