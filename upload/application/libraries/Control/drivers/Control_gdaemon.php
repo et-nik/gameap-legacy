@@ -102,7 +102,7 @@ class Control_gdaemon extends CI_Driver {
 			$buffer .= fgets($this->_connection);
 		}
 
-		return $this->_decode($buffer, $this->crypt_key);
+		return iconv("UTF-8", "UTF-8//IGNORE", $this->_decode($buffer, $this->crypt_key));
 	}
 	
 	// -----------------------------------------------------------------
@@ -148,7 +148,7 @@ class Control_gdaemon extends CI_Driver {
 			throw new Exception(lang('server_command_connection_failed') . ' (GDaemon)');
 		}
 		
-		stream_set_timeout($this->_connection, 600);
+		//~ stream_set_timeout($this->_connection, 600);
 		
 		$this->_auth = false;
 		return $this->_connection;
