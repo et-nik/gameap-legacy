@@ -464,7 +464,7 @@ class Users extends CI_Model {
 													? array_merge($user_data['modules_data'][$module_name], $data)
 													: $data;
 
-		$modules_data_json = json_encode($user_data['modules_data'][$module_name]);
+		$modules_data_json = json_encode($user_data['modules_data']);
 		
 		$sql_data['modules_data'] = $modules_data_json;
 		
