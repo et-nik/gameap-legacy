@@ -125,15 +125,25 @@ class Installer_rust extends CI_Driver {
 	public function get_default_parameters($game_code = 'rust', $os = 'linux', $parameters = array())
 	{
 		if ($this->_engine_version == 'experimental') {
-			isset($parameters['hostname']) 			OR $parameters['hostname'] 			= 'Rust Server';
-			isset($parameters['port']) 				OR $parameters['port'] 				= $this->server_data['server_port'];
-			isset($parameters['rcon_port']) 		OR $parameters['rcon_port'] 		= $this->server_data['server_port']+1;
-			isset($parameters['rcon_password']) 	OR $parameters['rcon_password'] 	= random_string('alnum', 8);
-			isset($parameters['saveinterval']) 		OR $parameters['saveinterval'] 		= 300;
+			(isset($parameters['hostname']) && !empty($parameters['hostname']))
+				OR $parameters['hostname'] = 'Rust Server';
+				
+			(isset($parameters['port']) && !empty($parameters['port']))
+				OR $parameters['port'] = $this->server_data['server_port'];
+				
+			(isset($parameters['rcon_port']) && !empty($parameters['rcon_port']))
+				OR $parameters['rcon_port'] = $this->server_data['server_port']+1;
+				
+			(isset($parameters['rcon_password']) && !empty($parameters['rcon_password']))
+				OR $parameters['rcon_password'] = random_string('alnum', 8);
+				
+			(isset($parameters['saveinterval']) && !empty($parameters['saveinterval']))
+				OR $parameters['saveinterval'] = 300;
 		}
 		
-		isset($parameters['maxplayers']) OR $parameters['maxplayers'] = 50;
-
+		(isset($parameters['maxplayers']) && !empty($parameters['maxplayers'])) 
+				OR $parameters['maxplayers'] = 50;
+				
 		return $parameters;
 	}
 	
