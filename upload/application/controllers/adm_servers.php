@@ -1442,6 +1442,10 @@ class Adm_servers extends CI_Controller {
 				
 				$local_tpl['start_command'] 		= $this->servers->server_data['start_command'];
 				
+				// Замена фигурных скобок, чтобы в параметрах запуска шоткоды команды не считались за шоткоды шаблона
+				$local_tpl['start_command'] 		= str_replace('{', '&#123;', $local_tpl['start_command']);
+				$local_tpl['start_command'] 		= str_replace('}', '&#125;', $local_tpl['start_command']);
+				
 				$local_tpl['query_port'] 			= $this->servers->server_data['query_port'];
 				$local_tpl['rcon_port'] 			= $this->servers->server_data['rcon_port'];
 				
