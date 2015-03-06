@@ -639,6 +639,10 @@ class Servers extends CI_Model {
 		/* Данные алиасов в массив */
 		$this->server_data['aliases_values'] = json_decode($this->server_data['aliases'], true);
 		
+		if (!is_array($this->server_data['aliases_values'])) {
+			$this->server_data['aliases_values'] = array();
+		}
+
 		/* Получаем query и rcon порты */
 		if (!$this->server_data['query_port']) {
 			$this->server_data['query_port'] = $this->server_data['server_port'];
