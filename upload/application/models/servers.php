@@ -214,37 +214,6 @@ class Servers extends CI_Model {
 		return $command;
 	}
 
-	//-----------------------------------------------------------
-	
-	/*
-	 * Функция отправляет команду на выделенный сервер
-	 * 
-	 * УСТАРЕЛА! В 1.0 версии будет удалена, используйте хелпер ds
-	*/
-	function command($command, $server_data, $path = false)
-    {
-		$this->load->helper('ds');
-		try {
-			send_command($command, $server_data, $path);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	//-----------------------------------------------------------
-	
-	/**
-     * Получение списка отправленных команд
-     * 
-     * УСТАРЕЛА! В 1.0 версии будет удалена, используйте хелпер ds
-     *
-    */
-	function get_sended_commands($last_command = false)
-	{
-		$this->load->helper('ds');
-		return get_sended_commands($last_command);
-	}
-    
     
     /*
      * Запуск сервера
@@ -305,35 +274,6 @@ class Servers extends CI_Model {
 		
 		$command = $this->command_generate($server_data, 'restart');
 		return send_command($command, $server_data);
-	}
-	
-	//-----------------------------------------------------------	
-	
-	/*
-     * Обновление сервера
-     * 
-     * @param array - данные сервера
-     *
-    */
-    function update($server_data)
-    {
-		$this->load->helper('ds');
-		
-		if(!is_array($server_data)) {
-			// был передан id, получаем данные сервера
-			$server_data = $this->get_server_data($server_data);
-		}
-		
-		$command = $this->command_generate($server_data, 'update');
-		
-		/* Определение пути до steamcmd */
-		if ($server_data['steamcmd_path']) {
-			$steamcmd_path = $server_data['steamcmd_path'];
-		} else {
-			$steamcmd_path = false;
-		}
-		
-		return send_command($command, $server_data, $steamcmd_path);
 	}
 
 	//-----------------------------------------------------------	
@@ -1182,29 +1122,6 @@ class Servers extends CI_Model {
 	// ----------------------------------------------------------------
 	 
     /**
-     * Записывает содержимое файла
-     * 
-     * @param string 	$file расположение файла без script_path и dir
-     * @param array		$server_data массив с данными сервера
-     * @return bool
-     * 
-     * УСТАРЕЛА! В 1.0 версии будет удалена!
-     * Оставлена для обратной совместимости!
-    */
-	public function write_file($file, $file_contents = '', $server_data = array()) 
-	{
-		try {
-			$server_data = empty($server_data) ? $this->server_data : $server_data;
-			$this->load->helper('ds');
-			return write_ds_file($file, $file_contents, $server_data);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	// ----------------------------------------------------------------
-	 
-    /**
      * Читает содержимое файла с удаленного сервера
      * 
      * @param str
@@ -1216,84 +1133,6 @@ class Servers extends CI_Model {
 		$server_data = empty($server_data) ? $this->server_data : $server_data;
 		$this->load->helper('ds');
 		return read_ds_file($file, $server_data);
-	}
-	
-	
-	// ----------------------------------------------------------------
-	 
-    /**
-     * Записывает локальный файл
-     * файл должен существовать
-     * 
-     * @param str
-     * @return str
-     * 
-     * УСТАРЕЛА! В 1.0 версии будет удалена!
-     * Оставлена для обратной совместимости!
-    */
-	function write_local_file($file, $data = false) 
-	{
-		try {
-			$server_data = empty($server_data) ? $this->server_data : $server_data;
-			$this->load->helper('ds');
-			return write_ds_file($file, $file_contents, $server_data);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	// ----------------------------------------------------------------
-	 
-    /**
-     * Загружает файл на удаленный сервер
-     * 
-     * @param str
-     * @param str
-     * @return bool
-     * 
-     * УСТАРЕЛА! В 1.0 версии будет удалена!
-     * Оставлена для обратной совместимости!
-     * 
-    */
-	function upload_remote_file($file, $remote_file, $mode = 0666)
-	{
-		try {
-			$server_data = &$this->server_data;
-		
-			$this->load->driver('files');
-			$this->load->helper('ds');
-			
-			$config = get_file_protocol_config($server_data);
-			$this->files->set_driver($config['driver']);
-			$this->files->connect($config);
-			
-			$this->files->upload($file, $remote_file);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	// ----------------------------------------------------------------
-	 
-    /**
-     * Записывает данные в удаленный файл
-     * 
-     * @param str
-     * @return str
-     * 
-     * УСТАРЕЛА! В 1.0 версии будет удалена!
-     * Оставлена для обратной совместимости!
-     * 
-    */
-	function write_remote_file($file, $data, $server_data = array()) 
-	{
-		try {
-			$server_data = empty($server_data) ? $this->server_data : $server_data;
-			$this->load->helper('ds');
-			return write_ds_file($file, $file_contents, $server_data);
-		} catch (Exception $e) {
-			return false;
-		}
 	}
 	
 	// ----------------------------------------------------------------
