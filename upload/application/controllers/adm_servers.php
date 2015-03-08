@@ -1477,7 +1477,7 @@ class Adm_servers extends CI_Controller {
 				$local_tpl['game_type_dropdown'] = array();
 				$local_tpl['aliases_list'] = array();
 				
-				$server_aliases = json_decode($this->servers->server_data['aliases'], true);
+				$server_aliases = $this->servers->server_data['aliases'];
 
 				$local_tpl['game_type_dropdown'] 		= form_dropdown('game_type', $options, $this->servers->server_data['game_type']);
 				$local_tpl['server_enabled_checkbox'] 	= form_checkbox('enabled', 'accept', $this->servers->server_data['enabled']);
@@ -1593,7 +1593,7 @@ class Adm_servers extends CI_Controller {
 										: false;
 										
 				/* Значения алиасов на сервере */
-				$server_aliases = json_decode($this->servers->server_data['aliases'], true);
+				$server_aliases = $this->servers->server_data['aliases'];
 
 				/* Прогон по алиасам */
 				
