@@ -308,8 +308,9 @@ class Servers extends CI_Model {
 	}
 	
 	//-----------------------------------------------------------	
+	
 	/*
-     * Перезапуск сервера
+     * Обновление сервера
      * 
      * @param array - данные сервера
      *
@@ -334,7 +335,7 @@ class Servers extends CI_Model {
 		
 		return send_command($command, $server_data, $steamcmd_path);
 	}
-	
+
 	//-----------------------------------------------------------	
 	/*
      * Добавление нового сервера
@@ -371,6 +372,25 @@ class Servers extends CI_Model {
 		}
 		
 		return (bool)$this->db->update('servers', $data);
+	}
+	
+	/**
+     * Обновляет поле с данными для модулей
+     * 
+     * @param id 	 	id сервера
+     * @param array 	новые данные
+     * @param string	имя модуля
+     * @return bool
+     *
+    */
+	function update_modules_data($id, $data, $module_name)
+	{
+		$server_data = $this->get_server_data($id, true, true, true);
+
+		$server_data['modules_data'][$module_name] = $data;
+		$sql_data['modules_data'] = json_encode($server_data['modules_data']);
+
+		return (bool)$this->edit_game_server($id, $sql_data);
 	}
 
 	//-----------------------------------------------------------	
@@ -697,6 +717,8 @@ class Servers extends CI_Model {
 			$this->server_data['control_login'] 	= $this->server_ds_data['control_login'];
 			$this->server_data['control_password'] 	= $this->server_ds_data['control_password'];
 			
+			$this->server_data['modules_data'] 		= json_decode($this->server_ds_data['modules_data'], true);
+			
 			if (strtolower($this->server_data['os']) == 'windows') {
 				$execfile = $this->_exec_file['windows'];
 			} else {
@@ -777,7 +799,7 @@ class Servers extends CI_Model {
 				}
 			}
 			
-			$this->server_data['aliases'] = json_encode($this->server_data['aliases_values']);
+			$this->server_data['aliases'] = $this->server_data['aliases_values'];
 
 		} else {
 			/* Информация о модификации игры не найдена */
@@ -817,7 +839,7 @@ class Servers extends CI_Model {
 			$tpl_data[$num]['server_rcon_port'] 	= $this->server_data['rcon_port'];
 		}
 		
-		foreach ($this->servers_list as $server_data){
+		foreach ($this->servers_list as $server_data) {
 			$num++;
 			
 			$tpl_data[$num]['server_id'] 			= $server_data['id'];
