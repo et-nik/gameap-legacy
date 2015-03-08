@@ -253,7 +253,7 @@ class Cron extends MX_Controller {
 	/**
 	 * Установка/обновление игрового сервера. Общая функция.
 	 */
-	private function _install_server($server_id = 0)
+	private function _install_server($server_id = 0, $update_server = false)
 	{
 		if (!$server_id) {
 			return;
@@ -411,62 +411,64 @@ class Cron extends MX_Controller {
 				}
 			}
 
-
+		
 			/* Устанавливаем серверу rcon пароль */
-			$this->_cmd_output('---Set rcon password');
-			$this->load->helper('safety');
-			$new_rcon = generate_code(8);
-			
-			try {
-				$this->servers->change_rcon($new_rcon, $this->servers_data[$server_id]);
-			} catch (Exception $e) {
-				$this->_cmd_output('---Rcon set failed. Message: ' . $e->getMessage());
-			}
-			
-			/* Конфигурирование сервера 
-			 * Здесь задаются параметры запуска и различные базовые настройки */
-			$this->_cmd_output('----Configuring server');
-			$this->installer->set_game_variables($this->servers_data[$server_id]['start_code'], 
-											$this->servers_data[$server_id]['engine'],
-											$this->servers_data[$server_id]['engine_version']
-			);
-			
-			$this->installer->set_os($this->servers_data[$server_id]['os']);
-			$this->installer->server_data = $this->servers_data[$server_id];
-			
-			/* Правка конфигов. Здесь происходит редактирование параметров
-			 * в конфигурации.
-			 * Для некоторых игр такие параметры как порт, IP, RCON пароль
-			 * задаются в конфигах. */
-			try {
-				$this->installer->change_config();
-			} catch (Exception $e) {
-				$this->_cmd_output('---Change config failed. Message: ' . $e->getMessage());
-			}
-			
-			$this->_cmd_output('----Set aliases');
-			$aliases_values = array();
-			$aliases_values = $this->servers_data[$server_id]['aliases'];
+			if ($update_server) {
+				$this->_cmd_output('---Set rcon password');
+				$this->load->helper('safety');
+				$new_rcon = generate_code(8);
+				
+				try {
+					$this->servers->change_rcon($new_rcon, $this->servers_data[$server_id]);
+				} catch (Exception $e) {
+					$this->_cmd_output('---Rcon set failed. Message: ' . $e->getMessage());
+				}
+				
+				/* Конфигурирование сервера 
+				 * Здесь задаются параметры запуска и различные базовые настройки */
+				$this->_cmd_output('----Configuring server');
+				$this->installer->set_game_variables($this->servers_data[$server_id]['start_code'], 
+												$this->servers_data[$server_id]['engine'],
+												$this->servers_data[$server_id]['engine_version']
+				);
+				
+				$this->installer->set_os($this->servers_data[$server_id]['os']);
+				$this->installer->server_data = $this->servers_data[$server_id];
+				
+				/* Правка конфигов. Здесь происходит редактирование параметров
+				 * в конфигурации.
+				 * Для некоторых игр такие параметры как порт, IP, RCON пароль
+				 * задаются в конфигах. */
+				try {
+					$this->installer->change_config();
+				} catch (Exception $e) {
+					$this->_cmd_output('---Change config failed. Message: ' . $e->getMessage());
+				}
+				
+				$this->_cmd_output('----Set aliases');
+				$aliases_values = array();
+				$aliases_values = $this->servers_data[$server_id]['aliases'];
 
-			$server_data['installed'] 		= 1;
-			$server_data['rcon']			= $new_rcon;
-			$server_data['aliases'] 		= json_encode($this->installer->get_default_parameters($aliases_values));
-			
-			if (!$this->servers_data[$server_id]['start_command']) {
-				$server_data['start_command'] 	= $this->installer->get_start_command();
+				$server_data['installed'] 		= 1;
+				$server_data['rcon']			= $new_rcon;
+				$server_data['aliases'] 		= json_encode($this->installer->get_default_parameters($aliases_values));
+				
+				if (!$this->servers_data[$server_id]['start_command']) {
+					$server_data['start_command'] 	= $this->installer->get_start_command();
+				}
+				
+				// Путь к картам
+				$server_data['maps_path'] = $this->installer->get_maps_path();
+				
+				// Список портов
+				$ports = $this->installer->get_ports();
+				
+				$server_data['query_port'] = $ports[1];
+				$server_data['rcon_port'] = $ports[2];
+				unset($ports);
+				
+				$this->servers->edit_game_server($server_id, $server_data);
 			}
-			
-			// Путь к картам
-			$server_data['maps_path'] = $this->installer->get_maps_path();
-			
-			// Список портов
-			$ports = $this->installer->get_ports();
-			
-			$server_data['query_port'] = $ports[1];
-			$server_data['rcon_port'] = $ports[2];
-			unset($ports);
-			
-			$this->servers->edit_game_server($server_id, $server_data);
 			
 			$log_data['type'] = 'server_command';
 			$log_data['command'] = 'install';
@@ -1214,7 +1216,7 @@ class Cron extends MX_Controller {
 					try {
 						// Обновление - установка файлов поверх существующих
 						$this->servers->stop($this->servers_data[$server_id]);
-						$this->_install_server($server_id);
+						$this->_install_server($server_id, true);
 						
 						$cron_success = true;
 						$cron_stats['success'] ++;
