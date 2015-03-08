@@ -349,7 +349,8 @@ class Web_ftp extends CI_Controller {
 			$this->files->set_driver($config['driver']);
 			$this->files->connect($config);
 			
-			if ($this->files->file_size($file) > 5000000) {
+			// 2Mb
+			if ($this->files->file_size($file) > 2000000) {
 				$this->_send_error(lang('web_ftp_file_big'));
 				return;
 			}
