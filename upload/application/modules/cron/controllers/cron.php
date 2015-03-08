@@ -391,9 +391,12 @@ class Cron extends MX_Controller {
 				}
 			}
 			
+			
+			
 			/* Устанавливаем 777 права на директории, в которые загружается контент (карты, модели и пр.)
 			* и 666 на конфиг файлы, которые можно редактировать через админпанель */
-			if(strtolower($this->servers_data[$server_id]['os']) != 'windows') {
+			$this->_cmd_output('---Change privileges');
+			if (strtolower($this->servers_data[$server_id]['os']) != 'windows') {
 
 				if ($this->servers_data[$server_id]['su_user'] != '') {
 					$command[] = 'chown -R ' . $this->servers_data[$server_id]['su_user'] . ' ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'];
@@ -410,6 +413,7 @@ class Cron extends MX_Controller {
 
 
 			/* Устанавливаем серверу rcon пароль */
+			$this->_cmd_output('---Set rcon password');
 			$this->load->helper('safety');
 			$new_rcon = generate_code(8);
 			
@@ -421,6 +425,7 @@ class Cron extends MX_Controller {
 			
 			/* Конфигурирование сервера 
 			 * Здесь задаются параметры запуска и различные базовые настройки */
+			$this->_cmd_output('----Configuring server');
 			$this->installer->set_game_variables($this->servers_data[$server_id]['start_code'], 
 											$this->servers_data[$server_id]['engine'],
 											$this->servers_data[$server_id]['engine_version']
@@ -439,8 +444,9 @@ class Cron extends MX_Controller {
 				$this->_cmd_output('---Change config failed. Message: ' . $e->getMessage());
 			}
 			
+			$this->_cmd_output('----Set aliases');
 			$aliases_values = array();
-			$aliases_values = json_decode($this->servers_data[$server_id]['aliases'], true);
+			$aliases_values = $this->servers_data[$server_id]['aliases'];
 
 			$server_data['installed'] 		= 1;
 			$server_data['rcon']			= $new_rcon;
@@ -788,6 +794,8 @@ class Cron extends MX_Controller {
 	*/
 	private function _unpack_files($server_id, $pack_file)
 	{
+		$this->_cmd_output("---Unpack Files: " . basename($pack_file));
+		
 		$pathinfo = pathinfo($pack_file);
 		
 		switch (strtolower($this->servers_data[$server_id]['os'])) {
@@ -828,6 +836,8 @@ class Cron extends MX_Controller {
 			$this->servers_data[$server_id], 
 			$this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir']
 		);
+		
+		$this->_cmd_output("---Unpack Files successful");
 			
 		return true;
 
@@ -879,6 +889,8 @@ class Cron extends MX_Controller {
 	*/
 	private function _wget_files($server_id, $link, $rep_type = 'local')
 	{
+		$this->_cmd_output("---Get Files: " . $link);
+		
 		$commands = array();
 		
 		if ($rep_type == 'local') {
