@@ -115,7 +115,15 @@ class Settings extends CI_Controller {
 			}
 			
 			/* Допустимые алиасы */
-			$allowable_aliases = json_decode($this->servers->server_data['aliases_list'], true);
+			if (isset($this->servers->server_data['aliases_list']) && $this->servers->server_data['aliases_list'] != '') {
+				$allowable_aliases = json_decode($this->servers->server_data['aliases_list'], true);
+			} else {
+				$allowable_aliases = array();
+			}
+			
+			if (!$allowable_aliases) {
+				$allowable_aliases = array();
+			}
 			
 			/* Значения алиасов на сервере */
 			$aliases_values =& $this->servers->server_data['aliases_values'];
