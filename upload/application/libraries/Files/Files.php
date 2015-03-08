@@ -38,7 +38,7 @@ class Files extends CI_Driver_Library {
 		$this->CI->lang->load('ftp');
 		$this->CI->lang->load('sftp');
 		
-		$this->valid_drivers = array('files_ftp', 'files_sftp', 'files_local');
+		$this->valid_drivers = array('files_ftp', 'files_sftp', 'files_local', 'files_gdaemon');
 
 		$this->_get_tmp_dir();
 	}
