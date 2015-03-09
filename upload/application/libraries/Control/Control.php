@@ -284,6 +284,13 @@ class Control extends CI_Driver_Library {
 	
 	// ---------------------------------------------------------------------
 	
+	public function disconnect() 
+	{
+		return $this->{$this->driver}->disconnect();
+	}
+	
+	// ---------------------------------------------------------------------
+	
 	public function clear_commands() 
 	{
 		$this->_sended_commands = array();
