@@ -40,6 +40,13 @@ class Files_gdaemon extends CI_Driver {
 	
 	// -----------------------------------------------------------------
 	
+	function __destruct()
+	{
+		$this->close();
+	}
+	
+	// -----------------------------------------------------------------
+	
 	function _encode($value, $secret_key)
 	{
 		if (strlen($value)%16) {
@@ -72,6 +79,7 @@ class Files_gdaemon extends CI_Driver {
 	{
 		foreach ($config as $key => $val)
 		{
+			
 			if (isset($this->$key))
 			{
 				$this->$key = $val;
@@ -146,6 +154,21 @@ class Files_gdaemon extends CI_Driver {
 	
 	// -----------------------------------------------------------------
 	
+	function close()
+	{
+		$this->crypt_key		= "";
+		$this->client_key		= "";
+		
+		if (!$this->_connection && is_resource($this->_connection)) {
+			return;
+		}
+	
+		fwrite($this->_connection, "exit\n");
+		fclose($this->_connection);
+	}
+	
+	// -----------------------------------------------------------------
+	
 	function connect($config = array())
 	{
 		if ($this->_connection && $config['hostname'] == $this->hostname) {
@@ -153,15 +176,13 @@ class Files_gdaemon extends CI_Driver {
 			return;
 		} elseif ($this->_connection) {
 			// Разрываем соединение со старым сервером
-			$this->disconnect();
+			$this->close();
 		}
 		
 		if (count($config) > 0) {
 			$this->initialize($config);
 		}
 
-		!$this->port OR $this->port = 31707;
-		
 		if (!$this->hostname OR !$this->port) {
 			$this->_error('server_command_empty_connect_data');
 		}
@@ -173,7 +194,7 @@ class Files_gdaemon extends CI_Driver {
 			$this->_error('server_command_connection_failed');
 		}
 		
-		stream_set_timeout($this->_connection, 240);
+		stream_set_timeout($this->_connection, 15);
 		
 		$this->_auth = false;
 		$this->_login();
@@ -438,10 +459,11 @@ class Files_gdaemon extends CI_Driver {
 			'type' 		=> "read_dir"
 		));
 		
+
 		$encode_string = $this->_encode($send_json, $this->crypt_key);
 		
 		fwrite($this->_connection, "command {$encode_string}\n");
-		
+
 		$read = $this->_read();
 
 		if (!$contents = json_decode($read, true)) {
