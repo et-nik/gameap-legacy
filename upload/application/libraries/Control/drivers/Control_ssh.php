@@ -111,13 +111,16 @@ class Control_ssh extends CI_Driver {
 					// Удаление пустых значений
 					$values_exp = array_values(array_diff($values_exp, array(null)));
 					
-					if ($values_exp[8] != $file_name) {
+					$fname_key = preg_match('/^\d{2,4}\-\d\d\-\d\d/i', $values_exp[5]) ? 7 : 8;
+					
+					if ($values_exp[$fname_key] != $file_name) {
 						continue;
 					}
 					
 					/* С побитовыми операциями не дружу, поэтому способ извращенский =) */
 					
 					// Значение $values
+					// Ubuntu 10.10: -rwxr-xr-x 1 root  root   5718 2014-11-19 18:14 server.sh
 					// Debian: -rwxr-xr-x  1 root        root     3361 Feb  8 15:02 server.sh
 					// CentOS: -rwxrwxrwx. 1 root root 3361 Mar 21 02:10 server.sh
 					
