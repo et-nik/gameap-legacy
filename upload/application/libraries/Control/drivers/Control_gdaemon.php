@@ -102,7 +102,7 @@ class Control_gdaemon extends CI_Driver {
 			$buffer .= fgets($this->_connection);
 		}
 
-		return $this->_decode($buffer, $this->crypt_key);
+		return iconv("UTF-8", "UTF-8//IGNORE", $this->_decode($buffer, $this->crypt_key));
 	}
 	
 	// -----------------------------------------------------------------
