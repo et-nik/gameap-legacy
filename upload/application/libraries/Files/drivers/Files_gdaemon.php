@@ -163,8 +163,8 @@ class Files_gdaemon extends CI_Driver {
 			return;
 		}
 	
-		fwrite($this->_connection, "exit\n");
-		fclose($this->_connection);
+		@fwrite($this->_connection, "exit\n");
+		@fclose($this->_connection);
 	}
 	
 	// -----------------------------------------------------------------
@@ -364,7 +364,7 @@ class Files_gdaemon extends CI_Driver {
 	 */
 	function file_size($file)
 	{
-		if (!$path) {
+		if (!$file) {
 			$this->_error('server_files_directory_no_set');
 		}
 		
@@ -374,8 +374,8 @@ class Files_gdaemon extends CI_Driver {
 		
 		$send_json = json_encode(array(
 			'key' 		=> $this->client_key,
-			'dir' 		=> $path,
-			'type' 		=> "read_dir"
+			'file' 		=> $file,
+			'type' 		=> "filesize"
 		));
 
 		$encode_string = $this->_encode($send_json, $this->crypt_key);
@@ -471,7 +471,11 @@ class Files_gdaemon extends CI_Driver {
 		}
 		
 		$return_list = array();
-
+	
+		if (empty($contents['list'])) {
+			return array();
+		}
+		
 		foreach($contents['list'] as &$file) {
 			$pathinfo = pathinfo($file[0]);
 			
