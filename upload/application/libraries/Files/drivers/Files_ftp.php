@@ -34,7 +34,9 @@ class Files_ftp extends CI_Driver {
 	var $passive	= TRUE;
 	var $debug		= FALSE;
 	var $conn_id	= FALSE;
-
+	
+	// Месяцы без нулября, обязательно нужно прибавить единичку
+	var $raw_months 	= array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 
 	/**
 	 * Constructor - Sets Preferences
@@ -100,7 +102,7 @@ class Files_ftp extends CI_Driver {
 		if (count($config) > 0) {
 			$this->initialize($config);
 		}
-
+		
 		if (FALSE === ($this->conn_id = @ftp_connect($this->hostname, $this->port))) {
 			$this->_error('ftp_unable_to_connect');
 			return FALSE;
@@ -500,36 +502,30 @@ class Files_ftp extends CI_Driver {
 	 */
 	function list_files_full_info($path = '.', $extensions = array()) 
 	{
+		$CI =& get_instance();
+		$CI->load->helper('date');
+		
 		if (!ftp_chdir($this->conn_id, $path)) {
 			$this->_error('server_files_directory_not_found');
 			return false;
 		}
 		
-		$list_files = $this->list_files($path);
+		$list_files = ftp_rawlist($this->conn_id, $path);
+		
+		if (empty($list_files)) {
+			return array();
+		}
+		
 		$return_list = array();
 
 		foreach($list_files as &$file) {
-			
-			$pathinfo = pathinfo($file);
-			
-			/* Если файл не имеет расширения, а нам нужны файлы с определенным
-			 * расширением и не нужны нотисы */
-			if (!empty($extensions) && !isset($pathinfo['extension'])) {
-				continue;
-			}
-			
-			/* Если заданы расширения $extensions и в массиве нет расширения,
-			 * то такой файл пропускаем */
-			if (!empty($extensions) && !in_array($pathinfo['extension'], $extensions)) {
-				continue;
-			}
-			
-			$file_size = ftp_size($this->conn_id, $file);
 
-			$return_list[] = array('file_name' => basename($file),
-									'file_time' => ftp_mdtm($this->conn_id, $file),
-									'file_size' => $file_size,
-									'type' => ($file_size == -1) ? 'd' : 'f',
+			$expl = preg_split("/[\s,]+/", $file, 9);
+
+			$return_list[] = array('file_name' => basename($expl[8]),
+									'file_time' => human_to_unix($expl[6] . '-' . (array_search($expl[5], $this->raw_months)+1) . '-' . date('Y') . ' ' . $expl[7]),
+									'file_size' => $expl[4],
+									'type' => substr($expl[0], 0, 1) == 'd' ? 'd' : 'f',
 			);
 		}
 
