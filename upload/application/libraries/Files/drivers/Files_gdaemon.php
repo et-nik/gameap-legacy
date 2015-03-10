@@ -36,7 +36,7 @@ class Files_gdaemon extends CI_Driver {
 	
 	private $_auth		= false;
 	
-	private $_max_file_size = 2000000;
+	private $_max_file_size = 1000000;
 	
 	// -----------------------------------------------------------------
 	
@@ -282,7 +282,7 @@ class Files_gdaemon extends CI_Driver {
 	*/
 	public function delete_dir($filepath)
 	{
-		return true;
+		return $this->delete_file($filepath);
 	}
 	
 	// -----------------------------------------------------------------
@@ -295,6 +295,34 @@ class Files_gdaemon extends CI_Driver {
 	 */
 	public function delete_file($filepath)
 	{
+		if (!$this->_connection OR !$this->_auth) {
+			$this->_error('server_command_not_connected');
+		}
+		
+		$send_json = json_encode(array(
+			'key' 				=> $this->client_key,
+			'file' 				=> $filepath,
+			'type' 				=> "remove"
+		));
+		
+		$encode_string = $this->_encode($send_json, $this->crypt_key);
+		
+		fwrite($this->_connection, "command {$encode_string}\n");
+		
+		$read = $this->_read();
+		
+		if (!$contents = json_decode($read, true)) {
+			$this->_error('server_command_get_response_failed');
+		}
+		
+		if ($contents['status'] == 3) {
+			$this->_error('web_ftp_file_not_found');
+		}
+		
+		if ($contents['status'] != 10) {
+			return false;
+		}
+		
 		return true;
 	}
 	
@@ -329,7 +357,7 @@ class Files_gdaemon extends CI_Driver {
 			$this->_error('server_command_get_response_failed');
 		}
 		
-		if ($contents['status'] == 41) {
+		if ($contents['status'] == 3) {
 			$this->_error('web_ftp_file_not_found');
 		}
 		
