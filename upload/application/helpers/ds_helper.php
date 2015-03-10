@@ -171,15 +171,13 @@ if ( ! function_exists('get_file_protocol'))
     {
 		if($server_data['ftp_host']) {
 			return 'ftp';
-			
 		} elseif ($server_data['ssh_host']) {
 			return 'sftp';
-			
+		} elseif ($server_data['gdaemon_host']) {
+			return 'gdaemon'
 		} elseif ($server_data['local_server']) {
 			return 'local';
-			
 		} else {
-			
 			return false;
 		}
 	}
