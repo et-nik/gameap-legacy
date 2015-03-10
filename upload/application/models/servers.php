@@ -650,6 +650,9 @@ class Servers extends CI_Model {
 			$this->server_data['telnet_password'] 	= $this->server_ds_data['telnet_password'];
 			$this->server_data['telnet_passwd'] 	= $this->server_ds_data['telnet_password'];
 			$this->server_data['telnet_path'] 		= $this->server_ds_data['telnet_path'];
+			
+			$this->server_data['gdaemon_host']		= $this->server_ds_data['gdaemon_host'];
+			$this->server_data['gdaemon_key'] 		= $this->server_ds_data['gdaemon_key'];
 
 			$this->server_data['control_protocol'] 	= $this->server_ds_data['control_protocol'];
 			$this->server_data['control_ip'] 		= $this->server_ds_data['control_ip'];
@@ -657,7 +660,7 @@ class Servers extends CI_Model {
 			$this->server_data['control_login'] 	= $this->server_ds_data['control_login'];
 			$this->server_data['control_password'] 	= $this->server_ds_data['control_password'];
 			
-			$this->server_data['modules_data'] 		= json_decode($this->server_ds_data['modules_data'], true);
+			$this->server_data['modules_data'] 		= $this->server_ds_data['modules_data'];
 			
 			if (strtolower($this->server_data['os']) == 'windows') {
 				$execfile = $this->_exec_file['windows'];
