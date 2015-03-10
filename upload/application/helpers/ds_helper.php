@@ -218,6 +218,16 @@ if ( ! function_exists('get_file_protocol_config'))
 			$config['username'] = $server_data['ssh_login'];
 			$config['password'] = $server_data['ssh_password'];
 			//~ $config['debug'] = true;
+		} elseif ($server_data['gdaemon_host']) {
+			$config['driver'] = 'gdaemon';
+			
+			$explode = explode(':', $server_data['gdaemon_host']);
+			
+			$config['hostname'] = $explode[0];
+			$config['port'] = isset($explode[1]) ? $explode[1] : '22';
+			
+			$config['username'] = '';
+			$config['password'] = $server_data['gdaemon_key'];
 		} elseif ($server_data['local_server']) {
 			$config['driver'] = 'local';
 		} else {
