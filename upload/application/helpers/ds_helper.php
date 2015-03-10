@@ -174,7 +174,7 @@ if ( ! function_exists('get_file_protocol'))
 		} elseif ($server_data['ssh_host']) {
 			return 'sftp';
 		} elseif ($server_data['gdaemon_host']) {
-			return 'gdaemon'
+			return 'gdaemon';
 		} elseif ($server_data['local_server']) {
 			return 'local';
 		} else {
@@ -220,11 +220,11 @@ if ( ! function_exists('get_file_protocol_config'))
 			//~ $config['debug'] = true;
 		} elseif ($server_data['gdaemon_host']) {
 			$config['driver'] = 'gdaemon';
-			
+
 			$explode = explode(':', $server_data['gdaemon_host']);
 			
 			$config['hostname'] = $explode[0];
-			$config['port'] = isset($explode[1]) ? $explode[1] : '22';
+			$config['port'] = isset($explode[1]) ? $explode[1] : 31707;
 			
 			$config['username'] = '';
 			$config['password'] = $server_data['gdaemon_key'];
@@ -320,6 +320,10 @@ if ( ! function_exists('get_ds_file_path'))
 				
 			case 'sftp':
 				$dir = reduce_double_slashes($server_data['ssh_path'] . '/' . $server_data['dir'] . '/');
+				break;
+				
+			case 'gdaemon':
+				$dir = reduce_double_slashes($server_data['script_path'] . '/' . $server_data['dir'] . '/');
 				break;
 				
 			case 'local':
