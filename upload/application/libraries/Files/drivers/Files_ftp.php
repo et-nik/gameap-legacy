@@ -524,16 +524,16 @@ class Files_ftp extends CI_Driver {
 			$pathinfo = pathinfo($expl[8]);
 			
 			/* Если файл не имеет расширения, а нам нужны файлы с определенным
--			 * расширением и не нужны нотисы */
--			if (!empty($extensions) && !isset($pathinfo['extension'])) {
--				continue;
--			}
--			
--			/* Если заданы расширения $extensions и в массиве нет расширения,
--			 * то такой файл пропускаем */
--			if (!empty($extensions) && !in_array($pathinfo['extension'], $extensions)) {
--				continue;
--			}
+			 * расширением и не нужны нотисы */
+			if (!empty($extensions) && !isset($pathinfo['extension'])) {
+				continue;
+			}
+			
+			/* Если заданы расширения $extensions и в массиве нет расширения,
+			 * то такой файл пропускаем */
+			if (!empty($extensions) && !in_array($pathinfo['extension'], $extensions)) {
+				continue;
+			}
 
 			$return_list[] = array('file_name' => basename($expl[8]),
 									'file_time' => human_to_unix($expl[6] . '-' . (array_search($expl[5], $this->raw_months)+1) . '-' . date('Y') . ' ' . $expl[7]),
