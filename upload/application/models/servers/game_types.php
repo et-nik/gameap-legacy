@@ -132,6 +132,30 @@ class Game_types extends CI_Model {
 		return $tpl_data;
 
 	}
+	
+	// ----------------------------------------------------------------
+    
+    /**
+     * Проверяет, существует ли мод с данным id
+     * Параметру id может быть передан id мода, либо массив where
+     * 
+     * 
+     * @param int|array
+     * @return bool
+    */  
+    function live($id = false) 
+    {
+		if (false == $id) {
+			return false;
+		}
 
+		if (is_array($id)) {
+			$this->db->where($id);
+		} else {
+			$this->db->where(array('id' => $id));
+		}
+		
+		return (bool)($this->db->count_all_results('game_types') > 0);
+    }
 
 }

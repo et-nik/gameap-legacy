@@ -225,4 +225,28 @@ class Games extends CI_Model {
 		
 	}
 	
+	// ----------------------------------------------------------------
+    
+    /**
+     * Проверяет, существует ли игра с данным code
+     * Параметру code может быть передан code игры, либо массив where
+     * 
+     * @param string|array
+     * @return bool
+    */  
+    function live($code = false) 
+    {
+		if (false == $code) {
+			return false;
+		}
+
+		if (is_array($code)) {
+			$this->db->where($code);
+		} else {
+			$this->db->where(array('code' => $code));
+		}
+		
+		return (bool)($this->db->count_all_results('games') > 0);
+    }
+	
 }
