@@ -548,7 +548,7 @@ class Server_control extends CI_Controller {
 				$query = $this->db->get_where('cron', $where, 1);
 				
 				if ($query->num_rows > 0) {
-					$this->_show_message(lang('server_command_update_task_exists'), site_url('admin/server_control/' . $server_id));
+					$this->_show_message(lang('server_command_update_task_exists'), site_url('admin/server_control/main/' . $server_id));
 					return false;
 				}
 			} elseif ($sql_data['code'] == 'server_start' OR $sql_data['code'] == 'server_stop' OR $sql_data['code'] == 'server_restart') {
