@@ -140,7 +140,7 @@ class Settings extends CI_Controller {
 					$num++; // Отсчет продолжаем, не сбрасываем
 					
 					// Задаем правила проверки для алиаса
-					$this->form_validation->set_rules('alias_' . $alias['alias'], $alias['desc'], 'trim|max_length[32]|xss_clean');
+					$this->form_validation->set_rules('alias_' . $alias['alias'], $alias['desc'], 'trim|max_length[64]|xss_clean');
 					
 					if(isset($aliases_values[$alias['alias']])) {
 						$value_alias = $aliases_values[$alias['alias']];
