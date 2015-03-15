@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS `gameap_captcha` (
 `captcha_id` int(16) NOT NULL,
   `captcha_time` int(32) NOT NULL,
   `ip_address` varchar(64) NOT NULL,
-  `word` varchar(64) NOT NULL
+  `word` varchar(64) NOT NULL,
+  PRIMARY KEY (`captcha_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
@@ -37,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `gameap_captcha` (
 --
 
 CREATE TABLE IF NOT EXISTS `gameap_cron` (
-`id` int(16) NOT NULL,
+`id` int(16) NOT NULL AUTO_INCREMENT,
   `name` tinytext NOT NULL,
   `code` varchar(32) NOT NULL,
   `command` tinytext NOT NULL,
@@ -46,7 +47,8 @@ CREATE TABLE IF NOT EXISTS `gameap_cron` (
   `started` int(1) NOT NULL,
   `date_perform` int(32) NOT NULL,
   `date_performed` int(32) NOT NULL,
-  `time_add` int(32) NOT NULL
+  `time_add` int(32) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
@@ -88,7 +90,8 @@ CREATE TABLE IF NOT EXISTS `gameap_dedicated_servers` (
   `script_restart` text NOT NULL,
   `script_stop` text NOT NULL,
   `script_start` text NOT NULL,
-  `modules_data` mediumtext NOT NULL
+  `modules_data` mediumtext NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
@@ -106,7 +109,8 @@ CREATE TABLE IF NOT EXISTS `gameap_games` (
   `app_id` int(16) NOT NULL,
   `app_set_config` char(64) NOT NULL,
   `local_repository` text NOT NULL,
-  `remote_repository` text NOT NULL
+  `remote_repository` text NOT NULL,
+  PRIMARY KEY (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -116,7 +120,7 @@ CREATE TABLE IF NOT EXISTS `gameap_games` (
 --
 
 CREATE TABLE IF NOT EXISTS `gameap_game_types` (
-`id` int(11) NOT NULL,
+`id` int(11) NOT NULL AUTO_INCREMENT,
   `game_code` char(16) NOT NULL,
   `name` tinytext NOT NULL,
   `config_files` text NOT NULL,
@@ -133,7 +137,8 @@ CREATE TABLE IF NOT EXISTS `gameap_game_types` (
   `srestart_cmd` varchar(64) NOT NULL DEFAULT '',
   `chname_cmd` varchar(64) NOT NULL DEFAULT '',
   `ban_cmd` varchar(64) NOT NULL DEFAULT '',
-  `kick_cmd` varchar(64) NOT NULL DEFAULT ''
+  `kick_cmd` varchar(64) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
@@ -143,7 +148,7 @@ CREATE TABLE IF NOT EXISTS `gameap_game_types` (
 --
 
 CREATE TABLE IF NOT EXISTS `gameap_logs` (
-`id` int(16) NOT NULL,
+`id` int(16) NOT NULL AUTO_INCREMENT,
   `date` int(32) NOT NULL,
   `type` tinytext NOT NULL,
   `command` varchar(32) NOT NULL,
@@ -151,7 +156,8 @@ CREATE TABLE IF NOT EXISTS `gameap_logs` (
   `server_id` int(32) NOT NULL,
   `ip` tinytext NOT NULL,
   `msg` tinytext NOT NULL,
-  `log_data` mediumtext NOT NULL
+  `log_data` mediumtext NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
@@ -193,7 +199,7 @@ CREATE TABLE IF NOT EXISTS `gameap_modules` (
 --
 
 CREATE TABLE IF NOT EXISTS `gameap_servers` (
-`id` int(16) NOT NULL,
+`id` int(16) NOT NULL AUTO_INCREMENT,
   `screen_name` varchar(64) NOT NULL DEFAULT '',
   `game` varchar(16) NOT NULL,
   `game_type` int(16) NOT NULL,
@@ -218,7 +224,8 @@ CREATE TABLE IF NOT EXISTS `gameap_servers` (
   `script_start` tinytext NOT NULL,
   `start_command` text NOT NULL,
   `aliases` text NOT NULL,
-  `modules_data` mediumtext NOT NULL
+  `modules_data` mediumtext NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
@@ -267,7 +274,7 @@ CREATE TABLE IF NOT EXISTS `gameap_settings` (
 --
 
 CREATE TABLE IF NOT EXISTS `gameap_users` (
-`id` int(16) NOT NULL,
+`id` int(16) NOT NULL AUTO_INCREMENT,
   `login` tinytext NOT NULL,
   `password` text NOT NULL,
   `hash` tinytext NOT NULL,
@@ -283,6 +290,7 @@ CREATE TABLE IF NOT EXISTS `gameap_users` (
   `privileges` text NOT NULL,
   `modules_data` mediumtext NOT NULL,
   `filters` tinytext NOT NULL,
-  `notices` mediumtext NOT NULL
+  `notices` mediumtext NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
