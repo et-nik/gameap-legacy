@@ -21,7 +21,7 @@ class Users_test extends CIUnit_TestCase
 		
 		$this->CI->users->get_user_data(1);
 
-        $this->assertEqual('test', $CI->users->user_data['login']);
-        $this->assertEqual('password', $CI->users->user_data['password']);
+        $this->assertEquals('test', $CI->users->user_data['login']);
+        $this->assertEquals('password', $CI->users->user_data['password']);
     }
 }
