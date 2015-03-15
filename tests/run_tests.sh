@@ -1,5 +1,4 @@
-#~ tests/GDaemon/daemon
-#~ netstat -ano | grep 31708
-
-
+cd tests/GDaemon && ./daemon
+cd ../../
+sudo netstat -lntup
 phpunit --configuration tests/phpunit.xml 
