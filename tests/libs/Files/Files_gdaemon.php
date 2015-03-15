@@ -14,7 +14,7 @@ class Files_gdaemon_test extends CIUnit_TestCase
         
 		$config = array(
 			'hostname' => 'localhost',
-			'port' => 31708,
+			'port' => 31707,
 			'login' => '',
 			'password' => '1234567890123456',
 		);
