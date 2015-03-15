@@ -29,6 +29,12 @@ class Users_test extends CIUnit_TestCase
 			
 		$this->assertTrue($this->CI->users->update_user($sql_data, 1));
 	}
+	
+	public function test_get_users_list()
+    {
+		$this->CI->users->get_users_list();
+		var_dump($this->CI->users->users_list);
+	}
     
     public function test_get_user_data()
     {			
