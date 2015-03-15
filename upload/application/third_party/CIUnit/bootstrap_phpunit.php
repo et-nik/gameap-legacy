@@ -73,7 +73,7 @@ if ( ! defined('CIUnit_Version') ) {
  *
  * This is the path to the tests folder.
  */
-    $tests_folder = dirname(__FILE__) . "/../../../tests";
+    $tests_folder = dirname(__FILE__) . "/../../../../tests";
 
 // --------------------------------------------------------------------
 // END OF USER CONFIGURABLE SETTINGS.  DO NOT EDIT BELOW THIS LINE

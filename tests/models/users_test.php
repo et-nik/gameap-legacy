@@ -33,7 +33,7 @@ class Users_test extends CIUnit_TestCase
 	public function test_get_users_list()
     {
 		$this->CI->users->get_users_list();
-		var_dump($this->CI->users->users_list);
+		//~ var_dump($this->CI->users->users_list);
 	}
     
     public function test_get_user_data()
@@ -43,13 +43,13 @@ class Users_test extends CIUnit_TestCase
         $this->assertEquals('test', $this->CI->users->user_data['login']);
         $this->assertEquals('username', $this->CI->users->user_data['name']);
         $this->assertEquals('nikita.hldm@gmail.com', $this->CI->users->user_data['email']);
-        $this->assertEquals(hash_password('new_password'), $this->CI->users->user_data['password']);
+        $this->assertEquals(hash_password('new_password', $this->CI->users->user_data['password']), $this->CI->users->user_data['password']);
     }
     
     public function test_user_live()
     {	
 		$this->assertTrue($this->CI->users->user_live(1));
-		$this->assertFalse($this->CI->users->user_live(2));
+		$this->assertFalse($this->CI->users->user_live(99990));
 		
 		$this->assertTrue($this->CI->users->user_live('test', 'login'));
 		$this->assertFalse($this->CI->users->user_live('false_user', 'login'));
