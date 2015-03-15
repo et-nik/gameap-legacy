@@ -27,7 +27,7 @@ class Users_test extends CIUnit_TestCase
 		$sql_data['name'] 		= 'username';
 		$sql_data['email'] 		= 'nikita.hldm@gmail.com';
 			
-		$this->assertTrue($this->CI->users->update_user(1, $sql_data));
+		$this->assertTrue($this->CI->users->update_user($sql_data, 1));
 	}
     
     public function test_get_user_data()
