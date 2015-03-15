@@ -12,7 +12,8 @@ sudo netstat -lntup
 
 # Make files
 sudo mkdir /home/travis/build/ET-NiK/GameAP/Files
-sudo chmod 755 /home/travis/build/ET-NiK/GameAP/Files
+sudo chmod 777 /home/travis/build/ET-NiK/GameAP/Files
+
 echo FILE_CONTENTS >> /home/travis/build/ET-NiK/GameAP/Files/File01.txt
 echo FILE_CONTENTS >> /home/travis/build/ET-NiK/GameAP/Files/File02.txt
 sudo chmod 666 /home/travis/build/ET-NiK/GameAP/Files/File01.txt
