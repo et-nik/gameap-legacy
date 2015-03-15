@@ -253,7 +253,7 @@ class Files_gdaemon extends CI_Driver {
 			return false;
 		}
 		
-		return true;
+		//~ return file_put_contents($locpath, $contents);
 	}
 	
 	// -----------------------------------------------------------------
@@ -369,7 +369,7 @@ class Files_gdaemon extends CI_Driver {
 			return false;
 		}
 		
-		return file_put_contents($locpath, base64_decode($contents['contents']));
+		return (false !== file_put_contents($locpath, base64_decode($contents['contents'])));
 	}
 	
 	// -----------------------------------------------------------------
