@@ -6,7 +6,7 @@
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2013, Nikita Kuznetsov (http://hldm.org)
+ * @copyright	Copyright (c) 2013-2015, Nikita Kuznetsov (http://hldm.org)
  * @license		http://gameap.ru/license.html
  * @link		http://gameap.ru
  * @filesource	
@@ -25,6 +25,7 @@
 $this->load->dbforge();
 
 // Удаление таблиц, если есть
+$this->dbforge->drop_table('actions');
 $this->dbforge->drop_table('captcha');
 $this->dbforge->drop_table('cron');
 $this->dbforge->drop_table('dedicated_servers');
@@ -35,7 +36,30 @@ $this->dbforge->drop_table('modules');
 $this->dbforge->drop_table('servers');
 $this->dbforge->drop_table('servers_privileges');
 $this->dbforge->drop_table('settings');
+$this->dbforge->drop_table('sessions');
 $this->dbforge->drop_table('users');
+
+/*----------------------------------*/
+/* 				actions				*/
+/*----------------------------------*/
+
+$fields = array(
+	'id' => array(
+					'type' => 'TINYTEXT',
+	),
+	
+	'action' => array(
+					'type' => 'VARCHAR',
+					'constraint' => 64, 
+	),
+	
+	'data' => array(
+					'type' => 'MEDIUMTEXT',
+	),
+);
+
+$this->dbforge->add_field($fields);
+$this->dbforge->create_table('actions');
 
 /*----------------------------------*/
 /* 				captcha				*/
@@ -141,6 +165,11 @@ $fields = array(
 							'type' => 'TINYTEXT',
 		),
 		
+		'disabled' => array(
+							'type' => 'INT', 
+							'constraint' => 1,
+		),
+		
 		'os' => array(
 							'type' => 'TINYTEXT',
 		),
@@ -175,6 +204,14 @@ $fields = array(
 		),
 		
 		'steamcmd_path' => array(
+							'type' => 'TINYTEXT',
+		),
+		
+		'gdaemon_host' => array(
+							'type' => 'TINYTEXT',
+		),
+		
+		'gdaemon_key' => array(
 							'type' => 'TINYTEXT',
 		),
 		
@@ -226,8 +263,32 @@ $fields = array(
 							'type' => 'TINYTEXT',
 		),
 		
+		'script_start' => array(
+							'type' => 'TEXT',
+		),
+		
+		'script_stop' => array(
+							'type' => 'TEXT',
+		),
+		
+		'script_restart' => array(
+							'type' => 'TEXT',
+		),
+		
+		'script_status' => array(
+							'type' => 'TEXT',
+		),
+
+		'script_get_console' => array(
+							'type' => 'TEXT',
+		),
+		
+		'script_send_command' => array(
+							 'type' => 'TEXT',
+		),	
+		
 		'modules_data' => array(
-							 'type' => 'TINYTEXT',
+							 'type' => 'MEDIUMTEXT',
 		),
 );
 
@@ -340,45 +401,7 @@ $fields = array(
 		'local_repository' => array(
 							'type' => 'TEXT',
 		),
-		
-		'execfile_windows' => array(
-							'type' => 'VARCHAR',
-							'constraint' => 32,
-		),
-		
-		'execfile_linux' => array(
-							'type' => 'VARCHAR',
-							'constraint' => 32,
-		),
-		
-		'script_start' => array(
-							'type' => 'TINYTEXT',
-		),
-		
-		'script_stop' => array(
-							'type' => 'TINYTEXT',
-		),
-		
-		'script_restart' => array(
-							'type' => 'TINYTEXT',
-		),
-		
-		'script_status' => array(
-							'type' => 'TINYTEXT',
-		),
-		
-		'script_update' => array(
-							'type' => 'TINYTEXT',
-		),
-		
-		'script_get_console' => array(
-							'type' => 'TINYTEXT',
-		),
-		
-		'script_send_command' => array(
-							 'type' => 'TINYTEXT',
-		),	
-		
+
 		'kick_cmd' => array(
 							'type' => 'VARCHAR',
 							'constraint' => 64,
@@ -643,6 +666,22 @@ $fields = array(
 							'default'		=> '',
 		),
 		
+		'cpu_limit' => array(
+							'type' => 'INT'
+		),
+		
+		'ram_limit' => array(
+							'type' => 'INT'
+		),
+		
+		'net_limit' => array(
+							'type' => 'INT'
+		),
+		
+		'status' => array(
+							'type' => 'TEXT'
+		),
+		
 		'script_start' => array(
 							'type' => 'TINYTEXT',
 		),
@@ -656,7 +695,7 @@ $fields = array(
 		),
 		
 		'modules_data' => array(
-							'type' => 'TINYTEXT',
+							'type' => 'MEDIUMTEXT',
 		),	
 
 
@@ -720,6 +759,36 @@ $fields = array(
 $this->dbforge->add_field($fields);
 $this->dbforge->create_table('settings');
 
+/*----------------------------------*/
+/* 				sessoins			*/
+/*----------------------------------*/
+
+$fields = array(
+		'user_id' => array(
+							'type' => 'INT',
+		),
+		
+		'hash' => array(
+							'type' => 'TINYTEXT',
+		),
+		
+		'ip_address' => array(
+							'type' => 'VARCHAR',
+							'constraint' => 64, 
+		),
+		
+		'user_agent' => array(
+							'type' => 'TINYTEXT',
+		),
+		
+		'expires' => array(
+							'type' => 'INT',
+		),
+);
+
+$this->dbforge->add_field($fields);
+$this->dbforge->create_table('sessions');
+			
 /*----------------------------------*/
 /* 				users				*/
 /*----------------------------------*/
@@ -792,7 +861,11 @@ $fields = array(
 		),
 		
 		'filters' => array(
-							'type' => 'TINYTEXT',
+							'type' => 'MEDIUMTEXT',
+		),
+		
+		'notices' => array(
+							'type' => 'MEDIUMTEXT',
 		),
 );
 
