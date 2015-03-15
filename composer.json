@@ -1,0 +1,11 @@
+{
+    "name": "et-nik/gameap",
+    "description": "GameAP",
+    "minimum-stability": "dev",
+    "license": "MIT",
+    "require": {
+		"php": ">=5.2.4",
+        "phpunit/phpunit": "4.4.*",
+        "mustangostang/spyc": "0.5.*"
+    }
+}
