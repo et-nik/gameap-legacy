@@ -14,7 +14,7 @@ env:
   - DB=mysqli
 
 before_script:
-  - cd tests/GDaemon && ./daemon
+  - tests/GDaemon/daemon
   - sh -c "if [ '$DB' = 'mysql' ] || [ '$DB' = 'mysqli' ] || [ '$DB' = 'pdo/mysql' ]; then mysql -e 'create database IF NOT EXISTS gameap_test;' -uroot; fi"
   - sh -c "if [ '$DB' = 'mysql' ] || [ '$DB' = 'mysqli' ] || [ '$DB' = 'pdo/mysql' ]; then mysql -uroot -h localhost gameap_test < tests/test.sql; fi"
 
