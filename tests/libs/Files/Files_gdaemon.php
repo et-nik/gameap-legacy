@@ -25,6 +25,7 @@ class Files_gdaemon_test extends CIUnit_TestCase
     public function test_upload()
     {
 		$this->assertTrue($this->CI->files->upload(TESTSPATH . 'upload_file.txt', 'Files/upload_file.txt'));
+		$this->assertTrue(($this->CI->files->file_size('/home/travis/build/ET-NiK/GameAP/tests/GDaemon/Files/upload_file.txt') > 0));
 	}
 	
 	public function test_read_file()
@@ -44,7 +45,7 @@ class Files_gdaemon_test extends CIUnit_TestCase
 	
 	public function test_download()
 	{
-		$this->assertInternalType('int', $this->CI->files->download('Files/upload_file.txt', TESTSPATH . 'download_file.txt'));
+		$this->assertInternalType('bool', $this->CI->files->download('Files/upload_file.txt', TESTSPATH . 'download_file.txt'));
 		$this->assertTrue(file_exists(TESTSPATH . 'download_file.txt'));
 		
 		$this->assertEquals(filesize(TESTSPATH . 'upload_file.txt'), filesize(TESTSPATH . 'download_file.txt'));
