@@ -253,7 +253,7 @@ class Files_gdaemon extends CI_Driver {
 			return false;
 		}
 		
-		//~ return file_put_contents($locpath, $contents);
+		return true;
 	}
 	
 	// -----------------------------------------------------------------
