@@ -13,10 +13,8 @@ env:
   - DB=mysql
   - DB=mysqli
 
-sudo: false
-
-#~ before_script:
-  #~ - sh -c "if [ '$DB' = 'mysql' ] || [ '$DB' = 'mysqli' ] || [ '$DB' = 'pdo/mysql' ]; then mysql -e 'create database IF NOT EXISTS gameap_test;'; fi"
+before_script:
+  - sh -c "if [ '$DB' = 'mysql' ] || [ '$DB' = 'mysqli' ] || [ '$DB' = 'pdo/mysql' ]; then mysql -e 'create database IF NOT EXISTS gameap_test;' -uroot; fi"
   #~ - sh -c "if [ '$DB' = 'mysql' ] || [ '$DB' = 'mysqli' ] || [ '$DB' = 'pdo/mysql' ]; then mysql -u root -p -h localhost gameap_test < tests/test.sql; fi"
 
 script: phpunit -d zend.enable_gc=0 -d date.timezone=UTC --coverage-text --configuration tests/phpunit.xml
