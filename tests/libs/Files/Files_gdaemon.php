@@ -12,15 +12,6 @@ class Files_gdaemon_test extends CIUnit_TestCase
         // GDaemon Test
         $this->CI->files->set_driver('gdaemon');
         
-        $config = array(
-			'hostname' => '127.0.0.1',
-			'port' => 31708,
-			'login' => '',
-			'password' => '1234567890123456',
-		);
-
-		$this->assertInternalType('resource', $this->CI->files->connect($config));
-		
 		$config = array(
 			'hostname' => 'localhost',
 			'port' => 31708,
