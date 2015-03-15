@@ -1,6 +1,6 @@
 <?php
 
-class Files_ftp_test extends CIUnit_TestCase
+class Files_sftp_test extends CIUnit_TestCase
 {
     public function setUp()
     {
