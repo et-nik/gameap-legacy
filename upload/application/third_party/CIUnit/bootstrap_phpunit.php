@@ -168,3 +168,6 @@ require_once CIUPATH . 'core/CodeIgniter' . EXT;
 
 // Load the CIUnit Framework
 require_once CIUPATH. 'libraries/CIUnit.php';
+
+// CONFIG
+$CFG->config['encryption_key'] = '1234567890123456';
