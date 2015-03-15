@@ -42,7 +42,7 @@ class Users_test extends CIUnit_TestCase
 
         $this->assertEquals('test', $this->CI->users->user_data['login']);
         $this->assertEquals('username', $this->CI->users->user_data['name']);
-        $this->assertEquals('email', $this->CI->users->user_data['email']);
+        $this->assertEquals('nikita.hldm@gmail.com', $this->CI->users->user_data['email']);
         $this->assertEquals(hash_password('new_password'), $this->CI->users->user_data['password']);
     }
     
