@@ -199,7 +199,7 @@ class Files_gdaemon extends CI_Driver {
 		$this->_auth = false;
 		$this->_login();
 		
-		return $this->_connection;
+		return true;
 	}
 	
 	// -----------------------------------------------------------------
