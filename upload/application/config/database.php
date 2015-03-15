@@ -11,7 +11,7 @@ $active_record = TRUE;
 
 $db['default']['hostname'] = 'localhost';
 $db['default']['username'] = $GLOBALS['db_username'];
-$db['default']['password'] = $GLOBALS['db_password']);
+$db['default']['password'] = $GLOBALS['db_password'];
 $db['default']['database'] = 'gameap_test';
 $db['default']['dbdriver'] = 'mysqli';
 $db['default']['dbprefix'] = 'gameap_';
