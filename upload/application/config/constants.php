@@ -80,7 +80,7 @@ define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 |
 */
 
-define('AP_VERSION',	'1.0-beta');
+define('AP_VERSION',	'1.0-beta1');
 define('AP_DATE',	'15.03.2015');
 
 
