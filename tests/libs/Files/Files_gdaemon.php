@@ -19,7 +19,7 @@ class Files_gdaemon_test extends CIUnit_TestCase
 			'password' => '1234567890123456',
 		);
 
-		$this->assertInternalType('resource', $this->CI->files->connect($config));
+		$this->assertTrue($this->CI->files->connect($config));
     }
 
     public function test_upload()

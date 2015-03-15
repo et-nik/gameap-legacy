@@ -19,7 +19,9 @@ class Files_sftp_test extends CIUnit_TestCase
 			'password' => '1234',
 		);
 
-		$this->assertInternalType('resource', $this->CI->files->connect($config));
+		$this->assertTrue($this->CI->files->connect($config));
+		
+		print_r($this->CI->files->list_files_full_info('.'));
     }
 
     public function test_upload()
