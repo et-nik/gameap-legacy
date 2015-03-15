@@ -17,9 +17,9 @@ class Users_test extends CIUnit_TestCase
 		$sql_data['login'] 		= 'test';
 		$sql_data['password'] 	= hash_password('password');
 			
-		$this->CI->users->add_user($sql_data);
+		$this->assertTrue($this->CI->users->add_user($sql_data));
 		
-		$this->CI->users->get_user_data(1);
+		$this->assertTrue($this->CI->users->get_user_data(1));
 
         $this->assertEquals('test', $this->CI->users->user_data['login']);
         $this->assertEquals('password', $this->CI->users->user_data['password']);
