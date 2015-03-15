@@ -1,2 +1,2 @@
-./GDaemon/daemon
-phpunit --configuration phpunit.xml 
+tests/GDaemon/daemon
+phpunit --configuration tests/phpunit.xml 
