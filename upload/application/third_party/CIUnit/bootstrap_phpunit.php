@@ -168,3 +168,7 @@ require_once CIUPATH . 'core/CodeIgniter' . EXT;
 
 // Load the CIUnit Framework
 require_once CIUPATH. 'libraries/CIUnit.php';
+
+// Database
+require_once TESTSPATH . 'fixtures/db.php';
+require_once TESTSPATH . 'fixtures/demo_data.php';
