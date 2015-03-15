@@ -32,7 +32,7 @@ class Users_test extends CIUnit_TestCase
     
     public function test_get_user_data()
     {			
-		$this->assertTrue($this->CI->users->get_user_data(1));
+		$this->CI->users->get_user_data(1);
 
         $this->assertEquals('test', $this->CI->users->user_data['login']);
         $this->assertEquals('username', $this->CI->users->user_data['name']);
