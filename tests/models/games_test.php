@@ -66,7 +66,7 @@ class Games_test extends CIUnit_TestCase {
 		$games_list = $this->CI->games->get_games_list(array('code' => 'valve'));
 		$this->assertTrue(is_array($games_list));
 		
-		$this->assertEquals('valve', $this->CI->games->games_list[0]['code'],);
+		$this->assertEquals('valve', $this->CI->games->games_list[0]['code']);
 		$this->assertEquals('valve', $this->CI->games->games_list[0]['start_code']);
 		$this->assertEquals('Half-Life', $this->CI->games->games_list[0]['name']);
 		$this->assertEquals('GoldSource', $this->CI->games->games_list[0]['engine']);
@@ -74,9 +74,9 @@ class Games_test extends CIUnit_TestCase {
 		$this->assertEquals(90, $this->CI->games->games_list[0]['app_id']);
 		$this->assertEquals('+game valve', $this->CI->games->games_list[0]['app_set_config']);
 		$this->assertEquals('/home/ftp/files/', $this->CI->games->games_list[0]['local_repository']);
-		$this->assertEquals('ftp://127.0.0.1/files/', $this->CI->games->games_list[0]['remote_repository']);4
+		$this->assertEquals('ftp://127.0.0.1/files/', $this->CI->games->games_list[0]['remote_repository']);
 		
-		$this->assertEquals('valve', $games_list[0]['code'],);
+		$this->assertEquals('valve', $games_list[0]['code']);
 		$this->assertEquals('valve', $games_list[0]['start_code']);
 		$this->assertEquals('Half-Life', $games_list[0]['name']);
 		$this->assertEquals('GoldSource', $games_list[0]['engine']);
