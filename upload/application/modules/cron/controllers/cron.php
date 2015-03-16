@@ -69,8 +69,8 @@ class Cron extends MX_Controller {
 		$this->load->helper('ds');
 		$this->load->helper('date');
 		
-		// Максимальное время выполнени 3 часа
-		set_time_limit(3*3600);
+		// Максимальное время выполнени 1 час
+		set_time_limit(1*3600);
 		
 		// Загрузка базы данных
 		$this->load->database();
@@ -413,7 +413,7 @@ class Cron extends MX_Controller {
 
 		
 			/* Устанавливаем серверу rcon пароль */
-			if ($update_server) {
+			if (!$update_server) {
 				$this->_cmd_output('---Set rcon password');
 				$this->load->helper('safety');
 				$new_rcon = generate_code(8);
@@ -449,7 +449,6 @@ class Cron extends MX_Controller {
 				$aliases_values = array();
 				$aliases_values = $this->servers_data[$server_id]['aliases'];
 
-				$server_data['installed'] 		= 1;
 				$server_data['rcon']			= $new_rcon;
 				$server_data['aliases'] 		= json_encode($this->installer->get_default_parameters($aliases_values));
 				
@@ -467,8 +466,11 @@ class Cron extends MX_Controller {
 				$server_data['rcon_port'] = $ports[2];
 				unset($ports);
 				
-				$this->servers->edit_game_server($server_id, $server_data);
+				
 			}
+			
+			$server_data['installed'] 		= 1;
+			$this->servers->edit_game_server($server_id, $server_data);
 			
 			$log_data['type'] = 'server_command';
 			$log_data['command'] = 'install';
