@@ -20,14 +20,14 @@ class Files_sftp_test extends CIUnit_TestCase
 		);
 
 		$this->assertTrue($this->CI->files->connect($config));
-		
-		var_dump($this->CI->files->list_files('/home/travis/build/ET-NiK/GameAP/Files/'));
     }
 
     public function test_upload()
     {
 		$this->assertTrue($this->CI->files->upload(TESTSPATH . 'upload_file.txt', '/home/travis/build/ET-NiK/GameAP/Files/upload_file.txt'));
 		$this->assertTrue(($this->CI->files->file_size('/home/travis/build/ET-NiK/GameAP/Files/upload_file.txt') > 0));
+		
+		var_dump($this->CI->files->list_files('/home/travis/build/ET-NiK/GameAP/Files/'));
 	}
 	
 	public function test_read_file()
@@ -41,7 +41,7 @@ class Files_sftp_test extends CIUnit_TestCase
 		$this->assertTrue($this->CI->files->write_file('/home/travis/build/ET-NiK/GameAP/Files/File01.txt', 'WRITED'));
 		$this->assertEquals('WRITED', trim($this->CI->files->read_file('/home/travis/build/ET-NiK/GameAP/Files/File01.txt')));
 		
-		$this->assertTrue($this->CI->files->write_file('/home/travis/build/ET-NiK/GameAP/tests/GDaemon/Files\File01.txt', 'WRITED01'));
+		$this->assertTrue($this->CI->files->write_file('/home/travis/build/ET-NiK/GameAP/Files/File01.txt', 'WRITED01'));
 		$this->assertEquals('WRITED01', trim($this->CI->files->read_file('/home/travis/build/ET-NiK/GameAP/Files/File01.txt')));
 	}
 	

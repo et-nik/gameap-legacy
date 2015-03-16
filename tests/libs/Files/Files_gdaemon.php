@@ -25,7 +25,7 @@ class Files_gdaemon_test extends CIUnit_TestCase
     public function test_upload()
     {
 		$this->assertTrue($this->CI->files->upload(TESTSPATH . 'upload_file.txt', 'Files/upload_file.txt'));
-		$this->assertTrue(($this->CI->files->file_size('/home/travis/build/ET-NiK/GameAP/Files/upload_file.txt') > 0));
+		$this->assertTrue(($this->CI->files->file_size('Files/upload_file.txt') > 0));
 	}
 	
 	public function test_read_file()
