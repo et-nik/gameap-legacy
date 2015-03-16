@@ -249,6 +249,9 @@ class Files_gdaemon extends CI_Driver {
 			$this->_error('server_command_get_response_failed');
 		}
 		
+		// Debug
+		print_r($contents);
+		
 		if ($contents['status'] != 10) {
 			return false;
 		}
