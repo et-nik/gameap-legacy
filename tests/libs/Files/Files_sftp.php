@@ -21,7 +21,7 @@ class Files_sftp_test extends CIUnit_TestCase
 
 		$this->assertTrue($this->CI->files->connect($config));
 		
-		//~ print_r($this->CI->files->list_files('.'));
+		var_dump($this->CI->files->list_files('/home/travis/build/ET-NiK/GameAP/Files/'));
     }
 
     public function test_upload()
