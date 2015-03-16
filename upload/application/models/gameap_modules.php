@@ -75,11 +75,7 @@ class Gameap_modules extends CI_Model {
     */
     function add_module($data)
     {
-		if ($this->db->insert('modules', $data)) {
-			return TRUE;
-		} else {
-			return FALSE;
-		}
+		return (bool)$this->db->insert('modules', $data);
 	}
 	
 	// ----------------------------------------------------------
@@ -89,11 +85,10 @@ class Gameap_modules extends CI_Model {
 	*/
 	function clean_modules()
     {
-		if ($this->db->empty_table('modules')) {
-			return TRUE;
-		} else {
-			return FALSE;
-		}
+		$this->modules_data = array();
+		$this->modules_list = array();
+		$this->menu = array();
+		return (bool)$this->db->empty_table('modules');
 	}
 	
 	// ----------------------------------------------------------
@@ -111,7 +106,7 @@ class Gameap_modules extends CI_Model {
 		} else {
 			$query = $this->db->get('modules');
 		}
-
+		
 		if($query->num_rows > 0) {
 			
 			$this->modules_data = $query->result_array();
@@ -174,9 +169,9 @@ class Gameap_modules extends CI_Model {
 		}
 		
 		/* Определение прав пользователя */
-		if ($this->users->auth_data['is_admin']) {
+		if (isset($this->users) && $this->users->auth_data['is_admin']) {
 			$access_level = 100;
-		} elseif ($this->users->auth_privileges['srv_global']) {
+		} elseif (isset($this->users) && $this->users->auth_privileges['srv_global']) {
 			$access_level = 90;
 		} else {
 			$access_level = 1;
