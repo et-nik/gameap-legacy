@@ -1629,6 +1629,9 @@ class Cron extends MX_Controller {
 		// Запись информации о времени выполнения операций
 		file_put_contents(APPPATH . 'cache/cron_time.json', json_encode($cron_time));
 		
+		// Удаление логов за последнюю неделю
+		$this->db->delete('logs', array('date <' => now()-604800)); 
+		
 		$this->_cmd_output("Cron end");
 		
 		$log_data['server_id'] = 0;
