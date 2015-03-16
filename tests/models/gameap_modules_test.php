@@ -26,7 +26,9 @@ class Gameap_modules_test extends CIUnit_TestCase
 	public function test_clean_modules()
 	{			
 		$this->assertTrue($this->CI->gameap_modules->clean_modules());
-		$this->assertTrue(empty($this->CI->gameap_modules->get_modules_list()));
+		
+		$modules_list = $this->CI->gameap_modules->get_modules_list();
+		$this->assertTrue(empty($modules_list));
 	}
 	
 	public function test_get_menu_modules()
@@ -43,7 +45,7 @@ class Gameap_modules_test extends CIUnit_TestCase
 	public function test_get_modules_data()
 	{			
 		$modules_data = $this->CI->gameap_modules->get_modules_data();
-		$this->assertTrue(is_array($this->CI->gameap_modules->get_modules_data()));
+		$this->assertTrue(is_array($modules_data));
 		
 		$this->assertEquals($this->CI->gameap_modules->modules_data[0]['short_name'], 'module');
 		$this->assertEquals($this->CI->gameap_modules->modules_data[0]['name'], 'My Module');
