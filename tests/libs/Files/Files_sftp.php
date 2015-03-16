@@ -26,8 +26,6 @@ class Files_sftp_test extends CIUnit_TestCase
     {
 		$this->assertTrue($this->CI->files->upload(TESTSPATH . 'upload_file.txt', '/home/travis/build/ET-NiK/GameAP/Files/upload_file.txt'));
 		$this->assertTrue(($this->CI->files->file_size('/home/travis/build/ET-NiK/GameAP/Files/upload_file.txt') > 0));
-		
-		var_dump($this->CI->files->list_files('/home/travis/build/ET-NiK/GameAP/Files/'));
 	}
 	
 	public function test_read_file()
