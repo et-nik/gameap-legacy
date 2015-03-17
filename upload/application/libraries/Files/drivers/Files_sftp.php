@@ -56,7 +56,9 @@ class Files_sftp extends CI_Driver {
 	
 	public function check()
 	{
-		return true;
+		if(!in_array('ssh2', get_loaded_extensions())){
+			throw new Exception(lang('server_command_ssh_not_module'));
+		}
 	}
 
 	// --------------------------------------------------------------------

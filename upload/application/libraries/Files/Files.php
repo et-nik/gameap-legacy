@@ -95,6 +95,9 @@ class Files extends CI_Driver_Library {
 			throw new Exception(lang('server_files_driver_not_set'));
 		}
 		
+		// Проверка возможности работы с драйвером
+		$this->{$this->driver}->check();
+		
 		return $this->{$this->driver}->connect($config);
 	}
 	
