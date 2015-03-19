@@ -4,6 +4,12 @@ class Files_sftp_test extends CIUnit_TestCase
 {
     public function setUp()
     {
+        if (!extension_loaded('ssh2')) {
+            $this->markTestSkipped(
+              'The SSH2 extension is not available.'
+            );
+        }
+        
         $this->CI->load->driver('files');
     }
     
