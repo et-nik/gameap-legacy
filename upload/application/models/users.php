@@ -221,7 +221,7 @@ class Users extends CI_Model {
 				}
 			}
 			
-			$this->auth_id 						= $user_id;
+			$this->auth_id 						= (int) $user_id;
 			$this->auth_login 					= $this->auth_data['login'];
 			$this->auth_data['balance'] 		= (int)$this->encrypt->decode($this->auth_data['balance']);
 			$this->auth_data['modules_data'] 	= (isset($this->auth_data['modules_data'])) ? json_decode($this->auth_data['modules_data'], true) : array();
@@ -263,6 +263,10 @@ class Users extends CI_Model {
     /**
      * Авторизация пользователя
      * Проверка логина и пароля
+     * 
+     * @param string		логин
+     * @param string		пароль (не хеш)
+     * @return int|bool		возвращает ID пользователя, в случае успеха и false в случае неудачи.
     */
     function user_auth($user_login = '', $user_password = '')
     {
@@ -279,7 +283,7 @@ class Users extends CI_Model {
             
             $this->user_data = $query->row_array();
             $user_data = &$this->user_data;
-            
+
             // Проверка на разрешенные IP
             if ($user_data['is_admin'] && isset($this->config->config['admin_ip'])) {
 				if (!$this->_check_subnet()) {
@@ -310,7 +314,7 @@ class Users extends CI_Model {
 				$this->update_user(array('password' => $new_hash), $this->user_data['id']);
 			}
             
-            $this->auth_id 		= $user_data['id'];
+            $this->auth_id 		= (int) $user_data['id'];
             $this->auth_login 	= $user_data['login'];
             $this->auth_data 	= $user_data;
             $this->auth_data['balance'] = (int)$this->encrypt->decode($user_data['balance']);
