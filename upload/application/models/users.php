@@ -760,11 +760,11 @@ class Users extends CI_Model {
 		if ($no_filter != true) {
 			!$this->_filter_users_list['login'] OR $this->db->like('login', $this->_filter_users_list['login']);
 			
-			!$this->_filter_users_list['register_before'] 	OR $this->db->where('reg_date >', $this->_filter_users_list['register_before']);
-			!$this->_filter_users_list['register_after'] 	OR $this->db->where('reg_date <', $this->_filter_users_list['register_after']);
+			!$this->_filter_users_list['register_before'] 	OR $this->db->where('reg_date <', $this->_filter_users_list['register_before']);
+			!$this->_filter_users_list['register_after'] 	OR $this->db->where('reg_date >', $this->_filter_users_list['register_after']);
 			
-			!$this->_filter_users_list['last_visit_before'] OR $this->db->where('last_auth >', $this->_filter_users_list['last_visit_before']);
-			!$this->_filter_users_list['last_visit_after'] 	OR $this->db->where('last_auth <', $this->_filter_users_list['last_visit_after']);
+			!$this->_filter_users_list['last_visit_before'] OR $this->db->where('last_auth <', $this->_filter_users_list['last_visit_before']);
+			!$this->_filter_users_list['last_visit_after'] 	OR $this->db->where('last_auth >', $this->_filter_users_list['last_visit_after']);
 		}
 		
 		$query = $this->db->get('users', $limit, $offset);
@@ -783,6 +783,7 @@ class Users extends CI_Model {
 			return $this->users_list;
 			
 		}else{
+			$this->users_list = array();
 			return NULL;
 		}
 	}
@@ -872,6 +873,22 @@ class Users extends CI_Model {
 			!isset($filter['last_visit_before']) OR $this->_filter_users_list['last_visit_before'] = $filter['last_visit_before'];
 			!isset($filter['last_visit_after']) OR $this->_filter_users_list['last_visit_after'] = $filter['last_visit_after'];
 		}
+	}
+	
+	/**
+	 * Очистка фильтров списка
+	 */
+	function clear_filter()
+	{
+		$this->_filter_users_list	= array(
+			'login' 			=> false,
+			
+			'register_before' 	=> false,
+			'register_after' 	=> false,
+			
+			'last_visit_before' => false,
+			'last_visit_after' 	=> false,
+		);
 	}
 	
 	// ----------------------------------------------------------------
