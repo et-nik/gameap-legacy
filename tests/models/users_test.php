@@ -14,9 +14,17 @@ class Users_test extends CIUnit_TestCase
 
     public function test_add_user()
     {			
+		// User 1
 		$sql_data['reg_date'] 	= time();
 		$sql_data['login'] 		= 'test';
 		$sql_data['password'] 	= hash_password('password');
+			
+		$this->assertTrue($this->CI->users->add_user($sql_data));
+		
+		// User 2
+		$sql_data['reg_date'] 	= time();
+		$sql_data['login'] 		= 'test2';
+		$sql_data['password'] 	= hash_password('password2');
 			
 		$this->assertTrue($this->CI->users->add_user($sql_data));
     }
@@ -56,5 +64,61 @@ class Users_test extends CIUnit_TestCase
 		
 		$this->assertTrue($this->CI->users->user_live('nikita.hldm@gmail.com', 'email'));
 		$this->assertFalse($this->CI->users->user_live('1234@gmail.com', 'email'));
+	}
+	
+	public function test_user_auth()
+	{
+		$this->assertTrue( ($this->CI->users->user_auth('test', 'new_password') === 1) );
+		$this->assertFalse( $this->CI->users->user_auth('test', 'new_password2') );
+		$this->assertFalse( $this->CI->users->user_auth('test2', 'new_password') );
+	}
+	
+	public function test_check_user()
+	{
+		$_COOKIE['user_id'] 	= '1';
+		$_COOKIE['hash'] 		= 'hash_test';
+		
+		$sql_data['hash'] 		= 'hash_testd41d8cd98f00b204e9800998ecf8427e';
+			
+		$this->assertTrue($this->CI->users->update_user($sql_data, 1));
+		$this->assertTrue($this->CI->users->check_user());
+		
+		$sql_data['hash'] 		= 'unknown_hashd41d8cd98f00b204e9800998ecf8427e';
+		$this->assertTrue($this->CI->users->update_user($sql_data, 1));
+		$this->assertFalse($this->CI->users->check_user());
+	}
+	
+	public function test_set_filter()
+	{
+		$this->CI->users->clear_filter();
+		$this->CI->users->set_filter(array('login' => 'test2'));
+		$this->CI->users->get_users_list();
+		$this->assertCount(1, $this->CI->users->users_list);
+		$this->assertTrue( ($this->CI->users->users_list[0]['login'] == 'test2') );
+		
+		$this->CI->users->clear_filter();
+		$this->CI->users->get_users_list();
+		$this->assertCount(2, $this->CI->users->users_list);
+		
+		$this->CI->users->clear_filter();
+		$this->CI->users->set_filter(array('login' => '', 'register_before' => (time()-1337) ));
+		$this->CI->users->get_users_list();
+		$this->assertCount(0, $this->CI->users->users_list);
+		
+		//~ $this->CI->users->set_filter(array('login' => 'test2'));
+		//~ $this->CI->users->get_users_list();
+		//~ $this->assertTrue( ($this->CI->users->users_list[0]['login'] == 'test2') );
+	}
+	
+	public function test_count_all_users()
+	{
+		$this->CI->users->clear_filter();
+		$this->assertTrue( ($this->CI->users->count_all_users() === 2) );
+		
+		$this->CI->users->set_filter(array('login' => 'test2'));
+		$this->assertTrue( ($this->CI->users->count_all_users() === 1) );
+		
+		$this->CI->users->set_filter(array('login' => 'unknown'));
+		$this->assertTrue( ($this->CI->users->count_all_users() === 0) );
 	}
 }
