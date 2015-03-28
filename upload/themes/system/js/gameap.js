@@ -7,7 +7,7 @@ function sprintf( format ) {
 
 function ShowLoad() {
 	$("body").append('\
-				<div id="loading" style="top: 50%;left: 50%;position: absolute;">\
+				<div id="loading" style="top: 50%;left: 50%;position: fixed;">\
 					<img src="/themes/system/images/loading.gif" />\
 				</div>'
 	);
@@ -52,3 +52,88 @@ function dump(arr,level) {
 	}
 	return dumped_text;
 }
+
+function base64_decode( data ) {	// Decodes data encoded with MIME base64
+	// 
+	// +   original by: Tyler Akins (http://rumkin.com)
+
+
+	var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+	var o1, o2, o3, h1, h2, h3, h4, bits, i=0, enc='';
+
+	do {  // unpack four hexets into three octets using index points in b64
+		h1 = b64.indexOf(data.charAt(i++));
+		h2 = b64.indexOf(data.charAt(i++));
+		h3 = b64.indexOf(data.charAt(i++));
+		h4 = b64.indexOf(data.charAt(i++));
+
+		bits = h1<<18 | h2<<12 | h3<<6 | h4;
+
+		o1 = bits>>16 & 0xff;
+		o2 = bits>>8 & 0xff;
+		o3 = bits & 0xff;
+
+		if (h3 == 64)	  enc += String.fromCharCode(o1);
+		else if (h4 == 64) enc += String.fromCharCode(o1, o2);
+		else			   enc += String.fromCharCode(o1, o2, o3);
+	} while (i < data.length);
+
+	return enc;
+}
+
+function utf8_encode(string) {
+	string = string.replace(/\r\n/g,"\n");
+	var utftext = "";
+	
+	for (var n = 0; n < string.length; n++) {
+	
+		var c = string.charCodeAt(n);
+	
+		if (c < 128) {
+			utftext += String.fromCharCode(c);
+		}
+		else if((c > 127) && (c < 2048)) {
+			utftext += String.fromCharCode((c >> 6) | 192);
+			utftext += String.fromCharCode((c & 63) | 128);
+		}
+		else {
+			utftext += String.fromCharCode((c >> 12) | 224);
+			utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+			utftext += String.fromCharCode((c & 63) | 128);
+		}
+	
+	}
+	
+	return utftext;
+}
+
+function utf8_decode(utftext) {
+	var string = "";
+	var i = 0;
+	var c = c1 = c2 = 0;
+
+	while ( i < utftext.length ) {
+
+		c = utftext.charCodeAt(i);
+
+		if (c < 128) {
+			string += String.fromCharCode(c);
+			i++;
+		}
+		else if((c > 191) && (c < 224)) {
+			c2 = utftext.charCodeAt(i+1);
+			string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+			i += 2;
+		}
+		else {
+			c2 = utftext.charCodeAt(i+1);
+			c3 = utftext.charCodeAt(i+2);
+			string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+			i += 3;
+		}
+
+	}
+
+	return string;
+}
+
