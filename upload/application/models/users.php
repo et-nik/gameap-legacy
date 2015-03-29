@@ -279,6 +279,8 @@ class Users extends CI_Model {
         
         $query = $this->db->get_where('users', array('login' => $user_login), 1);
         
+        var_dump($query);
+        
         if ($query->num_rows > 0) {
             
             $this->user_data = $query->row_array();
@@ -291,29 +293,18 @@ class Users extends CI_Model {
 				}
 			}
             
-            if (substr($this->user_data['password'], 0, 4) == '$2a$') {
-				// Используется blowfish
-				$old_hash = false;
-				$password_hash = hash_password($user_password, $this->user_data['password']);
-			} else {
-				/* Используется старый md5, будет удален в 1.0 версии*/
-				$old_hash = true;
-				$password_hash = hash_password_old($user_password, $this->user_data);
-			}
+			// Используется blowfish
+			$password_hash = hash_password($user_password, $this->user_data['password']);
 
         } else {
             return false;
         }
         
+        print_r($this->user_data)
+        echo "\nHASH: " . $password_hash;
+        
         // Проверка пароля
         if ($password_hash == $this->user_data['password']) {
-			
-			if ($old_hash) {
-				// Обновляем хеш пароля
-				$new_hash = hash_password($user_password);
-				$this->update_user(array('password' => $new_hash), $this->user_data['id']);
-			}
-            
             $this->auth_id 		= (int) $user_data['id'];
             $this->auth_login 	= $user_data['login'];
             $this->auth_data 	= $user_data;
