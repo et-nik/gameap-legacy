@@ -68,7 +68,7 @@ class Users_test extends CIUnit_TestCase
 	
 	public function test_user_auth()
 	{
-		$this->assertTrue( ($this->CI->users->user_auth('test', 'new_password') === 1) );
+		$this->assertEquals( 1, $this->CI->users->user_auth('test', 'new_password'));
 		$this->assertFalse( $this->CI->users->user_auth('test', 'new_password2') );
 		$this->assertFalse( $this->CI->users->user_auth('test2', 'new_password') );
 	}
