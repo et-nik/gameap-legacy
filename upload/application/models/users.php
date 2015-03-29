@@ -300,7 +300,7 @@ class Users extends CI_Model {
             return false;
         }
         
-        print_r($this->user_data)
+        print_r($this->user_data);
         echo "\nHASH: " . $password_hash;
         
         // Проверка пароля
