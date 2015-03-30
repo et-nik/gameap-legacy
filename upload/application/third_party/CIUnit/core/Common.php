@@ -231,7 +231,7 @@ function &get_config(Array $replace = array())
 		}
 
 		// Is the config file in the environment folder?
-		if (file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/config.php'))
+		if (defined('ENVIRONMENT') && file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/config.php'))
 		{
 			require($file_path);
 		}
