@@ -279,8 +279,6 @@ class Users extends CI_Model {
         
         $query = $this->db->get_where('users', array('login' => $user_login), 1);
         
-        var_dump($query);
-        
         if ($query->num_rows > 0) {
             
             $this->user_data = $query->row_array();
@@ -299,9 +297,6 @@ class Users extends CI_Model {
         } else {
             return false;
         }
-        
-        print_r($this->user_data);
-        echo "\nHASH: " . $password_hash;
         
         // Проверка пароля
         if ($password_hash == $this->user_data['password']) {
