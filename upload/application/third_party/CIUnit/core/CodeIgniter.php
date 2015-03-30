@@ -211,13 +211,13 @@
         }
     }
     */
-    
 /*
  * -----------------------------------------------------
  * Load the security class for xss and csrf support
  * -----------------------------------------------------
  */
 	$SEC =& load_class('Security', 'core');
+
 /*
  * ------------------------------------------------------
  *  Load the Input class and sanitize globals

@@ -216,49 +216,57 @@
 * @access   private
 * @return   array
 */
-function &get_config(Array $replace = array())
-{
-	static $config;
+    function &get_config($replace = array())
+    {
+        static $_config;
 
-	if (empty($config))
-	{
-		$file_path = APPPATH.'config/config.php';
-		$found = FALSE;
-		if (file_exists($file_path))
-		{
-			$found = TRUE;
-			require($file_path);
-		}
+        if (isset($_config))
+        {
+            return $_config[0];
+        }
 
-		// Is the config file in the environment folder?
-		if (defined('ENVIRONMENT') && file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/config.php'))
-		{
-			require($file_path);
-		}
-		elseif ( ! $found)
-		{
-			set_status_header(503);
-			echo 'The configuration file does not exist.';
-			exit(3); // EXIT_CONFIG
-		}
+        // Fetch the config file
+        if ( ! file_exists(APPPATH.'config/config'.EXT))
+        {
+            exit('The configuration file does not exist.');
+        }
+        else
+        {
+            require(APPPATH.'config/config'.EXT);
+        }
 
-		// Does the $config array exist in the file?
-		if ( ! isset($config) OR ! is_array($config))
-		{
-			set_status_header(503);
-			echo 'Your config file does not appear to be formatted correctly.';
-			exit(3); // EXIT_CONFIG
-		}
-	}
+        // Fetch the CIU config file
+        if ( ! file_exists(CIUPATH .'config/config'.EXT))
+        {
+            exit('The configuration file does not exist.');
+        }
+        else
+        {
+            require(CIUPATH.'config/config'.EXT);
+        }
 
-	// Are any values being dynamically added or replaced?
-	foreach ($replace as $key => $val)
-	{
-		$config[$key] = $val;
-	}
+        // Does the $config array exist in the file?
+        if ( ! isset($config) OR ! is_array($config))
+        {
+            exit('Your config file does not appear to be formatted correctly.');
+        }
 
-	return $config;
-}
+        // Are any values being dynamically replaced?
+        if (count($replace) > 0)
+        {
+            foreach ($replace as $key => $val)
+            {
+                if (isset($config[$key]))
+                {
+                    $config[$key] = $val;
+                }
+            }
+        }
+
+        $_config[0] =& $config;
+        return $config;
+    }
+
 // ------------------------------------------------------------------------
 
 /**
