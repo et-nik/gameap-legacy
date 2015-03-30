@@ -209,51 +209,52 @@ if ( ! function_exists('is_loaded'))
 * @access	private
 * @return	array
 */
+// ------------------------------------------------------------------------
+
 if ( ! function_exists('get_config'))
 {
-	function &get_config($replace = array())
+	function &get_config(Array $replace = array())
 	{
-		static $_config;
+		static $config;
 
-		if (isset($_config))
-		{
-			return $_config[0];
-		}
-
-		// Is the config file in the environment folder?
-		if ( ! defined('ENVIRONMENT') OR ! file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/config.php'))
+		if (empty($config))
 		{
 			$file_path = APPPATH.'config/config.php';
-		}
-
-		// Fetch the config file
-		if ( ! file_exists($file_path))
-		{
-			exit('The configuration file does not exist.');
-		}
-
-		require($file_path);
-
-		// Does the $config array exist in the file?
-		if ( ! isset($config) OR ! is_array($config))
-		{
-			exit('Your config file does not appear to be formatted correctly.');
-		}
-
-		// Are any values being dynamically replaced?
-		if (count($replace) > 0)
-		{
-			foreach ($replace as $key => $val)
+			$found = FALSE;
+			if (file_exists($file_path))
 			{
-				if (isset($config[$key]))
-				{
-					$config[$key] = $val;
-				}
+				$found = TRUE;
+				require($file_path);
+			}
+
+			// Is the config file in the environment folder?
+			if (file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/config.php'))
+			{
+				require($file_path);
+			}
+			elseif ( ! $found)
+			{
+				set_status_header(503);
+				echo 'The configuration file does not exist.';
+				exit(3); // EXIT_CONFIG
+			}
+
+			// Does the $config array exist in the file?
+			if ( ! isset($config) OR ! is_array($config))
+			{
+				set_status_header(503);
+				echo 'Your config file does not appear to be formatted correctly.';
+				exit(3); // EXIT_CONFIG
 			}
 		}
 
-		$_config[0] =& $config;
-		return $_config[0];
+		// Are any values being dynamically added or replaced?
+		foreach ($replace as $key => $val)
+		{
+			$config[$key] = $val;
+		}
+
+		return $config;
 	}
 }
 
