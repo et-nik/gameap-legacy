@@ -466,6 +466,9 @@ class Cron extends MX_Controller {
 				$server_data['rcon_port'] = $ports[2];
 				unset($ports);
 				
+				// Прочие данные
+				$this->installer->change_server_data($server_data);
+				
 				
 			}
 			
@@ -863,7 +866,8 @@ class Cron extends MX_Controller {
 			
 				$this->servers_data[$server_id]['dir'] = $this->_linux_to_windows_path($this->servers_data[$server_id]['dir']);
 				
-				$commands[] = 'xcopy ' . $link . ' ' . $this->servers_data[$server_id]['script_path'] . '\\' . $this->servers_data[$server_id]['dir'] . ' /Y /E';
+				//~ $commands[] = 'xcopy ' . $link . ' ' . $this->servers_data[$server_id]['script_path'] . '\\' . $this->servers_data[$server_id]['dir'] . ' /Y /E';
+				$commands[] = 'powershell cp -R ' . $link . '/* ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . '/';
 				break;
 	
 			default:
