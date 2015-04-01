@@ -339,6 +339,9 @@ class Adm_servers extends CI_Controller {
 		$data['screen_name'] = $data['game'] . '_' . random_string('alnum', 6) . '_' . $data['server_port'];
 		$data['maps_path'] = $this->games->games_list[0]['start_code'] . '/maps';
 		
+		// Прочие данные
+		$this->installer->change_server_data($server_data);
+		
 		return $data;
 	}
 	
