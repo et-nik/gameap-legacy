@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `gameap_cron` (
 --
 
 CREATE TABLE IF NOT EXISTS `gameap_dedicated_servers` (
-`id` int(16) NOT NULL,
+`id` int(16) NOT NULL AUTO_INCREMENT,
   `name` tinytext NOT NULL,
   `disabled` int(1) NOT NULL,
   `os` tinytext NOT NULL,
