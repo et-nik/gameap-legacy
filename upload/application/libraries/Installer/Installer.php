@@ -168,6 +168,22 @@ class Installer extends CI_Driver_Library {
 	// -----------------------------------------------------------------
 	
 	/**
+	 * Изменение данных сервера
+	*/
+	public function change_server_data(&$server_data)
+	{
+		if (false == in_array('installer_' . $this->_engine, $this->valid_drivers)) {
+			$this->errors = 'Driver' . $this->_engine . ' not found';
+		}
+		
+		if (method_exists($this->{$this->_engine}, 'change_server_data')) {
+			$this->{$this->_engine}->change_server_data($server_data);
+		}
+	}
+	
+	// -----------------------------------------------------------------
+	
+	/**
 	 * Устанавливает нужные значения в конфигурации
 	*/
 	public function change_config()
