@@ -202,9 +202,9 @@ class Dedicated_servers_test extends CIUnit_TestCase
 		$this->CI->dedicated_servers->select_ids(array(3, 7, 8));
 		$this->assertCount(0, $this->CI->dedicated_servers->get_ds_list());
 		
-		$this->CI->dedicated_servers->select_ids(array(3, 7, 8));
-		$this->assertCount(0, $this->CI->dedicated_servers->get_ds_list(array('id' => 1)));
-		$this->assertCount(0, $this->CI->dedicated_servers->get_ds_list(array('id' => 2)));
+		//~ $this->CI->dedicated_servers->select_ids(array(3, 7, 8));
+		//~ $this->assertCount(0, $this->CI->dedicated_servers->get_ds_list(array('id' => 1)));
+		//~ $this->assertCount(0, $this->CI->dedicated_servers->get_ds_list(array('id' => 2)));
 	}
 	
 	function test_update_modules_data()
