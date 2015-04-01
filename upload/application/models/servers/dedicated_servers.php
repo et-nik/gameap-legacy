@@ -120,20 +120,6 @@ class Dedicated_servers extends CI_Model {
 	//-----------------------------------------------------------
 	
 	/**
-     * Получение списка отправленных команд
-     * 
-     * УСТАРЕЛА! В 1.0 версии будет удалена, используйте хелпер ds
-    */
-	function get_sended_commands($last_command = false)
-	{
-		$this->load->helper('ds');
-		return get_sended_commands($last_command);
-	}
-	
-	
-	//-----------------------------------------------------------
-	
-	/**
      * Удаление выделенного сервера
      * 
      * @param array
@@ -328,6 +314,20 @@ class Dedicated_servers extends CI_Model {
 		return (bool)($this->db->count_all_results('dedicated_servers') > 0);
     }
     
+    // -----------------------------------------------------------
+	
+	/**
+	 * Массив с id выделенных серверов
+	 */
+	function select_ids($ds_ids)
+	{
+		if (empty($ds_ids)) {
+			return false;
+		}
+		
+		$this->db->where_in('id', $ds_ids);
+	}
+    
     // ----------------------------------------------------------------
     
     /**
@@ -385,10 +385,7 @@ class Dedicated_servers extends CI_Model {
 	{
 		$ds_data = $this->get_ds_data($id);
 
-		$ds_data['modules_data'][$module_name] = isset($ds_data['modules_data'][$module_name]) && is_array($ds_data['modules_data'][$module_name])
-												 ? array_merge($ds_data['modules_data'][$module_name], $data)
-												 : $data;
-												 
+		$ds_data['modules_data'][$module_name] = $data;
 		$sql_data['modules_data'] = json_encode($ds_data['modules_data']);
 
 		return (bool)$this->edit_dedicated_server($id, $sql_data);
@@ -461,18 +458,4 @@ class Dedicated_servers extends CI_Model {
 		
 		return (bool)($query->num_rows > 0);
 	}
-
-	//-----------------------------------------------------------
-	
-	/*
-	 * Функция отправляет команду на сервер
-	 * 
-	 * УСТАРЕЛА! В 1.0 версии будет удалена, используйте хелпер ds
-	*/
-	function command($command, $server_data = false, $path = false)
-    {
-		$this->load->helper('ds');
-		return send_command($command, $server_data, $path);
-	}
-
 }
