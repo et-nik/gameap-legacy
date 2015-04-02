@@ -448,16 +448,18 @@ class Dedicated_servers extends CI_Model {
 	 * 
 	 * @param str, array
 	*/
-	function check_ports($ds_id, $ports)
+	function check_ports($ds_id, $ports, $server_ip = false)
 	{
 		$this->db->where('ds_id', $ds_id);
+		
+		if ($server_ip) {
+			$this->db->where('server_ip', $server_ip);
+		}
 		
 		$this->db->where_in('server_port', $ports);
 		$this->db->or_where_in('query_port', $ports);
 		$this->db->or_where_in('rcon_port', $ports);
 		
-		$query = $this->db->get('servers');
-		
-		return (bool)($query->num_rows > 0);
+		return (bool)$this->db->count_all_results('servers');
 	}
 }
