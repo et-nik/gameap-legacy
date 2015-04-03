@@ -59,3 +59,4 @@ $lang['install_db_dbprefix']					= 'Prefix';
 $lang['install_db_error']						= 'Database error';
 $lang['install_database_saved']					= 'Database configuration saved';
 
+$lang['install_db_pdo']							= 'PDO driver';
