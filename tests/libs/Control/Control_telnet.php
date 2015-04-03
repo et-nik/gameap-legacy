@@ -22,7 +22,7 @@ class Control_telnet_test extends CIUnit_TestCase
 	
 	public function test_command()
 	{
-		//~ $this->assertEquals('travis', $this->CI->control->command('whoami'));
-		//~ $this->assertEquals('travis', $this->CI->control->command('whoami', '/home'));
+		//~ $this->assertEquals('travis', trim($this->CI->control->command('whoami'))));
+		//~ $this->assertEquals('travis', trim($this->CI->control->command('whoami', '/home')));
 	}
 }
