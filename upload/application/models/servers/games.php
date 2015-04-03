@@ -113,10 +113,10 @@ class Games extends CI_Model {
     function get_games_list($where = FALSE, $limit = 99999, $offset = 0)
     {
 		$this->db->order_by('name', 'asc'); 
-		
+
 		if (is_array($where)) {
 			$this->db->where($where);
-		} else {
+		} else if ($where !== FALSE){
 			$this->db->where('code', $where);
 		}
 		

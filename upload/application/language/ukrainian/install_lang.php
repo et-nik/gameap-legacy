@@ -57,5 +57,5 @@ $lang['install_db_dbprefix'] = 'Префікс';
 $lang['install_db_error'] = 'Помилка з\'єднання з базою даних. Перевірте зазначені дані';
 $lang['install_database_saved'] = 'Конфігураційний файл бази даних створений';
 
-
+$lang['install_db_pdo']							= 'Драйвер PDO';
 

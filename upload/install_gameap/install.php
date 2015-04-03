@@ -401,7 +401,7 @@ switch($page) {
 				break;
 			}
 		}
-		
+
 		if (!$this->load->database($db_cfg)) {
 			$this->_show_message(lang('install_db_error'));
 			return FALSE;
