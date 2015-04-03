@@ -25,8 +25,8 @@ class Control_local_test extends CIUnit_TestCase
 		$this->assertEquals('travis', trim($this->CI->control->command('whoami')));
 		$this->assertEquals('travis', trim($this->CI->control->command('whoami', '/home')));
 		
-		$this->assertEquals('/', $this->CI->control->command('pwd', '/'));
-		$this->assertEquals('/home', $this->CI->control->command('pwd', '/home'));
-		$this->assertEquals('/home/travis/build/ET-NiK/GameAP', $this->CI->control->command('pwd', '/home/travis/build/ET-NiK/GameAP'));
+		$this->assertEquals('/', trim($this->CI->control->command('pwd', '/')));
+		$this->assertEquals('/home',  trim($this->CI->control->command('pwd', '/home')));
+		$this->assertEquals('/home/travis/build/ET-NiK/GameAP',  trim($this->CI->control->command('pwd', '/home/travis/build/ET-NiK/GameAP')));
 	}
 }
