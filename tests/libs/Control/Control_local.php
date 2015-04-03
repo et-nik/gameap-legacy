@@ -7,12 +7,12 @@ class Control_local_test extends CIUnit_TestCase
         $this->CI->load->driver('control');
         
         $this->CI->control->set_data(array('os' => 'linux', 'path' => '/home'));
-		$this->CI->control->set_driver('gdaemon');
+		$this->CI->control->set_driver('local');
 	}
 	
 	public function test_connect()
 	{
-		$this->assertInternalType('resource', $this->CI->control->connect('localhost', 0));
+		//~ $this->assertInternalType('resource', $this->CI->control->connect('localhost', 0));
 	}
 	
 	public function test_auth()
