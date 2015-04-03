@@ -28,7 +28,7 @@ class Control_ssh_test extends CIUnit_TestCase
 	
 	public function test_command()
 	{
-		$this->assertEquals('travis', trim($this->CI->control->command('whoami'))));
+		$this->assertEquals('travis', trim($this->CI->control->command('whoami')));
 		$this->assertEquals('travis', trim($this->CI->control->command('whoami', '/home')));
 		
 		$this->assertEquals('/', $this->CI->control->command('pwd', '/'));
