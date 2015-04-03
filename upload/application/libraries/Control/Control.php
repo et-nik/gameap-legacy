@@ -166,7 +166,7 @@ class Control extends CI_Driver_Library {
 	public function set_data($ds)
 	{
 		$this->os		= isset($ds['os']) ? strtolower($ds['os']) : '';
-		$this->path		= isset($ds['path']) ? $this->_path_proccess($ds['path']) : '';
+		$this->path		= isset($ds['path']) ? $ds['path'] : '';
 	}
 	
 	// ---------------------------------------------------------------------
