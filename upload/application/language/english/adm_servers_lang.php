@@ -219,3 +219,16 @@ $lang['adm_servers_send_command']					= 'Send command on console';
 
 // 0.9.9
 $lang['adm_servers_generate_rcon_password']			= 'Generate new';
+
+// 1.0
+$lang['adm_servers_cpu_limit']						= 'CPU limit';
+$lang['adm_servers_ram_limit']						= 'RAM limit';
+$lang['adm_servers_net_limit']						= 'Network limit';
+
+$lang['adm_servers_disable_ds']						= 'Disable this dedicated server';
+$lang['adm_servers_unknown_engine']					= 'Unsupported game engine';
+
+$lang['adm_servers_gdaemon_access']					= 'GameAP Daemon';
+$lang['adm_servers_gdaemon_data']					= 'GameAP Daemon details';
+$lang['adm_servers_gdaemon_host']					= 'Host(IP:port)';
+$lang['adm_servers_gdaemon_key']					= 'GDaemon access key';

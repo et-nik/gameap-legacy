@@ -167,3 +167,11 @@ $lang['administration']							= 'Admin';
 
 /* -- 0.9.9 -- */
 $lang['closed']									= 'Closed';
+
+/* -- 1.0 -- */
+$lang['files']									= 'Files';
+$lang['limites']								= 'Quota';
+$lang['default_value']							= 'Default';
+
+$lang['close']									= 'Close';
+$lang['size'] 									= 'Size';
