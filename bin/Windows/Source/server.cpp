@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
 	if (file_exists("psexec.exe")) {
 		psexec = str( boost::format("psexec.exe -accepteula -s -i -d -w \"%s\" -a %s ") % dir % cpu_affinity() );
 	} else if(file_exists("paexec.exe")) {
-		psexec = str( boost::format("paexec.exe \\\\localhost -s -d -w  \"%s\" -a %s ") % dir % cpu_affinity() );
+		psexec = str( boost::format("paexec.exe \\\\localhost -s -d -w \"%s\" -a %s") % dir % cpu_affinity() );
 	} else {
 		std::cout << "psexec.exe and paexec.exe not found" << std::endl;
 		//psexec = str( boost::format("start /D \"%s\" /I ") % dir );
