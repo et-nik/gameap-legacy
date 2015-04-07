@@ -128,9 +128,10 @@ class Adm_servers extends CI_Controller {
 	*/
 	public function check_port($port)
 	{
-		$ds_id = (int)$this->input->post('ds_id');
+		$ds_id 		= (int)$this->input->post('ds_id');
+		$server_ip 	= $this->input->post('server_ip');
 		
-		if (!$this->dedicated_servers->check_ports($ds_id, $port)) {
+		if ($this->dedicated_servers->check_ports($ds_id, $port, $server_ip)) {
 			$this->output->append_output('<img src="' . base_url('themes/system/images/warning.png') . '" />' . lang('adm_servers_port_exists'));
 		}
 	}
