@@ -75,6 +75,8 @@ class Query {
 			$server_info['host'] = "{$server_info['host']}:{$server_info['port']}";
 		}
 		
+		$server_info['options'] = array('timeout' => 5.0);
+		
 		try {
 			return $this->gameq->addServer($server_info);
 		} catch(Exception $e) {
