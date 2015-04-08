@@ -121,4 +121,29 @@ class Users_test extends CIUnit_TestCase
 		$this->CI->users->set_filter(array('login' => 'unknown'));
 		$this->assertTrue( ($this->CI->users->count_all_users() === 0) );
 	}
+	
+	public function test_users_privileges()
+	{
+		$user_id = 2;	// NonAuth
+		$server_id = 1;
+
+		foreach ($this->CI->users->all_privileges as $key => &$privilege) {
+			// True
+			$this->CI->users->set_server_privileges($key, true, $server_id,  $user_id);
+			$this->CI->users->update_server_privileges($user_id, $server_id);
+			$privileges = $this->CI->users->get_server_privileges($server_id, $user_id);
+			
+			$this->assertFalse( ($this->CI->users->auth_servers_privileges[$key] == 1) ); 	// AUTH, UserID = 1
+			$this->assertTrue($this->CI->users->servers_privileges[$key]);					// UserID = 2
+			$this->assertTrue($privileges[$key]);
+
+			// False
+			$this->CI->users->set_server_privileges($key, false, $server_id,  $user_id);
+			$this->CI->users->update_server_privileges($user_id, $server_id);
+			$privileges = $this->CI->users->get_server_privileges($server_id, $user_id);
+			
+			$this->assertFalse($this->CI->users->servers_privileges[$key]);
+			$this->assertFalse($privileges[$key]);
+		}
+	}
 }
