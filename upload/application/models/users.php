@@ -249,11 +249,11 @@ class Users extends CI_Model {
     {
 		!$this->_filter_users_list['login'] OR $this->db->like('login', $this->_filter_users_list['login']);
 		
-		!$this->_filter_users_list['register_before'] 	OR $this->db->where('reg_date >', $this->_filter_users_list['register_before']);
-		!$this->_filter_users_list['register_after'] 	OR $this->db->where('reg_date <', $this->_filter_users_list['register_after']);
+		!$this->_filter_users_list['register_before'] 	OR $this->db->where('reg_date <', $this->_filter_users_list['register_before']);
+		!$this->_filter_users_list['register_after'] 	OR $this->db->where('reg_date >', $this->_filter_users_list['register_after']);
 		
-		!$this->_filter_users_list['last_visit_before'] OR $this->db->where('last_auth >', $this->_filter_users_list['last_visit_before']);
-		!$this->_filter_users_list['last_visit_after'] 	OR $this->db->where('last_auth <', $this->_filter_users_list['last_visit_after']);
+		!$this->_filter_users_list['last_visit_before'] OR $this->db->where('last_auth <', $this->_filter_users_list['last_visit_before']);
+		!$this->_filter_users_list['last_visit_after'] 	OR $this->db->where('last_auth >', $this->_filter_users_list['last_visit_after']);
 		
 		return $this->db->count_all_results('users');
 	}
