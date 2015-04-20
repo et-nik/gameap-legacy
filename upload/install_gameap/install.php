@@ -256,7 +256,7 @@ switch($page) {
 							<td>' . form_dropdown('pdodriver', $pdoDrivers,array(),'id="pdodrivers"') . '</td>
 						</tr>';
 						
-			$content .= '<script src="http://localhost/gameap/themes/system/js/install.js"></script>';
+			$content .= '<script src="http://{base_url}/gameap/themes/system/js/install.js"></script>';
 		}
 	
 		$content .= '
@@ -401,7 +401,7 @@ switch($page) {
 				break;
 			}
 		}
-
+		
 		if (!$this->load->database($db_cfg)) {
 			$this->_show_message(lang('install_db_error'));
 			return FALSE;
