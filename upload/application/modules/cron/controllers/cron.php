@@ -403,11 +403,13 @@ class Cron extends MX_Controller {
 					$log .= 'chown -R ' . $this->servers_data[$server_id]['su_user'] . ' ' . $this->servers_data[$server_id]['script_path'] . '/' . $this->servers_data[$server_id]['dir'] . "\n";;
 				}
 				
-				try {
-					$log .= "\n---\nCHMOD\n" . $log . "\n" .  send_command($command, $this->servers_data[$server_id]);
-				} catch (Exception $e) {
-					$this->_cmd_output('---CHMOD failed. Message: ' . $e->getMessage());
-					$log .= $e->getMessage() . "\n";;
+				if (isset($command) && !empty($command)) {
+					try {
+						$log .= "\n---\nCHMOD\n" . $log . "\n" .  send_command($command, $this->servers_data[$server_id]);
+					} catch (Exception $e) {
+						$this->_cmd_output('---CHMOD failed. Message: ' . $e->getMessage());
+						$log .= $e->getMessage() . "\n";;
+					}
 				}
 			}
 
