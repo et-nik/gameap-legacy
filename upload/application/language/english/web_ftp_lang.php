@@ -41,3 +41,6 @@ $lang['web_ftp_file_big']										= 'File is too big';
 
 $lang['web_ftp_upload']											= 'Upload';
 $lang['web_ftp_recent_files']									= 'Recent files';
+
+$lang['web_ftp_new_name']										= 'New name';
+$lang['web_ftp_delete_file']									= 'Delete file';
