@@ -60,17 +60,17 @@ class Users_control extends CI_Controller {
 		
 		$tpl_data['filter_register_before']		= isset($filter['register_before']) && $filter['register_before'] 
 													? unix_to_human($filter['register_before']) 
-													: '';
+													: unix_to_human(now());
 		$tpl_data['filter_register_after']		= isset($filter['register_after']) && $filter['register_after'] 	
 													? unix_to_human($filter['register_after']) 
-													: unix_to_human(now());
+													: '';
 		
 		$tpl_data['filter_last_visit_before'] 	= isset($filter['last_visit_before']) && $filter['last_visit_before']
 													? unix_to_human($filter['last_visit_before']) 
-													: '';
+													: unix_to_human(now());
 		$tpl_data['filter_last_visit_after'] 	= isset($filter['last_visit_after']) && $filter['last_visit_after']
 													? unix_to_human($filter['last_visit_after']) 
-													: unix_to_human(now());
+													: '';
 		
 		return $tpl_data;
 	}
