@@ -5,9 +5,8 @@
  * An open source application development framework for PHP 5.1.6 or newer
  *
  * @package		CodeIgniter
- * @author		EllisLab Dev Team
- * @copyright		Copyright (c) 2008 - 2014, EllisLab, Inc.
- * @copyright		Copyright (c) 2014 - 2015, British Columbia Institute of Technology (http://bcit.ca/)
+ * @author		ExpressionEngine Dev Team
+ * @copyright	Copyright (c) 2008 - 2011, EllisLab, Inc.
  * @license		http://codeigniter.com/user_guide/license.html
  * @link		http://codeigniter.com
  * @since		Version 1.0
@@ -20,11 +19,14 @@
  * Common Functions
  *
  * Loads the base classes and executes the request.
+ * 
+ * Modify by ET-NiK
+ * Added method is_https from CodeIgniter 3.0
  *
  * @package		CodeIgniter
  * @subpackage	codeigniter
  * @category	Common Functions
- * @author		EllisLab Dev Team
+ * @author		ExpressionEngine Dev Team
  * @link		http://codeigniter.com/user_guide/
  */
 
@@ -32,6 +34,9 @@
 
 /**
 * Determines if the current version of PHP is greater then the supplied value
+*
+* Since there are a few places where we conditionally test for PHP > 5
+* we'll set a static variable.
 *
 * @access	public
 * @param	string
@@ -209,52 +214,50 @@ if ( ! function_exists('is_loaded'))
 * @access	private
 * @return	array
 */
-// ------------------------------------------------------------------------
-
 if ( ! function_exists('get_config'))
 {
-	function &get_config(Array $replace = array())
+	function &get_config($replace = array())
 	{
-		static $config;
+		static $_config;
 
-		if (empty($config))
+		if (isset($_config))
+		{
+			return $_config[0];
+		}
+
+		// Is the config file in the environment folder?
+		if ( ! defined('ENVIRONMENT') OR ! file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/config.php'))
 		{
 			$file_path = APPPATH.'config/config.php';
-			$found = FALSE;
-			if (file_exists($file_path))
-			{
-				$found = TRUE;
-				require($file_path);
-			}
-
-			// Is the config file in the environment folder?
-			if (defined('ENVIRONMENT') && file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/config.php'))
-			{
-				require($file_path);
-			}
-			elseif ( ! $found)
-			{
-				set_status_header(503);
-				echo 'The configuration file does not exist.';
-				exit(3); // EXIT_CONFIG
-			}
-
-			// Does the $config array exist in the file?
-			if ( ! isset($config) OR ! is_array($config))
-			{
-				set_status_header(503);
-				echo 'Your config file does not appear to be formatted correctly.';
-				exit(3); // EXIT_CONFIG
-			}
 		}
 
-		// Are any values being dynamically added or replaced?
-		foreach ($replace as $key => $val)
+		// Fetch the config file
+		if ( ! file_exists($file_path))
 		{
-			$config[$key] = $val;
+			exit('The configuration file does not exist.');
 		}
 
-		return $config;
+		require($file_path);
+
+		// Does the $config array exist in the file?
+		if ( ! isset($config) OR ! is_array($config))
+		{
+			exit('Your config file does not appear to be formatted correctly.');
+		}
+
+		// Are any values being dynamically replaced?
+		if (count($replace) > 0)
+		{
+			foreach ($replace as $key => $val)
+			{
+				if (isset($config[$key]))
+				{
+					$config[$key] = $val;
+				}
+			}
+		}
+
+		return $_config[0] =& $config;
 	}
 }
 
@@ -284,6 +287,36 @@ if ( ! function_exists('config_item'))
 		}
 
 		return $_config_item[$item];
+	}
+}
+
+// ------------------------------------------------------------------------
+
+if ( ! function_exists('is_https'))
+{
+	/**
+	 * Is HTTPS?
+	 *
+	 * Determines if the application is accessed via an encrypted
+	 * (HTTPS) connection.
+	 *
+	 * @return	bool
+	 */
+	function is_https()
+	{
+		if ( ! empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
+		{
+			return TRUE;
+		}
+		elseif (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+		{
+			return TRUE;
+		}
+		elseif ( ! empty($_SERVER['HTTP_FRONT_END_HTTPS']) && strtolower($_SERVER['HTTP_FRONT_END_HTTPS']) !== 'off')
+		{
+			return TRUE;
+		}
+		return FALSE;
 	}
 }
 
@@ -470,6 +503,9 @@ if ( ! function_exists('_exception_handler'))
 	{
 		 // We don't bother with "strict" notices since they tend to fill up
 		 // the log file with excess information that isn't normally very helpful.
+		 // For example, if you are running PHP 5 and you use version 4 style
+		 // class functions (without prefixes like "public", "private", etc.)
+		 // you'll get notices telling you that these have been deprecated.
 		if ($severity == E_STRICT)
 		{
 			return;
