@@ -256,7 +256,7 @@ switch($page) {
 							<td>' . form_dropdown('pdodriver', $pdoDrivers,array(),'id="pdodrivers"') . '</td>
 						</tr>';
 						
-			$content .= '<script src="http://{base_url}/gameap/themes/system/js/install.js"></script>';
+			$content .= '<script src="{base_url}/gameap/themes/system/js/install.js"></script>';
 		}
 	
 		$content .= '
