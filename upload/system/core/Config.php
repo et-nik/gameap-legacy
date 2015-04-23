@@ -19,6 +19,10 @@
  * CodeIgniter Config Class
  *
  * This class contains functions that enable config files to be managed
+ * 
+ * Modified methods (by ET-NiK):
+ * 	__construct
+ * 
  *
  * @package		CodeIgniter
  * @subpackage	Libraries
@@ -66,13 +70,12 @@ class CI_Config {
 		// Set the base_url automatically if none was provided
 		if ($this->config['base_url'] == '')
 		{
-			if (isset($_SERVER['HTTP_HOST']))
+			// Modify by ET-NiK
+			if (isset($_SERVER['HTTP_HOST']) && preg_match('/^((\[[0-9a-f:]+\])|(\d{1,3}(\.\d{1,3}){3})|[a-z0-9\-\.]+)(:\d+)?$/i', $_SERVER['HTTP_HOST']))
 			{
-				$base_url = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off' ? 'https' : 'http';
-				$base_url .= '://'. $_SERVER['HTTP_HOST'];
-				$base_url .= str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
+				$base_url = (is_https() ? 'https' : 'http').'://'.$_SERVER['HTTP_HOST']
+					.substr($_SERVER['SCRIPT_NAME'], 0, strpos($_SERVER['SCRIPT_NAME'], basename($_SERVER['SCRIPT_FILENAME'])));
 			}
-
 			else
 			{
 				$base_url = 'http://localhost/';
@@ -186,33 +189,14 @@ class CI_Config {
 	 * @param	bool
 	 * @return	string
 	 */
-	function item($item, $index = '')
+	public function item($item, $index = '')
 	{
 		if ($index == '')
 		{
-			if ( ! isset($this->config[$item]))
-			{
-				return FALSE;
-			}
-
-			$pref = $this->config[$item];
-		}
-		else
-		{
-			if ( ! isset($this->config[$index]))
-			{
-				return FALSE;
-			}
-
-			if ( ! isset($this->config[$index][$item]))
-			{
-				return FALSE;
-			}
-
-			$pref = $this->config[$index][$item];
+			return isset($this->config[$item]) ? $this->config[$item] : NULL;
 		}
 
-		return $pref;
+		return isset($this->config[$index], $this->config[$index][$item]) ? $this->config[$index][$item] : NULL;
 	}
 
 	// --------------------------------------------------------------------
