@@ -108,7 +108,7 @@ function server_status()
 		return;
 	fi
 
-	if [[ `sudo su $USER -c "screen -ls |grep $SNAME"` ]]
+	if [[ $(ps aux | grep -v grep | grep -i screen | grep -i $SNAME) != "" ]]
 		then
 		echo 1;
     else
