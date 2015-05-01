@@ -369,18 +369,6 @@ $fields = array(
 							'type' => 'TINYTEXT',
 		),
 		
-		'config_files' => array(
-							'type' => 'TEXT',
-		),
-		
-		'content_dirs' => array(
-							'type' => 'TEXT',
-		),
-		
-		'log_dirs' => array(
-							'type' => 'TEXT',
-		),
-		
 		'fast_rcon' => array(
 							'type' => 'TEXT',
 		),

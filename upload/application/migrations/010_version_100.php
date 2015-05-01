@@ -57,6 +57,10 @@ class Migration_Version_100 extends CI_Migration {
 		!$this->db->field_exists('execfile_windows', 'game_types') 		OR $this->dbforge->drop_column('game_types', 'execfile_windows');
 		!$this->db->field_exists('execfile_linux', 'game_types') 		OR $this->dbforge->drop_column('game_types', 'execfile_linux');
 		
+		!$this->db->field_exists('config_files', 'game_types') 			OR $this->dbforge->drop_column('game_types', 'config_files');
+		!$this->db->field_exists('content_dirs', 'game_types') 			OR $this->dbforge->drop_column('game_types', 'content_dirs');
+		!$this->db->field_exists('log_dirs', 'game_types') 				OR $this->dbforge->drop_column('game_types', 'log_dirs');
+		
 		// Данные пользователей
 		$fields = array();
 		if (!$this->db->field_exists('notices', 'users')) {
