@@ -94,7 +94,7 @@ class Installer_rust extends CI_Driver {
 						break;
 				}
 				
-				$start_command .= '-batchmode -hostname "Rust Server" -maxplayers {maxplayers} -port {port} -datadir "serverdata/" -oxidedir "save/oxide"';
+				$start_command .= '-batchmode -hostname ""Rust Server"" -maxplayers {maxplayers} -port {port} -datadir "serverdata/" -oxidedir "save/oxide"';
 				break;
 			
 			/////
@@ -110,7 +110,7 @@ class Installer_rust extends CI_Driver {
 						break;
 				}
 				
-				$start_command .= '-batchmode -server.hostname "{hostname}" -load -server.maxplayers {maxplayers} -server.ip {ip} -server.port {port} +rcon.ip {ip} +rcon.port {rcon_port} +rcon.password {rcon_password} +server.saveinterval {saveinterval} -autoupdate';
+				$start_command .= '-batchmode -server.hostname ""{hostname}"" -load -server.maxplayers {maxplayers} -server.level ""{level}"" -server.ip {ip} -server.port {port} +rcon.ip {ip} +rcon.port {rcon_port} +rcon.password {rcon_password} +server.saveinterval {saveinterval} -server.worldsize {worldsize} -server.seed {seed} -server.secure {secure} -autoupdate';
 				break;
 		}
 
