@@ -56,7 +56,7 @@ if ( ! function_exists('replace_shotcodes'))
 		isset($server_data['net_limit']) 		OR $server_data['net_limit'] 		= '';
 		
 		// Команда запуска игрового сервера (напр. "hlds_run -game valve +ip 127.0.0.1 +port 27015 +map crossfire")
-		$command = str_replace('{command}', 	strip_quotes($server_data['start_command']) , $command);
+		$command = str_replace('{command}', 	$server_data['start_command'] , $command);
 		// ID сервера
 		$command = str_replace('{id}', 			strip_quotes($server_data['id']) 			, $command);
 		$command = str_replace('{script_path}', strip_quotes($server_data['script_path']) 	, $command);
