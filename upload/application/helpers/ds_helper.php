@@ -70,6 +70,10 @@ if ( ! function_exists('replace_shotcodes'))
 		$command = str_replace('{ip}', 			strip_quotes($server_data['server_ip']) 	, $command);
 		// Порт сервера для коннекта
 		$command = str_replace('{port}', 		strip_quotes($server_data['server_port']) 	, $command);
+		
+		$command = str_replace('{query_port}', 	strip_quotes($server_data['query_port']) 	, $command);
+		$command = str_replace('{rcon_port}', 	strip_quotes($server_data['rcon_port']) 	, $command);
+		
 		// Игра
 		$command = str_replace('{game}', 		strip_quotes($server_data['start_code']) 	, $command);
 		// Пользователь
