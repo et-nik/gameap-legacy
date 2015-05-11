@@ -166,7 +166,7 @@ class Control extends CI_Driver_Library {
 	public function set_data($ds)
 	{
 		$this->os		= isset($ds['os']) ? strtolower($ds['os']) : '';
-		$this->path		= isset($ds['path']) ? $this->_path_proccess($ds['path']) : '';
+		$this->path		= isset($ds['path']) ? $ds['path'] : '';
 	}
 	
 	// ---------------------------------------------------------------------
@@ -243,13 +243,7 @@ class Control extends CI_Driver_Library {
 		// Проверяем, существует ли файл в команде. 
 		// Проверяются файлы .sh и .exe, если это команда, например wget, то проверки не будет
 		$explode = explode(' ', $command);
-		
-		if (strpos($explode[0], '\\') !== false && strpos($explode[0], '/') !== false) {
-			$file = $path . '/' . $explode[0];
-		}
-		else {
-			$file = $explode[0];
-		}
+		$file = $path . '/' . $explode[0];
 
 		$cd 		= $path ? $this->_path_proccess($path) . ' && ' : '';
 		$command 	= $this->_slash_reverse($command);
