@@ -275,7 +275,6 @@ class Users extends CI_Model {
         }
         
         $user_login = safesql($user_login);
-        $user_password = safesql($user_password);
         
         $query = $this->db->get_where('users', array('login' => $user_login), 1);
         
