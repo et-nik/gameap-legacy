@@ -169,9 +169,9 @@ class Gameap_modules extends CI_Model {
 		}
 		
 		/* Определение прав пользователя */
-		if (isset($this->users) && $this->users->auth_data['is_admin']) {
+		if (isset($this->users->auth_data) && $this->users->auth_data['is_admin']) {
 			$access_level = 100;
-		} elseif (isset($this->users) && $this->users->auth_privileges['srv_global']) {
+		} elseif (isset($this->users->auth_data) && $this->users->auth_privileges['srv_global']) {
 			$access_level = 90;
 		} else {
 			$access_level = 1;
@@ -201,7 +201,7 @@ class Gameap_modules extends CI_Model {
 			
 			$i++;
 		}
-		
+
 		return $this->menu;
 		
 	}
