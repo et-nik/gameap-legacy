@@ -51,7 +51,7 @@ class Tpl_replace
 	
 	// -----------------------------------------------------------------
 	
-	function _get_lang_line($matches)
+	private function _get_lang_line($matches)
 	{
 		return $this->CI->lang->line($matches[1]);
 	}
@@ -65,7 +65,7 @@ class Tpl_replace
 	{
 		$output = $this->CI->output->get_output();
 		
-		$output = preg_replace_callback('/' . $this->l_delim . 'lang\_([a-z\_\-]*)' . $this->r_delim . '/', array($this,'_get_lang_line'), $output);
+		$output = preg_replace_callback('/' . $this->l_delim . 'lang\_([a-z0-9\_\-]*)' . $this->r_delim . '/', array($this,'_get_lang_line'), $output);
 		$this->CI->output->set_output($output);
 	}
 	
@@ -92,6 +92,39 @@ class Tpl_replace
 		$output = str_replace($this->l_delim .  'base_url' . $this->r_delim, $this->CI->config->config['base_url'], $output);
 		
 
+		$this->CI->output->set_output($output);
+	}
+	
+	// -----------------------------------------------------------------
+	
+	private function _get_notice($notification)
+	{
+		if (!isset($this->CI->users->auth_id)) {
+			return '';
+		}
+		
+		$key = $notification[1];
+		
+		if (isset($this->CI->users->auth_data['notices'][$key]['text'])) {
+			return $this->CI->users->auth_data['notices'][$key]['text'];
+		}
+		
+		return '';
+	}
+	
+	// -----------------------------------------------------------------
+	
+	/**
+	 * Парсер уведомлений
+	 */
+	public function parse_notices()
+	{
+		if (!isset($this->CI->users->auth_id)) {
+			return;
+		}
+		
+		$output = $this->CI->output->get_output();
+		$output = preg_replace_callback('/' . $this->l_delim . 'notice\_([a-z0-9\_\-]*)' . $this->r_delim . '/', array($this,'_get_notice'), $output);
 		$this->CI->output->set_output($output);
 	}
 	
