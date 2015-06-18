@@ -581,6 +581,10 @@ class Users extends CI_Model {
             $where = array('user_id' => $user_id, 'server_id' => $server_id);
         }
         
+        if (!$this->db->table_exists('servers_privileges')) {
+			return false;
+		}
+        
         $query = $this->db->get_where('servers_privileges', $where, 1);
         $row_array = $query->row_array();
         
