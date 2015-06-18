@@ -17,7 +17,7 @@ class Auth extends CI_Controller {
 	public $user_data = array();
 	
 	// Список запрещенных логинов при регистрации
-	private $_denied_logins = array('administrator', 'admin', 'system', 'gameap', 'root');
+	private $_denied_logins = array('administrator', 'admin', 'system', 'gameap', 'root', 'scripts');
 	
 	// -----------------------------------------------------------------
 
@@ -287,6 +287,7 @@ class Auth extends CI_Controller {
 				
 				/* Перенаправляем пользователя в нужное место, 
 				 * если заданы нужные куки location_page */
+				
 				if($location_page = $this->input->cookie('location_page', true)){
 					// Уничтожаем куки
 					$cookie = array(
@@ -458,7 +459,6 @@ class Auth extends CI_Controller {
 				/* Пользователь с кодом найден, шаманим   */
 				/* -------------------------------------- */
 				
-				$this->load->model('password');
 				$this->load->helper('safety');
 				
 				$old_password = $user_list['0']['password'];
