@@ -326,8 +326,11 @@ class Servers extends CI_Model {
 	function update_modules_data($id, $data, $module_name)
 	{
 		$server_data = $this->get_server_data($id, true, true, true);
-
-		$server_data['modules_data'][$module_name] = $data;
+		
+		$server_data['modules_data'][$module_name] = isset($server_data['modules_data'][$module_name]) && is_array($server_data['modules_data'][$module_name])
+													? array_merge($server_data['modules_data'][$module_name], $data)
+													: $data;
+													
 		$sql_data['modules_data'] = json_encode($server_data['modules_data']);
 
 		return (bool)$this->edit_game_server($id, $sql_data);
@@ -867,6 +870,8 @@ class Servers extends CI_Model {
 		$server['host'] = $host . ':' . $port;
 		$this->query->set_data($server);
 		
+		$this->query->set_data($server);
+
 		$request = $this->query->get_status();
 		$status = (bool)$request[ $server['id'] ];
 		
