@@ -94,7 +94,7 @@ class Installer_rust extends CI_Driver {
 						break;
 				}
 				
-				$start_command .= '-batchmode -hostname ""Rust Server"" -maxplayers {maxplayers} -port {port} -datadir "serverdata/" -oxidedir "save/oxide"';
+				$start_command .= '-batchmode -hostname ""Rust Server"" -maxplayers {maxplayers} -port {port} -datadir ""serverdata/"" -oxidedir ""save/oxide""';
 				break;
 			
 			/////
