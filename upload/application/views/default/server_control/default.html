@@ -41,7 +41,7 @@ if($this->users->auth_privileges['srv_restart'] == 1
 <div style="overflow: hidden;">
     <div style="width: 100%;">
 		<?php if( $this->users->auth_servers_privileges['UPLOAD_CONTENTS'] && $this->users->auth_servers_privileges['CHANGE_CONFIG']): ?>
-			<div class="menu_icons"><a href="{site_url}web_ftp/server/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/files.png" /><br />{lang_server_files_cfg_files}</a></div>
+			<div class="menu_icons"><a href="{site_url}web_ftp/server/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/remote_folder.png" /><br />{lang_server_files_cfg_files}</a></div>
 		<?php endif; ?>
       
 		<?php if($this->users->auth_servers_privileges['CONSOLE_VIEW']): ?>
