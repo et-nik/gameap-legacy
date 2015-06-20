@@ -243,7 +243,15 @@ class Control extends CI_Driver_Library {
 		// Проверяем, существует ли файл в команде. 
 		// Проверяются файлы .sh и .exe, если это команда, например wget, то проверки не будет
 		$explode = explode(' ', $command);
-		$file = $path . '/' . $explode[0];
+
+		if (strpos(str_replace('./', '', $explode[0]), '\\') === false 
+			&& strpos(str_replace('./', '', $explode[0]), '/') === false
+		) {
+			$file = $path . '/' . $explode[0];
+		}
+		else {
+			$file = $explode[0];
+		}
 
 		$cd 		= $path ? $this->_path_proccess($path) . ' && ' : '';
 		$command 	= $this->_slash_reverse($command);
