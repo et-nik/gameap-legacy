@@ -57,7 +57,7 @@
 
 <div style="display: none;">
 	<div class="box-modal" id="edit_file" style="width: 90%;height:500px;">
-		<div class="box-modal_close arcticmodal-close">close</div>
+		<div class="box-modal_close arcticmodal-close">{lang_close}</div>
 		<h3>{lang_server_files_edit}</h3>
 		<p>
 		<form action="#" accept-charset="utf-8">
@@ -71,7 +71,7 @@
 <div style="display: none;">
 	<div class="box-modal" id="rename" style="width: 90%;">
 		<div class="box-modal_close arcticmodal-close">{lang_close}</div>
-		<h3>New name</h3>
+		<h3>{lang_web_ftp_new_name}</h3>
 		<p>
 		<form action="#" accept-charset="utf-8" onsubmit="RenameFile();return false;">
 			<input name="new_file_name" type="text" style="width:100%;"/>
@@ -83,8 +83,8 @@
 
 <div style="display: none;">
 	<div class="box-modal" id="delete_confirm">
-		<div class="box-modal_close arcticmodal-close">close</div>
-		<h3>Delete file?</h3>
+		<div class="box-modal_close arcticmodal-close">{lang_close}</div>
+		<h3>{lang_web_ftp_delete_file}?</h3>
 		<p align="center">
 			<a onclick="DeleteFile()" href="#"><button form="fconfirm" class="minimal">{lang_yes}</button></a>
 			<a class="arcticmodal-close" href="#"><button class="minimal">{lang_no}</button></a>
@@ -94,7 +94,7 @@
 
 <div style="display: none;">
 	<div class="box-modal" id="upload_file">
-		<div class="box-modal_close arcticmodal-close">close</div>
+		<div class="box-modal_close arcticmodal-close">{lang_close}</div>
 		<p class="hr">{lang_server_files_content}</p>
 		<form id="fupload_file" action="#" onsubmit="UploadFile();$('#upload_file').arcticmodal('close');return false;" method="post" accept-charset="utf-8" enctype="multipart/form-data">
 			<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
