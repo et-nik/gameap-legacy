@@ -393,6 +393,11 @@ class Users_control extends CI_Controller {
     {
 		$user_id = (int)$user_id;
 		
+		if (!$user_data = $this->users->get_user_data($user_id)) {
+			$this->_show_message(lang('users_id_unavailable'));
+			return false;
+		}
+		
 		//Проверка, есть ли права на добавление
 		if (!$this->users->auth_privileges['usr_edit']) {
 				$this->tpl_data['content'] .= lang('users_no_privileges_for_edit');
@@ -404,9 +409,6 @@ class Users_control extends CI_Controller {
 			}
 			
 			$local_tpl = array();
-			
-			/* Получаем данные редактируемого пользователя, но записываем их лишь в переменную $user_data */
-			$user_data = $this->users->get_user_data($user_id);
 
 			/* В целях безопасности, редактировать администратора может только он сам */
 			if ($user_data['is_admin'] && $user_data['id'] != $this->users->auth_id) {
