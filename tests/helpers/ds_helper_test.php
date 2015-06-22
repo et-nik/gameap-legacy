@@ -31,8 +31,9 @@ class Ds_helper_test extends CIUnit_TestCase
 			'ram_limit' 		=> '256',
 			'net_limit' 		=> '1000',
 			
+			'aliases'	=> array('maxplayers'),
 			'aliases_list'	=> json_encode(array(array('alias' => 'maxplayers'))),
-			'aliases_values'	=> array('maxplayers' => '32'),
+			'aliases_values'	=> array('maxplayers' => 32),
 		);
 		
 		$this->assertEquals('start', replace_shotcodes('{command}', $server_data));
