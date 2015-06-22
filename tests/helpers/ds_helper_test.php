@@ -37,7 +37,7 @@ class Ds_helper_test extends CIUnit_TestCase
 		
 		$this->assertEquals('start', replace_shotcodes('{command}', $server_data));
 		$this->assertEquals('1337', replace_shotcodes('{id}', $server_data));
-		$this->assertEquals('script_path', replace_shotcodes('{script_path}', $server_data));
+		$this->assertEquals('/home/servers', replace_shotcodes('{script_path}', $server_data));
 		$this->assertEquals('my_server', replace_shotcodes('{game_dir}', $server_data));
 		$this->assertEquals('/home/servers/my_server', replace_shotcodes('{dir}', $server_data));
 		$this->assertEquals('screen', replace_shotcodes('{name}', $server_data));
