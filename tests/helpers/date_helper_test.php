@@ -4,6 +4,7 @@ class Date_helper_test extends CIUnit_TestCase
 {
 	public function setUp()
     {
+        date_default_timezone_set('Europe/Moscow');
         $this->CI->load->helper('date');
     }
     
