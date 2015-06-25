@@ -23,7 +23,6 @@ class Ds_helper_test extends CIUnit_TestCase
 			'id' 			=> 1337,
 			'dir' 			=> 'my_server',
 			'script_path' 	=> '/home/servers',
-			'screen_name' 	=> 'screen',
 			'start_code' 	=> 'cstrike',
 			'su_user' 		=> 'nik',
 			
@@ -41,7 +40,7 @@ class Ds_helper_test extends CIUnit_TestCase
 		$this->assertEquals('/home/servers', replace_shotcodes('{script_path}', $server_data));
 		$this->assertEquals('my_server', replace_shotcodes('{game_dir}', $server_data));
 		$this->assertEquals('/home/servers/my_server', replace_shotcodes('{dir}', $server_data));
-		$this->assertEquals('screen', replace_shotcodes('{name}', $server_data));
+		$this->assertEquals('gameap', replace_shotcodes('{name}', $server_data));
 		$this->assertEquals('127.0.0.1', replace_shotcodes('{ip}', $server_data));
 		$this->assertEquals('27015', replace_shotcodes('{port}', $server_data));
 		$this->assertEquals('27016', replace_shotcodes('{query_port}', $server_data));
