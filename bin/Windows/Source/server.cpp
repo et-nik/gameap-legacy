@@ -269,8 +269,12 @@ int main(int argc, char *argv[])
 		psexec = str( boost::format("paexec.exe \\\\localhost -s -d -w \"%s\" -a %s") % dir % cpu_affinity() );
 	} else {
 		std::cout << "psexec.exe and paexec.exe not found" << std::endl;
-		//psexec = str( boost::format("start /D \"%s\" /I ") % dir );
-		psexec = str(boost::format("screen -t start -S %s -c ") % screen_name);
+		
+		if (file_exists("screen.exe")) {
+			psexec = str( boost::format("screen -t start -S %s -c ") % screen_name );
+		} else {
+			psexec = str( boost::format("start /D \"%s\" /I ") % dir );
+		}
 	}
     
     /* Разъединение программы и аргумента в команде запуска сервера */
@@ -356,7 +360,7 @@ int main(int argc, char *argv[])
 			std::cout << "Server is Down" << std::endl;
 		}
 		
-	} 
+	}
 	else if (std::string(type) == "get_console") {
 		std::string output = "";
 #ifdef _WIN32
