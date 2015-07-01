@@ -267,14 +267,11 @@ int main(int argc, char *argv[])
 		psexec = str( boost::format("psexec.exe -accepteula -s -i -d -w \"%s\" -a %s ") % dir % cpu_affinity() );
 	} else if(file_exists("paexec.exe")) {
 		psexec = str( boost::format("paexec.exe \\\\localhost -s -d -w \"%s\" -a %s") % dir % cpu_affinity() );
+	} else if(file_exists("screen.exe")) {
+		psexec = str( boost::format("screen -t start -S %s -d %s -c") % screen_name % dir );
 	} else {
-		//std::cout << "psexec.exe and paexec.exe not found" << std::endl;
-		
-		if (file_exists("screen.exe")) {
-			psexec = str( boost::format("screen -t start -S %s -c ") % screen_name );
-		} else {
-			psexec = str( boost::format("start /D \"%s\" /I ") % dir );
-		}
+		std::cout << "psexec.exe, paexec.exe and screen.exe not found" << std::endl;
+		psexec = str( boost::format("start /D \"%s\" /I ") % dir );
 	}
     
     /* Разъединение программы и аргумента в команде запуска сервера */
