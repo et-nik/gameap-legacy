@@ -268,7 +268,7 @@ int main(int argc, char *argv[])
 	} else if(file_exists("paexec.exe")) {
 		psexec = str( boost::format("paexec.exe \\\\localhost -s -d -w \"%s\" -a %s") % dir % cpu_affinity() );
 	} else {
-		std::cout << "psexec.exe and paexec.exe not found" << std::endl;
+		//std::cout << "psexec.exe and paexec.exe not found" << std::endl;
 		
 		if (file_exists("screen.exe")) {
 			psexec = str( boost::format("screen -t start -S %s -c ") % screen_name );
