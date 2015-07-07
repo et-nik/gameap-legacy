@@ -38,14 +38,6 @@ class Control extends CI_Driver_Library {
 	
 	private $_no_sudo			= false;		// Не добавлять sudo
 	
-	// Лимиты (работают только в Linux)
-	private $_limits			= array(
-		'ram'		=> 0, 		// RAM limit
-		'cpu'		=> 0, 		// CPU Load limit
-		'dnet'		=> 0, 		// Download speed limit
-		'unet'		=> 0, 		// Upload speed limit
-	);
-	
 	public function __construct()
 	{
 		$this->CI =& get_instance();
@@ -127,23 +119,6 @@ class Control extends CI_Driver_Library {
 				//$command = $command;
 				break;
 		}
-		
-		return $command;
-	}
-	
-	// ---------------------------------------------------------------------
-	
-	/**
-	 * Добавляет лимиты к команде
-	 */
-	private function _add_limits($command = '')
-	{
-		if ($this->os == 'windows') {
-			return $command;
-		}
-		
-		// Оперативная память
-		$command = $this->_limit['ram'] ? "ulimit -v {$this->_limit['ram']} && " . $command : $command;
 		
 		return $command;
 	}
@@ -256,7 +231,7 @@ class Control extends CI_Driver_Library {
 		$cd 		= $path ? $this->_path_proccess($path) . ' && ' : '';
 		$command 	= $this->_slash_reverse($command);
 		$command 	= $this->_add_sudo($command);
-		
+
 		// Костыль для карт типа $2000$
 		if ($this->os != 'windows') {
 			$command    = str_replace('$', '\\\\\$', $command);
@@ -324,26 +299,6 @@ class Control extends CI_Driver_Library {
 		}
 		
 		return $this->{$this->driver}->auth($login, $password);
-	}
-	
-	// ---------------------------------------------------------------------
-	
-	/**
-	 * Ограничение на использование оперативной памяти
-	 */
-	public function set_ram_limit()
-	{
-		
-	}
-	
-	// ---------------------------------------------------------------------
-	
-	/**
-	 * Ограничение на использование процессорного времени
-	 */
-	public function set_cpu_limit()
-	{
-		
 	}
 	
 	// ---------------------------------------------------------------------
