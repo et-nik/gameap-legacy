@@ -10,7 +10,7 @@ Server Requirements
 
 Web-server
 ------
-* PHP version 5.2.4 or newer.
+* PHP version 5.3 or newer.
 * SSH2 module PHP
 * GD module PHP
 * Enabled ftp functions
