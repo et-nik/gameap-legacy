@@ -93,7 +93,7 @@ if ( ! function_exists('replace_shotcodes'))
 			/* Прогон по алиасам */
 			if($allowable_aliases && !empty($allowable_aliases)){
 				foreach ($allowable_aliases as $alias) {
-					if(isset($server_data['aliases_values'][$alias['alias']]) && !empty($server_data['aliases_values'][$alias['alias']])) {
+					if(isset($server_data['aliases_values'][$alias['alias']])) {
 						$command = str_replace('{' . $alias['alias'] . '}', $server_data['aliases_values'][$alias['alias']] , $command);	
 					}
 				}
@@ -125,7 +125,7 @@ if ( ! function_exists('send_command'))
 			throw new Exception(lang('server_command_ds_disabled'));
 		}
 		
-		$command = $CI->servers->replace_shotcodes($command, $server_data);
+		$command = replace_shotcodes($command, $server_data);
 		
 		$path = $path ? $path : $server_data['script_path'];
 		$CI->control->set_data(array('os' => $server_data['os'], 'path' => $path));
