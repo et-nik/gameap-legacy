@@ -10,9 +10,9 @@ class Dedicated_servers extends CI_Model {
     private $_errors	= false;
     
     private $_scripts_default = array(
-		'script_start' 			=> '-t start -d {dir} -n {name} -i {ip} -p {port} -c "{command}" -u {user}',
+		'script_start' 			=> '-t start -d {dir} -n {name} -i {ip} -p {port} -c "{command}" -s {net_limit} -f {cpu_limit} -m {ram_limit} -u {user}',
 		'script_stop' 			=> '-t stop -d {dir} -n {name} -i {ip} -p {port} -c "{command}" -u {user}',
-		'script_restart' 		=> '-t restart -d {dir} -n {name} -i {ip} -p {port} -c "{command}" -u {user}',
+		'script_restart' 		=> '-t restart -d {dir} -n {name} -i {ip} -p {port} -c "{command}" -s {net_limit} -f {cpu_limit} -m {ram_limit} -u {user}',
 		'script_status' 		=> '-t status -d {dir} -n {name} -i {ip} -p {port} -c "{command}" -u {user}',
 		'script_get_console' 	=> '-t get_console -d {dir} -n {name} -u {user}',
 		'script_send_command' 	=> '-t send_command -d {dir} -n {name} -c "{command}" -u {user}',
