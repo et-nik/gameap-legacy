@@ -257,6 +257,11 @@ class Control extends CI_Driver_Library {
 		$command 	= $this->_slash_reverse($command);
 		$command 	= $this->_add_sudo($command);
 		
+		// Костыль для карт типа $2000$
+		if ($this->os != 'windows') {
+			$command    = str_replace('$', '\\\\\$', $command);
+		}
+		
 		// Подготовка полной команды
 		$final_command = $cd . $command;
 		$this->_sended_commands[] = $final_command;
