@@ -132,7 +132,7 @@ class Settings extends CI_Controller {
 			if($allowable_aliases && !empty($allowable_aliases)) {
 				foreach ($allowable_aliases as $alias) {
 
-					if(!$this->users->auth_privileges['srv_global'] && $alias['only_admins']) {
+					if(!$this->users->auth_data['is_admin'] && !$this->users->auth_privileges['srv_global'] && $alias['only_admins']) {
 						/* Алиас могут редактировать только администраторы */
 						continue;
 					}
@@ -151,7 +151,7 @@ class Settings extends CI_Controller {
 					$data = array(
 						  'name'        => 'alias_' . $alias['alias'],
 						  'value'       => $value_alias,
-						  'maxlength'   => '32',
+						  'maxlength'   => '64',
 						  'size'        => '30',
 						);
 
