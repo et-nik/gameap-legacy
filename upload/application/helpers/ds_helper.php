@@ -81,6 +81,10 @@ if ( ! function_exists('replace_shotcodes'))
 		$command = str_replace('{game}', 		strip_quotes($server_data['start_code']) 	, $command);
 		// Пользователь
 		$command = str_replace('{user}', 		strip_quotes($server_data['su_user']) 		, $command);
+		
+		$command = str_replace('{cpu_limit}', 	strip_quotes($server_data['cpu_limit']) 	, $command);
+		$command = str_replace('{ram_limit}', 	strip_quotes($server_data['ram_limit']) 	, $command);
+		$command = str_replace('{net_limit}', 	strip_quotes($server_data['net_limit']) 	, $command);
 
 		/*-------------------*/
 		/* Замена по алиасам */
@@ -130,7 +134,7 @@ if ( ! function_exists('send_command'))
 		$path = $path ? $path : $server_data['script_path'];
 		$CI->control->set_data(array('os' => $server_data['os'], 'path' => $path));
 		$CI->control->set_driver($server_data['control_protocol']);
-		
+
 		$CI->control->connect($server_data['control_ip'], $server_data['control_port']);
 		$CI->control->auth($server_data['control_login'], $server_data['control_password']);
 		$result = $CI->control->command($command, $path);
