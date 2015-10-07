@@ -264,7 +264,7 @@ class Auth extends CI_Controller {
 				$cookie = array(
 				'name'   => 'user_id',
 				'value'  => $this->user_data['user_id'],
-				'expire' => '86500',
+				'expire' => 86500 * 7, // Одна неделя
 				'path'   => '/',
 				);
 
@@ -273,7 +273,7 @@ class Auth extends CI_Controller {
 				$cookie = array(
 					'name'   => 'hash',
 					'value'  => $hash,
-					'expire' => '86500',
+					'expire' => 86500 * 7, // Одна неделя
 					'path'   => '/',
 				);
 
