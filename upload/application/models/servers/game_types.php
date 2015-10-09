@@ -4,6 +4,8 @@ class Game_types extends CI_Model {
 	
 	var $game_types_list = array();	// Список типов игр
 	
+	private $_fields = array();
+	
 	//-----------------------------------------------------------	
 	/*
      * Добавление новой игровой модификации
@@ -52,7 +54,54 @@ class Game_types extends CI_Model {
 		}
 	}
 	
+	// -----------------------------------------------------------------
+	
+	public function select_fields($fields)
+	{
+		$this->_fields = $fields;
+	}
+	
+	// -----------------------------------------------------------------
+	
+	/**
+	 * Получение списка имён игровых модификаций
+	 * 
+	 * @return array
+	 */
+	public function get_names($variant = 1)
+	{
+		if (empty($this->game_types_list)) {
+			return [];
+		}
+		
+		$names = [];
+		
+		switch ($variant) {
+			default:
+			case 1:
+				foreach ($this->game_types_list as &$game_type) {
+					$names[$game_type['id']] = $game_type['name'];
+				}
+				break;
+			
+			case 2:
+				foreach ($this->game_types_list as &$game_type) {
+					$names[] = ['id' => $game_type['id'], 'name' => $game_type['name']];
+				}
+				break;
+				
+			case 3:
+				foreach ($this->game_types_list as &$game_type) {
+					$names[] = ['game_type_id' => $game_type['id'], 'game_type_name' => $game_type['name']];
+				}
+				break;
+		}
+		
+		return $names;
+	}
+	
 	//-----------------------------------------------------------
+	
 	/**
      * Получение списка игровых модификаций
      * 
@@ -72,6 +121,9 @@ class Game_types extends CI_Model {
 		 * в этом случае будет выбран сервер id которого = 1
 		 * 
 		*/
+		
+		// Выбор полей
+		!$this->_fields OR $this->db->select($this->_fields);
 		
 		if(is_array($where)) {
 			$query = $this->db->get_where('game_types', $where, $limit);
