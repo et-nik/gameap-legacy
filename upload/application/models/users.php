@@ -266,9 +266,10 @@ class Users extends CI_Model {
      * 
      * @param string		логин
      * @param string		пароль (не хеш)
+     * @param string		тип авторизации (по логину или по email)
      * @return int|bool		возвращает ID пользователя, в случае успеха и false в случае неудачи.
     */
-    function user_auth($user_login = '', $user_password = '')
+    function user_auth($user_login = '', $user_password = '', $type = 'login')
     {
         if(!$user_login OR !$user_password){
             return false;
@@ -276,7 +277,14 @@ class Users extends CI_Model {
         
         $user_login = safesql($user_login);
         
-        $query = $this->db->get_where('users', array('login' => $user_login), 1);
+        switch ($type) {
+			default:
+				$query = $this->db->get_where('users', array('login' => $user_login), 1);
+				break;
+			case 'email':
+				$query = $this->db->get_where('users', array('email' => $user_login), 1);
+				break;
+		}
         
         if ($query->num_rows > 0) {
             
