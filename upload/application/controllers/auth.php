@@ -248,8 +248,13 @@ class Auth extends CI_Controller {
 					// Пользователь существует
 				}
 			}
-
-			$check = $this->users->user_auth($user_data['login'], $user_data['password']);
+			
+			if (filter_var($user_data['login'], FILTER_VALIDATE_EMAIL)) {
+				$check = $this->users->user_auth($user_data['login'], $user_data['password'], 'email');
+			}
+			else {
+				$check = $this->users->user_auth($user_data['login'], $user_data['password']);
+			}
 
 			/* Если все сходится, то задаем куки*/
 			if($check) {
