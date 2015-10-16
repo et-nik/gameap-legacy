@@ -380,17 +380,24 @@ class Dedicated_servers extends CI_Model {
      * @param id 	 	id сервера
      * @param array 	новые данные
      * @param string	имя модуля
+     * @param bool
+     * 
      * @return bool
      *
     */
-	function update_modules_data($id, $data, $module_name)
+	function update_modules_data($id, $data, $module_name, $erase = false)
 	{
 		$ds_data = $this->get_ds_data($id);
-
-		$ds_data['modules_data'][$module_name] = isset($ds_data['modules_data'][$module_name]) && is_array($ds_data['modules_data'][$module_name])
+		
+		if (!$erase) {
+			$ds_data['modules_data'][$module_name] = isset($ds_data['modules_data'][$module_name]) && is_array($ds_data['modules_data'][$module_name])
 													? array_merge($ds_data['modules_data'][$module_name], $data)
 													: $data;
-													
+		}
+		else {
+			$ds_data['modules_data'][$module_name] = $data;
+		}
+												
 		$sql_data['modules_data'] = json_encode($ds_data['modules_data']);
 
 		return (bool)$this->edit_dedicated_server($id, $sql_data);
