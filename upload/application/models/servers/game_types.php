@@ -71,10 +71,10 @@ class Game_types extends CI_Model {
 	public function get_names($variant = 1)
 	{
 		if (empty($this->game_types_list)) {
-			return [];
+			return array();
 		}
 		
-		$names = [];
+		$names = array();
 		
 		switch ($variant) {
 			default:
