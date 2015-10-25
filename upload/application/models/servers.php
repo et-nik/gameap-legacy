@@ -320,19 +320,26 @@ class Servers extends CI_Model {
      * @param id 	 	id сервера
      * @param array 	новые данные
      * @param string	имя модуля
+     * @param bool
+     * 
      * @return bool
      *
     */
-	function update_modules_data($id, $data, $module_name)
+	function update_modules_data($id, $data, $module_name, $erase = false)
 	{
 		$server_data = $this->get_server_data($id, true, true, true);
 		
-		$server_data['modules_data'][$module_name] = isset($server_data['modules_data'][$module_name]) && is_array($server_data['modules_data'][$module_name])
+		if (!$erase) {
+			$server_data['modules_data'][$module_name] = isset($server_data['modules_data'][$module_name]) && is_array($server_data['modules_data'][$module_name])
 													? array_merge($server_data['modules_data'][$module_name], $data)
 													: $data;
+		}
+		else {
+			$server_data['modules_data'][$module_name] = $data;
+		}
 													
 		$sql_data['modules_data'] = json_encode($server_data['modules_data']);
-
+		
 		return (bool)$this->edit_game_server($id, $sql_data);
 	}
 
@@ -606,6 +613,12 @@ class Servers extends CI_Model {
 			$this->server_data['aliases_values'] = array();
 		}
 		
+		if (!empty($this->server_data['modules_data'])) {
+			$this->server_data['modules_data'] = json_decode($this->server_data['modules_data'], true);
+		} else {
+			$this->server_data['modules_data'] = array();
+		}
+		
 		// Значение RCON пароля из алиаса
 		if (preg_match('/^\{alias_([a-z\-\_]+)\}$/', $this->server_data['rcon'], $m)) {
 			$this->server_data['rcon'] = isset($this->server_data['aliases_values'][ $m[1] ]) ? $this->server_data['aliases_values'][ $m[1] ] : '' ;
@@ -668,7 +681,7 @@ class Servers extends CI_Model {
 			$this->server_data['control_login'] 	= $this->server_ds_data['control_login'];
 			$this->server_data['control_password'] 	= $this->server_ds_data['control_password'];
 			
-			$this->server_data['modules_data'] 		= $this->server_ds_data['modules_data'];
+			$this->server_data['ds_modules_data'] 	= $this->server_ds_data['modules_data'];
 			
 			if (strtolower($this->server_data['os']) == 'windows') {
 				$execfile = $this->_exec_file['windows'];
