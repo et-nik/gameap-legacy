@@ -101,6 +101,7 @@ class Users extends CI_Model {
         parent::__construct();
         
         $this->load->helper('safety');
+        $this->load->helper('date');
         $this->load->library('encrypt');
     }
     
@@ -233,6 +234,9 @@ class Users extends CI_Model {
 			// Что-то вроде костыля
 			$this->auth_privileges = $this->auth_data['privileges'];
 			$this->auth_servers_privileges = $this->get_server_privileges();
+			
+			// Обновление данных авторизации
+			$this->update_user(array('last_auth' => now()));
 
             return true;
         } else {
@@ -453,13 +457,18 @@ class Users extends CI_Model {
      * @return bool
      *
     */
-	public function update_modules_data($user_id, $data, $module_name)
+	public function update_modules_data($user_id, $data, $module_name, $erase = false)
 	{
 		$user_data = $this->get_user_data($user_id);
 		
-		$user_data['modules_data'][$module_name] = isset($user_data['modules_data'][$module_name]) && is_array($user_data['modules_data'][$module_name])
-													? array_merge($user_data['modules_data'][$module_name], $data)
-													: $data;
+		if (!$erase) {
+			$user_data['modules_data'][$module_name] = isset($user_data['modules_data'][$module_name]) && is_array($user_data['modules_data'][$module_name])
+				? array_merge($user_data['modules_data'][$module_name], $data)
+				: $data;
+		}
+		else {
+			$user_data['modules_data'][$module_name] = $data;
+		}
 
 		$modules_data_json = json_encode($user_data['modules_data']);
 		
@@ -937,7 +946,7 @@ class Users extends CI_Model {
 			$user_data =& $this->user_data;
 		}
 		
-		$user_name = isset($user_data['name']) ? $user_data['name']  : $user_data['login'];
+		$user_name = $user_data['name'] ? $user_data['name']  : $user_data['login'];
 		$message = str_replace('{user_name}', $user_name, $message);
 		$message = str_replace('{user_balance}', $user_data['balance'], $message);
 		
