@@ -144,8 +144,8 @@ if ( ! function_exists('steamid_to_steamid64'))
 {
 	function steamid_to_steamid64($steamid) 
 	{
-		$steamid = str_replace('STEAM_', '' ,$steamid);
-		$parts = explode(':', $steamid);
-		return bcadd((bcadd('76561197960265728', $parts[1])), (bcmul($parts[2], '2')));
+		list( , $m1, $m2) = explode(':', $steamid, 3);
+		list($steam_cid, ) = explode('.', bcadd((((int) $m2 * 2) + $m1), '76561197960265728'), 2);
+		return $steam_cid;
 	}
 }
