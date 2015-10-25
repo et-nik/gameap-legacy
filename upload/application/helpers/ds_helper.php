@@ -379,3 +379,12 @@ if ( ! function_exists('list_ds_files'))
 		}
 	}
 }
+
+// -----------------------------------------------------------------
+	
+	function linux_slash_to_windows($string)
+	{
+		$string = str_replace('/', '\\', $string . '\\');
+		$string = substr($string, 0, strlen($string)-1);
+		return $string;
+	}
