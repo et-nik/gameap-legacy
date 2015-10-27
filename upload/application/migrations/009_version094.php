@@ -37,14 +37,6 @@ class Migration_Version094 extends CI_Migration {
 
 			$this->dbforge->add_column('servers', $fields, 'aliases');
 		}
-		
-		$fields = array(
-			'log_data' => array(
-						'type' => 'MEDIUMTEXT',
-			),	
-		);
-
-		$this->dbforge->modify_column('logs', $fields);
 
 	}
 	
