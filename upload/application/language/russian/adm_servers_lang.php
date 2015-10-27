@@ -233,3 +233,5 @@ $lang['adm_servers_gdaemon_access']					= 'GameAP Daemon';
 $lang['adm_servers_gdaemon_data']					= 'Данные GameAP Daemon';
 $lang['adm_servers_gdaemon_host']					= 'Хост (IP:порт)';
 $lang['adm_servers_gdaemon_key']					= 'Ключ GDaemon';
+
+$lang['adm_servers_gdaemon_data_unavailable']		= 'GDaemon данные неверны. Проверьте правильность заполненных данных.';
