@@ -52,4 +52,67 @@ class Ds_helper_test extends CIUnit_TestCase
 		$command = '{dir} {ip} {name} {query_port} {rcon_port} {maxplayers}';
         $this->assertEquals('/home/servers/my_server 127.0.0.1 gameap 27016 27017 32', replace_shotcodes($command, $server_data));
     }
+
+    public function test_get_file_protocol()
+    {
+		$this->assertEquals('ftp', get_file_protocol(array('ftp_host' => 'localhost')));
+		$this->assertEquals('sftp', get_file_protocol(array('ssh_host' => 'localhost')));
+		$this->assertEquals('gdaemon', get_file_protocol(array('gdaemon_host' => 'localhost')));
+		$this->assertEquals('local', get_file_protocol(array('local_server' => 1)));
+		
+		$this->assertEquals('ftp', get_file_protocol(array('ftp_host' => 'localhost', 'ssh_host' => 'localhost')));
+		$this->assertEquals('sftp', get_file_protocol(array('ssh_host' => 'localhost', 'gdaemon_host' => 'localhost')));
+		$this->assertEquals('gdaemon', get_file_protocol(array('gdaemon_host' => 'localhost', 'local_server' => 1)));
+	}
+	
+	public function test_get_ds_file_path()
+	{
+		$this->assertEquals('/home/serv01/cstrike/', get_ds_file_path(array(
+			'ftp_host' 	=> 'localhost',
+			'ftp_path' 	=> '/home/serv01',
+			'dir' 		=> 'cstrike',
+		)));
+		
+		$this->assertEquals('/home/serv01/cstrike', get_ds_file_path(array(
+			'ftp_host' 	=> 'localhost',
+			'ftp_path' 	=> '/home/serv01//',
+			'dir' 		=> '/cstrike/',
+		)));
+		
+		$this->assertEquals('/home/serv01/cstrike/', get_ds_file_path(array(
+			'ssh_host' 	=> 'localhost',
+			'ssh_path' 	=> '/home/serv01',
+			'dir' 		=> 'cstrike',
+		)));
+		
+		$this->assertEquals('/home/serv01/cstrike', get_ds_file_path(array(
+			'ssh_host' 	=> 'localhost',
+			'ssh_path' 	=> '/home/serv01//',
+			'dir' 		=> '/cstrike/',
+		)));
+		
+		$this->assertEquals('/home/serv01/cstrike/', get_ds_file_path(array(
+			'gdaemon_host' 	=> 'localhost',
+			'script_path' 	=> '/home/serv01',
+			'dir' 		=> 'cstrike',
+		)));
+		
+		$this->assertEquals('/home/serv01/cstrike', get_ds_file_path(array(
+			'gdaemon_host' 	=> 'localhost',
+			'script_path' 	=> '/home/serv01//',
+			'dir' 		=> '/cstrike/',
+		)));
+		
+		$this->assertEquals('/home/serv01/cstrike/', get_ds_file_path(array(
+			'local_server' => 1,
+			'script_path' 	=> '/home/serv01',
+			'dir' 		=> 'cstrike',
+		)));
+		
+		$this->assertEquals('/home/serv01/cstrike', get_ds_file_path(array(
+			'local_server' => 1,
+			'script_path' 	=> '/home/serv01//',
+			'dir' 		=> '/cstrike/',
+		)));
+	}
 }
