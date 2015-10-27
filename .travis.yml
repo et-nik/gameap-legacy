@@ -10,7 +10,7 @@ php:
   - hhvm
   
 env:
-  - DB=mysql
+  #- DB=mysql
   - DB=mysqli
 
 before_script:
