@@ -86,13 +86,13 @@ class Game_types extends CI_Model {
 			
 			case 2:
 				foreach ($this->game_types_list as &$game_type) {
-					$names[] = ['id' => $game_type['id'], 'name' => $game_type['name']];
+					$names[] = array('id' => $game_type['id'], 'name' => $game_type['name']);
 				}
 				break;
 				
 			case 3:
 				foreach ($this->game_types_list as &$game_type) {
-					$names[] = ['game_type_id' => $game_type['id'], 'game_type_name' => $game_type['name']];
+					$names[] = array('game_type_id' => $game_type['id'], 'game_type_name' => $game_type['name']);
 				}
 				break;
 		}
