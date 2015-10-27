@@ -381,10 +381,12 @@ if ( ! function_exists('list_ds_files'))
 }
 
 // -----------------------------------------------------------------
-	
+if ( ! function_exists('linux_slash_to_windows'))
+{	
 	function linux_slash_to_windows($string)
 	{
 		$string = str_replace('/', '\\', $string . '\\');
 		$string = substr($string, 0, strlen($string)-1);
 		return $string;
 	}
+}
