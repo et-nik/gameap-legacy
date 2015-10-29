@@ -26,6 +26,11 @@
 
 /**
  * Замена шоткодов в команде
+ * 
+ * @param string
+ * @param array
+ * 
+ * @return array
 */
 if ( ! function_exists('replace_shotcodes'))
 {
@@ -113,6 +118,12 @@ if ( ! function_exists('replace_shotcodes'))
 /**
  * Соединяется с выделенным сервером, производит авторизацию
  * и отправляет заданную команду
+ * 
+ * @param string or array
+ * @param array
+ * @param bool
+ * 
+ * @return string
 */
 if ( ! function_exists('send_command'))
 {
@@ -147,6 +158,8 @@ if ( ! function_exists('send_command'))
 
 /**
  * Список отправленных команд на выделенный сервер
+ * 
+ * @return array
 */
 if ( ! function_exists('get_sended_commands'))
 {
@@ -161,6 +174,8 @@ if ( ! function_exists('get_sended_commands'))
 
 /**
  * Последняя отправленная команда на выделенный сервер
+ * 
+ * @return array
 */
 if ( ! function_exists('get_last_command'))
 {
@@ -175,6 +190,9 @@ if ( ! function_exists('get_last_command'))
 
 /**
  * Получение названия протокола передачи данных
+ * 
+ * @param array
+ * @return string
  */
 if ( ! function_exists('get_file_protocol'))
 {
@@ -198,6 +216,9 @@ if ( ! function_exists('get_file_protocol'))
 
 /**
  * Получение данных для соединения с sftp, ftp
+ * 
+ * @param array
+ * @return array
  */
 if ( ! function_exists('get_file_protocol_config'))
 {
@@ -255,6 +276,11 @@ if ( ! function_exists('get_file_protocol_config'))
  * Чтение файла на удаленном сервере
  * Функция хорошо подходит лишь для единоразового чтения, т.к. 
  * при каждом выполнении производит соединение
+ * 
+ * @param string
+ * @param array
+ * 
+ * @return bool
 */
 if ( ! function_exists('read_ds_file'))
 {
@@ -279,6 +305,12 @@ if ( ! function_exists('read_ds_file'))
  * Запись файла на удаленном сервере
  * Функция хорошо подходит лишь для единоразовой записи, т.к. 
  * при каждом выполнении производит соединение
+ * 
+ * @param string
+ * @param string
+ * @param array
+ * 
+ * @return bool
 */
 if ( ! function_exists('write_ds_file'))
 {
@@ -354,6 +386,13 @@ if ( ! function_exists('get_ds_file_path'))
 
 /**
  * Список файлов
+ * 
+ * @param string	директория
+ * @param array		данные сервера
+ * @param bool		полная информация о файлах (размер, привилегии)
+ * @param array		массив с расширениями		
+ * 
+ * @return array
 */
 if ( ! function_exists('list_ds_files'))
 {
@@ -381,6 +420,16 @@ if ( ! function_exists('list_ds_files'))
 }
 
 // -----------------------------------------------------------------
+
+/**
+ * Конвертирует linux слеши в windows
+ * 
+ * echo linux_slash_to_windows('C:/Windows/system32'); // C:\Windows\system32
+ * echo linux_slash_to_windows('C:/Windows/system32/'); // C:\Windows\system32
+ * 
+ * @param string
+ * @return string
+ */
 if ( ! function_exists('linux_slash_to_windows'))
 {	
 	function linux_slash_to_windows($string)
