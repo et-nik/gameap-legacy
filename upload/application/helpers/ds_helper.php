@@ -439,3 +439,47 @@ if ( ! function_exists('linux_slash_to_windows'))
 		return $string;
 	}
 }
+
+// -----------------------------------------------------------------
+
+/**
+ * Проверяет наличие файла на ftp, sftp, http или https сервере
+ * 
+ * exist_remote_file('https://example.com/file.zip');
+ * exist_remote_file('ftp://user:password@example.com/file.zip');
+ * 
+ * @param string
+ * @return bool
+ */
+if ( ! function_exists('remote_file_exists'))
+{	
+	function remote_file_exists($file = '')
+	{
+		$expl 		= explode("://", $file);
+		$protocol 	= strtolower($expl[0]);
+		
+		$cl = curl_init($file);
+		curl_setopt($cl, CURLOPT_NOBODY, true);
+		curl_setopt($cl,CURLOPT_RETURNTRANSFER,true);
+		curl_exec($cl);
+		
+		switch ($protocol) {
+			case 'ftp':
+			case 'sftp':
+				$retcode = curl_getinfo($cl, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+				$result = ($retcode != -1);
+				break;
+			
+			case 'http':
+			case 'https':
+			default:
+				$retcode = curl_getinfo($cl, CURLINFO_HTTP_CODE);
+				$result = ($retcode == 200);
+				break;
+		}
+		
+		curl_close($cl); 
+		
+		return $result;
+	}
+}
