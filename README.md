@@ -1,8 +1,8 @@
 GameAP
 ======
-
 A free web-panel, allows you manage your GoldSRC and Source servers easy. You can startup/stop/restart server and edit or view any servers files and much more. Its works on Linux and Windows OS.
 
+Build Status: [![Build Status](https://travis-ci.org/ET-NiK/GameAP.svg?branch=master)](https://travis-ci.org/ET-NiK/GameAP)
 
 Server Requirements
 ======
