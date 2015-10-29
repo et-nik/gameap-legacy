@@ -9,6 +9,16 @@ class Ds_helper_test extends CIUnit_TestCase
     {
         $this->CI->load->helper('ds');
     }
+    
+    private _get_ds_file_path($server = array())
+	{
+		return get_ds_file_path($server);
+	}
+
+    private _get_file_protocol($server = array())
+	{
+		return get_file_protocol($server);
+	}
 
     public function test_replace_shotcodes()
     {
@@ -55,61 +65,61 @@ class Ds_helper_test extends CIUnit_TestCase
 
     public function test_get_file_protocol()
     {
-		$this->assertEquals('ftp', get_file_protocol(array('ftp_host' => 'localhost')));
-		$this->assertEquals('sftp', get_file_protocol(array('ssh_host' => 'localhost')));
-		$this->assertEquals('gdaemon', get_file_protocol(array('gdaemon_host' => 'localhost')));
-		$this->assertEquals('local', get_file_protocol(array('local_server' => 1)));
+		$this->assertEquals('ftp', $this->_get_file_protocol(array('ftp_host' => 'localhost')));
+		$this->assertEquals('sftp', $this->_get_file_protocol(array('ssh_host' => 'localhost')));
+		$this->assertEquals('gdaemon', $this->_get_file_protocol(array('gdaemon_host' => 'localhost')));
+		$this->assertEquals('local', $this->_get_file_protocol(array('local_server' => 1)));
 		
-		$this->assertEquals('ftp', get_file_protocol(array('ftp_host' => 'localhost', 'ssh_host' => 'localhost')));
-		$this->assertEquals('sftp', get_file_protocol(array('ssh_host' => 'localhost', 'gdaemon_host' => 'localhost')));
-		$this->assertEquals('gdaemon', get_file_protocol(array('gdaemon_host' => 'localhost', 'local_server' => 1)));
+		$this->assertEquals('ftp', $this->_get_file_protocol(array('ftp_host' => 'localhost', 'ssh_host' => 'localhost')));
+		$this->assertEquals('sftp', $this->_get_file_protocol(array('ssh_host' => 'localhost', 'gdaemon_host' => 'localhost')));
+		$this->assertEquals('gdaemon', $this->_get_file_protocol(array('gdaemon_host' => 'localhost', 'local_server' => 1)));
 	}
 	
 	public function test_get_ds_file_path()
 	{
-		$this->assertEquals('/home/serv01/cstrike/', get_ds_file_path(array(
+		$this->assertEquals('/home/serv01/cstrike/', $this->_get_ds_file_path(array(
 			'ftp_host' 	=> 'localhost',
 			'ftp_path' 	=> '/home/serv01',
 			'dir' 		=> 'cstrike',
 		)));
 		
-		$this->assertEquals('/home/serv01/cstrike', get_ds_file_path(array(
+		$this->assertEquals('/home/serv01/cstrike', $this->_get_ds_file_path(array(
 			'ftp_host' 	=> 'localhost',
 			'ftp_path' 	=> '/home/serv01//',
 			'dir' 		=> '/cstrike/',
 		)));
 		
-		$this->assertEquals('/home/serv01/cstrike/', get_ds_file_path(array(
+		$this->assertEquals('/home/serv01/cstrike/', $this->_get_ds_file_path(array(
 			'ssh_host' 	=> 'localhost',
 			'ssh_path' 	=> '/home/serv01',
 			'dir' 		=> 'cstrike',
 		)));
 		
-		$this->assertEquals('/home/serv01/cstrike', get_ds_file_path(array(
+		$this->assertEquals('/home/serv01/cstrike', $this->_get_ds_file_path(array(
 			'ssh_host' 	=> 'localhost',
 			'ssh_path' 	=> '/home/serv01//',
 			'dir' 		=> '/cstrike/',
 		)));
 		
-		$this->assertEquals('/home/serv01/cstrike/', get_ds_file_path(array(
+		$this->assertEquals('/home/serv01/cstrike/', $this->_get_ds_file_path(array(
 			'gdaemon_host' 	=> 'localhost',
 			'script_path' 	=> '/home/serv01',
 			'dir' 		=> 'cstrike',
 		)));
 		
-		$this->assertEquals('/home/serv01/cstrike', get_ds_file_path(array(
+		$this->assertEquals('/home/serv01/cstrike', $this->_get_ds_file_path(array(
 			'gdaemon_host' 	=> 'localhost',
 			'script_path' 	=> '/home/serv01//',
 			'dir' 		=> '/cstrike/',
 		)));
 		
-		$this->assertEquals('/home/serv01/cstrike/', get_ds_file_path(array(
+		$this->assertEquals('/home/serv01/cstrike/', $this->_get_ds_file_path(array(
 			'local_server' => 1,
 			'script_path' 	=> '/home/serv01',
 			'dir' 		=> 'cstrike',
 		)));
 		
-		$this->assertEquals('/home/serv01/cstrike', get_ds_file_path(array(
+		$this->assertEquals('/home/serv01/cstrike', $this->_get_ds_file_path(array(
 			'local_server' => 1,
 			'script_path' 	=> '/home/serv01//',
 			'dir' 		=> '/cstrike/',
