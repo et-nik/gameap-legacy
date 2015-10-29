@@ -125,4 +125,13 @@ class Ds_helper_test extends CIUnit_TestCase
 			'dir' 		=> '/cstrike/',
 		)));
 	}
+	
+	public function test_remote_file_exists()
+	{
+		$this->assertTrue(remote_file_exists('http://mirror.yandex.ru/debian/README'));
+		$this->assertFalse(remote_file_exists('http://mirror.yandex.ru/debian/README_NOT_FOUND'));
+		
+		$this->assertTrue(remote_file_exists('ftp://mirror.yandex.ru/debian/README'));
+		$this->assertFalse(remote_file_exists('ftp://mirror.yandex.ru/debian/README_NOT_FOUND'));
+	}
 }
