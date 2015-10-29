@@ -10,12 +10,12 @@ class Ds_helper_test extends CIUnit_TestCase
         $this->CI->load->helper('ds');
     }
     
-    private _get_ds_file_path($server = array())
+    private function _get_ds_file_path($server = array())
 	{
 		return get_ds_file_path($server);
 	}
 
-    private _get_file_protocol($server = array())
+    private function _get_file_protocol($server = array())
 	{
 		return get_file_protocol($server);
 	}
