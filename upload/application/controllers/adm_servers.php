@@ -2049,6 +2049,12 @@ class Adm_servers extends CI_Controller {
 					$sql_data['local_repository'] 	= $this->input->post('local_repository');
 					$sql_data['remote_repository'] 	= $this->input->post('remote_repository');
 					
+					// Проверка наличия файла в удалённом репозитории
+					if (!remote_file_exists($sql_data['remote_repository'])) {
+						$this->_show_message('adm_servers_rep_file_not_exists');
+						return false;
+					}
+					
 					// Проверяем наличие Query класса
 					if (!file_exists(APPPATH . 'libraries/gameq/protocols/' . strtolower($sql_data['engine']) . '.php')) {
 						$this->_show_message('adm_servers_unknown_engine');
@@ -2099,6 +2105,12 @@ class Adm_servers extends CI_Controller {
 					
 					$sql_data['local_repository'] 	= $this->input->post('local_repository');
 					$sql_data['remote_repository'] 	= $this->input->post('remote_repository');
+					
+					// Проверка наличия файла в удалённом репозитории
+					if (!remote_file_exists($sql_data['remote_repository'])) {
+						$this->_show_message('adm_servers_rep_file_not_exists');
+						return false;
+					}
 					
 					/*
 					 * ----------------------------
