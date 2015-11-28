@@ -108,7 +108,7 @@ function server_status()
 		return;
 	fi
 
-	if [[ $(ps aux | grep -v grep | grep -i screen | grep -i $SNAME) != "" ]]
+	if [[ `sudo su $USER -c "screen -ls |grep $SNAME"` ]]
 		then
 		echo 1;
     else
@@ -120,11 +120,11 @@ function server_status()
 # Получение частей команд
 function get_parts()
 {
-	if [[ $RAM_LIMIT && $allow_ram_limit ]]; then
+	if [[ $RAM_LIMIT > 0 && $allow_ram_limit ]]; then
 		COMMAND_PARTS[0]="ulimit -Hv $RAM_LIMIT ;";
 	fi
 	
-	if [[ $NET_LIMIT && $allow_net_limit ]]; then
+	if [[ $NET_LIMIT > 0 && $allow_net_limit ]]; then
 		COMMAND_PARTS[1]="trickle -d $NET_LIMIT -u $NET_LIMIT";
 	fi
 }
@@ -145,7 +145,7 @@ function cpu_limit()
 }
 
 # Получение опций
-while getopts "t:d:n:i:p:c:u:m:f:s:" opt ;
+while getopts 't:d:n:i:p:c:u:m:f:s:' opt ;
 do
 	case $opt in
 		t)
@@ -219,8 +219,8 @@ case "$TYPE" in
 		;;
 		
 	restart)
-		get_parts;
-		server_stop;
+		get_parts >> /dev/null
+		server_stop >> /dev/null
 		
 		if [ "$(server_start)" == "Server started" ] ;
 			then
