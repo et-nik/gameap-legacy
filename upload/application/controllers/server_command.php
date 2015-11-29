@@ -71,6 +71,7 @@ class Server_command extends CI_Controller {
 		
 		foreach ($players_list as &$player) {
 			if ($player['user_id'] == $player_id) {
+				$this->rcon->disconnect();
 				return $player;
 			}
 		}
@@ -618,16 +619,17 @@ class Server_command extends CI_Controller {
 									$message = lang('server_command_cmd_sended');
 									break;
 							}
+							
+							$this->rcon->disconnect();
 								
+							if(trim($rcon_string) != '') {
+								$rcon_string = str_replace("\n", "<br />", $rcon_string);
+								$rcon_string = str_replace("\r", "<br />", $rcon_string);
 								
-								if(trim($rcon_string) != '') {
-									$rcon_string = str_replace("\n", "<br />", $rcon_string);
-									$rcon_string = str_replace("\r", "<br />", $rcon_string);
-									
-									//$rcon_string = iconv('windows-1251', 'UTF-8', $rcon_string);
-									
-									$message .= '<p align="left"><strong>' . lang('server_command_answer') . ':</strong> <code>' . $rcon_string . '</code></p>';
-								}
+								//$rcon_string = iconv('windows-1251', 'UTF-8', $rcon_string);
+								
+								$message .= '<p align="left"><strong>' . lang('server_command_answer') . ':</strong> <code>' . $rcon_string . '</code></p>';
+							}
 								
 							// Получаем команду без параметров, для логов
 							$rcommand = explode(' ', $rcon_command);
