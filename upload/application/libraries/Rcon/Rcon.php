@@ -58,19 +58,36 @@ class Rcon extends CI_Driver_Library {
 	/**
 	 * Соединение с сервером
 	 * 
+	 * @return bool
 	*/
 	public function connect()
 	{
-		$engine = $this->engine;
-		
 		if (false == in_array('rcon_' . $this->engine, $this->valid_drivers)) {
 			$this->errors = 'Driver' . $this->engine . ' not found';
 			return false;
 		}
 		
-		$this->rcon_connect = $this->$engine->connect();
+		$this->rcon_connect = $this->{$this->engine}->connect();
 		
 		return (bool)$this->rcon_connect;
+	}
+	
+	// ----------------------------------------------------------------
+	
+	/**
+	 * Отключение от сервера
+	 * 
+	 * @return null
+	 */
+	public function disconnect()
+	{
+		if (!$this->engine) {
+			return;
+		}
+		
+		if (method_exists($this->{$this->engine}, 'disconnect')) {
+			$this->{$this->engine}->disconnect();
+		}
 	}
 	
 	// ----------------------------------------------------------------

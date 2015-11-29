@@ -9,6 +9,11 @@ class Rcon_rust extends CI_Driver {
 	{
 		return $this->CI->rcon->source->connect();
     }
+    
+    function disconnect() 
+	{
+		$this->CI->rcon->source->disconnect();
+    }
 
 	function command($command) 
 	{
