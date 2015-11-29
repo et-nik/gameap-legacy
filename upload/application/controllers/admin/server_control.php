@@ -262,7 +262,7 @@ class Server_control extends CI_Controller {
 										$this->servers->servers->server_data['engine'],
 										$this->servers->servers->server_data['engine_version']
 			);
-			
+
 			$rcon_connect = $this->rcon->connect();
 			
 		} else {
@@ -275,7 +275,7 @@ class Server_control extends CI_Controller {
 			$local_tpl['users_list'] 	= array();
 			$local_tpl['players_list'] = array();
 			
-			if($users_list = $this->rcon->get_players()){
+			if ($users_list = $this->rcon->get_players()){
 				$local_tpl['users_list'] = $users_list;
 				$local_tpl['players_list'] = $users_list;
 			}
@@ -291,6 +291,7 @@ class Server_control extends CI_Controller {
 			$local_tpl['maps_list']	= $this->_get_maps_list();
 			$local_tpl['frcon_list'] 	= $this->_get_frcon_list();
 			$local_tpl['base_cvars'] 	= $this->_get_base_cvars();
+			$this->rcon->connect();
 			
 		} else {
 			// Ошибка соединения с сервером
