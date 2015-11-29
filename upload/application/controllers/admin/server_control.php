@@ -291,7 +291,7 @@ class Server_control extends CI_Controller {
 			$local_tpl['maps_list']	= $this->_get_maps_list();
 			$local_tpl['frcon_list'] 	= $this->_get_frcon_list();
 			$local_tpl['base_cvars'] 	= $this->_get_base_cvars();
-			$this->rcon->connect();
+			$this->rcon->disconnect();
 			
 		} else {
 			// Ошибка соединения с сервером
