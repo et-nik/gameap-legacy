@@ -443,6 +443,27 @@ if ( ! function_exists('linux_slash_to_windows'))
 // -----------------------------------------------------------------
 
 /**
+ * Конвертирует windows слеши в linux
+ * 
+ * echo windows_slash_to_linux('\home\servers'); // /home/servers
+ * echo windows_slash_to_linux('/home\\//servers\\'); // /home/servers
+ * 
+ * @param string
+ * @return string
+ */
+if ( ! function_exists('windows_slash_to_linux'))
+{	
+	function windows_slash_to_linux($string)
+	{
+		$string = str_replace('\\', '/', $string . '/');
+		$string = substr($string, 0, strlen($string)-1);
+		return $string;
+	}
+}
+
+// -----------------------------------------------------------------
+
+/**
  * Проверяет наличие файла на ftp, sftp, http или https сервере
  * 
  * exist_remote_file('https://example.com/file.zip');
