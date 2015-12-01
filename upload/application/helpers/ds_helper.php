@@ -435,6 +435,7 @@ if ( ! function_exists('linux_slash_to_windows'))
 	function linux_slash_to_windows($string)
 	{
 		$string = str_replace('/', '\\', $string . '\\');
+		$string = preg_replace('/\\\\{2,}/si', '\\', $string);
 		$string = substr($string, 0, strlen($string)-1);
 		return $string;
 	}
@@ -456,6 +457,7 @@ if ( ! function_exists('windows_slash_to_linux'))
 	function windows_slash_to_linux($string)
 	{
 		$string = str_replace('\\', '/', $string . '/');
+		$string = preg_replace('/\/{2,}/si', '\/', $string);
 		$string = substr($string, 0, strlen($string)-1);
 		return $string;
 	}
