@@ -145,8 +145,8 @@ class Ds_helper_test extends CIUnit_TestCase
 	
 	public function windows_slash_to_linux()
 	{
-		$this->assertEquals('/home/servers', linux_slash_to_windows('\\home\\servers'));
-		$this->assertEquals('/home/servers', linux_slash_to_windows('\\home\\servers\\'));
-		$this->assertEquals('/home/servers', linux_slash_to_windows('/home//\\servers\\//'));
+		$this->assertEquals('/home/servers', windows_slash_to_linux('\\home\\servers'));
+		$this->assertEquals('/home/servers', windows_slash_to_linux('\\home\\servers\\'));
+		$this->assertEquals('/home/servers', windows_slash_to_linux('/home//\\servers\\//'));
 	}
 }
