@@ -135,7 +135,7 @@ class Ds_helper_test extends CIUnit_TestCase
 		$this->assertFalse(remote_file_exists('ftp://mirror.yandex.ru/debian/README_NOT_FOUND'));
 	}
 	
-	public function linux_slash_to_windows()
+	public function test_linux_slash_to_windows()
 	{
 		$this->assertEquals('C:\\servers', linux_slash_to_windows('C:/servers'));
 		$this->assertEquals('C:\\servers', linux_slash_to_windows('C:/servers/'));
@@ -143,7 +143,7 @@ class Ds_helper_test extends CIUnit_TestCase
 		$this->assertEquals('C:\\servers', linux_slash_to_windows('C:///servers\\//'));
 	}
 	
-	public function windows_slash_to_linux()
+	public function test_windows_slash_to_linux()
 	{
 		$this->assertEquals('/home/servers', windows_slash_to_linux('\\home\\servers'));
 		$this->assertEquals('/home/servers', windows_slash_to_linux('\\home\\servers\\'));
