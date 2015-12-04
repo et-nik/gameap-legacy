@@ -328,7 +328,10 @@ class Users extends CI_Model {
     /**
      * Получает данные пользователя
      * 
-     * @param int   id пользователя
+     * $this->users->get_user_data(48);
+     * $this->users->get_user_data(array('login' => 'gameap'));
+     * 
+     * @param int|array   id пользователя|массив с условиями
      * @return array
     */
     function get_user_data($user_id = false)
