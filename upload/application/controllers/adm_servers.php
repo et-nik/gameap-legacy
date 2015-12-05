@@ -1374,12 +1374,12 @@ class Adm_servers extends CI_Controller {
 				$this->form_validation->set_rules('cpu', 'CPU', 'trim|max_length[64]|xss_clean');
 				
 				// Скрипты
-				$this->form_validation->set_rules('script_start', lang('adm_servers_command_start'), 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_stop', lang('adm_servers_command_stop'), 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_restart', lang('adm_servers_command_restart'), 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_status', lang('adm_servers_command_status'), 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_get_console', lang('adm_servers_command_get_console'), 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_send_command', lang('adm_servers_send_command'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('script_start', lang('adm_servers_command_start'), 'trim|max_length[512]|xss_clean');
+				$this->form_validation->set_rules('script_stop', lang('adm_servers_command_stop'), 'trim|max_length[512]|xss_clean');
+				$this->form_validation->set_rules('script_restart', lang('adm_servers_command_restart'), 'trim|max_length[512]|xss_clean');
+				$this->form_validation->set_rules('script_status', lang('adm_servers_command_status'), 'trim|max_length[512]|xss_clean');
+				$this->form_validation->set_rules('script_get_console', lang('adm_servers_command_get_console'), 'trim|max_length[512]|xss_clean');
+				$this->form_validation->set_rules('script_send_command', lang('adm_servers_send_command'), 'trim|max_length[512]|xss_clean');
 
 				// Редактирование данных доступа к серверу (пароли ftp, ssh)
 				$this->form_validation->set_rules('steamcmd_path', lang('adm_servers_steamcmd_path'), 'trim|max_length[256]|xss_clean');
@@ -1642,7 +1642,7 @@ class Adm_servers extends CI_Controller {
 				
 				$this->form_validation->set_rules('screen_name', lang('adm_servers_screen_name'), 'trim|max_length[64]|xss_clean');
 				$this->form_validation->set_rules('su_user', lang('adm_servers_user_start'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('start_command', lang('adm_servers_command_start'), 'trim|max_length[512]|xss_clean');
+				$this->form_validation->set_rules('start_command', lang('adm_servers_command_start'), 'trim|max_length[1024]|xss_clean');
 				
 				$this->form_validation->set_rules('cpu_limit', lang('adm_servers_cpu_limit'), 'trim|integer|less_than[100]|xss_clean');
 				$this->form_validation->set_rules('ram_limit', lang('adm_servers_ram_limit'), 'trim|integer|xss_clean');
@@ -2474,6 +2474,35 @@ class Adm_servers extends CI_Controller {
 		}
 		
 		$this->parser->parse('main.html', $this->tpl_data);
+	}
+	
+	// -----------------------------------------------------------------
+	
+	/**
+	 * Быстрое примерение фильтров списка серверов на машине.
+	 * 
+	 * @param int
+	 */
+	function filter_ds_servers($ds_id = 0)
+	{
+		if (!$ds_id) {
+			redirect('admin');
+		}
+		
+		if (!$this->dedicated_servers->get_ds_list(array('id' => $ds_id), 1)) {
+			redirect('admin');
+		}
+		
+		$this->servers->select_fields('id, server_ip');
+		$game_servers = $this->servers->get_game_servers_list(array('ds_id' => $ds_id));
+		
+		$filter = array('ip' => array());
+		foreach ($game_servers as &$gserv) {
+			$filter['ip'][] = $gserv['server_ip'];
+		}
+		
+		$this->users->update_filter('servers_list', $filter);
+		redirect('admin');
 	}
 	
 	// -----------------------------------------------------------------
