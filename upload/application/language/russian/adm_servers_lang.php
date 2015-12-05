@@ -234,4 +234,9 @@ $lang['adm_servers_gdaemon_data']					= 'Данные GameAP Daemon';
 $lang['adm_servers_gdaemon_host']					= 'Хост (IP:порт)';
 $lang['adm_servers_gdaemon_key']					= 'Ключ GDaemon';
 
+// 1.0.1
 $lang['adm_servers_gdaemon_data_unavailable']		= 'GDaemon данные неверны. Проверьте правильность заполненных данных.';
+$lang['adm_servers_rep_file_not_exists']			= 'Файл не найдён в удалённом репозитории';
+
+// 1.1
+$lang['adm_servers_apply_ds_filter']				= 'Применить фильтр с игровыми серверами';
