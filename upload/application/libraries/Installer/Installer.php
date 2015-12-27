@@ -50,7 +50,7 @@ class Installer extends CI_Driver_Library {
         $this->_CI->load->helper('patterns_helper');
         $this->_CI->load->helper('string');
         $this->_CI->load->helper('ds');
-        $this->valid_drivers = array('installer_goldsource', 'installer_source', 'installer_minecraft', 'installer_cod4',
+        $this->valid_drivers = array('installer_goldsource', 'installer_source', 'installer_hurtworld' , 'installer_minecraft', 'installer_cod4',
 										'installer_mta', 'installer_samp', 'installer_rust', 'installer_teamspeak3',
 									);
     }
