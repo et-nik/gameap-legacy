@@ -2050,7 +2050,7 @@ class Adm_servers extends CI_Controller {
 					$sql_data['remote_repository'] 	= $this->input->post('remote_repository');
 					
 					// Проверка наличия файла в удалённом репозитории
-					if (!remote_file_exists($sql_data['remote_repository'])) {
+					if ($sql_data['remote_repository'] != "" && !remote_file_exists($sql_data['remote_repository'])) {
 						$this->_show_message('adm_servers_rep_file_not_exists');
 						return false;
 					}
@@ -2107,7 +2107,7 @@ class Adm_servers extends CI_Controller {
 					$sql_data['remote_repository'] 	= $this->input->post('remote_repository');
 					
 					// Проверка наличия файла в удалённом репозитории
-					if (!remote_file_exists($sql_data['remote_repository'])) {
+					if ($sql_data['remote_repository'] != "" && !remote_file_exists($sql_data['remote_repository'])) {
 						$this->_show_message('adm_servers_rep_file_not_exists');
 						return false;
 					}
