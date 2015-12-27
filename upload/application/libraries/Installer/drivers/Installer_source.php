@@ -31,6 +31,9 @@ class Installer_source extends CI_Driver {
 	
 	/**
 	 * Список стандартных карт
+	 * 
+	 * @param string		код игры
+	 * @return string		карта
 	*/
 	private function _get_default_map($game_code = 'cstrike')
 	{
@@ -47,7 +50,7 @@ class Installer_source extends CI_Driver {
 						'tf'		=> 'ctf_2fort',
 		);
 		
-		return $default_maps[$game_code];
+		return in_array($game_code, $default_maps) ? $default_maps[$game_code] : "";
 	}
 	
 	// -----------------------------------------------------------------
