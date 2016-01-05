@@ -1471,21 +1471,38 @@ class Cron extends MX_Controller {
 				if($this->servers->server_settings['SERVER_AUTOSTART']) {
 
 					// Проверка статуса сервера
-					$status = $this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['query_port'], $this->servers_data[$server_id]['engine'], $this->servers_data[$server_id]['engine_version']);
+					$status = $this->servers->server_status(
+						$this->servers_data[$server_id]['server_ip'], 
+						$this->servers_data[$server_id]['query_port'], 
+						$this->servers_data[$server_id]['engine'], 
+						$this->servers_data[$server_id]['engine_version']
+					);
 					
 					/* Повторная проверка, контрольная.
 					 * Бывали случаи, что сервер перезагружался, даже если нормально работал */
 					if (!$status) {
 						sleep(3);
-						$status = $this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['query_port'], $this->servers_data[$server_id]['engine'], $this->servers_data[$server_id]['engine_version']);
+						$status = $this->servers->server_status(
+							$this->servers_data[$server_id]['server_ip'], 
+							$this->servers_data[$server_id]['query_port'], 
+							$this->servers_data[$server_id]['engine'], 
+							$this->servers_data[$server_id]['engine_version']
+						);
 					}
 					
 					if(!$status) {
 						/* Смотрим данные предыдущих проверок, если сервер был в оффе, то запускаем его */
 
 						/* Получение данных проверки крона из логов */
-						$where = array('date >=' => now() - 780,  'type' => 'cron_check', 'command' => 'server_status', 'server_id' => $server_id, 'log_data' => 'Server is down');
-						$logs = $this->panel_log->get_log($where); // Логи сервера в админпанели
+						$logs = $this->panel_log->get_log(
+							array(
+								'date >=' => now() - 780,  
+								'type' => 'cron_check', 
+								'command' => 'server_status', 
+								'server_id' => $server_id, 
+								'log_data' => 'Server is down'
+							)
+						);
 
 						$response 		= false;
 						$console_data 	= '';
@@ -1513,7 +1530,7 @@ class Cron extends MX_Controller {
 								$log_data['msg'] = 'Start server failed';
 							}
 
-							if(strpos($response, 'Server is already running') !== false) {
+							if(count($logs) >= 3 && strpos($response, 'Server is already running') !== false) {
 								/* Сервер запущен, видимо завис */
 								try {
 									$response = $this->servers->restart($this->servers_data[$server_id]);
@@ -1635,8 +1652,8 @@ class Cron extends MX_Controller {
 		// Запись информации о времени выполнения операций
 		file_put_contents(APPPATH . 'cache/cron_time.json', json_encode($cron_time));
 		
-		// Удаление логов за последнюю неделю
-		$this->db->delete('logs', array('date <' => now()-604800)); 
+		// Удаление логов за два месяца
+		$this->db->delete('logs', array('date <' => now()-(604800*8))); 
 		
 		$this->_cmd_output("Cron end");
 		
