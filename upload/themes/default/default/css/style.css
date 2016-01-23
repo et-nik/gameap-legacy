@@ -6,6 +6,12 @@ body {
 	background: #F3F3F3;
 }
 
+h1, h2, h3, h4, h5, h6 {
+	font-size: 18px;
+	border: 0;
+	border-bottom: 1px solid #ccc;
+}
+
 #body{
 	margin: 0 15px 0 15px;
 }
