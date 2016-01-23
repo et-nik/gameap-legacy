@@ -55,42 +55,42 @@ class Users extends CI_Model {
 
     /* Все базовые привилегии */
     var $all_user_privileges = array(
-			'srv'					=> '{lang_base_privileges_srv}',					// Привилегии на серверы
-			'srv_global' 			=> '{lang_base_privileges_srv_global}',				// Глобальные серверные права
-			'srv_start' 			=> '{lang_base_privileges_srv_start}',				// Запуск серверов
-			'srv_stop' 				=> '{lang_base_privileges_srv_stop}',				// Остановка серверов
-			'srv_restart' 			=> '{lang_base_privileges_srv_restart}',			// Перезапуск серверов
-			
-			'usr'					=> '{lang_base_privileges_usr}',					// Привилегии на пользователей
-			'usr_create' 			=> '{lang_base_privileges_usr_create}',				// Создание пользователей
-			'usr_edit' 				=> '{lang_base_privileges_usr_edit}',				// Редактирование пользователей
-			'usr_edit_privileges' 	=> '{lang_base_privileges_usr_edit_privileges}',	// Редактирование привилегий пользователей
-			'usr_delete' 			=> '{lang_base_privileges_usr_delete}',				// Удаление пользователей
+		'srv'					=> '{lang_base_privileges_srv}',					// Привилегии на серверы
+		'srv_global' 			=> '{lang_base_privileges_srv_global}',				// Глобальные серверные права
+		'srv_start' 			=> '{lang_base_privileges_srv_start}',				// Запуск серверов
+		'srv_stop' 				=> '{lang_base_privileges_srv_stop}',				// Остановка серверов
+		'srv_restart' 			=> '{lang_base_privileges_srv_restart}',			// Перезапуск серверов
+		
+		'usr'					=> '{lang_base_privileges_usr}',					// Привилегии на пользователей
+		'usr_create' 			=> '{lang_base_privileges_usr_create}',				// Создание пользователей
+		'usr_edit' 				=> '{lang_base_privileges_usr_edit}',				// Редактирование пользователей
+		'usr_edit_privileges' 	=> '{lang_base_privileges_usr_edit_privileges}',	// Редактирование привилегий пользователей
+		'usr_delete' 			=> '{lang_base_privileges_usr_delete}',				// Удаление пользователей
 	);
     
     // Все серверные привилегии
     var $all_privileges = array(
-			'VIEW' 					=> '{lang_servers_privileges_view}',				// Отображение сервера в списке
-            'RCON_SEND' 			=> '{lang_servers_privileges_rcon_send}',			// Отправка ркон команд
-            'CHANGE_RCON' 			=> '{lang_servers_privileges_change_rcon}',			// Смена пароля
-            'FAST_RCON' 			=> '{lang_servers_privileges_fast_rcon}',			// Fast rcon
-            'PLAYERS_KICK' 			=> '{lang_servers_privileges_players_kick}',		// Кик игроков
-            'PLAYERS_BAN' 			=> '{lang_servers_privileges_players_ban}',			// Бан игроков
-            'PLAYERS_CH_NAME' 		=> '{lang_servers_privileges_players_chname}',		// Смена имени игрокам
-            'CHANGE_MAP' 			=> '{lang_servers_privileges_change_map}',			// Смена карты
-            'SERVER_START' 			=> '{lang_servers_privileges_start}',				// Старт сервера
-            'SERVER_STOP' 			=> '{lang_servers_privileges_stop}',				// Остановка сервера
-            'SERVER_RESTART' 		=> '{lang_servers_privileges_restart}',				// Перезапуск сервера
-            'SERVER_SOFT_RESTART' 	=> '{lang_servers_privileges_soft_restart}',		// Мягкий перезапуск
-            'SERVER_CHAT_MSG' 		=> '{lang_servers_privileges_chat_msg}',			// Сообщение в чат
-            'SERVER_SET_PASSWORD' 	=> '{lang_servers_privileges_set_password}',		// Задание пароля на сервер
-            'SERVER_UPDATE' 		=> '{lang_servers_privileges_update}',				// Обновление сервера
-            'SERVER_SETTINGS' 		=> '{lang_servers_privileges_settings}',			// Настройки
-            'CONSOLE_VIEW' 			=> '{lang_servers_privileges_console_view}',		// Просмотр консоли
-            'TASK_MANAGE' 			=> '{lang_servers_privileges_task_manage}',			// Управление заданиями
-            'UPLOAD_CONTENTS' 		=> '{lang_servers_privileges_upload_contents}',		// Загрузка контента
-            'CHANGE_CONFIG'			=> '{lang_servers_privileges_change_config}',		// Редактирование конфигов
-            'LOGS_VIEW' 			=> '{lang_servers_privileges_log_view}',			// Просмотр логов
+		'VIEW' 					=> '{lang_servers_privileges_view}',				// Отображение сервера в списке
+		'RCON_SEND' 			=> '{lang_servers_privileges_rcon_send}',			// Отправка ркон команд
+		'CHANGE_RCON' 			=> '{lang_servers_privileges_change_rcon}',			// Смена пароля
+		'FAST_RCON' 			=> '{lang_servers_privileges_fast_rcon}',			// Fast rcon
+		'PLAYERS_KICK' 			=> '{lang_servers_privileges_players_kick}',		// Кик игроков
+		'PLAYERS_BAN' 			=> '{lang_servers_privileges_players_ban}',			// Бан игроков
+		'PLAYERS_CH_NAME' 		=> '{lang_servers_privileges_players_chname}',		// Смена имени игрокам
+		'CHANGE_MAP' 			=> '{lang_servers_privileges_change_map}',			// Смена карты
+		'SERVER_START' 			=> '{lang_servers_privileges_start}',				// Старт сервера
+		'SERVER_STOP' 			=> '{lang_servers_privileges_stop}',				// Остановка сервера
+		'SERVER_RESTART' 		=> '{lang_servers_privileges_restart}',				// Перезапуск сервера
+		'SERVER_SOFT_RESTART' 	=> '{lang_servers_privileges_soft_restart}',		// Мягкий перезапуск
+		'SERVER_CHAT_MSG' 		=> '{lang_servers_privileges_chat_msg}',			// Сообщение в чат
+		'SERVER_SET_PASSWORD' 	=> '{lang_servers_privileges_set_password}',		// Задание пароля на сервер
+		'SERVER_UPDATE' 		=> '{lang_servers_privileges_update}',				// Обновление сервера
+		'SERVER_SETTINGS' 		=> '{lang_servers_privileges_settings}',			// Настройки
+		'CONSOLE_VIEW' 			=> '{lang_servers_privileges_console_view}',		// Просмотр консоли
+		'TASK_MANAGE' 			=> '{lang_servers_privileges_task_manage}',			// Управление заданиями
+		'UPLOAD_CONTENTS' 		=> '{lang_servers_privileges_upload_contents}',		// Загрузка контента
+		'CHANGE_CONFIG'			=> '{lang_servers_privileges_change_config}',		// Редактирование конфигов
+		'LOGS_VIEW' 			=> '{lang_servers_privileges_log_view}',			// Просмотр логов
     );
      
 	// ----------------------------------------------------------------
