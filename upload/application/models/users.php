@@ -92,7 +92,20 @@ class Users extends CI_Model {
 		'CHANGE_CONFIG'			=> '{lang_servers_privileges_change_config}',		// Редактирование конфигов
 		'LOGS_VIEW' 			=> '{lang_servers_privileges_log_view}',			// Просмотр логов
     );
-     
+    
+    // Группы пользователей
+    var $users_groups = array(
+		1 						=> '{lang_users_group_user}',
+		10 						=> '{lang_users_group_content_manager}',
+		
+		50 						=> '{lang_users_group_support1}',
+		51 						=> '{lang_users_group_support2}',
+		52 						=> '{lang_users_group_support3}',
+		
+		90 						=> '{lang_users_group_server_manager}',
+		100 					=> '{lang_users_group_admin}',
+    );
+    
 	// ----------------------------------------------------------------
 
     function __construct()
