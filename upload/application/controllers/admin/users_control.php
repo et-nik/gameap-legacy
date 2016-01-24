@@ -447,6 +447,10 @@ class Users_control extends CI_Controller {
 			$user_new_data['name'] 		= $this->input->post('name', true);
 			$user_new_data['email'] 	= $this->input->post('email', true);
 			$user_new_data['group'] 	= $this->input->post('group', true);
+			
+			if ($user_new_data['group'] == 100) {
+				$user_new_data['is_admin'] = 1;
+			}
 
 			if ($this->users->update_user($user_new_data, $user_data['id'])) {
 				$log_data['msg'] 			= 'Update user successed';
