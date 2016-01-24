@@ -178,3 +178,4 @@ $lang['size'] 									= 'Size';
 
 /* -- 1.1 -- */
 $lang['group']									= 'Group';
+$lang['reinstall']								= 'Reinstall';
