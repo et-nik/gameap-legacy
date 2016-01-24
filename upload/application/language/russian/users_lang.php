@@ -31,3 +31,13 @@ $lang['users_add_user']												= 'Добавить пользователя'
 $lang['users_list']													= 'Список пользователей';
 $lang['users_base_privileges']										= 'Базовые привилегии';
 $lang['users_servers_privileges']									= 'Привилегии на серверы';
+
+
+// 1.1
+$lang['users_group_user']											= 'Пользователи';
+$lang['users_group_content_manager']								= 'Контент менеджер';
+$lang['users_group_support1']										= 'Тех. поддержка (уровень 1)';
+$lang['users_group_support2']										= 'Тех. поддержка (уровень 2)';
+$lang['users_group_support3']										= 'Тех. поддержка (уровень 3)';
+$lang['users_group_server_manager']									= 'Сервер менеджер';
+$lang['users_group_admin']											= 'Администратор';
