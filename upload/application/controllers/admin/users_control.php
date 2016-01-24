@@ -398,80 +398,80 @@ class Users_control extends CI_Controller {
 			return false;
 		}
 		
-		//Проверка, есть ли права на добавление
-		if (!$this->users->auth_privileges['usr_edit']) {
-				$this->tpl_data['content'] .= lang('users_no_privileges_for_edit');
+		// Проверка, есть ли права на добавление
+		if (! $this->users->auth_privileges['usr_edit']) {
+			$this->_show_message(lang('users_no_privileges_for_edit'));
+			return false;
+		}
+		
+		if (! $user_id) {
+			$this->_show_message(lang('users_empty_id'));
+			return false;
+		}
+		
+		$local_tpl = array();
+
+		/* В целях безопасности, редактировать администратора может только он сам */
+		if ($user_data['is_admin'] && $user_data['id'] != $this->users->auth_id) {
+			$this->_show_message(lang('users_edit_admin_denied'), site_url('admin/users_control'));
+			return false;
+		}
+		
+		$this->load->library('form_validation');
+		
+		$this->form_validation->set_rules('name', lang('name'), 'trim|xss_clean');
+		$this->form_validation->set_rules('email', lang('email'), 'trim|required|valid_email');
+		$this->form_validation->set_rules('new_password', lang('password'), 'trim');
+		$this->form_validation->set_rules('group', lang('group'), 'integer|reqired');
+		
+		if (!$this->form_validation->run()) {
+			
+			if (validation_errors()) {
+				$this->_show_message(validation_errors());
+				return false;
+			}
+			
+			$local_tpl = $this->users->tpl_userdata($user_id, $user_data);
+			$local_tpl['groups_dropdown'] = form_dropdown('group', $this->users->users_groups, $user_data['group']);
+			
+			$this->tpl_data['content'] .= $this->parser->parse('web_users/user_edit.html', $local_tpl, true);
+			
 		} else {
 			
-			if (!$user_id) {
-				$this->_show_message(lang('users_empty_id'));
-				return false;
+			if ($this->input->post('new_password') !== ''){
+				$password_encrypt = $this->input->post('new_password', true);
+				$password_encrypt = hash_password($password_encrypt);
+				$user_new_data['password'] = $password_encrypt;
 			}
 			
-			$local_tpl = array();
+			$user_new_data['name'] 		= $this->input->post('name', true);
+			$user_new_data['email'] 	= $this->input->post('email', true);
+			$user_new_data['group'] 	= $this->input->post('group', true);
 
-			/* В целях безопасности, редактировать администратора может только он сам */
-			if ($user_data['is_admin'] && $user_data['id'] != $this->users->auth_id) {
-				$this->_show_message(lang('users_edit_admin_denied'), site_url('admin/users_control'));
-				return false;
+			if ($this->users->update_user($user_new_data, $user_data['id'])) {
+				$log_data['msg'] 			= 'Update user successed';
+				$this->_show_message(lang('users_usr_data_saved'), site_url('admin/users_control'), lang('users_back_to_users'));
+			} else {
+				$log_data['msg'] 			= 'Update user failed';
+				$this->_show_message('Error');
 			}
 			
-			if(!$this->input->post('user_edit_submit')){
-				$local_tpl = $this->users->tpl_userdata($user_id, $user_data);
-				$this->tpl_data['content'] .= $this->parser->parse('web_users/user_edit.html', $local_tpl, true);
-			}else{
-				$this->load->library('form_validation');
-				
-				$this->form_validation->set_rules('name', 'Имя', 'trim|xss_clean');
-				$this->form_validation->set_rules('email', 'E-Mail', 'trim|required|valid_email');
-				$this->form_validation->set_rules('new_password', 'Пароль', 'trim');
-				
-				if (!$this->form_validation->run()){
+			// Записываем логи
+			$log_data['type'] 			= 'users_control';
+			$log_data['command'] 		= 'edit_user';
+			$log_data['server_id'] 		= 0;
+			$log_data['user_name'] 		= $this->users->auth_login;
+			
+			$log_data['log_data'] 		= 'UserID: ' . $user_id 
+											. ' UserName: ' . $user_data['login'] 
+											. ' AdminID: ' . $this->users->auth_id 
+											. ' AdminName: ' . $this->users->auth_login;
+											
+			$this->panel_log->save_log($log_data);
 					
-					if (validation_errors()) {
-						$this->_show_message(validation_errors());
-						return false;
-					}
-					
-					$this->tpl_data['content'] .= '<p>' . lang('users_form_unavailable') . '</p>';
-				}else{
-					
-					if($this->input->post('new_password') !== ''){
-						
-						$password_encrypt = $this->input->post('new_password', true);
-						$password_encrypt = hash_password($password_encrypt);
-						$user_new_data['password'] = $password_encrypt;
-					}
-					
-					$user_new_data['name'] = $this->input->post('name', true);
-					$user_new_data['email'] = $this->input->post('email', true);
-
-					if ($this->users->update_user($user_new_data, $user_data['id'])) {
-						$log_data['msg'] 			= 'Update user successed';
-						$this->_show_message(lang('users_usr_data_saved'), site_url('admin/users_control'), lang('users_back_to_users'));
-					} else {
-						$log_data['msg'] 			= 'Update user failed';
-						$this->_show_message('Error');
-					}
-					
-					// Записываем логи
-					$log_data['type'] 			= 'users_control';
-					$log_data['command'] 		= 'edit_user';
-					$log_data['server_id'] 		= 0;
-					$log_data['user_name'] 		= $this->users->auth_login;
-					
-					$log_data['log_data'] 		= 'UserID: ' . $user_id 
-													. ' UserName: ' . $user_data['login'] 
-													. ' AdminID: ' . $this->users->auth_id 
-													. ' AdminName: ' . $this->users->auth_login;
-													
-					$this->panel_log->save_log($log_data);
-							
-					return true;
-				}
-			}
+			return true;
 		}
-            
+
         $this->parser->parse('main.html', $this->tpl_data);
     }
     
