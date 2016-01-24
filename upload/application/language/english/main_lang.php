@@ -175,3 +175,6 @@ $lang['default_value']							= 'Default';
 
 $lang['close']									= 'Close';
 $lang['size'] 									= 'Size';
+
+/* -- 1.1 -- */
+$lang['group']									= 'Group';

@@ -31,3 +31,12 @@ $lang['users_add_user']												= 'Add new user';
 $lang['users_list']													= 'Users';
 $lang['users_base_privileges']										= 'Base privileges';
 $lang['users_servers_privileges']									= 'Server privileges';
+
+// 1.1
+$lang['users_group_user']											= 'Users';
+$lang['users_group_content_manager']								= 'Content manager';
+$lang['users_group_support1']										= 'Support (level 1)';
+$lang['users_group_support2']										= 'Support (level 2)';
+$lang['users_group_support3']										= 'Support (level 3)';
+$lang['users_group_server_manager']									= 'Server manager';
+$lang['users_group_admin']											= 'Administrator';
