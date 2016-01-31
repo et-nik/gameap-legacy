@@ -267,7 +267,7 @@ class Files_local extends CI_Driver {
 			$return_list[] = array('file_name' => basename($file),
 									'file_time' => $file_stat['mtime'],
 									'file_size' => $file_stat['size'],
-									'type' => is_dir($dir . '/' . $file) ? 'd' : 'f',
+									'type' => is_dir($path . '/' . $file) ? 'd' : 'f',
 			);
 		}
 
