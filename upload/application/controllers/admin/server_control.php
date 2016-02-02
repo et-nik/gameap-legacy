@@ -217,6 +217,92 @@ class Server_control extends CI_Controller {
 		return $tpl_data;
 	}
 
+    // -----------------------------------------------------------------
+
+    private function _get_modules_menu()
+    {
+        $this->load->driver('cache');
+        $this->load->helper('directory');
+
+        $modules_menu = array();
+
+        if (!$menu = $this->_load_menu_from_cache()) {
+            $menu = array();
+            if ($map = directory_map(APPPATH . 'modules')) {
+                foreach($map as $key => $value) {
+                    if (!is_array($value)) {
+                        /* Это файл */
+                        continue;
+                    }
+                    
+                    if (!is_dir(APPPATH . 'modules/' . $key)) {
+                        /* Это не директория */
+                        continue;
+                    }
+
+                    if (file_exists(APPPATH . 'modules/' . $key . '/menu.json')) {
+                        $menu[$key] = json_decode(file_get_contents(APPPATH . 'modules/' . $key . '/menu.json'), true);
+
+                        if (!$menu[$key]) {
+                            unset($menu[$key]);
+                        }
+                        
+                    }
+                }
+            }
+
+            $this->_save_menu_to_cache($menu);
+        }
+        
+        foreach ($menu as &$array) {
+            if (isset($array['servers_control'])) {
+                foreach ($array['servers_control'] as &$menu_item) {
+                    if ($this->users->auth_data['group'] < $menu_item['group']) {
+                        continue;
+                    }
+                    
+                    $modules_menu[] = [
+                        'modules_menu_icon' => $menu_item['icon'],
+                        'modules_menu_link' => $menu_item['link'],
+                        'modules_menu_text' => $menu_item['text'],
+                    ];
+                }
+            }
+        }
+        
+        return $modules_menu;
+    }
+
+    //------------------------------------------------------------------
+
+    private function _load_menu_from_cache()
+    {
+        if ($this->cache->is_supported('memcached')) {
+            return $this->cache->memcached->get('servers_menu');
+        }
+        elseif ($this->cache->is_supported('apc')) {
+            return $this->cache->apc->get('servers_menu');
+        }
+        else {
+            return $this->cache->file->get('servers_menu');
+        }
+    }
+
+    // -----------------------------------------------------------------
+
+    private function _save_menu_to_cache($menu_list = array())
+    {
+        if ($this->cache->is_supported('memcached')) {
+            return $this->cache->memcached->save('servers_menu', $menu_list, 86400);
+        }
+        elseif ($this->cache->is_supported('apc')) {
+            return $this->cache->apc->save('servers_menu', $menu_list, 86400);
+        }
+        else {
+            return $this->cache->file->save('servers_menu', $menu_list, 86400);
+        }
+    }
+    
     //--------------------------------------------------------------------------
 	
 	/**
@@ -249,6 +335,9 @@ class Server_control extends CI_Controller {
 			$this->_show_message(lang('server_control_server_not_found'));
 			return false;
 		}
+
+        // Menu
+        $local_tpl['modules_menu'] = $this->_get_modules_menu();
 
 		$rcon_connect = false;
 		
