@@ -262,8 +262,8 @@ class Server_control extends CI_Controller {
                     }
                     
                     $modules_menu[] = [
-                        'modules_menu_icon' => $menu_item['icon'],
-                        'modules_menu_link' => $menu_item['link'],
+                        'modules_menu_icon' => base_url($menu_item['icon']),
+                        'modules_menu_link' => site_url($menu_item['link']),
                         'modules_menu_text' => $menu_item['text'],
                     ];
                 }
