@@ -1580,45 +1580,47 @@ class Cron extends MX_Controller {
 			/*==================================================*/
 			/*    	СТАТИСТИКА ВЫДЕЛЕННОГО СЕРВЕРА  			*/
 			/*==================================================*/
-			$this->_cmd_output("--Get Stats");
-		
-			// Статистика выполняется не чаще 1 раза в 30 минут
-			
-			if ((now()-1800) > $cron_time['stats']) {
-				if (!$stats = $this->_stats_processing($ds)) {
-					$this->_cmd_output('---Stats server #' . $ds['id'] . ' failed');
-					continue;
-				}
-				
-				if(isset($stats['cpu_usage']) && isset($stats['memory_usage'])) {
-					$this->_cmd_output('---Stats server #' . $ds['id'] . ' successful');
-				} else {
-					$this->_cmd_output('---Stats server #' . $ds['id'] . ' failed');
-					continue;
-				}
+            if (!$this->config->item('disable_dsstats')) {
+                $this->_cmd_output("--Get Stats");
+            
+                // Статистика выполняется не чаще 1 раза в 30 минут
+                
+                if ((now()-1800) > $cron_time['stats']) {
+                    if (!$stats = $this->_stats_processing($ds)) {
+                        $this->_cmd_output('---Stats server #' . $ds['id'] . ' failed');
+                        continue;
+                    }
+                    
+                    if(isset($stats['cpu_usage']) && isset($stats['memory_usage'])) {
+                        $this->_cmd_output('---Stats server #' . $ds['id'] . ' successful');
+                    } else {
+                        $this->_cmd_output('---Stats server #' . $ds['id'] . ' failed');
+                        continue;
+                    }
 
-				/* 
-				 * Обновляем статистику
-				 * Добавляем новое значение в существующий массив
-				 * date - дата проверки (unix time)
-				 * cpu_usage - использование cpu (%)
-				 * memory_usage - использование памяти (%)
-				*/
+                    /* 
+                     * Обновляем статистику
+                     * Добавляем новое значение в существующий массив
+                     * date - дата проверки (unix time)
+                     * cpu_usage - использование cpu (%)
+                     * memory_usage - использование памяти (%)
+                    */
 
-				$stats_array = json_decode($ds['stats'], true);
-				$stats_array OR $stats_array = array();
-				
-				$stats_array = array_slice($stats_array, -40);
+                    $stats_array = json_decode($ds['stats'], true);
+                    $stats_array OR $stats_array = array();
+                    
+                    $stats_array = array_slice($stats_array, -40);
 
-				$stats_array[] = array('date' => now(), 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
-				$data['stats'] = json_encode($stats_array);
-				$this->dedicated_servers->edit_dedicated_server($ds['id'], $data);
-				
-			} else {
-				$this->_cmd_output('---Stats server #' . $ds['id'] . ' missed');
-				continue;
+                    $stats_array[] = array('date' => now(), 'cpu_usage' => $stats['cpu_usage'], 'memory_usage' => $stats['memory_usage']);
+                    $data['stats'] = json_encode($stats_array);
+                    $this->dedicated_servers->edit_dedicated_server($ds['id'], $data);
+                    
+                } else {
+                    $this->_cmd_output('---Stats server #' . $ds['id'] . ' missed');
+                    continue;
+                }
 			}
-			
+            
 			$this->control->disconnect();
 			usleep(200000);
 
