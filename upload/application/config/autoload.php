@@ -64,7 +64,7 @@ $autoload['libraries'] = array('parser', 'pagination');
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('form', 'url', 'language', 'modules', 'patterns');
+$autoload['helper'] = array('cache', 'form', 'url', 'language', 'modules', 'patterns');
 
 
 /*
