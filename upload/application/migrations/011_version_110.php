@@ -21,6 +21,7 @@ class Migration_Version_110 extends CI_Migration {
 			$fields = array(
                 'id' => array(
                     'type' => 'INT',
+                    'auto_increment' => TRUE
                 ),
                     
                 'hook_id' => array(

@@ -451,6 +451,7 @@ $this->dbforge->create_table('game_types');
 $fields = array(
     'id' => array(
         'type' => 'INT',
+        'auto_increment' => TRUE
     ),
         
     'hook_id' => array(
