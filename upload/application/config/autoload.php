@@ -52,7 +52,7 @@ $autoload['packages'] = array();
 |	$autoload['libraries'] = array('database', 'session', 'xmlrpc');
 */
 
-$autoload['libraries'] = array('parser', 'pagination');
+$autoload['libraries'] = array('gameap_hooks', 'parser', 'pagination');
 
 
 /*
