@@ -306,12 +306,18 @@ class Servers extends CI_Model {
     function edit_game_server($id, $data)
     {
 		$this->db->where('id', $id);
+        $this->gameap_hooks->run('pre_server_edit', array('server_id' => $id, 'server_data' => &$data));
 		
 		if (isset($data['rcon'])) {
 			$data['rcon'] = $this->encrypt->encode($data['rcon']);
 		}
 		
-		return (bool)$this->db->update('servers', $data);
+		if ((bool)$this->db->update('servers', $data)) {
+            $this->gameap_hooks->run('post_server_edit', array('server_id' => $id, 'server_data' => &$data));
+            return true;
+        } else {
+            return false;
+        }
 	}
 	
 	/**
@@ -351,10 +357,14 @@ class Servers extends CI_Model {
     */
     function delete_game_server($id)
     {
-		if ($this->db->delete('servers', array('id' => $id))) {
+        $this->gameap_hooks->run('pre_server_delete', array('server_id' => $id));
+
+        if ($this->db->delete('servers', array('id' => $id))) {
 			
 			$this->db->delete('servers_privileges', array('server_id' => $id));
 			$this->db->delete('logs', array('server_id' => $id));
+
+            $this->gameap_hooks->run('post_server_delete', array('server_id' => $id));
 			
 			return true;
 		} else {
