@@ -37,7 +37,7 @@ if ( ! function_exists('save_to_cache'))
         $CI =& get_instance();
 
         if ($CI->cache->is_supported('memcached')) {
-            return $this->cache->memcached->save($key, $items, $time);
+            return $CI->cache->memcached->save($key, $items, $time);
         }
         elseif ($CI->cache->is_supported('apc')) {
             return $CI->cache->apc->save($key, $items, $time);
