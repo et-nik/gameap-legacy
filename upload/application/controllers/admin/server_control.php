@@ -257,6 +257,14 @@ class Server_control extends CI_Controller {
         foreach ($menu as &$array) {
             if (isset($array['servers_control'])) {
                 foreach ($array['servers_control'] as &$menu_item) {
+                    
+                    if (isset($menu_item['games'])
+                        && !empty($menu_item['games'])
+                        && !in_array($this->servers->server_data['game_code'], $menu_item['games'])
+                    ) {
+                        continue;
+                    }
+                    
                     if ($this->users->auth_data['group'] < $menu_item['group']) {
                         continue;
                     }
@@ -277,30 +285,14 @@ class Server_control extends CI_Controller {
 
     private function _load_menu_from_cache()
     {
-        if ($this->cache->is_supported('memcached')) {
-            return $this->cache->memcached->get('servers_menu');
-        }
-        elseif ($this->cache->is_supported('apc')) {
-            return $this->cache->apc->get('servers_menu');
-        }
-        else {
-            return $this->cache->file->get('servers_menu');
-        }
+        return load_from_cache('servers_menu');
     }
 
     // -----------------------------------------------------------------
 
     private function _save_menu_to_cache($menu_list = array())
     {
-        if ($this->cache->is_supported('memcached')) {
-            return $this->cache->memcached->save('servers_menu', $menu_list, 86400);
-        }
-        elseif ($this->cache->is_supported('apc')) {
-            return $this->cache->apc->save('servers_menu', $menu_list, 86400);
-        }
-        else {
-            return $this->cache->file->save('servers_menu', $menu_list, 86400);
-        }
+        save_to_cache('servers_menu', $menu_list, 60);
     }
     
     //--------------------------------------------------------------------------
