@@ -28,7 +28,6 @@ $this->load->dbforge();
 $this->dbforge->drop_table('actions');
 $this->dbforge->drop_table('captcha');
 $this->dbforge->drop_table('cron');
-$this->dbforge->drop_table('hooks');
 $this->dbforge->drop_table('dedicated_servers');
 $this->dbforge->drop_table('games');
 $this->dbforge->drop_table('game_types');
@@ -443,39 +442,6 @@ $fields = array(
 $this->dbforge->add_field($fields);
 $this->dbforge->add_key('id', TRUE);
 $this->dbforge->create_table('game_types');
-
-/*----------------------------------*/
-/*              hooks               */
-/*----------------------------------*/
-
-$fields = array(
-    'id' => array(
-        'type' => 'INT',
-        'auto_increment' => TRUE
-    ),
-        
-    'hook_id' => array(
-        'type' => 'INT',
-    ),
-        
-    'module' => array(
-        'type' => 'VARCHAR',
-        'constraint' => 32, 
-    ),
-        
-    'callback' => array(
-        'type' => 'TINYTEXT',
-    ),
-        
-    'pre' => array(
-        'type' => 'INT',
-        'constraint' => 1,
-    ),
-);
-
-$this->dbforge->add_field($fields);
-$this->dbforge->add_key('id', TRUE);
-$this->dbforge->create_table('hooks');
 
 /*----------------------------------*/
 /*              logs                */
