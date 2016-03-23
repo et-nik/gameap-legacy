@@ -17,32 +17,34 @@ class Migration_Version_110 extends CI_Migration {
 		
 		// Хуки GameAP
 		$fields = array();
-		if (!$this->db->table_exists('sessions')) {
+		if (!$this->db->table_exists('hooks')) {
 			$fields = array(
-					'user_id' => array(
-										'type' => 'INT',
-					),
-					
-					'hash' => array(
-										'type' => 'TINYTEXT',
-					),
-					
-					'ip_address' => array(
-										'type' => 'VARCHAR',
-										'constraint' => 64, 
-					),
-					
-					'user_agent' => array(
-										'type' => 'TINYTEXT',
-					),
-					
-					'expires' => array(
-										'type' => 'INT',
-					),
-			);
+                'id' => array(
+                    'type' => 'INT',
+                ),
+                    
+                'hook_id' => array(
+                    'type' => 'INT',
+                ),
+                    
+                'module' => array(
+                    'type' => 'VARCHAR',
+                    'constraint' => 32, 
+                ),
+                    
+                'callback' => array(
+                    'type' => 'TINYTEXT',
+                ),
+                    
+                'pre' => array(
+                    'type' => 'INT',
+                    'constraint' => 1,
+                ),
+            );
 
-			$this->dbforge->add_field($fields);
-			$this->dbforge->create_table('sessions');
+            $this->dbforge->add_field($fields);
+            $this->dbforge->add_key('id', TRUE);
+			$this->dbforge->create_table('hooks');
 		}
 	}
 	
