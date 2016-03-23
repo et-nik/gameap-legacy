@@ -14,7 +14,7 @@
  * Помошник для работы с кешем
  *
  * @package		Game AdminPanel
- * @category	Helpers
+ * @category    Helpers
  * @author		Nikita Kuznetsov (ET-NiK)
  * @sinse		1.1
 */
@@ -34,14 +34,16 @@ if ( ! function_exists('save_to_cache'))
 {
 	function save_to_cache($key, $items, $time = 60)
 	{
-        if ($this->cache->is_supported('memcached')) {
+        $CI =& get_instance();
+
+        if ($CI->cache->is_supported('memcached')) {
             return $this->cache->memcached->save($key, $items, $time);
         }
-        elseif ($this->cache->is_supported('apc')) {
-            return $this->cache->apc->save($key, $items, $time);
+        elseif ($CI->cache->is_supported('apc')) {
+            return $CI->cache->apc->save($key, $items, $time);
         }
         else {
-            return $this->cache->file->save($key, $items, $time);
+            return $CI->cache->file->save($key, $items, $time);
         } 
 	}
 }
@@ -59,14 +61,16 @@ if ( ! function_exists('load_from_cache'))
 {
 	function load_from_cache($key)
 	{
-        if ($this->cache->is_supported('memcached')) {
-            return $this->cache->memcached->get($key);
+        $CI =& get_instance();
+
+        if ($CI->cache->is_supported('memcached')) {
+            return $CI->cache->memcached->get($key);
         }
-        elseif ($this->cache->is_supported('apc')) {
-            return $this->cache->apc->get($key);
+        elseif ($CI->cache->is_supported('apc')) {
+            return $CI->cache->apc->get($key);
         }
         else {
-            return $this->cache->file->get($key);
+            return $CI->cache->file->get($key);
         }
 	}
 }
@@ -84,14 +88,16 @@ if ( ! function_exists('delete_in_cache'))
 {
 	function delete_in_cache($key)
 	{
-        if ($this->cache->is_supported('memcached')) {
-            return $this->cache->memcached->delete($key);
+        $CI =& get_instance();
+
+        if ($CI->cache->is_supported('memcached')) {
+            return $CI->cache->memcached->delete($key);
         }
-        elseif ($this->cache->is_supported('apc')) {
-            return $this->cache->apc->delete($key);
+        elseif ($CI->cache->is_supported('apc')) {
+            return $CI->cache->apc->delete($key);
         }
         else {
-            return $this->cache->file->delete($key);
+            return $CI->cache->file->delete($key);
         }
 	}
 }
