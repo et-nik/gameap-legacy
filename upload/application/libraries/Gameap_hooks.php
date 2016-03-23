@@ -23,17 +23,6 @@ class Gameap_hooks {
     private $_hooks_callbacks = array();
     private $_files_loaded = array();
 
-    private $_gameap_hooks = array(
-        'pre_server_update',
-        'post_server_update',
-        
-        'pre_server_edit',
-        'post_server_edit',
-        
-        'pre_server_delete',
-        'post_server_delete',
-    );
-
     public static $registry;
     
     // -----------------------------------------------------------------
@@ -52,9 +41,8 @@ class Gameap_hooks {
 
     private function _init_hooks()
     {
-        // $cache_hooks_callbacks = load_from_cache('gameap_hooks_callbacks');
-        $cache_hooks_callbacks = false;
-
+        $cache_hooks_callbacks = load_from_cache('gameap_hooks_callbacks');
+        
         if ($cache_hooks_callbacks) {
             $this->_hooks_callbacks = $cache_hooks_callbacks;
             return true;
@@ -124,10 +112,6 @@ class Gameap_hooks {
      */
     public function run($hook_id, $params = array())
     {
-        if (!in_array($hook_id, $this->_gameap_hooks)) {
-            return;
-        }
-
         if (!isset($this->_hooks_callbacks[$hook_id])) {
             return;
         }
