@@ -1464,10 +1464,10 @@ class Adm_servers extends CI_Controller {
 				$where = array('game_code' => $this->servers->server_data['game']);
 				$gametypes_list = $this->game_types->get_gametypes_list($where);
 				
-				$options = array();
+				$gtypes_options = array();
 				$i = 0;
 				foreach($gametypes_list as $list) {
-					$options[$list['id']] = $list['name'];
+					$gtypes_options[$list['id']] = $list['name'];
 					
 					/* Узнаем ключ в массиве модификации которой принадлежит этот сервер */
 					if ($list['id'] == $this->servers->server_data['game_type']) {
@@ -1482,8 +1482,16 @@ class Adm_servers extends CI_Controller {
 				
 				$server_aliases = $this->servers->server_data['aliases'];
 
-				$local_tpl['game_type_dropdown'] 		= form_dropdown('game_type', $options, $this->servers->server_data['game_type']);
+				$local_tpl['game_type_dropdown'] 		= form_dropdown('game_type', $gtypes_options, $this->servers->server_data['game_type']);
 				$local_tpl['server_enabled_checkbox'] 	= form_checkbox('enabled', 'accept', $this->servers->server_data['enabled']);
+
+                $ds_list = $this->dedicated_servers->get_ds_list();
+                
+                $ds_options = array();
+				foreach($ds_list as &$dsarr) {
+					$ds_options[$dsarr['id']] = $dsarr['name'];
+				}
+                $local_tpl['ds_list_dropdown'] = form_dropdown('ds_id', $ds_options, $this->servers->server_data['ds_id']);
 				
 				// Заменяем двойные кавычки на html символы
 				$local_tpl['start_command'] 	= str_replace('"', '&quot;', $local_tpl['start_command'] );
@@ -1987,7 +1995,7 @@ class Adm_servers extends CI_Controller {
 					$sql_data['dir'] = $this->input->post('dir');
 					$sql_data['game_type'] = $this->input->post('game_type');
 					$sql_data['enabled'] = (int)(bool)$this->input->post('enabled');
-					//$sql_data['ds_id'] = $this->input->post('ds_id');
+					$sql_data['ds_id'] = $this->input->post('ds_id');
 					
 					$sql_data['screen_name'] = $this->input->post('screen_name');
 					$sql_data['su_user'] = $this->input->post('su_user');
