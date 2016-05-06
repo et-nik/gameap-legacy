@@ -160,8 +160,7 @@ class Game_types extends CI_Model {
 			$tpl_data[$num]['gt_id'] 	= $game_types['id'];
 			//~ $tpl_data[$num]['gt_code'] 	= $game_types['game_code'];
 			$tpl_data[$num]['gt_name'] 	= $game_types['name'];
-			$tpl_data[$num]['gt_size'] 	= $game_types['disk_size'];
-			
+            
 			if($script_param = TRUE) {
 				
 				$tpl_data[$num]['local_repository']		= $game_types['local_repository'];
