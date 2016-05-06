@@ -117,6 +117,43 @@ class Migration_Version_200 extends CI_Migration {
 			
 			$this->dbforge->add_column('dedicated_servers', $fields, 'gdaemon_login');
 		}
+
+        if (!$this->db->table_exists('ds_stats')) {
+            $this->dbforge->add_field(array(
+                'id' => array(
+                    'type' => 'INT',
+                    'auto_increment' => true
+                ),
+                'ds_id' => array(
+                    'type' => 'INT'
+                ),
+                'time' => array(
+                    'type' => 'INT'
+                ),
+                'loa' => array(
+                    'type' => 'TINYTEXT'
+                ),
+                'ram' => array(
+                    'type' => 'TINYTEXT'
+                ),
+                'cpu' => array(
+                    'type' => 'TINYTEXT'
+                ),
+                'ifstat' => array(
+                    'type' => 'TINYTEXT'
+                ),
+                'ping' => array(
+                    'type' => 'INT',
+                    'constraint' => 4
+                ),
+                'drvspace' => array(
+                    'type' => 'TINYTEXT'
+                ),
+            ));
+            
+            $this->dbforge->add_key('id', true);
+            $this->dbforge->create_table('ds_stats');
+        }
     }
 
     public function down() 
