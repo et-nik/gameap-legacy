@@ -198,17 +198,7 @@ if ( ! function_exists('get_file_protocol'))
 {
 	function get_file_protocol(&$server_data)
     {
-		if($server_data['ftp_host']) {
-			return 'ftp';
-		} elseif ($server_data['ssh_host']) {
-			return 'sftp';
-		} elseif ($server_data['gdaemon_host']) {
-			return 'gdaemon';
-		} elseif ($server_data['local_server']) {
-			return 'local';
-		} else {
-			return false;
-		}
+		return 'gdaemon';
 	}
 }
 
@@ -227,44 +217,16 @@ if ( ! function_exists('get_file_protocol_config'))
 		// Данные для соединения
 		$config = array();
 		
-		if($server_data['ftp_host']) {
-			/* Работа с FTP */
-			$config['driver'] = 'ftp';
+		$config['driver'] = 'gdaemon';
 
-			$explode = explode(':', $server_data['ftp_host']);
-			$config['hostname'] = $explode[0];
-			$config['port'] = isset($explode[1]) ? $explode[1] : '21';
+        $explode = explode(':', $server_data['gdaemon_host']);
 			
-			$config['username'] = $server_data['ftp_login'];
-			$config['password'] = $server_data['ftp_password'];
-			//~ $config['debug'] = true;
+        $config['hostname'] = $explode[0];
+        $config['port'] = isset($explode[1]) ? $explode[1] : 31707;
 			
-		} elseif ($server_data['ssh_host']) {
-			/* Работа с sFTP */
-			$config['driver'] = 'sftp';
-			
-			$explode = explode(':', $server_data['ssh_host']);
-			$config['hostname'] = $explode[0];
-			$config['port'] = isset($explode[1]) ? $explode[1] : '22';
-			
-			$config['username'] = $server_data['ssh_login'];
-			$config['password'] = $server_data['ssh_password'];
-			//~ $config['debug'] = true;
-		} elseif ($server_data['gdaemon_host']) {
-			$config['driver'] = 'gdaemon';
-
-			$explode = explode(':', $server_data['gdaemon_host']);
-			
-			$config['hostname'] = $explode[0];
-			$config['port'] = isset($explode[1]) ? $explode[1] : 31707;
-			
-			$config['username'] = '';
-			$config['password'] = $server_data['gdaemon_key'];
-		} elseif ($server_data['local_server']) {
-			$config['driver'] = 'local';
-		} else {
-			$config['driver'] = false;
-		}
+        $config['username'] = $server_data['gdaemon_login'];;
+        $config['password'] = $server_data['gdaemon_password'];;
+        $config['key']      = $server_data['gdaemon_key'];
 		
 		return $config;
 	}
@@ -355,30 +317,7 @@ if ( ! function_exists('get_ds_file_path'))
     {
 		$CI =& get_instance();
 		$CI->load->helper('string');
-		
-		switch(get_file_protocol($server_data)) {
-			case 'ftp':
-				$dir = reduce_double_slashes($server_data['ftp_path'] . '/' . $server_data['dir'] . '/');
-				break;
-				
-			case 'sftp':
-				$dir = reduce_double_slashes($server_data['ssh_path'] . '/' . $server_data['dir'] . '/');
-				break;
-				
-			case 'gdaemon':
-				$dir = reduce_double_slashes($server_data['script_path'] . '/' . $server_data['dir'] . '/');
-				break;
-				
-			case 'local':
-				$dir = reduce_double_slashes($server_data['script_path'] . '/' . $server_data['dir'] . '/');
-				break;
-				
-			default:
-				$dir = '/';
-				break;
-		}
-		
-		return $dir;
+		return reduce_double_slashes($server_data['work_path'] . '/' . $server_data['dir'] . '/');
 	}
 }
 
