@@ -660,37 +660,14 @@ class Servers extends CI_Model {
 			
 			// Данные для игрового сервера из машины
 			$this->server_data['os'] 			= strtolower($this->server_ds_data['os']);
-			$this->server_data['local_server'] 	= $this->server_ds_data['local_server'];
-			
+
 			$this->server_data['ds_disabled'] 	= $this->server_ds_data['disabled'];
 
-			$this->server_data['ftp_host']		= $this->server_ds_data['ftp_host'];
-			$this->server_data['ftp_login'] 	= $this->server_ds_data['ftp_login'];
-			$this->server_data['ftp_password'] 	= $this->server_ds_data['ftp_password'];
-			$this->server_data['ftp_passwd'] 	= $this->server_ds_data['ftp_password'];
-			$this->server_data['ftp_path'] 		= $this->server_ds_data['ftp_path'];
-			
-			$this->server_data['ssh_host']		= $this->server_ds_data['ssh_host'];
-			$this->server_data['ssh_login'] 	= $this->server_ds_data['ssh_login'];
-			$this->server_data['ssh_password'] 	= $this->server_ds_data['ssh_password'];
-			$this->server_data['ssh_passwd'] 	= $this->server_ds_data['ssh_password'];
-			$this->server_data['ssh_path'] 		= $this->server_ds_data['ssh_path'];
-			
-			$this->server_data['telnet_host']		= $this->server_ds_data['telnet_host'];
-			$this->server_data['telnet_login'] 		= $this->server_ds_data['telnet_login'];
-			$this->server_data['telnet_password'] 	= $this->server_ds_data['telnet_password'];
-			$this->server_data['telnet_passwd'] 	= $this->server_ds_data['telnet_password'];
-			$this->server_data['telnet_path'] 		= $this->server_ds_data['telnet_path'];
-			
 			$this->server_data['gdaemon_host']		= $this->server_ds_data['gdaemon_host'];
+			$this->server_data['gdaemon_login'] 	= $this->server_ds_data['gdaemon_login'];
+			$this->server_data['gdaemon_password'] 	= $this->server_ds_data['gdaemon_password'];
 			$this->server_data['gdaemon_key'] 		= $this->server_ds_data['gdaemon_key'];
 
-			$this->server_data['control_protocol'] 	= $this->server_ds_data['control_protocol'];
-			$this->server_data['control_ip'] 		= $this->server_ds_data['control_ip'];
-			$this->server_data['control_port'] 		= $this->server_ds_data['control_port'];
-			$this->server_data['control_login'] 	= $this->server_ds_data['control_login'];
-			$this->server_data['control_password'] 	= $this->server_ds_data['control_password'];
-			
 			$this->server_data['ds_modules_data'] 	= $this->server_ds_data['modules_data'];
 			
 			if (strtolower($this->server_data['os']) == 'windows') {
@@ -699,31 +676,14 @@ class Servers extends CI_Model {
 				$execfile = $this->_exec_file['linux'];
 			}
 			
+			$this->server_data['work_path'] 			= $this->server_ds_data['work_path'];
+            
 			$this->server_data['script_start'] 			= $execfile . ' ' . $this->server_ds_data['script_start'];
 			$this->server_data['script_stop'] 			= $execfile . ' ' . $this->server_ds_data['script_stop'];
 			$this->server_data['script_restart'] 		= $execfile . ' ' . $this->server_ds_data['script_restart'];
 			$this->server_data['script_status'] 		= $execfile . ' ' . $this->server_ds_data['script_status'];
 			$this->server_data['script_get_console'] 	= $execfile . ' ' . $this->server_ds_data['script_get_console'];
 			$this->server_data['script_send_command'] 	= $execfile . ' ' . $this->server_ds_data['script_send_command'];
-			
-			/* Определение пути до скрипта и до steamcmd */
-			switch ($this->server_data['control_protocol']) {
-				case 'local':
-					$this->server_data['script_path'] 	= $this->config->config['local_script_path'];
-					$this->server_data['steamcmd_path'] = ($this->config->config['local_steamcmd_path']) ? $this->config->config['local_steamcmd_path'] : $this->config->config['local_script_path'];
-					break;
-					
-				case 'telnet':
-					$this->server_data['script_path'] 	= $this->server_ds_data['telnet_path'];
-					$this->server_data['steamcmd_path'] = ($this->server_ds_data['steamcmd_path']) ? $this->server_ds_data['steamcmd_path'] : $this->server_ds_data['telnet_path'];
-					break;
-
-				default:
-					// По умолчанию SSH
-					$this->server_data['script_path'] 	= $this->server_ds_data['ssh_path'];
-					$this->server_data['steamcmd_path'] = ($this->server_ds_data['steamcmd_path']) ? $this->server_ds_data['steamcmd_path'] : $this->server_ds_data['ssh_path'];
-					break;
-			}
 		}
 		
 		// Получение сведений об игре
@@ -752,8 +712,7 @@ class Servers extends CI_Model {
 			$this->server_data['mod_name'] 		= $this->game_types->game_types_list['0']['name'];
 			$this->server_data['fast_rcon']		= $this->game_types->game_types_list['0']['fast_rcon'];
 			$this->server_data['aliases_list'] 	= $this->game_types->game_types_list['0']['aliases'];
-			$this->server_data['disk_size'] 	= $this->game_types->game_types_list['0']['disk_size'];
-			
+
 			$this->server_data['kick_cmd'] 		= $this->game_types->game_types_list['0']['kick_cmd'];
 			$this->server_data['ban_cmd'] 		= $this->game_types->game_types_list['0']['ban_cmd'];
 			$this->server_data['chname_cmd'] 	= $this->game_types->game_types_list['0']['chname_cmd'];
