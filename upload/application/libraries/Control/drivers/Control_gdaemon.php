@@ -96,14 +96,7 @@ class Control_gdaemon extends CI_Driver {
 	 */
 	private function _read()
 	{
-		$buffer = "";
-
-		while (@!$buffer[strlen($buffer)-1] == "\n" & !feof($this->_connection)) {
-			$buffer .= fgets($this->_connection);
-		}
-
-		//~ return iconv("UTF-8", "UTF-8//IGNORE", $this->_decode($buffer, $this->crypt_key));
-		return $this->_decode($buffer, $this->crypt_key);
+		
 	}
 	
 	// -----------------------------------------------------------------
@@ -166,18 +159,7 @@ class Control_gdaemon extends CI_Driver {
 			throw new Exception(lang('server_command_empty_auth_data') . ' (GDaemon)');
 		}
 		
-		fwrite($this->_connection, "getkey\n");
-
-		$this->crypt_key 	= $password;
-		$this->_fix_crypt_key();
-		
-		$this->client_key 	= $this->_read();
-		
-		if (!preg_match("/^[a-zA-Z0-9]{16}$/", $this->client_key)) {
-			throw new Exception(lang('server_command_login_failed') . ' (GDaemon)');
-		}
-		
-		$this->_auth = true;
+		// $this->_auth = true;
 		return true;
 	}
 
@@ -196,25 +178,7 @@ class Control_gdaemon extends CI_Driver {
 			throw new Exception(lang('server_command_not_connected') . ' (GDaemon)');
 		}
 		
-		$send_json = json_encode(array(
-			'key' 		=> $this->client_key,
-			'commands' 	=> array(
-								$command,
-							),
-			'type' 		=> "commands"
-		));
-		
-		$encode_string = $this->_encode($send_json, $this->crypt_key);
-
-		fwrite($this->_connection, "command {$encode_string}\n");
-		
-		$read = $this->_read();
-
-		if (!$contents = json_decode($read, true)) {
-			throw new Exception(lang('server_command_get_response_failed') . ' (GDaemon)');
-		}
-		
-		return implode("\n", $contents['command_results']);
+		return "";
 	}
 	
 	// ----------------------------------------------------------------
