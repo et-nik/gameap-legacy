@@ -26,18 +26,37 @@ class Files_gdaemon extends CI_Driver {
 	var $hostname		= '';
 	var $username		= '';
 	var $password		= '';
+	var $key		    = '';
+    
 	var $port 			= 31707;
 	
 	var $crypt_key		= '';
 	var $client_key		= "";
 	
 	var $_connection 	= false;
+	private $_socket;
 	var $errors 		= '';
 	
 	private $_auth		= false;
 	
 	private $_max_file_size = 1000000;
+
+    private $_CI;
+
+    private $_write_binn;
+    private $_read_binn;
 	
+	// -----------------------------------------------------------------
+	
+	function __construct()
+	{
+		$this->_CI = &get_instance();
+        $this->_CI->load->library("binn");
+
+        $this->_write_binn = new Binn();
+        $this->_read_binn = new Binn();
+	}
+    
 	// -----------------------------------------------------------------
 	
 	function __destruct()
@@ -89,6 +108,17 @@ class Files_gdaemon extends CI_Driver {
 		// Prep the hostname
 		$this->hostname = preg_replace('|.+?://|', '', $this->hostname);
 	}
+
+    // -----------------------------------------------------------------
+
+    private function _binn_free()
+    {
+        $this->_write_binn->binn_free();
+        $this->_write_binn->binn_list();
+
+        $this->_read_binn->binn_free();
+        $this->_read_binn->binn_list();
+    }
 	
 	private function _auth()
 	{
@@ -99,27 +129,27 @@ class Files_gdaemon extends CI_Driver {
 
 	private function _login()
 	{
-		if ($this->_auth == true) {
-			return true;
-		}
+        $this->_binn_free();
+        
+        $this->_write_binn->add_int16(1);
+        $this->_write_binn->add_str($this->username);
+        $this->_write_binn->add_str($this->password);
+        $this->_write_binn->add_int16(3); // Set mode DAEMON_SERVER_MODE_FILES
 
-		if(!$this->password) {
-			$this->_error('server_command_empty_auth_data');
-		}
-		
-		fwrite($this->_connection, "getkey\n");
+        socket_write($this->_socket, $this->_write_binn->get_binn_val() . "\xFF\xFF\xFF\xFF");
+        $read = $this->_read();
 
-		$this->crypt_key 		= $this->password;
-		$this->_fix_crypt_key();
-		
-		$this->client_key 	= $this->_read();
+        $this->_read_binn->binn_open($read);
 
-		if (!preg_match("/^[a-zA-Z0-9]{16}$/", $this->client_key)) {
-			$this->_error('server_command_login_failed');
-		}
-		
-		$this->_auth = true;
-		return true;
+        $results = $this->_read_binn->get_binn_arr();
+
+        if ($results[0] == 100) {
+            $this->_auth = true;
+            return true;
+        } else {
+            $this->_error("server_command_gdaemon_login_failed", $results[1]);
+            return false;
+        }
 	}
 	
 	// -----------------------------------------------------------------
@@ -129,13 +159,7 @@ class Files_gdaemon extends CI_Driver {
 	 */
 	private function _read()
 	{
-		$buffer = "";
-
-		while (@!$buffer[strlen($buffer)-1] == "\n" & !feof($this->_connection)) {
-			$buffer .= fgets($this->_connection);
-		}
-
-		return $this->_decode($buffer, $this->crypt_key);
+        return substr(socket_read($this->_socket, 10240), 0, -4);
 	}
 	
 	// -----------------------------------------------------------------
@@ -156,29 +180,15 @@ class Files_gdaemon extends CI_Driver {
 	
 	function close()
 	{
-		$this->crypt_key		= "";
-		$this->client_key		= "";
-		
-		if (!$this->_connection && is_resource($this->_connection)) {
+		if (!$this->_socket && is_resource($this->_socket)) {
 			return;
 		}
-	
-		@fwrite($this->_connection, "exit\n");
-		@fclose($this->_connection);
 	}
 	
 	// -----------------------------------------------------------------
 	
 	function connect($config = array())
 	{
-		if ($this->_connection && $config['hostname'] == $this->hostname) {
-			/* Уже соединен с этим сервером, экономим электроэнергию */
-			return;
-		} elseif ($this->_connection) {
-			// Разрываем соединение со старым сервером
-			$this->close();
-		}
-		
 		if (count($config) > 0) {
 			$this->initialize($config);
 		}
@@ -186,15 +196,13 @@ class Files_gdaemon extends CI_Driver {
 		if (!$this->hostname OR !$this->port) {
 			$this->_error('server_command_empty_connect_data');
 		}
+
+        $this->_socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        socket_connect($this->_socket, $this->hostname, $this->port);
 		
-		// Соединение с сервером
-		$this->_connection = @fsockopen($this->hostname, $this->port, $errno, $errstr, 10); 
-		
-		if (!$this->_connection) {
+		if (!$this->_socket) {
 			$this->_error('server_command_connection_failed');
 		}
-		
-		stream_set_timeout($this->_connection, 15);
 		
 		$this->_auth = false;
 		$this->_login();
@@ -222,38 +230,7 @@ class Files_gdaemon extends CI_Driver {
 	 */
 	public function upload($locpath, $rempath, $mode = 'auto', $permissions = NULL)
 	{
-		if (!$this->_connection OR !$this->_auth) {
-			$this->_error('server_command_not_connected');
-		}
 		
-		if (filesize($locpath) > $this->_max_file_size) {
-			$this->_error('web_ftp_file_big');
-		}
-		
-		$file_contents = file_get_contents($locpath);
-		
-		$send_json = json_encode(array(
-			'key' 				=> $this->client_key,
-			'file' 				=> $rempath,
-			'contents' 			=> base64_encode($file_contents),
-			'type' 				=> "write_file"
-		));
-		
-		$encode_string = $this->_encode($send_json, $this->crypt_key);
-		
-		fwrite($this->_connection, "command {$encode_string}\n");
-		
-		$read = $this->_read();
-
-		if (!$contents = json_decode($read, true)) {
-			$this->_error('server_command_get_response_failed');
-		}
-
-		if ($contents['status'] != 10) {
-			return false;
-		}
-		
-		return true;
 	}
 	
 	// -----------------------------------------------------------------
@@ -282,7 +259,7 @@ class Files_gdaemon extends CI_Driver {
 	*/
 	public function delete_dir($filepath)
 	{
-		return $this->delete_file($filepath);
+		// return $this->delete_file($filepath);
 	}
 	
 	// -----------------------------------------------------------------
@@ -295,35 +272,7 @@ class Files_gdaemon extends CI_Driver {
 	 */
 	public function delete_file($filepath)
 	{
-		if (!$this->_connection OR !$this->_auth) {
-			$this->_error('server_command_not_connected');
-		}
 		
-		$send_json = json_encode(array(
-			'key' 				=> $this->client_key,
-			'file' 				=> $filepath,
-			'type' 				=> "remove"
-		));
-		
-		$encode_string = $this->_encode($send_json, $this->crypt_key);
-		
-		fwrite($this->_connection, "command {$encode_string}\n");
-		
-		$read = $this->_read();
-		
-		if (!$contents = json_decode($read, true)) {
-			$this->_error('server_command_get_response_failed');
-		}
-		
-		if ($contents['status'] == 3) {
-			$this->_error('web_ftp_file_not_found');
-		}
-		
-		if ($contents['status'] != 10) {
-			return false;
-		}
-		
-		return true;
 	}
 	
 	// -----------------------------------------------------------------
@@ -337,39 +286,7 @@ class Files_gdaemon extends CI_Driver {
 	 */
 	public function download($rempath, $locpath)
 	{
-		if (!$this->_connection OR !$this->_auth) {
-			$this->_error('server_command_not_connected');
-		}
 		
-		$send_json = json_encode(array(
-			'key' 				=> $this->client_key,
-			'file' 				=> $rempath,
-			'type' 				=> "read_file"
-		));
-		
-		$encode_string = $this->_encode($send_json, $this->crypt_key);
-		
-		fwrite($this->_connection, "command {$encode_string}\n");
-		
-		$read = $this->_read();
-
-		if (!$contents = json_decode($read, true)) {
-			$this->_error('server_command_get_response_failed');
-		}
-		
-		if ($contents['status'] == 3) {
-			$this->_error('web_ftp_file_not_found');
-		}
-		
-		if ($contents['status'] == 42) {
-			$this->_error('web_ftp_file_big');
-		}
-		
-		if ($contents['status'] != 10) {
-			return false;
-		}
-		
-		return (false !== file_put_contents($locpath, base64_decode($contents['contents'])));
 	}
 	
 	// -----------------------------------------------------------------
@@ -392,35 +309,7 @@ class Files_gdaemon extends CI_Driver {
 	 */
 	function file_size($file)
 	{
-		if (!$file) {
-			$this->_error('server_files_directory_no_set');
-		}
 		
-		if (!$this->_connection OR !$this->_auth) {
-			$this->_error('server_command_not_connected');
-		}
-		
-		$send_json = json_encode(array(
-			'key' 		=> $this->client_key,
-			'file' 		=> $file,
-			'type' 		=> "filesize"
-		));
-
-		$encode_string = $this->_encode($send_json, $this->crypt_key);
-		
-		fwrite($this->_connection, "command {$encode_string}\n");
-		
-		$read = $this->_read();
-
-		if (!$contents = json_decode($read, true)) {
-			$this->_error('server_command_get_response_failed');
-		}
-
-		if ($contents['status'] != 10) {
-			return 0;
-		}
-		
-		return $contents['filesize'];
 	}
 	
 	// -----------------------------------------------------------------
@@ -434,30 +323,52 @@ class Files_gdaemon extends CI_Driver {
 			$this->_error('server_files_directory_no_set');
 		}
 		
-		if (!$this->_connection OR !$this->_auth) {
+		if (!$this->_socket OR !$this->_auth) {
 			$this->_error('server_command_not_connected');
 		}
-		
-		$send_json = json_encode(array(
-			'key' 		=> $this->client_key,
-			'dir' 		=> $path,
-			'type' 		=> "read_dir"
-		));
 
-		$encode_string = $this->_encode($send_json, $this->crypt_key);
-		
-		fwrite($this->_connection, "command {$encode_string}\n");
-		
-		$read = $this->_read();
-
-		if (!$contents = json_decode($read, true)) {
-			$this->_error('server_command_get_response_failed');
+        if (!$path) {
+			$this->_error('server_files_directory_no_set');
 		}
+
+		if (!$this->_socket OR !$this->_auth) {
+			$this->_error('server_command_not_connected');
+		}
+
+        $this->_binn_free();
+
+        $this->_write_binn->add_int16(4);       // Read dir
+        $this->_write_binn->add_str($path);     // Dir path
+        $this->_write_binn->add_uint8(1);       // Mode
+
+        socket_write($this->_socket, $this->_write_binn->get_binn_val() . "\xFF\xFF\xFF\xFF");
+        $read = $this->_read();
+
+        $this->_read_binn->binn_open($read);
+        $results = $this->_read_binn->get_binn_arr();
+
+        if ($results[0] != 100) {
+            // Error
+            $this->_error("server_command_gdaemon_list_files_error", $results[1]);
+            return false;
+        }
+
+        $files_list =& $results[2];
+
+		if (empty($files_list)) {
+			return array();
+		}
+
+        $return_list = array();
 		
-		$return_list = array();
-		
-		foreach($contents['list'] as &$file) {
-			$return_list[] = $file[0];
+		foreach($files_list as &$file) {
+			$pathinfo = pathinfo($file[0]);
+
+            if (basename($file[0]) == '.' OR basename($file[0]) == '..') {
+                continue;
+            }
+
+            $return_list[] = basename($file[0]);
 		}
 		
 		return $return_list;
@@ -473,39 +384,46 @@ class Files_gdaemon extends CI_Driver {
 	 */
 	function list_files_full_info($path = '.', $extensions = array()) 
 	{
-		if (!$path) {
+        if (!$path) {
 			$this->_error('server_files_directory_no_set');
 		}
-		
-		if (!$this->_connection OR !$this->_auth) {
+
+		if (!$this->_socket OR !$this->_auth) {
 			$this->_error('server_command_not_connected');
 		}
-		
-		$send_json = json_encode(array(
-			'key' 		=> $this->client_key,
-			'dir' 		=> $path,
-			'type' 		=> "read_dir"
-		));
-		
 
-		$encode_string = $this->_encode($send_json, $this->crypt_key);
-		
-		fwrite($this->_connection, "command {$encode_string}\n");
+        $this->_binn_free();
 
-		$read = $this->_read();
+        $this->_write_binn->add_int16(4);       // Read dir
+        $this->_write_binn->add_str($path);     // Dir path
+        $this->_write_binn->add_uint8(1);       // Mode
 
-		if (!$contents = json_decode($read, true)) {
-			$this->_error('server_command_get_response_failed');
-		}
-		
-		$return_list = array();
-	
-		if (empty($contents['list'])) {
+        socket_write($this->_socket, $this->_write_binn->get_binn_val() . "\xFF\xFF\xFF\xFF");
+        $read = $this->_read();
+
+        $this->_read_binn->binn_open($read);
+        $results = $this->_read_binn->get_binn_arr();
+
+        if ($results[0] != 100) {
+            // Error
+            $this->_error("server_command_gdaemon_list_files_error", $results[1]);
+            return false;
+        }
+
+        $files_list =& $results[2];
+
+		if (empty($files_list)) {
 			return array();
 		}
+
+        $return_list = array();
 		
-		foreach($contents['list'] as &$file) {
+		foreach($files_list as &$file) {
 			$pathinfo = pathinfo($file[0]);
+
+            if (basename($file[0]) == '.' OR basename($file[0]) == '..') {
+                continue;
+            }
 			
 			/* Если файл не имеет расширения, а нам нужны файлы с определенным
 			 * расширением и не нужны нотисы */
@@ -521,9 +439,9 @@ class Files_gdaemon extends CI_Driver {
 		
 			
 			$return_list[] = array('file_name' => basename($file[0]),
-									'file_time' => $file[1],
-									'file_size' => $file[2],
-									'type' => ($file[3]) ? 'd' : 'f',
+                                    'file_size' => $file[1],
+									'file_time' => $file[2],
+									'type' => ($file[3] == 1) ? 'd' : 'f',
 			);
 		}
 		
@@ -539,32 +457,7 @@ class Files_gdaemon extends CI_Driver {
 	 */
 	public function mkdir($path = '', $permissions = 0755)
 	{
-		if (!$path) {
-			$this->_error('server_files_directory_no_set');
-		}
 		
-		if (!$this->_connection OR !$this->_auth) {
-			$this->_error('server_command_not_connected');
-		}
-		
-		$send_json = json_encode(array(
-			'key' 				=> $this->client_key,
-			'dir' 				=> $path,
-			'permissions' 		=> $permissions,
-			'type' 				=> "mkdir"
-		));
-		
-		$encode_string = $this->_encode($send_json, $this->crypt_key);
-		
-		fwrite($this->_connection, "command {$encode_string}\n");
-		
-		$read = $this->_read();
-
-		if (!$contents = json_decode($read, true)) {
-			$this->_error('server_command_get_response_failed');
-		}
-		
-		return ($contents['status'] == 10);
 	}
 	
 	// -----------------------------------------------------------------
@@ -574,28 +467,7 @@ class Files_gdaemon extends CI_Driver {
 	 */
 	public function rename($old_file, $new_file)
 	{
-		if (!$this->_connection OR !$this->_auth) {
-			$this->_error('server_command_not_connected');
-		}
 		
-		$send_json = json_encode(array(
-			'key' 				=> $this->client_key,
-			'old_file' 				=> $old_file,
-			'new_file' 				=> $new_file,
-			'type' 				=> "move"
-		));
-		
-		$encode_string = $this->_encode($send_json, $this->crypt_key);
-		
-		fwrite($this->_connection, "command {$encode_string}\n");
-		
-		$read = $this->_read();
-		
-		if (!$contents = json_decode($read, true)) {
-			$this->_error('server_command_get_response_failed');
-		}
-		
-		return ($contents['status'] == 10);
 	}
 	
 	// -----------------------------------------------------------------
@@ -605,7 +477,7 @@ class Files_gdaemon extends CI_Driver {
 	 */
 	public function move($old_file, $new_file)
 	{
-		return $this->rename($old_file, $new_file);
+
 	}
 	
 	// -----------------------------------------------------------------
@@ -616,8 +488,8 @@ class Files_gdaemon extends CI_Driver {
 	 * @access	private
 	 * @param	string
 	 */
-	function _error($msg)
+	function _error($msg, $p1 = "", $p2 = "")
 	{
-		throw new Exception(lang($msg) . ' (GDaemon)');
+		throw new Exception(lang($msg, $p1, $p2) . ' (GDaemon)');
 	}
 }
