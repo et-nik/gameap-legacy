@@ -46,9 +46,6 @@
 	<ul class="tabs">
 		<li><a href="#access_data">{lang_adm_servers_ds_access}</a></li>
 		<li><a href="#gdaemon_data">{lang_adm_servers_gdaemon_access}</a></li>
-		<li><a href="#ftp_data">{lang_adm_servers_ftp_data}</a></li>
-        <li><a href="#ssh_data">{lang_adm_servers_ssh_data}</a></li>
-        <li><a href="#telnet_data">{lang_adm_servers_telnet_data}</a></li>
     </ul>
     
     <div id="access_data" class="tab_content">
@@ -61,7 +58,7 @@
 			
 			<tr>
 				<td>{lang_adm_servers_path_to_executable_file}:</td>
-				<td><input type="text" name="script_path" /></td>
+				<td><input type="text" name="work_path" /></td>
 			</tr>
 			
 			<tr>
@@ -69,20 +66,6 @@
 				<td><input type="text" name="steamcmd_path" /></td>
 			</tr>
 			
-			<tr>
-				<td width="40%">{lang_adm_servers_control_protocol}:</td>
-				<td>
-					<select name="control_protocol">
-						<?php if(in_array('ssh2', get_loaded_extensions())): ?>
-						<option value="0" selected="selected">{lang_adm_servers_default}</option>
-						<option value="ssh">SSH</option>
-						<?php endif; ?>
-						<option value="gdaemon">GDaemon</option>
-						<option value="telnet">Telnet</option>
-						<option value="local">Local</option>
-					 </select>
-				</td>
-			</tr>
 		</table>
 	</div>
 	
@@ -99,101 +82,20 @@
 				<td><input type="text" name="gdaemon_host" /></td>
 			</tr>
 
+            <tr>
+				<td width="30%">{lang_adm_servers_gdaemon_login}:</td>
+				<td><input type="text" name="gdaemon_host" /></td>
+			</tr>
+            
+			<tr>
+				<td width="30%">{lang_adm_servers_gdaemon_password}:</td>
+				<td><input type="text" name="gdaemon_host" /></td>
+			</tr>
+
 			<tr>
 				<td>{lang_adm_servers_gdaemon_key}:</td>
 				<td><input type="text" name="gdaemon_key" /></td>
 			</tr>
-
-		</table>
-	</div>
-	
-	<div id="ssh_data" class="tab_content">
-		<table class="zebra" width="100%">
-			<tbody>
-				<tr>
-					<td colspan="2"><p class="hr">{lang_adm_servers_ssh_data}</p></td>
-				</tr>
-			</tbody>
-			
-			<?php if(in_array('ssh2', get_loaded_extensions())): ?>
-			<tr>
-				<td width="30%">{lang_adm_servers_ssh_host}:</td>
-				<td><input type="text" name="ssh_host" /></td>
-			</tr>
-
-			<tr>
-				<td>{lang_login}:</td>
-				<td><input type="text" name="ssh_login" /></td>
-			</tr>
-
-			<tr>
-				<td>{lang_password}:</td>
-				<td><input type="text" name="ssh_password" /></td>
-			</tr>
-			<?php else: ?>
-			<tr>
-				<td colspan="2">{lang_adm_servers_not_ssh_php}</td>
-			</tr>
-			<?php endif; ?>
-		</table>
-	</div>
-	
-	<div id="telnet_data" class="tab_content">
-		<table class="zebra" width="100%">
-			<tbody>
-				<tr>
-					<td colspan="2"><p class="hr">{lang_adm_servers_telnet_data}</p></td>
-				</tr>
-			</tbody>
-
-			<tr>
-				<td width="30%">{lang_adm_servers_telnet_host}:</td>
-				<td><input type="text" name="telnet_host" /></td>
-			</tr>
-
-			<tr>
-				<td>{lang_login}:</td>
-				<td><input type="text" name="telnet_login" /></td>
-			</tr>
-
-			<tr>
-				<td>{lang_password}:</td>
-				<td><input type="text" name="telnet_password"  /></td>
-			</tr>
-			
-		</table>
-	</div>
-
-	<div id="ftp_data" class="tab_content">
-		<table class="zebra" width="100%">
-			<tbody>
-				<tr>
-					<td colspan="2"><p class="hr">{lang_adm_servers_ftp_data}</p></td>
-				</tr>
-			</tbody>
-
-
-			<tr>
-				<td width="30%">{lang_adm_servers_ftp_host}:</td>
-				<td><input type="text" name="ftp_host" /></td>
-			</tr>
-
-			<tr>
-				<td>{lang_login}:</td>
-				<td><input type="text" name="ftp_login" /></td>
-			</tr>
-
-			<tr>
-				<td>{lang_password}:</td>
-				<td><input type="text" name="ftp_password" /></td>
-			</tr>
-
-<!--
-			<tr>
-				<td>{lang_adm_servers_path_to_executable_file}:</td>
-				<td><input type="text" name="ftp_path" /></td>
-			</tr>
--->
 
 		</table>
 	</div>

@@ -128,7 +128,7 @@
 
 				<tr>
 					<td>{lang_adm_servers_server_dir}:<br /><span class="description">[ {lang_adm_servers_server_dir_desc} ]</span></td>
-					<td>{script_path}/<input type="text" name="dir" value="{server_dir}" /></td>
+					<td>{work_path}/<input type="text" name="dir" value="{server_dir}" /></td>
 				</tr>
 				
 				<script type="text/javascript">
@@ -192,8 +192,7 @@
 				<tr>
 					<td colspan="2"><p class="hr">{lang_adm_servers_start_parameters}</p></td>
 				</tr>
-
-				<?php if($this->servers->server_data['os'] != 'Windows'): ?>
+                
 				<tr>
 					<td>{lang_adm_servers_screen_name}:</td>
 					<td><input type="text" name="screen_name" value="{screen_name}"/></td>
@@ -203,8 +202,6 @@
 					<td>{lang_adm_servers_user_start}:</td>
 					<td><input type="text" name="su_user" value="{su_user}" /></td>
 				</tr>
-
-				<?php endif; ?>
 
 				<tr>
 					<td width="45%">{lang_adm_servers_command_start}:</td>
