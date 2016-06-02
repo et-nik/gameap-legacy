@@ -11,18 +11,13 @@ Server Requirements
 Web-server
 ------
 * PHP version 5.3 or newer.
-* SSH2 module PHP
 * GD module PHP
-* Enabled ftp functions
 
 Dedicated Server (Linux)
 ------
-* Screen
-* SSH server (not in local)
-* FTP server (not in local)
+
 
 Dedicated Server (Windows)
 ------
-* Telnet or SSH server (not in local)
-* FTP server (not in local)
+
 * Administration privileges
