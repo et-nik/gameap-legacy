@@ -109,16 +109,8 @@ class Adm_servers extends CI_Controller {
 		$ds_id = (int)$this->input->post('ds_id');
 		
 		$this->dedicated_servers->get_ds_list(array('id' => $ds_id), 1);
-		
-		if(strtolower($this->dedicated_servers->ds_list[0]['control_protocol']) == 'ssh') {
-			$this->output->append_output($this->dedicated_servers->ds_list[0]['ssh_path']);
-		} elseif(strtolower($this->dedicated_servers->ds_list[0]['control_protocol']) == 'telnet') {
-			$this->output->append_output($this->dedicated_servers->ds_list[0]['telnet_path']);
-		} elseif(strtolower($this->dedicated_servers->ds_list[0]['os']) == 'windows') {
-			$this->output->append_output($this->dedicated_servers->ds_list[0]['telnet_path']);
-		} else {
-			$this->output->append_output($this->dedicated_servers->ds_list[0]['ssh_path']);
-		}
+
+        $this->output->append_output($this->dedicated_servers->ds_list[0]['work_path']);
 	}
 	
 	// ----------------------------------------------------------------

@@ -114,27 +114,7 @@ class Adm_servers extends CI_Controller {
 	*/
 	private function _check_telnet($telnet_host, $telnet_login, $telnet_password, $os = 'windows')
 	{
-		$this->load->driver('control');
-
-		if ($telnet_login == '' OR $telnet_password == '') {
-			/* В Telnet не разрешены пустые логины или пароли */
-			return false;
-		}
-
-		// Разделяем на Host:Port
-		$telnet_host = explode(':', $telnet_host);
-		$telnet_host[1] = (isset($telnet_host[1])) ? (int)$telnet_host[1] : 23;
-		
-		$this->control->set_driver('telnet');
-		$this->control->set_data(array('os' => $os));
-		
-		try {
-			$this->control->connect($telnet_host[0], $telnet_host[1]);
-			$this->control->auth($telnet_login, $telnet_password);
-			return true;
-		} catch (Exception $e) {
-			return false;
-		}
+		return true;
 	}
 	
 	// -----------------------------------------------------------------
@@ -184,21 +164,7 @@ class Adm_servers extends CI_Controller {
 	*/
     function _check_ssh($ssh_host, $ssh_login, $ssh_password) 
     {
-		$this->load->driver('control');
-		
-		// Разделяем на Host:Port
-		$ssh_host = explode(':', $ssh_host);
-		$ssh_host[1] = (isset($ssh_host[1])) ? (int)$ssh_host[1] : 22;
-		
-		$this->control->set_driver('ssh');
-		
-		try {
-			$this->control->connect($ssh_host[0], $ssh_host[1]);
-			$this->control->auth($ssh_login, $ssh_password);
-			return true;
-		} catch (Exception $e) {
-			return false;
-		}
+		return true;
 	}
 
 	// -----------------------------------------------------------------
@@ -213,25 +179,7 @@ class Adm_servers extends CI_Controller {
 	*/
 	private function _check_ftp($ftp_host, $ftp_login, $ftp_password) 
 	{
-		$this->load->driver('files');
-
-		// Разделяем на Host:Port
-		$ftp_host = explode(':', $ftp_host);
-		$ftp_host[1] = (isset($ftp_host[1])) ? (int)$ftp_host[1] : 21;
-		
-		$ftp_config['hostname'] 	= $ftp_host[0];
-		$ftp_config['port']     	= $ftp_host[1];
-		$ftp_config['username'] 	= $ftp_login;
-		$ftp_config['password'] 	= $ftp_password;
-		$ftp_config['passive']  	= false;
-		
-		try {
-			$this->files->set_driver('ftp');
-			$this->files->connect($ftp_config);
-			return true;
-		} catch (Exception $e) {
-			return false;
-		}
+		return true;
 	}
 
 	// -----------------------------------------------------------------
@@ -242,11 +190,7 @@ class Adm_servers extends CI_Controller {
 	*/
 	private function _found_ftp_path($ftp_path = false)
 	{
-		try {
-			return $this->files->search(array('server.sh', 'server.exe'), $ftp_path);
-		} catch (Exception $e) {
-			return false;
-		}
+		return "";
 	}
 	
 	// -----------------------------------------------------------------
@@ -257,31 +201,7 @@ class Adm_servers extends CI_Controller {
 	*/
 	private function _found_sftp_path($sftp_path = false, $sftp_config)
 	{
-		$this->load->driver('files');
-		
-		// Исключаемые директории. В них поиск не ведется
-		$exclude_dirs = array('bin', 'boot', 'build', 'cdrom', 'dev', 'etc', 'lib',
-								'lib32', 'lib64', 'proc', 'media', 'mnt', 'run', 'sbin',
-								'selinux', 'sys', 'tmp',
-							);
-		
-		$this->files->set_driver('sftp');
-		
-		try {
-			$this->files->connect($sftp_config);
-			return $this->files->search(array('server.sh', 'server.exe'), $sftp_path, $exclude_dirs, 4);
-		} catch (Exception $e) {
-			
-			// Сохраняем логи
-			$log_data['type'] 			= 'sftp_search';
-			$log_data['command'] 		= 'search_file';
-			$log_data['server_id'] 		= 0;
-			$log_data['msg'] 			= 'server.sh/server.exe not found';
-			$log_data['log_data'] 		= $e->getMessage() . "\nPath: " . $sftp_path;
-			$this->panel_log->save_log($log_data);
-			
-			return false;
-		}
+		return "";
 	}
 	
 	// -----------------------------------------------------------------
@@ -1312,18 +1232,6 @@ class Adm_servers extends CI_Controller {
 				$tpl_list = $this->dedicated_servers->tpl_data_ds();
 				$local_tpl = $tpl_list[0];
 				
-				//if(in_array('ssh2', get_loaded_extensions()));
-				$options = array('gdaemon' => 'GameAP Daemon', 'ssh' => 'SSH', 'telnet' => 'Telnet');
-				
-				if ($this->dedicated_servers->ds_list['0']['control_protocol'] == 'local') {
-					// Поле Local отображается лишь для локального сервера
-					// Однако можно вручную подменить значения в html коде,
-					// но в этом нет ничего страшного
-					$options['local'] = 'Local';
-				}
-				
-				$local_tpl['control_protocol'] = form_dropdown('control_protocol', $options, $this->dedicated_servers->ds_list['0']['control_protocol']);
-
 				// Скрипты
 				$local_tpl['script_start'] 			= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_start']);
 				$local_tpl['script_stop'] 			= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_stop']);
@@ -1332,24 +1240,14 @@ class Adm_servers extends CI_Controller {
 				$local_tpl['script_get_console'] 	= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_get_console']);
 				$local_tpl['script_send_command'] 	= quotes_to_entities($this->dedicated_servers->ds_list['0']['script_send_command']);
 				
-				$local_tpl['script_path'] 		= $this->dedicated_servers->ds_list['0']['script_path'];
+				$local_tpl['work_path'] 		= $this->dedicated_servers->ds_list['0']['work_path'];
 				$local_tpl['steamcmd_path'] 	= $this->dedicated_servers->ds_list['0']['steamcmd_path'];
 				
 				$local_tpl['gdaemon_host'] 		= $this->dedicated_servers->ds_list['0']['gdaemon_host'];
 				$local_tpl['gdaemon_key'] 		= $this->dedicated_servers->ds_list['0']['gdaemon_key'];
-				
-				$local_tpl['ssh_host'] 			= $this->dedicated_servers->ds_list['0']['ssh_host'];
-				$local_tpl['ssh_login'] 		= $this->dedicated_servers->ds_list['0']['ssh_login'];
-				$local_tpl['ssh_path'] 			= $this->dedicated_servers->ds_list['0']['ssh_path'];
-				
-				$local_tpl['telnet_host'] 		= $this->dedicated_servers->ds_list['0']['telnet_host'];
-				$local_tpl['telnet_login'] 		= $this->dedicated_servers->ds_list['0']['telnet_login'];
-				$local_tpl['telnet_path'] 		= $this->dedicated_servers->ds_list['0']['telnet_path'];
-				
-				$local_tpl['ftp_host'] 			= $this->dedicated_servers->ds_list['0']['ftp_host'];
-				$local_tpl['ftp_login'] 		= $this->dedicated_servers->ds_list['0']['ftp_login'];
-				$local_tpl['ftp_path'] 			= $this->dedicated_servers->ds_list['0']['ftp_path'];
-				
+				$local_tpl['gdaemon_login'] 	= $this->dedicated_servers->ds_list['0']['gdaemon_login'];
+				$local_tpl['gdaemon_password']  = $this->dedicated_servers->ds_list['0']['gdaemon_password'];
+
 				$local_tpl['disabled_checkbox'] = form_checkbox('disabled', 'accept', $this->dedicated_servers->ds_list['0']['disabled']);
 				
 				
@@ -1383,26 +1281,11 @@ class Adm_servers extends CI_Controller {
 
 				// Редактирование данных доступа к серверу (пароли ftp, ssh)
 				$this->form_validation->set_rules('steamcmd_path', lang('adm_servers_steamcmd_path'), 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('script_path', lang('adm_servers_script_path'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('work_path', lang('adm_servers_work_path'), 'trim|max_length[256]|xss_clean');
 				
 				$this->form_validation->set_rules('gdaemon_host', lang('adm_servers_gdaemon_host'), 'trim|max_length[64]|xss_clean');
 				$this->form_validation->set_rules('gdaemon_key', lang('adm_servers_gdaemon_key'), 'trim|max_length[64]|xss_clean');
 				
-				$this->form_validation->set_rules('ssh_host', lang('adm_servers_ftp_host'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('ssh_login', 'SSH login', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('ssh_password', 'SSH password', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('ssh_path', 'Path SSH', 'trim|max_length[256]|xss_clean');
-					
-				$this->form_validation->set_rules('telnet_host', lang('adm_servers_telnet_host'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('telnet_login', 'Telnet login', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('telnet_password', 'Telnet password', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('telnet_path', 'Path Telnet', 'trim|max_length[256]|xss_clean');
-					
-				$this->form_validation->set_rules('ftp_host', lang('adm_servers_ftp_host'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('ftp_login', 'FTP login', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('ftp_password', 'FTP password', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('ftp_path', 'Path FTP', 'trim|max_length[256]|xss_clean');
-					
 				$this->form_validation->set_rules('control_protocol', lang('adm_servers_control_protocol'), 'trim|min_length[3]|max_length[16]|xss_clean');
 					
 				break;
@@ -1457,8 +1340,8 @@ class Adm_servers extends CI_Controller {
 				$local_tpl['net_limit'] 			= $this->servers->server_data['net_limit'];
 				
 				/* Получаем абсолютный путь к корневой директории с сервером и к исполняемым файлам */
-				$local_tpl['full_server_path'] = $this->servers->server_data['script_path'] . '/' . $this->servers->server_data['dir'];
-				$local_tpl['script_path'] = $this->servers->server_data['script_path'];
+				$local_tpl['full_server_path']      = $this->servers->server_data['work_path'] . '/' . $this->servers->server_data['dir'];
+				$local_tpl['work_path']             = $this->servers->server_data['work_path'];
 				
 				// Модификация
 				$where = array('game_code' => $this->servers->server_data['game']);
@@ -1846,117 +1729,27 @@ class Adm_servers extends CI_Controller {
 					
 					// Редактирование данных доступа к серверу (пароли ftp, ssh)
 					$sql_data['steamcmd_path'] 		= $this->input->post('steamcmd_path');
-					//~ $sql_data['script_path'] 		= $this->input->post('script_path');
-					$sql_data['control_protocol'] 	= $this->input->post('control_protocol');
+					$sql_data['work_path'] 		    = $this->input->post('work_path');
 					
 					$sql_data['gdaemon_host'] 		= $this->input->post('gdaemon_host');
 					$sql_data['gdaemon_key'] 		= $this->input->post('gdaemon_key');
-					
-					$sql_data['ssh_host'] 			= $this->input->post('ssh_host');
-					$sql_data['ssh_login'] 			= $this->input->post('ssh_login');
-					$sql_data['ssh_password'] 		= $this->input->post('ssh_password');
-					$sql_data['ssh_path'] 			= $this->input->post('script_path');
-					
-					$sql_data['telnet_host'] 		= $this->input->post('telnet_host');
-					$sql_data['telnet_login']		= $this->input->post('telnet_login');
-					$sql_data['telnet_password'] 	= $this->input->post('telnet_password');
-					$sql_data['telnet_path']		= $this->input->post('script_path');
-					
-					$sql_data['ftp_host'] 			= $this->input->post('ftp_host');
-					$sql_data['ftp_login'] 			= $this->input->post('ftp_login');
-					$sql_data['ftp_password'] 		= $this->input->post('ftp_password');
-					$sql_data['ftp_path'] 			= $this->input->post('ftp_path');	
+					$sql_data['gdaemon_login'] 		= $this->input->post('gdaemon_login');
+					$sql_data['gdaemon_password'] 	= $this->input->post('gdaemon_password');
 
-					/* 
-					 * Проверка указандых данных ssh, telnet, ftp
-					 * чтобы пароль подходил
-					*/
-					
-					// GDaemon
-					if (!empty($sql_data['gdaemon_host'])) {
-						
-						/* Ключ не задан, берем из базы */
-						if (empty($sql_data['gdaemon_key'])) {
-							$gdaemon_key = $this->dedicated_servers->ds_list['0']['gdaemon_key'];
-						} else {
-							$gdaemon_key = $sql_data['gdaemon_key'];
-						}
+					// GDaemon check
+                    
+                    /* Ключ не задан, берем из базы */
+                    if (empty($sql_data['gdaemon_key'])) {
+                        $gdaemon_key = $this->dedicated_servers->ds_list['0']['gdaemon_key'];
+                    } else {
+                        $gdaemon_key = $sql_data['gdaemon_key'];
+                    }
 
-						if (false == $this->_check_gdaemon($sql_data['gdaemon_host'], $gdaemon_key)) {
-							$this->_show_message(lang('adm_servers_gdaemon_data_unavailable'), 'javascript:history.back()');
-							return false;
-						}
-					}
-					
-					// SSH
-					if (!empty($sql_data['ssh_host'])) {
-						
-						/* Пароль не задан, берем из базы */
-						if(empty($sql_data['ssh_password'])) {
-							$ssh_password = $this->dedicated_servers->ds_list['0']['ssh_password'];
-						} else {
-							$ssh_password = $sql_data['ssh_password'];
-						}
-						
-						if (false == $this->_check_ssh($sql_data['ssh_host'], $sql_data['ssh_login'], $ssh_password)) {
-							$this->_show_message(lang('adm_servers_ssh_data_unavailable'), 'javascript:history.back()');
-							return false;
-						}
-						
-						$ssh_host = explode(':', $sql_data['ssh_host']);
-						$ssh_host[1] = (isset($ssh_host[1])) ? (int)$ssh_host[1] : 22;
-						
-						$sftp_config['hostname'] 	= $ssh_host[0];
-						$sftp_config['port'] 		= $ssh_host[1];
-						$sftp_config['username'] 	= $sql_data['ssh_login'];
-						$sftp_config['password'] 	= $ssh_password;
-						$sftp_config['debug'] 		= false;
-						
-						if (!$sql_data['ssh_path'] = $this->_found_sftp_path($sql_data['ssh_path'], $sftp_config)) {
-							$this->_show_message(lang('adm_servers_sftp_path_not_found'), 'javascript:history.back()');
-							return false;
-						}
-						
-					}
-					
-					// FTP
-					if(!empty($sql_data['ftp_host'])) {
-						
-						/* Пароль не задан, берем из базы */
-						if(empty($sql_data['ftp_password'])) {
-							$ftp_password = $this->dedicated_servers->ds_list['0']['ftp_password'];
-						} else {
-							$ftp_password = $sql_data['ftp_password'];
-						}
-						
-						
-						if (false == $this->_check_ftp($sql_data['ftp_host'], $sql_data['ftp_login'], $ftp_password)) {
-							$this->_show_message(lang('adm_servers_ftp_data_unavailable'), 'javascript:history.back()');
-							return false;
-						}
-						
-						if (!$sql_data['ftp_path'] = $this->_found_ftp_path($sql_data['ftp_path'])) {
-							$this->_show_message(lang('adm_servers_ftp_path_not_found'), 'javascript:history.back()');
-							return false;
-						}
-					}
-					
-					// TELNET
-					if (!empty($sql_data['telnet_host'])) {
-						
-						/* Пароль не задан, берем из базы */
-						if(empty($sql_data['telnet_password'])) {
-							$telnet_password = $this->dedicated_servers->ds_list['0']['telnet_password'];
-						} else {
-							$telnet_password = $sql_data['telnet_password'];
-						}
-						
-						if (false == $this->_check_telnet($sql_data['telnet_host'], $sql_data['telnet_login'], $telnet_password, strtolower($sql_data['os']))) {
-							$this->_show_message(lang('adm_servers_telnet_data_unavailable'), 'javascript:history.back()');
-							return false;
-						}
-					}
-					
+                    if (false == $this->_check_gdaemon($sql_data['gdaemon_host'], $gdaemon_key)) {
+                        $this->_show_message(lang('adm_servers_gdaemon_data_unavailable'), 'javascript:history.back()');
+                        return false;
+                    }
+
 					if($this->dedicated_servers->edit_dedicated_server($id, $sql_data)){
 						$local_tpl['message'] = lang('adm_servers_server_data_changed');
 					}else{
