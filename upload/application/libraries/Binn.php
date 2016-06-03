@@ -226,6 +226,10 @@ class Binn {
 
         // Size
         switch ($type) {
+            case BINN_BOOL:
+                $size = 1;
+                break;
+                
             case BINN_UINT8:
                 $size = 1;
                 break;
@@ -288,6 +292,9 @@ class Binn {
                     $return[] = $arr[1]->get_binn_arr();
                     break;
 
+                case BINN_BOOL:
+                case BINN_TRUE:
+                case BINN_FALSE:
                 case BINN_INT64:
                 case BINN_UINT64:
                 case BINN_INT32:
@@ -352,6 +359,18 @@ class Binn {
 
         foreach ($this->binn_arr as &$arr) {
             switch ($arr[0]) {
+                case BINN_BOOL:
+                    $this->binn_obj .= $arr[1] ? pack("C", BINN_TRUE) : pack("C", BINN_FALSE);
+                    break;
+                    
+                case BINN_TRUE:
+                    $this->binn_obj .= pack("C", BINN_TRUE);
+                    break;
+                    
+                case BINN_FALSE:
+                    $this->binn_obj .= pack("C", BINN_FALSE);
+                    break;
+                    
                 case BINN_UINT8:
                     $this->binn_obj .= pack("C", BINN_UINT8);
                     $this->binn_obj .= pack("C", $arr[1]);
@@ -418,12 +437,24 @@ class Binn {
     public function __call($name, $arguments)
     {
         switch ($name) {
+            case "add_bool":
+                self::_add_val(BINN_BOOL, $arguments[0]);
+                break;
+                
             case "add_uint8":
                 self::_add_val(BINN_UINT8, $arguments[0]);
                 break;
                 
             case "add_int16":
                 self::_add_val(BINN_INT16, $arguments[0]);
+                break;
+
+            case "add_int32":
+                self::_add_val(BINN_INT32, $arguments[0]);
+                break;
+
+            case "add_int64":
+                self::_add_val(BINN_INT64, $arguments[0]);
                 break;
 
             case "add_str":
@@ -493,6 +524,14 @@ class Binn {
             // $cur_type = strtotime(base_convert($byte_var_type, 10, 16));
 
             switch ($byte_var_type) {
+                case BINN_TRUE:
+                    self::_add_val(BINN_BOOL, true);
+                    break;
+                    
+                case BINN_FALSE:
+                    self::_add_val(BINN_BOOL, false);
+                    break;
+                    
                 case BINN_UINT64:
                     self::_add_val(BINN_UINT64, unpack("J", substr($binstring, $pos, 8))[1]);
                     $pos += 8;
