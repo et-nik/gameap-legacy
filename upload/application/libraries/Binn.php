@@ -445,6 +445,22 @@ class Binn {
                 self::_add_val(BINN_UINT8, $arguments[0]);
                 break;
                 
+            case "add_uint16":
+                self::_add_val(BINN_UINT16, $arguments[0]);
+                break;
+                
+            case "add_uint32":
+                self::_add_val(BINN_UINT32, $arguments[0]);
+                break;
+                
+            case "add_uint64":
+                self::_add_val(BINN_UINT64, $arguments[0]);
+                break;
+                
+            case "add_int8":
+                self::_add_val(BINN_INT8, $arguments[0]);
+                break;
+
             case "add_int16":
                 self::_add_val(BINN_INT16, $arguments[0]);
                 break;
