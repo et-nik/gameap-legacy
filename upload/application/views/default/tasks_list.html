@@ -1,0 +1,48 @@
+<a class="awesome" onclick="anichange('#filter'); return false" href="#">{lang_filter}</a>
+<br /><br />
+
+<script>
+function anichange (objName) {
+  if ( $(objName).css('display') == 'none' ) {
+    $(objName).animate({height: 'show'}, 400);
+  } else {
+    $(objName).animate({height: 'hide'}, 200);
+  }
+}
+</script>
+
+<div id="filter" style="display: none">
+	<br />
+	<form action="{site_url}admin/settings/set_filter/panel_log" method="post" accept-charset="utf-8">
+		<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+		
+		<table class="zebra" width="100%">
+
+		</table>
+			<p align="center">
+				<input class="button" type="submit" name="submit_filter" value="{lang_apply}" />
+				<input class="button" type="submit" name="reset" value="{lang_reset}" />
+			</p>
+	</form>
+</div>
+
+{pagination}
+<table width="100%" class="zebra">
+	<thead>
+		<th><strong>{lang_task}</strong></th>
+		<th><strong>{lang_ds_name}</strong></th>
+		<th><strong>{lang_server_name}</strong></th>
+		<th><strong>{lang_status}</strong></th>
+		<th>&nbsp;</td>
+	</thead>
+{tasks_list}
+	<tr>
+		<td width="20%">{task_htask}</td>
+		<td width="20%"><a href="{site_url}adm_servers/edit/dedicated_servers/{task_ds_id}">{task_ds_name}</a></td>
+		<td width="20%"><a href="{site_url}adm_servers/edit/game_servers/{task_server_id}">{task_server_name}</a></td>
+		<td width="20%">{task_hstatus}</td>
+		<td><a class="small awesome" href={site_url}tasks/view/{task_id}>{lang_view}</a></td>
+	</tr>
+{/tasks_list}
+</table>
+{pagination}
