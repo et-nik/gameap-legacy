@@ -1,5 +1,209 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+
+<script type="text/javascript">
+	var page = {
+		'site_url' : '{site_url}',
+		'template_files': '{site_url}themes/{template}/{style}/',
+		'system_template': '{site_url}themes/system/',
+		'csrf_token_name' : '{csrf_token_name}',
+		'csrf_hash' : '{csrf_hash}'
+	};
+</script>
+
+<script>
+    block = false;
+
+    task_status = '';
+    check_timeout = 2000;
+
+    function get_task_info(task_id)
+    {
+        $.ajax({ 
+            url:    sprintf("%sajax/tasks/get_info/%s", page.site_url, task_id),
+            type:     "GET",
+            dataType: "json",
+            success: function(response) {
+                if (response.status == '0') {
+                    noty({layout: 'bottomCenter', type: 'error', text: response.error_text});
+                    return;
+                } else {
+                    task_status = response.data.status;
+                }
+            },
+            error: function() {
+                noty({layout: 'bottomCenter', type: 'error', text: "unknown error"});
+            },
+            complete: function() {
+                HideLoad();
+                block = false;
+            }
+        });
+    }
+
+    check_step = 0;
+
+    var messages = {
+        "gsstart": ["Ожидание очереди", "Запуск сервера", "Проверка статуса"],
+        "gsstop": ["Ожидание очереди", "Остановка сервера", "Проверка статуса"],
+        "gsrest": ["Ожидание очереди", "Перезапуск сервера", "Проверка статуса"],
+        "gsinst": ["Ожидание очереди", "Обновление сервера", "Проверка результата"]
+    };
+
+    var success_messages = {
+        "gsstart": "Сервер успешно запущен. <br />Некоторое время он может быть оффлайн пока не загрузятся ресурсы, плагины, карта и т.д. Результат загрузки ресурсов можно видеть в консоли и логах сервера.",
+        "gsstop": "Сервер успешно остановлен.",
+        "gsrest": "Сервер успешно перезапущен. <br />Некоторое время он может быть оффлайн пока не загрузятся ресурсы, плагины, карта и т.д. Результат загрузки ресурсов можно видеть в консоли и логах сервера.",
+        "gsinst": "Сервер обновлён."
+    };
+
+    var message_title = {
+        "gsstart": "Запуск сервера",
+        "gsstop": "Остановка сервера",
+        "gsrest": "Перезапуск сервера",
+        "gsinst": "Обновление сервера"
+    };
+
+    function check_task(task, task_id)
+    {
+        intervalID = null;
+
+        function check_task_start()
+        {
+            get_task_info(task_id);
+    
+            if (task_status != 'waiting' && task_status != '') {
+                clearInterval(intervalID);
+                check_step = 1;
+                check_task(task, task_id);
+            }
+        }
+
+        function check_task_end()
+        {
+            get_task_info(task_id);
+    
+            if ((task_status == 'success' || task_status == 'error') && task_status != '') {
+                clearInterval(intervalID);
+                check_step = 2;
+                check_task(task, task_id);
+            }
+        }
+
+        function check_task_result()
+        {
+            clearInterval(intervalID);
+            check_step = 3;
+            check_task(task, task_id);
+        }
+
+        if (check_step == 0) {
+            $(".task-progress-header").html(message_title[task]);
+            $("#vts-content").html("");
+            $("#vts-content").append("<span class=\"vts-progress\">" + messages[task][0] + "...</span>");
+            intervalID = setInterval(check_task_start, check_timeout);
+        }
+
+        if (!intervalID && check_step == 1) {
+            $('.vts-progress').last().remove();
+            $("#vts-content").append("<span class=\"vts-progress\">&#10003; " + messages[task][0] + "</span><br />\n");
+            $("#vts-content").append("<span class=\"vts-progress\">" + messages[task][1] + "...</span>");
+            
+            intervalID = setInterval(check_task_end, check_timeout);
+        }
+
+        if (!intervalID && check_step == 2) {
+            $('.vts-progress').last().remove();
+            $("#vts-content").append("<span class=\"vts-progress\">&#10003; " + messages[task][1] + "</span><br />\n");
+            $("#vts-content").append("<span class=\"vts-progress\">" + messages[task][2] + "...</span>\n");
+            intervalID = setInterval(check_task_result, check_timeout);
+        }
+
+        if (check_step == 3) {
+            // End
+            $('.vts-progress').last().remove();
+            $("#vts-content").append("<span class=\"vts-progress\">&#10003; " + messages[task][2] + "</span><br />\n");
+
+            // Var nulled
+            check_step = 0;
+            task_status = '';
+
+            $('#view-task-status').arcticmodal('close');
+            noty({layout: 'bottomCenter', type: 'success', text: success_messages[task]});
+        }
+    }
+
+    function add_task(task)
+    {
+        if (block == true) {
+            return;
+        }
+
+        block = true;
+        ShowLoad();
+        
+        $.ajax({ 
+            url:     '{site_url}ajax/tasks/add_task',
+            type:     "POST",
+            data:
+            {
+                'task': task,
+                'server_id': {server_id},
+                '{csrf_token_name}': '{csrf_hash}'
+            },
+            dataType: "json",
+            success: function(response) {
+                if (response.status == '0') {
+                    noty({layout: 'bottomCenter', type: 'error', text: response.error_text});
+                    return;
+                } else {
+                    // noty({layout: 'bottomCenter', type: 'success', text: "Success"});
+                    $('#view-task-status').arcticmodal();
+                    check_task(task, response.task_id);
+                }
+            },
+            error: function() {
+                noty({layout: 'bottomCenter', type: 'error', text: "unknown error"});
+            },
+            complete: function() {
+                HideLoad();
+                block = false;
+            }
+        });
+    }
+
+    function start_server()
+    {
+        add_task('gsstart');
+    }
+
+    function stop_server()
+    {
+        add_task('gsstop');
+    }
+
+    function restart_server()
+    {
+        add_task('gsrest');
+    }
+
+    function update_server()
+    {
+        add_task('gsinst');
+    }
+</script>
+
 <p class="hr"><strong>{lang_server_control_base_commands}</strong></p>
+
+<div style="display: none;">
+    <div class="box-modal" style="width: 300px;" id="view-task-status">
+        <div class="box-modal_close arcticmodal-close">close</div>
+        <h2 class="task-progress-header"></h2>
+
+        <div id="vts-content">
+
+        </div>
+    </div>
+</div>
 
 <?php 
 if(($this->users->auth_privileges['srv_start'] == 1 
@@ -8,7 +212,7 @@ if(($this->users->auth_privileges['srv_start'] == 1
 ):
 
 ?>
-	<a class="large green awesome" href="{site_url}server_command/start/{server_id}">&#9658;&nbsp;{lang_start}</a>
+	<a id="start-server" class="large green awesome" href="#">&#9658;&nbsp;{lang_start}</a>
 <?php endif; ?>
 
 <?php 
@@ -17,7 +221,7 @@ if(($this->users->auth_privileges['srv_stop'] == 1
 	AND ($this->servers->server_data['server_status'] == 1)
 ):
 ?>
-	<a class="large red awesome" href="{site_url}server_command/stop/{server_id}">&#9632;&nbsp;{lang_stop}</a>
+	<a id="stop-server" class="large red awesome" href="#">&#9632;&nbsp;{lang_stop}</a>
 <?php endif; ?>
 
 <?php 
@@ -25,7 +229,7 @@ if($this->users->auth_privileges['srv_restart'] == 1
 	AND $this->users->auth_servers_privileges['SERVER_RESTART']
 ):
 ?>
-	<a class="large yellow awesome" href="{site_url}server_command/restart/{server_id}">&#10162;&nbsp;{lang_restart}</a>
+	<a id="restart-server" class="large yellow awesome" href="#">&#10162;&nbsp;{lang_restart}</a>
 <?php endif; ?>
 
 <?php if($this->users->auth_servers_privileges['SERVER_SOFT_RESTART'] AND $this->servers->server_data['srestart_cmd']): ?>
@@ -33,7 +237,7 @@ if($this->users->auth_privileges['srv_restart'] == 1
 <?php endif; ?>
 
 <?php if($this->users->auth_servers_privileges['SERVER_UPDATE']): ?>
-	<a class="large magenta awesome" href={site_url}server_command/update/{server_id}>&#10162;&nbsp;{lang_update}</a>
+	<a id="update-server" class="large magenta awesome" href="#">&#10162;&nbsp;{lang_update}</a>
 <?php endif; ?>
 
 <p class="hr"><strong>Инструменты</strong></p>
@@ -247,3 +451,25 @@ if($this->users->auth_privileges['srv_restart'] == 1
 	{/task_list}
 	</table>
 <?php endif; ?>
+
+<script>
+    $('#start-server').click(function() {
+        start_server();
+        return false;
+    });
+    
+    $('#stop-server').click(function() {
+        stop_server();
+        return false;
+    });
+    
+    $('#restart-server').click(function() {
+        restart_server();
+        return false;
+    });
+    
+    $('#update-server').click(function() {
+        update_server();
+        return false;
+    });
+</script>

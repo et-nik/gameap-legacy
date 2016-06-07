@@ -1095,14 +1095,12 @@ class Server_command extends CI_Controller {
 					$confirm_tpl['confirmed_url'] = site_url('server_command/restart/' . $this->servers->server_data['id'] . '/' . $this->security->get_csrf_hash());
 					$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
 				}
-			}else{
+			} else {
 					$message = lang('server_command_no_restart_privileges');
 					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
 					return false;
-					
-					break;
 			}
-		}else{
+		} else {
 			$message = lang('server_command_server_not_found');
 			$this->_show_message($message, site_url('admin'), lang('next'));
 			return false;
