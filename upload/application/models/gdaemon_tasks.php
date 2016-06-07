@@ -164,10 +164,17 @@ class Gdaemon_tasks extends CI_Model {
      * @param array $data
      * @return bool
      *
+     * @return int
+     *
     */
 	function add($data)
 	{
-		return (bool)$this->db->insert('gdaemon_tasks', $data);
+		if ((bool)$this->db->insert('gdaemon_tasks', $data)) {
+            return $this->db->insert_id();
+        }
+        else {
+            return 0;
+        }
 	}
 	
 	// -----------------------------------------------------------------
