@@ -1,15 +1,13 @@
-<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Game AdminPanel (АдминПанель)
- *
+ * Game AdminPanel (GameAP)
  * 
  *
  * @package		Game AdminPanel
- * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
+ * @author		Nikita Kuznetsov (NiK)
+ * @copyright	Copyright (c) 2014-2016
  * @license		http://www.gameap.ru/license.html
  * @link		http://www.gameap.ru
- * @filesource
 */
 class Server_command extends CI_Controller {
 	
@@ -28,24 +26,23 @@ class Server_command extends CI_Controller {
         $this->load->model('users');
         $this->lang->load('server_command');
         
-        if ($this->users->check_user()) {
-			//Base Template
-			$this->tpl_data['title'] 	= lang('server_command_title_index');
-			$this->tpl_data['heading'] 	= lang('server_command_header_index');
-			$this->tpl_data['content'] = '';
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
-			
-			$this->load->model('servers');
-			
-			$this->ext_list = get_loaded_extensions();
-        } else {
+        if (!$this->users->check_user()) {
             redirect('auth');
         }
+        
+        //Base Template
+        $this->tpl_data['title'] 	= lang('server_command_title_index');
+        $this->tpl_data['heading'] 	= lang('server_command_header_index');
+        $this->tpl_data['content'] = '';
+        $this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
+        $this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
+        
+        $this->load->model('servers');
+        
+        $this->ext_list = get_loaded_extensions();
     }
     
-    
-	// -----------------------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Получение ника игрока по id
@@ -79,85 +76,32 @@ class Server_command extends CI_Controller {
 		throw new Exception(lang('server_command_player_not_found'));
 	}
 
-	// -----------------------------------------------------------------------
-    
-	// Отображение информационного сообщения
-	function _show_message($message = false, $link = false, $link_text = false)
-	{
-		
-		if (!$message) {
-			$message = ($this->errors OR lang('error'));
-		}
-		
-		if (!$link) {
-			$link = site_url('admin');
-		}
-		
-		if (!$link_text) {
-			$link_text = lang('back');
-		}
+	// -----------------------------------------------------------------
+
+    /**
+     * Show info message
+     *
+     * @param string    $message
+     * @param string    $link 
+     * @param string    $link_test
+    */ 
+    private function _show_message($message = false, $link = false, $link_text = false)
+    {
+        $message 	OR $message = lang('error');
+		$link 		OR $link = 'javascript:history.back()';
+		$link_text 	OR $link_text = lang('back');
+
+        $local_tpl['message'] = $message;
+        $local_tpl['link'] = $link;
+        $local_tpl['back_link_txt'] = $link_text;
+        
+        $this->tpl['content'] = $this->parser->parse('info.html', $local_tpl, true);
+        $this->parser->parse('main.html', $this->tpl);
+    }
 	
-		$local_tpl['message'] = $message;
-		$local_tpl['link'] = $link;
-		$local_tpl['back_link_txt'] = $link_text;
-		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
-		$this->parser->parse('main.html', $this->tpl_data);
-	}
-	
-	// -----------------------------------------------------------------------
-	
+    // -----------------------------------------------------------------
+
 	/**
-	 * По ответу на команду, отправленную на физ. сервер получает
-	 * понятный пользователю ответ.
-	 * 
-	 * Можно было бы применить switch case, это было бы удобнее, 
-	 * но ответ может состоять более чем из одной строки
-	 * 
-	 */
-	private function _get_message($response = '', $server_id = '')
-	{
-		if (strpos($response, 'Server is already running') !== false) {
-			/* Сервер запущен ранее */
-			$message = lang('server_command_server_is_already_running', site_url('server_command/restart/'. $server_id), site_url('server_command/stop/' . $server_id));
-			
-		} elseif(strpos($response, 'Server started') !== false) {
-			/* Сервер успешно запущен */
-			$message = lang('server_command_started');
-			
-		} elseif(strpos($response, 'Server not started') !== false) {
-			// Неудачный запуск
-			$message = lang('server_command_start_failed');
-			
-		} elseif(strpos($response, 'Coulnd\'t find a running server') !== false) {
-			// Не найден запущенный сервер
-			$message = lang('server_command_running_server_not_found');
-			
-		} elseif(strpos($response, 'Server restarted') !== false) {
-			// Сервер перезапущен
-			$message = lang('server_command_restarted');
-			
-		} elseif(strpos($response, 'Server not restarted') !== false) {
-			// Сервер не перезапущен
-			$message = lang('server_command_restart_failed');
-			
-		} elseif(strpos($response, 'Server stopped') !== false) {
-			// Сервер остановлен
-			$message = lang('server_command_stopped');
-			
-		} elseif(strpos($response, 'Server not stopped') !== false) {
-			// Сервер не остановлен
-			$message = lang('server_command_stop_failed');
-
-		} else {
-			// Команда отправлена
-			$message = lang('server_command_cmd_sended');
-		}
-		
-		return $message;
-	}
-
-	/*
-	 * 
 	 * Главная страница
 	 * 
 	 * Используется как заглушка, 
@@ -168,6 +112,8 @@ class Server_command extends CI_Controller {
     {
 		redirect('admin');
 	}
+
+    // -----------------------------------------------------------------
 	
 	function rcon($command = false, $server_id = false, $custom_id = false, $confirm = false)
 	{
@@ -605,69 +551,33 @@ class Server_command extends CI_Controller {
 		return true;
 	}
 	
+	// -----------------------------------------------------------------
 	
 	/**
-	 * 
-	 * Просмотр консоли
-	 * 
+	 * Console view
 	*/
-	public function console_view($id)
+	public function console_view($server_id = 0)
     {
 		$this->tpl_data['title'] 	= lang('server_command_title_console_view');
 		$this->tpl_data['heading'] 	= lang('server_command_header_console_view');
-		
-		$this->load->helper('ds');
 			
 		/* Получены ли необходимые данные о сервере */
-		if($this->servers->get_server_data($id)) {
-			
-			$local_tpl['server_id'] = $id;
-			
-			// Получение прав на сервер
-			$this->users->get_server_privileges($this->servers->server_data['id']);
-			
-			if(!$this->users->auth_servers_privileges['CONSOLE_VIEW']) {
-				$this->_show_message(lang('server_command_no_console_privileges'), site_url('admin/server_control/main/' . $id));
-				return false;
-			}
+		if (!$this->servers->get_server_data($server_id)) {
+            $this->_show_message(lang('server_command_server_not_found'), site_url('admin'), lang('next'));
+			return;
+        }
 
-			/* Директория в которой располагается сервер */
-			$dir = $this->servers->server_data['script_path'] . '/' . $this->servers->server_data['dir'];
-			
-			$command = $this->servers->command_generate($this->servers->server_data, 'get_console');
-			
-			try {
-				$response = send_command($command, $this->servers->server_data);
-			} catch (Exception $e) {
-				$message = lang('server_command_' . $e->getMessage());
-				
-				if($this->users->auth_data['is_admin']) {
-					$message .= ' (' . strtoupper($this->servers->server_data['control_protocol']) . ')';
-					$message .= '<p>' . lang('server_command_sent_cmd') . ':<br /><code>' . get_last_command() . '</code></p>';
-				}
-				
-				$this->_show_message($message, site_url('admin/server_control/main/' . $id));
-				return false;
-			}
-			
-			$response = $this->_crop_console($response);
-			$local_tpl['console_content_original'] = $response;
-			
-			if (version_compare(phpversion(), '5.4.0') == -1) {
-				$console_content = str_replace("\n", "<br />\n", htmlspecialchars($response));
-			} else {
-				$console_content = str_replace("\n", "<br />\n", htmlspecialchars($response, ENT_SUBSTITUTE));
-			}
-			
-			$local_tpl['console_content'] = $console_content;
-			
-			$this->tpl_data['content'] = $this->parser->parse('servers/console_view.html', $local_tpl, true);
-			
-		} else {
-			$this->_show_message(lang('server_command_server_not_found'), site_url('admin'), lang('next'));
-			return false;
-		}
-		
+        $local_tpl['server_id'] = $id;
+        
+        // Получение прав на сервер
+        $this->users->get_server_privileges($this->servers->server_data['id']);
+        
+        if(!$this->users->auth_servers_privileges['CONSOLE_VIEW']) {
+            $this->_show_message(lang('server_command_no_console_privileges'), site_url('admin/server_control/main/' . $id));
+            return;
+        }
+
+        $this->tpl_data['content'] = $this->parser->parse('servers/console_view.html', $local_tpl, true);
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 }
