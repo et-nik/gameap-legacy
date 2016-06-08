@@ -97,6 +97,7 @@ class Gdaemon_tasks extends CI_Model {
 
         $this->db->join('dedicated_servers', 'dedicated_servers.id = gdaemon_tasks.ds_id');
         $this->db->join('servers', 'servers.id = gdaemon_tasks.server_id');
+        $this->db->order_by('gdaemon_tasks.id', 'desc');
         
         $query = $this->db->get();
         $this->tasks_list = $query->result_array();
