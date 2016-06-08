@@ -1,13 +1,82 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
 
 <script type="text/javascript">
-	var page = {
-		'site_url' : '{site_url}',
-		'template_files': '{site_url}themes/{template}/{style}/',
-		'system_template': '{site_url}themes/system/',
-		'csrf_token_name' : '{csrf_token_name}',
-		'csrf_hash' : '{csrf_hash}'
-	};
+    var page = {
+        'site_url' : '{site_url}',
+        'template_files': '{site_url}themes/{template}/{style}/',
+        'system_template': '{site_url}themes/system/',
+        'csrf_token_name' : '{csrf_token_name}',
+        'csrf_hash' : '{csrf_hash}',
+        'server_id' : {server_id}
+    };
+
+    var confirm_msg = {
+        "gsstart": "Вы уверены, что хотите запустить сервер?",
+        "gsstop": "Вы уверены, что хотите остановить сервер?",
+        "gsrest": "Вы уверены, что хотите перезапустить сервер?",
+        "gsinst": "Вы уверены, что хотите обновить сервер?"
+    };
+
+    var messages = {
+        "gsstart": ["Ожидание очереди", "Запуск сервера", "Проверка статуса"],
+        "gsstop": ["Ожидание очереди", "Остановка сервера", "Проверка статуса"],
+        "gsrest": ["Ожидание очереди", "Перезапуск сервера", "Проверка статуса"],
+        "gsinst": ["Ожидание очереди", "Обновление сервера", "Проверка результата"]
+    };
+
+    var success_messages = {
+        "gsstart": "Сервер успешно запущен. <br />Некоторое время он может быть оффлайн пока не загрузятся ресурсы, плагины, карта и т.д. Результат загрузки ресурсов можно видеть в консоли и логах сервера.",
+        "gsstop": "Сервер успешно остановлен.",
+        "gsrest": "Сервер успешно перезапущен. <br />Некоторое время он может быть оффлайн пока не загрузятся ресурсы, плагины, карта и т.д. Результат загрузки ресурсов можно видеть в консоли и логах сервера.",
+        "gsinst": "Сервер обновлён."
+    };
+
+    var error_messages = {
+        "gsstart": "Ошибка запуска сервера.",
+        "gsstop": "Ошибка остановки сервера.",
+        "gsrest": "Ошибка перезапуска сервера.",
+        "gsinst": "Ошибка обновления."
+    };
+
+    var message_title = {
+        "gsstart": "Запуск сервера",
+        "gsstop": "Остановка сервера",
+        "gsrest": "Перезапуск сервера",
+        "gsinst": "Обновление сервера"
+    };
+</script>
+
+<script>
+    // 0 - not get, 1 - getting, 2 - active, 3 - not active
+    var server_status = 0;
+
+    function get_server_status(server_id)
+    {
+        server_status = 1;
+
+        $.ajax({ 
+            url:    sprintf("%sajax/server_control/get_status/%s", page.site_url, server_id),
+            type:     "GET",
+            dataType: "json",
+            success: function(response) {
+                if (response.status == '0') {
+                    return;
+                } else {
+                    if (response.data.process_active == 1) {
+                        server_status = 2;
+                    } else {
+                        server_status = 3;
+                    }
+                }
+            },
+            error: function() {
+                // noty({layout: 'bottomCenter', type: 'error', text: "unknown error"});s
+            },
+            complete: function() {
+                // block = false;
+            }
+        });
+    }
 </script>
 
 <script>
@@ -41,28 +110,7 @@
     }
 
     check_step = 0;
-
-    var messages = {
-        "gsstart": ["Ожидание очереди", "Запуск сервера", "Проверка статуса"],
-        "gsstop": ["Ожидание очереди", "Остановка сервера", "Проверка статуса"],
-        "gsrest": ["Ожидание очереди", "Перезапуск сервера", "Проверка статуса"],
-        "gsinst": ["Ожидание очереди", "Обновление сервера", "Проверка результата"]
-    };
-
-    var success_messages = {
-        "gsstart": "Сервер успешно запущен. <br />Некоторое время он может быть оффлайн пока не загрузятся ресурсы, плагины, карта и т.д. Результат загрузки ресурсов можно видеть в консоли и логах сервера.",
-        "gsstop": "Сервер успешно остановлен.",
-        "gsrest": "Сервер успешно перезапущен. <br />Некоторое время он может быть оффлайн пока не загрузятся ресурсы, плагины, карта и т.д. Результат загрузки ресурсов можно видеть в консоли и логах сервера.",
-        "gsinst": "Сервер обновлён."
-    };
-
-    var message_title = {
-        "gsstart": "Запуск сервера",
-        "gsstop": "Остановка сервера",
-        "gsrest": "Перезапуск сервера",
-        "gsinst": "Обновление сервера"
-    };
-
+    task_result = 0;
     function check_task(task, task_id)
     {
         intervalID = null;
@@ -70,7 +118,7 @@
         function check_task_start()
         {
             get_task_info(task_id);
-    
+
             if (task_status != 'waiting' && task_status != '') {
                 clearInterval(intervalID);
                 check_step = 1;
@@ -81,19 +129,61 @@
         function check_task_end()
         {
             get_task_info(task_id);
-    
+
             if ((task_status == 'success' || task_status == 'error') && task_status != '') {
                 clearInterval(intervalID);
                 check_step = 2;
                 check_task(task, task_id);
             }
         }
-
+        
         function check_task_result()
         {
-            clearInterval(intervalID);
-            check_step = 3;
-            check_task(task, task_id);
+            if (task != 'gsstart' && task != 'gsstop' && task != 'gsrest') {
+                clearInterval(intervalID);
+
+                task_result = 1;
+                check_step = 3;
+                check_task(task, task_id);
+            }
+
+            if (server_status == 0) {
+                get_server_status(page.server_id);
+            }
+            
+            if (task == 'gsstart' || task == 'gsrest') {
+                if (server_status == 2) {
+                    clearInterval(intervalID);
+
+                    task_result = 1;
+                    check_step = 3;
+                    check_task(task, task_id);
+                } else if (server_status == 3) {
+                    clearInterval(intervalID);
+
+                    task_result = 0;
+                    check_step = 3;
+                    check_task(task, task_id);
+                }
+            }
+
+            if (task == 'gsstop') {
+                if (server_status == 3) {
+                    clearInterval(intervalID);
+
+                    task_result = 1;
+                    check_step = 3;
+                    check_task(task, task_id);
+                } else if (server_status == 2) {
+                    clearInterval(intervalID);
+
+                    task_result = 0;
+                    check_step = 3;
+                    check_task(task, task_id);
+                }
+            }
+            
+            // check_task(task, task_id);
         }
 
         if (check_step == 0) {
@@ -118,17 +208,38 @@
             intervalID = setInterval(check_task_result, check_timeout);
         }
 
-        if (check_step == 3) {
+        if (!intervalID && check_step == 3) {
             // End
             $('.vts-progress').last().remove();
             $("#vts-content").append("<span class=\"vts-progress\">&#10003; " + messages[task][2] + "</span><br />\n");
 
-            // Var nulled
-            check_step = 0;
-            task_status = '';
+            if (task_result) {
+                $('#view-task-status').arcticmodal('close');
+                noty({
+                    layout: 'center',
+                    type: 'success',
+                    text: success_messages[task],
+                    callback: {
+                        onClose: function() {
+                            location.reload();
+                        }
+                    }
+                });
+            }
+            else {
+                $('#view-task-status').arcticmodal('close');
+                
+                noty({
+                    layout: 'center',
+                    type: 'error',
+                    text: error_messages[task]
+                });
+            }
 
-            $('#view-task-status').arcticmodal('close');
-            noty({layout: 'bottomCenter', type: 'success', text: success_messages[task]});
+            // Var nulled
+            check_step      = 0;
+            task_status     = '';
+            task_result     = 0;
         }
     }
 
@@ -141,9 +252,9 @@
         block = true;
         ShowLoad();
         
-        $.ajax({ 
-            url:     '{site_url}ajax/tasks/add_task',
-            type:     "POST",
+        $.ajax({
+            url: sprintf("%sajax/tasks/add_task", page.site_url),
+            type: "POST",
             data:
             {
                 'task': task,
@@ -171,25 +282,26 @@
         });
     }
 
-    function start_server()
+    function server_act(task)
     {
-        add_task('gsstart');
+        noty({
+            layout: 'center',
+            type: 'confirm',
+            text: confirm_msg[task],
+            buttons: [
+                {addClass: 'btn btn-primary', text: '{lang_yes}', onClick: function($noty) {
+                        $noty.close();
+                        add_task(task);
+                    }
+                },
+                {addClass: 'btn btn-danger', text: '{lang_no}', onClick: function($noty) {
+                        $noty.close();
+                    }
+                }
+            ]
+        });
     }
 
-    function stop_server()
-    {
-        add_task('gsstop');
-    }
-
-    function restart_server()
-    {
-        add_task('gsrest');
-    }
-
-    function update_server()
-    {
-        add_task('gsinst');
-    }
 </script>
 
 <p class="hr"><strong>{lang_server_control_base_commands}</strong></p>
@@ -365,29 +477,6 @@ if($this->users->auth_privileges['srv_restart'] == 1
 		</form>
 	<?php endif; ?>
 
-	<?php if ($this->servers->server_data['chmap_cmd'] && $this->servers->server_data['maps_list'] ): ?>
-		<p class="hr"><strong>{lang_maps}</strong></p>
-		<form action="{site_url}server_command/rcon/changemap/{server_id}/" method="post" accept-charset="utf-8">
-			<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
-			<table width="50%">
-				<tr>
-					<td>{lang_server_control_select_map}</td>
-					<td>
-					<select name="map">
-					{maps_list}
-					<option value="{map_name}">{map_name}</option>
-					{/maps_list}
-						 </select>
-					</td>
-				</tr>
-				<tr>
-					<td></td>
-					<td><input type="submit" name="submit_changemap" value="{lang_server_control_change_map}" /></td>
-				</tr>
-			</table>
-		</form>
-	<?php endif; ?>
-
 	<?php if ($this->users->auth_servers_privileges['SERVER_SET_PASSWORD'] && $this->servers->server_data['passwd_cmd']): ?>
 	<p class="hr"><strong>{lang_server_control_password_to_server}</strong></p>
 		<form action="{site_url}server_command/rcon/set_password/{server_id}" method="post" accept-charset="utf-8">
@@ -404,72 +493,24 @@ if($this->users->auth_privileges['srv_restart'] == 1
 
 <?php endif; ?>
 
-<?php if ($this->users->auth_servers_privileges['LOGS_VIEW']): ?>
-	<p class="hr"><strong>{lang_server_control_last_actions}</strong></p>
-	<table width="100%" class="zebra">
-		<thead>
-		<tr>
-			<th><strong>{lang_time}</strong></th>
-			<th><strong>{lang_action}</strong></th>
-			<th><strong>{lang_command}</strong></th>
-			<th><strong>{lang_user}</strong></th>
-			<th>&nbsp;</td>
-		</tr>
-		</thead>
-	{log_list}
-		<tr>
-			<td width="20%">{log_date}</td>
-			<td width="20%">{log_type}</td>
-			<td width="20%">{log_command}</td>
-			<td width="20%">{log_user_name}</td>
-			<td><a class="small awesome" href={site_url}log_view/view/{log_id}>{lang_view}</a></td>
-		</tr>
-	{/log_list}
-	</table>
-<?php endif; ?>
-
-<?php if ($this->users->auth_servers_privileges['TASK_MANAGE']): ?>
-	<p class="hr"><strong>{lang_tasks}</strong></p>
-	<a class="small awesome" href={site_url}admin/server_control/add_task/{server_id}>{lang_server_control_add_task}</a>
-	<table width="100%" class="zebra">
-		<thead>
-		<tr>
-			<th><strong>{lang_time}</strong></th>
-			<th><strong>{lang_action}</strong></th>
-			<th>&nbsp;</td>
-		</tr>
-		</thead>
-	{task_list}
-		<tr>
-			<td width="20%">{task_date}</td>
-			<td width="20%">{task_action}</td>
-			<td>
-				<a class="green small awesome" title="{lang_edit}" href="{site_url}admin/server_control/edit_task/{task_id}">{lang_edit}<a/>&nbsp;
-				<a class="red small awesome" title="{lang_delete}" href="{site_url}admin/server_control/delete_task/{task_id}">X<a/>&nbsp;
-			</td>
-		</tr>
-	{/task_list}
-	</table>
-<?php endif; ?>
-
 <script>
     $('#start-server').click(function() {
-        start_server();
+        server_act('gsstart');
         return false;
     });
     
     $('#stop-server').click(function() {
-        stop_server();
+        server_act('gsstop');
         return false;
     });
     
     $('#restart-server').click(function() {
-        restart_server();
+        server_act('gsrest');
         return false;
     });
     
     $('#update-server').click(function() {
-        update_server();
+        server_act('gsinst');
         return false;
     });
 </script>
