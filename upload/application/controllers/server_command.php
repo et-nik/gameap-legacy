@@ -12,7 +12,7 @@
 class Server_command extends CI_Controller {
 	
 	//Template
-	var $tpl_data = array();
+	var $tpl = array();
 	var $user_data = array();
 	
 	var $ext_list;
@@ -31,11 +31,11 @@ class Server_command extends CI_Controller {
         }
         
         //Base Template
-        $this->tpl_data['title'] 	= lang('server_command_title_index');
-        $this->tpl_data['heading'] 	= lang('server_command_header_index');
-        $this->tpl_data['content'] = '';
-        $this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
-        $this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
+        $this->tpl['title'] 	= lang('server_command_title_index');
+        $this->tpl['heading'] 	= lang('server_command_header_index');
+        $this->tpl['content'] = '';
+        $this->tpl['menu'] = $this->parser->parse('menu.html', $this->tpl, true);
+        $this->tpl['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
         
         $this->load->model('servers');
         
@@ -235,7 +235,7 @@ class Server_command extends CI_Controller {
 				if(!$no_submit_name && !$this->input->post($submit_name)) {
 						
 					if($template_file){
-						$this->tpl_data['content'] .= $this->parser->parse($template_file, $local_tpl, true);
+						$this->tpl['content'] .= $this->parser->parse($template_file, $local_tpl, true);
 					}
 						
 				} else {
@@ -512,7 +512,7 @@ class Server_command extends CI_Controller {
 
 		}
 		
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 
 	/**
@@ -558,8 +558,8 @@ class Server_command extends CI_Controller {
 	*/
 	public function console_view($server_id = 0)
     {
-		$this->tpl_data['title'] 	= lang('server_command_title_console_view');
-		$this->tpl_data['heading'] 	= lang('server_command_header_console_view');
+		$this->tpl['title'] 	= lang('server_command_title_console_view');
+		$this->tpl['heading'] 	= lang('server_command_header_console_view');
 			
 		/* Получены ли необходимые данные о сервере */
 		if (!$this->servers->get_server_data($server_id)) {
@@ -577,8 +577,8 @@ class Server_command extends CI_Controller {
             return;
         }
 
-        $this->tpl_data['content'] = $this->parser->parse('servers/console_view.html', $local_tpl, true);
-		$this->parser->parse('main.html', $this->tpl_data);
+        $this->tpl['content'] = $this->parser->parse('servers/console_view.html', $local_tpl, true);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 }
 
