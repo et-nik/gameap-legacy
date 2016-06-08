@@ -33,6 +33,14 @@ class Migration_Version_200 extends CI_Migration {
                     'type' => 'INT'
                 ),
                 
+                'time_create' => array(
+                    'type' => 'INT'
+                ),
+                
+                'time_stchange' => array(
+                    'type' => 'INT'
+                ),
+                
                 'ds_id' => array(
                     'type' => 'INT'
                 ),
