@@ -131,6 +131,8 @@ class Adm_servers extends CI_Controller {
 	{
 		$this->load->driver('control');
 
+        return true;
+
 		if ($host == '' OR $key == '') {
 			return false;
 		}
@@ -140,7 +142,7 @@ class Adm_servers extends CI_Controller {
 		$host[1] = (isset($host[1])) ? (int)$host[1] : 31707;
 		
 		$this->control->set_driver('gdaemon');
-		//~ $this->control->set_data(array('os' => $os));
+		// $this->control->set_data(array('os' => $os));
 		
 		try {
 			$this->control->connect($host[0], $host[1]);
@@ -151,59 +153,7 @@ class Adm_servers extends CI_Controller {
 			return false;
 		}
 	}
-    
-    // -----------------------------------------------------------
-	
-	/**
-	 * Проверка SSH
-	 * 
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @return bool
-	*/
-    function _check_ssh($ssh_host, $ssh_login, $ssh_password) 
-    {
-		return true;
-	}
 
-	// -----------------------------------------------------------------
-	
-	/**
-	 * Проверка FTP
-	 * 
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @return bool
-	*/
-	private function _check_ftp($ftp_host, $ftp_login, $ftp_password) 
-	{
-		return true;
-	}
-
-	// -----------------------------------------------------------------
-	
-	/**
-	 * Поиск пути к server.sh/server.exe
-	 * Соединение с ftp сервером уже должно быть выполнено!
-	*/
-	private function _found_ftp_path($ftp_path = false)
-	{
-		return "";
-	}
-	
-	// -----------------------------------------------------------------
-	
-	/**
-	 * Поиск пути к server.sh/server.exe 
-	 * Если sftp отключен, то вернет false
-	*/
-	private function _found_sftp_path($sftp_path = false, $sftp_config)
-	{
-		return "";
-	}
-	
 	// -----------------------------------------------------------------
 	
 	/**
