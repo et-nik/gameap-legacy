@@ -122,6 +122,15 @@ class Migration_Version_200 extends CI_Migration {
 			$this->dbforge->add_column('dedicated_servers', $fields, 'gdaemon_login');
 		}
 
+        $fields = array();
+		if (!$this->db->field_exists('work_path', 'dedicated_servers')) {
+			$fields = array(
+				'work_path' => array('type' => 'VARCHAR', 'constraint' => 256)
+			);
+			
+			$this->dbforge->add_column('dedicated_servers', $fields, 'gdaemon_login');
+		}
+
         if (!$this->db->table_exists('ds_stats')) {
             $this->dbforge->add_field(array(
                 'id' => array(
