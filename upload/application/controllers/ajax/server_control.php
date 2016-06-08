@@ -1,19 +1,16 @@
-<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Game AdminPanel (АдминПанель)
- *
+ * Game AdminPanel (GameAP)
  * 
  *
  * @package		Game AdminPanel
- * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
- * @license		http://gameap.ru/license.html
- * @link		http://gameap.ru
- * @filesource
+ * @author		Nikita Kuznetsov (NiK)
+ * @copyright	Copyright (c) 2014-2016
+ * @license		http://www.gameap.ru/license.html
+ * @link		http://www.gameap.ru
 */
 
-
-// ------------------------------------------------------------------------
+// ---------------------------------------------------------------------
 
 /**
  * Ajax для получения базовой информации о серверах
@@ -28,7 +25,7 @@
 */
 class Server_control extends CI_Controller {
 	
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
     
     /**
      * Получает форму со списком игровых типов выбранной игры
@@ -55,8 +52,28 @@ class Server_control extends CI_Controller {
 			show_404();
 		}
     }
+
+    // -----------------------------------------------------------------
     
-    // -----------------------------------------------------------------------
+    private function _send_response($array)
+    {
+		$response = json_encode($array);
+		
+		if (!$response) {
+			$this->_send_error('Invalid data');
+		}
+		
+		$this->output->append_output($response);
+	}
+    
+    // -----------------------------------------------------------------
+    
+    private function _send_error($error = "")
+    {
+		$this->output->append_output(json_encode(array('status' => 0, 'error_text' => $error)));
+	}
+    
+    // -----------------------------------------------------------------
 	
 	/**
 	 * Обрезка пустых строк консоли
@@ -117,7 +134,7 @@ class Server_control extends CI_Controller {
 		return true;
 	}
     
-    // ----------------------------------------------------------------
+    // -----------------------------------------------------------------
     
     /**
      * Получение статуса сервера
@@ -125,33 +142,33 @@ class Server_control extends CI_Controller {
     public function get_status($server_id = false)
     {
 		if (!$server_id) {
-			show_404();
+			$this->_send_error("Empty server id");
+            return;
 		}
-		
+
 		if (false == $this->servers->get_server_data($server_id)) {
-			show_404();
+			$this->_send_error("Server not found");
+            return;
 		}
 		
 		/* Проверка привилегий на сервер */
 		$this->users->get_server_privileges($server_id);
 		
 		if (!$this->users->auth_servers_privileges['VIEW']) {
-			show_404();
+			$this->_send_error("Access denied");
+            return;
 		}
-		
-		if ($this->servers->server_status($this->servers->server_data['server_ip'], 
-											$this->servers->server_data['query_port'], 
-											$this->servers->server_data['engine'], 
-											$this->servers->server_data['engine_version'])
-		){
-			$this->output->append_output(1);							
-		} else {
-			$this->output->append_output(0);
-		}
-		
+
+        $this->_send_response(array(
+            'status' => 1,
+            'data' => array(
+                'process_active' => $this->servers->server_data['process_active'],
+                'last_process_check' => $this->servers->server_data['last_process_check']
+            )
+        ));
 	}
 	
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
     
     /**
      * Получение содержимого консоли
@@ -254,7 +271,7 @@ class Server_control extends CI_Controller {
 
 	}
 	
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
     
     /**
      * Отправка ркон команды на сервер
@@ -337,10 +354,6 @@ class Server_control extends CI_Controller {
 
 		}
 	}
-	
-	
-	
-	
 	
 }
 

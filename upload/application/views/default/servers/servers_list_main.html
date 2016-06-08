@@ -68,11 +68,11 @@
 			jQuery.ajax({ 
 				url:     '{site_url}ajax/server_control/get_status/' + server_id,
 				type:     "GET",
-				dataType: "html",
+				dataType: "json",
 				success: function(response) {
-					status[server_id] = Number(response);
+					// status[server_id] = Number(response);
 					
-					if (response == 1) {
+					if (response.status != 0 && response.data.process_active == 1) {
 						document.getElementById("status_" + server_id).innerHTML = "<img src=\"{base_url}themes/system/images/bullet_green.png\"/>";
 						
 						if (privileges['stop_' + server_id] == 1) {
