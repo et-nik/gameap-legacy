@@ -39,20 +39,33 @@ class Gdaemon_tasks extends CI_Model {
     {
         switch ($fname) {
             case 'ds_id':
-                $this->_filter_list['ds_id'] = $fvalue;
+                $this->_filter_list[$fname] = $fvalue;
                 break;
                 
             case 'server_id':
-                $this->_filter_list['server_id'] = $fvalue;
+                $this->_filter_list[$fname] = $fvalue;
                 break;
                 
             case 'task':
-                $this->_filter_list['task'] = $fvalue;
+                $this->_filter_list[$fname] = $fvalue;
                 break;
                 
             case 'status':
-                $this->_filter_list['status'] = $fvalue;
+                $this->_filter_list[$fname] = $fvalue;
                 break;
+
+            case 'time_create':
+            case 'time_create >':
+            case 'time_create <':
+                $this->_filter_list[$fname] = $fvalue;
+                break;
+                
+            case 'time_stchange':
+            case 'time_stchange >':
+            case 'time_stchange <':
+                $this->_filter_list[$fname] = $fvalue;
+                break;
+            
 
             default:
                 // Unknown filter
@@ -78,9 +91,15 @@ class Gdaemon_tasks extends CI_Model {
 
         if (!empty($this->_filter_list)) {
             foreach ($this->_filter_list as $fname => &$fval) {
-                $this->db->where($fname, $fval);
+                if (is_array($fval)) {
+                    $this->db->where_in($fname, $fval);
+                }
+                else {
+                    $this->db->where($fname, $fval);
+                }
             }
         }
+        $this->_filter_list = array();
 
         $this->db->select('
             gdaemon_tasks.id,
@@ -150,10 +169,15 @@ class Gdaemon_tasks extends CI_Model {
     {
         if (!empty($this->_filter_list)) {
             foreach ($this->_filter_list as $fname => &$fval) {
-                $this->db->where($fname, $fval);
+                if (is_array($fval)) {
+                    $this->db->where_in($fname, $fval);
+                }
+                else {
+                    $this->db->where($fname, $fval);
+                }
             }
         }
-
+        $this->_filter_list = array();
 		return $this->db->count_all_results('gdaemon_tasks');
     }
 
