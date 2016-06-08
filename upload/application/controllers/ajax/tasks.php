@@ -24,6 +24,8 @@ class Tasks extends CI_Controller {
         $this->load->model('users');
         $this->lang->load('main');
 
+        $this->load->helper('date');
+
         // if (!$this->input->is_ajax_request()) {
 		   // show_404();
 		// }
@@ -122,7 +124,7 @@ class Tasks extends CI_Controller {
         // Check doubles
         $this->gdaemon_tasks->set_filter('server_id', $server_id);
         $this->gdaemon_tasks->set_filter('task', $task);
-        $this->gdaemon_tasks->set_filter('status', 'waiting');
+        $this->gdaemon_tasks->set_filter('status', array('waiting', 'working'));
 
         if ($this->gdaemon_tasks->get_all_count() > 0) {
             $this->_send_error("This task exists. Please wait.");
@@ -132,6 +134,8 @@ class Tasks extends CI_Controller {
         $task_id = $this->gdaemon_tasks->add(array(
             'ds_id'         => $this->servers->server_data['ds_id'],
             'server_id'     => $server_id,
+            'time_create'   => now(),
+            'time_stchange' => now(),
             'task'          => $task,
             'status'        => 'waiting',
         ));
