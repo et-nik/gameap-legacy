@@ -50,38 +50,9 @@ class Dedicated_servers extends CI_Model {
 		
 		$this->load->library('encrypt');
 		
-		if (isset($data['gdaemon_key']) && $data['gdaemon_key'] != '') {
-			$data['gdaemon_key']	= $this->encrypt->encode($data['gdaemon_key']);
-		} else {
-			unset($data['gdaemon_key']);
-		}
-		
-		if (isset($data['ssh_login'])) {
-			$data['ssh_login']	= $this->encrypt->encode($data['ssh_login']);
-			if ($data['ssh_password'] == '') {
-				unset($data['ssh_password']);
-			} else {
-				$data['ssh_password']	= $this->encrypt->encode($data['ssh_password']);
-			}
-		}
-
-		if (isset($data['telnet_login'])) {
-			$data['telnet_login']	= $this->encrypt->encode($data['telnet_login']);
-			if ($data['telnet_password'] == '') {
-				unset($data['telnet_password']);
-			} else {
-				$data['telnet_password']	= $this->encrypt->encode($data['telnet_password']);
-			}
-		}
-		
-		if (isset($data['ftp_login'])) {
-			$data['ftp_login']	= $this->encrypt->encode($data['ftp_login']);
-			if ($data['ftp_password'] == '') {
-				unset($data['ftp_password']);
-			} else {
-				$data['ftp_password']	= $this->encrypt->encode($data['ftp_password']);
-			}
-		}
+        $data['gdaemon_login']	    = $this->encrypt->encode($data['gdaemon_login']);
+        $data['gdaemon_password']	= $this->encrypt->encode($data['gdaemon_password']);
+        $data['gdaemon_key']	    = $this->encrypt->encode($data['gdaemon_key']);
 		
 		return $data;
 	}
@@ -186,22 +157,9 @@ class Dedicated_servers extends CI_Model {
 				
 				$this->ds_list[$i]['modules_data'] 		= json_decode($this->ds_list[$i]['modules_data'], true);
 				
-				// GDAEMON, SSH, TELNET, FTP
-				$this->ds_list[$i]['control_ip'] 		= 'localhost';
-				$this->ds_list[$i]['control_port'] 		= 0;
-				$this->ds_list[$i]['control_login']		= '';
-				$this->ds_list[$i]['control_password']	= '';
-				
-				$this->ds_list[$i]['gdaemon_key']		= $this->encrypt->decode($this->ds_list[$i]['gdaemon_key']);
-				
-				$this->ds_list[$i]['ssh_login']			= $this->encrypt->decode($this->ds_list[$i]['ssh_login']);
-				$this->ds_list[$i]['ssh_password']		= $this->encrypt->decode($this->ds_list[$i]['ssh_password']);
-				
-				$this->ds_list[$i]['telnet_login']		= $this->encrypt->decode($this->ds_list[$i]['telnet_login']);
-				$this->ds_list[$i]['telnet_password']	= $this->encrypt->decode($this->ds_list[$i]['telnet_password']);
-				
-				$this->ds_list[$i]['ftp_login']			= $this->encrypt->decode($this->ds_list[$i]['ftp_login']);
-				$this->ds_list[$i]['ftp_password']		= $this->encrypt->decode($this->ds_list[$i]['ftp_password']);
+				$this->ds_list[$i]['gdaemon_key']		    = $this->encrypt->decode($this->ds_list[$i]['gdaemon_key']);
+				$this->ds_list[$i]['gdaemon_login']			= $this->encrypt->decode($this->ds_list[$i]['gdaemon_login']);
+				$this->ds_list[$i]['gdaemon_password']		= $this->encrypt->decode($this->ds_list[$i]['gdaemon_password']);
 				
 				// Скрипты запуска
 				$this->ds_list[$i]['script_start'] = $this->ds_list[$i]['script_start'] 
@@ -221,68 +179,7 @@ class Dedicated_servers extends CI_Model {
 					
 				$this->ds_list[$i]['script_send_command'] = $this->ds_list[$i]['script_send_command'] 
 					OR $this->ds_list[$i]['script_send_command'] = $this->_get_default_script('script_send_command');
-					
-				if (!in_array(strtolower($this->ds_list[$i]['control_protocol']), $this->available_control_protocols)) {
-					switch($this->ds_list[$i]['os']) {
-						case 'windows':
-							$this->ds_list[$i]['control_protocol'] = 'telnet';
-							break;
-						
-						default:
-							$this->ds_list[$i]['control_protocol'] = 'ssh';
-							break;
-					}
-				}
-				
-				switch(strtolower($this->ds_list[$i]['control_protocol'])) {
-					case 'gdaemon':
-						$this->ds_list[$i]['local_server'] 	= false;
-						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
-						
-						$explode = explode(':', $this->ds_list[$i]['gdaemon_host']);
-						$this->ds_list[$i]['control_ip'] 		= $explode[0];
-						$this->ds_list[$i]['control_port'] 		= isset($explode[1]) ? $explode[1] : 31707;
-
-						$this->ds_list[$i]['control_login']			= "NULL";
-						$this->ds_list[$i]['control_password'] 		= $this->ds_list[$i]['gdaemon_key'];
-						
-						break;
-						
-					case 'ssh':
-						$this->ds_list[$i]['local_server'] 	= false;
-						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
-						
-						$explode = explode(':', $this->ds_list[$i]['ssh_host']);
-						$this->ds_list[$i]['control_ip'] 		= $explode[0];
-						$this->ds_list[$i]['control_port'] 		= isset($explode[1]) ? $explode[1] : 22;
-
-						$this->ds_list[$i]['control_login']			= $this->ds_list[$i]['ssh_login'];
-						$this->ds_list[$i]['control_password'] 		= $this->ds_list[$i]['ssh_password'];
-						
-						break;
-						
-					case 'telnet':
-						$this->ds_list[$i]['local_server'] 	= false;
-						$this->ds_list[$i]['script_path'] = $this->ds_list[$i]['telnet_path'];
-						
-						$explode = explode(':', $this->ds_list[$i]['telnet_host']);
-						$this->ds_list[$i]['control_ip'] 		= $explode[0];
-						$this->ds_list[$i]['control_port'] 		= isset($explode[1]) ? $explode[1] : 23;
-
-						$this->ds_list[$i]['control_login']			= $this->ds_list[$i]['telnet_login'];
-						$this->ds_list[$i]['control_password'] 		= $this->ds_list[$i]['telnet_password'];
-
-						break;
-					
-					default:
-						$this->ds_list[$i]['local_server'] 	= true;
-						
-						$this->ds_list[$i]['script_path'] = $this->config->config['local_script_path']
-							OR $this->ds_list[$i]['script_path'] = $this->ds_list[$i]['ssh_path'];
-
-						break;
-				}
-
+                    
 				$i ++;
 			}
 			
