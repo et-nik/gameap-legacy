@@ -567,13 +567,13 @@ class Server_command extends CI_Controller {
 			return;
         }
 
-        $local_tpl['server_id'] = $id;
+        $local_tpl['server_id'] = $server_id;
         
         // Получение прав на сервер
         $this->users->get_server_privileges($this->servers->server_data['id']);
         
         if(!$this->users->auth_servers_privileges['CONSOLE_VIEW']) {
-            $this->_show_message(lang('server_command_no_console_privileges'), site_url('admin/server_control/main/' . $id));
+            $this->_show_message(lang('server_command_no_console_privileges'), site_url('admin/server_control/main/' . $server_id));
             return;
         }
 
