@@ -28,6 +28,10 @@ class Migration_Version_200 extends CI_Migration {
                     'type' => 'INT',
                     'auto_increment' => true
                 ),
+
+                'run_aft_id' => array(
+                    'type' => 'INT'
+                ),
                 
                 'ds_id' => array(
                     'type' => 'INT'
@@ -154,6 +158,16 @@ class Migration_Version_200 extends CI_Migration {
             $this->dbforge->add_key('id', true);
             $this->dbforge->create_table('ds_stats');
         }
+
+        $fields = array();
+		if (!$this->db->field_exists('process_active', 'servers')) {
+			$fields = array(
+				'process_active'        => array('type' => 'INT', 'constraint' => 1),
+				'last_process_check'    => array('type' => 'INT'),
+			);
+			
+			$this->dbforge->add_column('servers', $fields, 'start_command');
+		}
     }
 
     public function down() 
