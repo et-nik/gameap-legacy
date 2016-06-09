@@ -1,15 +1,12 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Game AdminPanel (АдминПанель)
- *
+ * Game AdminPanel (GameAP)
  * 
- *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
+ * @copyright	Copyright (c) 2014-2016, Nikita Kuznetsov (http://hldm.org)
  * @license		http://www.gameap.ru/license.html
  * @link		http://www.gameap.ru
- * @filesource
 */
 class Servers extends CI_Model {
 
@@ -31,11 +28,10 @@ class Servers extends CI_Model {
     );
     
     public $server_settings 		= array();
-    //~ public $commands			= array(); // Команды, которые отправлялись на сервер
     public $errors 					= ''; 	// Строка с ошибкой (если имеются)
-    
-    private $_exec_file				= array('linux' => './server.sh', 'windows' => 'server.exe');
 
+    // -----------------------------------------------------------------
+    
     function __construct()
     {
         // Call the Model constructor
@@ -45,7 +41,7 @@ class Servers extends CI_Model {
         $this->load->library('encrypt');
     }
     
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	private function _strip_quotes($string) 
 	{
@@ -55,7 +51,7 @@ class Servers extends CI_Model {
 		return $string;
 	}
 	
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	private function _apply_filter()
 	{
@@ -78,7 +74,7 @@ class Servers extends CI_Model {
 		}
 	}
 	
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	private function _get_engine() 
 	{
@@ -104,7 +100,7 @@ class Servers extends CI_Model {
 		return array($engine, $engine_version);
 	}
 	
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
     
     /*
      * Проверяет директорию на необходимые права
@@ -120,7 +116,7 @@ class Servers extends CI_Model {
 		return true;
 	}
 	
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
     
     /*
      * Проверяет файл на необходимые права
@@ -143,7 +139,7 @@ class Servers extends CI_Model {
 		return true;
 	}
 	
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	public function replace_shotcodes($command, &$server_data) 
 	{
@@ -155,7 +151,7 @@ class Servers extends CI_Model {
 		}
 	}
 	
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/*
 	 * Замена шоткодов в команде
@@ -166,7 +162,7 @@ class Servers extends CI_Model {
 		return replace_shotcodes($command, $server_data);
 	}
 
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/*
 	 * Замена шоткодов в команде
@@ -179,104 +175,9 @@ class Servers extends CI_Model {
 
 		return $command;
 	}
-	
-	//-----------------------------------------------------------
+
+	// -----------------------------------------------------------------
     
-    /*
-     * Генерирует команду для отправки на сервер
-     * 
-     * 
-    */
-    function command_generate($server_data, $type = 'start')
-    {
-		
-		/* Получение команд из данных сервера */
-		switch($type){
-			case 'start':
-				$command = $server_data['script_start'];
-				break;
-			case 'stop':
-				$command = $server_data['script_stop'];
-				break;
-			case 'restart':
-				$command = $server_data['script_restart'];
-				break;
-			case 'update':
-				$command = $server_data['script_update'];
-				break;
-			case 'get_console':
-				$command = $server_data['script_get_console'];
-				break;
-			default:
-				return false;
-		}
-
-		return $command;
-	}
-
-    
-    /*
-     * Запуск сервера
-     * 
-     * @param array - данные сервера или его id
-     *
-    */
-    function start($server_data)
-    {
-		$this->load->helper('ds');
-		
-		if(!is_array($server_data)) {
-			// был передан id, получаем данные сервера
-			$server_data = $this->get_server_data($server_data, false, true, true);
-		}
-		
-		$command = $this->command_generate($server_data, 'start');
-		return send_command($command, $server_data);
-	}
-	
-	
-	//-----------------------------------------------------------	
-	/*
-     * Остановка сервера
-     * 
-     * @param array - данные сервера
-     *
-    */
-    function stop($server_data)
-    {
-		$this->load->helper('ds');
-		
-		if(!is_array($server_data)) {
-			// был передан id, получаем данные сервера
-			$server_data = $this->get_server_data($server_data);
-		}
-		
-		$command = $this->command_generate($server_data, 'stop');
-		return send_command($command, $server_data);
-	}
-	
-	
-	//-----------------------------------------------------------	
-	/*
-     * Перезапуск сервера
-     * 
-     * @param array - данные сервера
-     *
-    */
-    function restart($server_data)
-    {
-		$this->load->helper('ds');
-		
-		if(!is_array($server_data)) {
-			// был передан id, получаем данные сервера
-			$server_data = $this->get_server_data($server_data, false, true, true);
-		}
-		
-		$command = $this->command_generate($server_data, 'restart');
-		return send_command($command, $server_data);
-	}
-
-	//-----------------------------------------------------------	
 	/*
      * Добавление нового сервера
      * 
@@ -297,7 +198,8 @@ class Servers extends CI_Model {
 		return (bool)$this->db->insert('servers', $data);
 	}
 
-	//-----------------------------------------------------------	
+	// -----------------------------------------------------------------
+    
 	/*
      * Редактирование сервера
      * 
@@ -319,6 +221,8 @@ class Servers extends CI_Model {
             return false;
         }
 	}
+
+    // -----------------------------------------------------------------
 	
 	/**
      * Обновляет поле с данными для модулей
@@ -349,7 +253,8 @@ class Servers extends CI_Model {
 		return (bool)$this->edit_game_server($id, $sql_data);
 	}
 
-	//-----------------------------------------------------------	
+	// -----------------------------------------------------------------
+    
 	/*
      * Удаление сервера
      * 
@@ -372,7 +277,7 @@ class Servers extends CI_Model {
 		}
 	}
 	
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
      * Получение списка серверов
@@ -388,7 +293,7 @@ class Servers extends CI_Model {
 		return $this->get_servers_list($user_id, $privilege_name, $where);
 	}
 	
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
      * Получение списка серверов
@@ -404,8 +309,8 @@ class Servers extends CI_Model {
 		return $this->get_servers_list($user_id, $privilege_name, $where);
 	}
 	
-	//-----------------------------------------------------------
-	
+	// -----------------------------------------------------------------
+    
 	/**
      * Задает фильтры для получения серверов с определенными данными
     */
@@ -418,7 +323,7 @@ class Servers extends CI_Model {
 		}
 	}
 	
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Сортировка для списка серверов
@@ -429,7 +334,7 @@ class Servers extends CI_Model {
 		$this->_order_by['order'] = $order;
 	}
 
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
      * Получение списка серверов
@@ -575,8 +480,7 @@ class Servers extends CI_Model {
 			return $this->servers_list;
 	}
 
-	
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
      * Получение данных сервера
@@ -741,7 +645,7 @@ class Servers extends CI_Model {
 		return $this->server_data;
 	}
 	
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
      * Получение данных сервера для шаблона
@@ -788,7 +692,7 @@ class Servers extends CI_Model {
 		return $tpl_data;
 	}
 
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
     
     /**
      * Проверяет, существует ли сервер с данным id
@@ -821,7 +725,7 @@ class Servers extends CI_Model {
 		return (bool)($this->db->count_all_results('dedicated_servers') > 0);
 	}
 
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
     
     /**
      * Проверяет статус сервера
@@ -873,7 +777,7 @@ class Servers extends CI_Model {
 		return $status;
 	}
 
-	//-----------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
      * Получение списка игровых серверов
@@ -929,7 +833,7 @@ class Servers extends CI_Model {
 		}
 	}
 	
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Получение количества игровых серверов в зависимости от условия
@@ -943,7 +847,7 @@ class Servers extends CI_Model {
 		return $this->db->count_all_results('servers');
 	}
 	
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
 	
 	/**
 	 * Получение списка файлов на сервере (удаленном или локальном)
@@ -956,7 +860,7 @@ class Servers extends CI_Model {
 		$files_list = list_ds_files($dir, $this->servers->server_data);
 	}
 
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
     
     /**
      * Получает список файлов на локальном сервере
@@ -976,7 +880,7 @@ class Servers extends CI_Model {
 	}
 	
 	
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
     
     /**
      * Получает список файлов на удаленном сервере в указанной директории
@@ -995,73 +899,7 @@ class Servers extends CI_Model {
 		return list_ds_files($dir, $server_data, true);
 	}
 
-
-	// ----------------------------------------------------------------
-	
-    /**
-     * ФУНКЦИЯ УСТАРЕЛА!
-     * Получает список карт
-     * 
-    */
-	function get_server_maps()
-    {
-		$this->load->helper('path');
-		$this->load->helper('ds');
-		$this->load->helper('date');
-		
-		if (strtolower($this->server_data['engine']) != 'goldsource' && strtolower($this->server_data['engine']) != 'source') {
-			return;
-		}
-
-		/* Получаем список карт из базы (своеобразный кеш)*/
-		$maps_cache = json_decode($this->server_data['maps_list'], true);
-		
-		/* Если списку не более суток */
-		if($maps_cache && $maps_cache['time'] > now() - 86400){
-			unset ($maps_cache['time']); // Удаляем time элемент
-			$maps_cache['from_cache'] = 1;
-			return $maps_cache;
-		}
-		
-		// Если в пути пусто, то никаких карт
-		if (empty($this->server_data['maps_path'])) {
-			return;
-		}
-		
-		$file_path = get_ds_file_path($this->server_data);
-		$files_list = list_ds_files($file_path. '/' . $this->server_data['maps_path'], $this->server_data);
-
-		/* Сортировка массива с файлами по возрастанию
-		 * 
-		 * Применена пользовательская сортировка по функции uasort_asc
-		 * которая чуть ниже. Сортировка происходит по file_name 
-		 * в массиве
-		*/
-		
-		if (!empty($files_list)) {
-			asort($files_list);
-			
-			$maps = array();
-			
-			/* Перебор карт, и удаление расширения файла */	
-			foreach ($files_list as $file) {
-				$extension = pathinfo($file, PATHINFO_EXTENSION);
-				
-				if ($extension != 'bsp') {
-					continue;
-				}
-				
-				$maps[]['map_name'] = str_replace('.bsp', '', basename($file));
-			}
-			
-			return $maps;
-			
-		} else {
-			return NULL;
-		}
-	}
-	
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
 	 
     /**
      * Сортировка массива по возрастанию
@@ -1072,7 +910,7 @@ class Servers extends CI_Model {
 		return $a['file_name'] > $b['file_name'] ? 1 : -1;
 	}
 	
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
     
     /**
      * Сортировка массива по убыванию
@@ -1083,7 +921,7 @@ class Servers extends CI_Model {
 		return $a['file_name'] < $b['file_name'] ? 1 : -1;
 	}
 	
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
 	 
     /**
      * Читает содержимое файла с локального сервера
@@ -1098,7 +936,7 @@ class Servers extends CI_Model {
 		return read_ds_file($file, $server_data);
 	}
 	
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
 	 
     /**
      * Читает содержимое файла
@@ -1114,7 +952,7 @@ class Servers extends CI_Model {
 		return read_ds_file($file, $server_data);
 	}
 	
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
 	 
     /**
      * Читает содержимое файла с удаленного сервера
@@ -1130,7 +968,7 @@ class Servers extends CI_Model {
 		return read_ds_file($file, $server_data);
 	}
 	
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
 	
     /**
      * Смена rcon пароля серверу
@@ -1171,7 +1009,7 @@ class Servers extends CI_Model {
 		}
 	}
 	
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
 	
     /**
      * Получение настроек сервера
@@ -1209,7 +1047,7 @@ class Servers extends CI_Model {
         return $server_settings;
 	}
 	
-	// ----------------------------------------------------------------
+	// -----------------------------------------------------------------
 
     /**
      * Запись настроек
