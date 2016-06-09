@@ -1,5 +1,5 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
-<p class="hr">{lang_information}</p>
+<h2>{lang_information}</h2>
 
 <table class="zebra" width="100%">
 	<tr>
@@ -25,20 +25,20 @@
 	<tr>
 		<td>&nbsp;</td>
 		<td>
-			<a class="awesome" href="{site_url}admin/profile/edit">{lang_profile_edit}</a></a>
-			<a class="awesome" href="{site_url}admin/profile/change_password">{lang_profile_change_password}</a>
+			<a class="button" href="{site_url}admin/profile/edit">{lang_profile_edit}</a></a>
+			<a class="button" href="{site_url}admin/profile/change_password">{lang_profile_change_password}</a>
 		</td>
 	</tr>
 </table>
 
-<p class="hr">{lang_profile_servers_privileges}</p>
+<h2>{lang_profile_servers_privileges}</h2>
 <?php if(($this->user_servers_count > 0)): ?>
 <table class="zebra" width="75%">
 {servers_list}
 	<tr>
 		<td>{server_name}</td>
 		<td>{server_ip}:{server_port}</td>
-		<td><a class="small awesome" href="{site_url}admin/profile/server_privileges/{server_id}">{lang_profile_view_privileges}</a></td>
+		<td><a class="small button" href="{site_url}admin/profile/server_privileges/{server_id}">{lang_profile_view_privileges}</a></td>
 	</tr>
 {/servers_list}
 </table>

@@ -1,5 +1,5 @@
-<a class="awesome" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>
-<a onclick="update_console();return false;" href="#" class="green awesome">{lang_update}</a>
+<a class="button" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>
+<a onclick="update_console();return false;" href="#" class="green button">{lang_update}</a>
 
 <h2>{lang_server_command_console}</h2>
 
@@ -85,4 +85,4 @@
 
 
 <input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
-<p><input id="command_input" type="text" style="width:75%" name="command" />&nbsp;<a onclick="send_command();return false;" class="small blue awesome">{lang_send}</a></p>
+<p><input id="command_input" type="text" style="width:75%" name="command" />&nbsp;<a onclick="send_command();return false;" class="small blue button">{lang_send}</a></p>

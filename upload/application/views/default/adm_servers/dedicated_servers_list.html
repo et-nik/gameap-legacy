@@ -1,9 +1,9 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
 
-<a class="awesome" href="{site_url}adm_servers/add/dedicated_servers">{lang_adm_servers_add_ds}</a>
-<a class="awesome" href="{site_url}adm_servers/ds_stats">{lang_adm_servers_ds_stats}</a>
+<a class="button" href="{site_url}adm_servers/add/dedicated_servers">{lang_adm_servers_add_ds}</a>
+<a class="button" href="{site_url}adm_servers/ds_stats">{lang_adm_servers_ds_stats}</a>
 
-<p class="hr">{lang_adm_servers_dedicated_servers}</p>
+<h2>{lang_adm_servers_dedicated_servers}</h2>
 <table width="100%" class="zebra">
 	<thead>
 	<tr>
@@ -24,7 +24,7 @@
 		<td>{ds_ip}</td>
 		<td>{ds_os}</td>
 		<td>{servers_count}</td>
-		<td><a class="small awesome" href="{site_url}adm_servers/edit/dedicated_servers/{ds_id}">{lang_control}</a>&nbsp;<a class="red small awesome" href="{site_url}adm_servers/delete/dedicated_servers/{ds_id}">X</a></td>
+		<td><a class="small button" href="{site_url}adm_servers/edit/dedicated_servers/{ds_id}">{lang_control}</a>&nbsp;<a class="red small button" href="{site_url}adm_servers/delete/dedicated_servers/{ds_id}">X</a></td>
 	</tr>
 {/ds_list}
 </table>

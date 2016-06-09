@@ -1,8 +1,8 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
-<a class="awesome" href="{site_url}adm_servers/view/game_types">« {lang_adm_servers_back_to_game_types}</a>
-<a class="awesome" href="{site_url}adm_servers/edit/games/{game_code}">{lang_adm_servers_go_to_game}</a>
-<a class="awesome" href="{site_url}adm_servers/dublicate_game_type/{gt_id}">{lang_adm_servers_dublicate_game_type}</a>
-<a class="awesome red" href="{site_url}adm_servers/delete/game_types/{gt_id}">{lang_delete}</a>
+<a class="button" href="{site_url}adm_servers/view/game_types">« {lang_adm_servers_back_to_game_types}</a>
+<a class="button" href="{site_url}adm_servers/edit/games/{game_code}">{lang_adm_servers_go_to_game}</a>
+<a class="button" href="{site_url}adm_servers/dublicate_game_type/{gt_id}">{lang_adm_servers_dublicate_game_type}</a>
+<a class="button red" href="{site_url}adm_servers/delete/game_types/{gt_id}">{lang_delete}</a>
 <h2>{lang_adm_servers_game_type_control}</h2>
 
 <p>{lang_adm_servers_game_types_documentation}</p>
@@ -33,10 +33,10 @@
 
 
 	<div id="fast_rcon" class="tab_content">
-		<p class="hr">Fast RCON</p>
+		<h2>Fast RCON</h2>
 		<table class="zebra" id="frcon_list" width="100%">
 			<tr>
-				<td colspan="4"><a class="small awesome" href="#" onclick="add_new_item('frcon_list'); return false;" id="add">{lang_add}</a></td>
+				<td colspan="4"><a class="small button" href="#" onclick="add_new_item('frcon_list'); return false;" id="add">{lang_add}</a></td>
 			</tr>
 
 			<tr>
@@ -48,7 +48,7 @@
 			<tr id="frcon_list{id}">
 				<td>{desc}</td>
 				<td>{rcon_command}</td>
-				<td align="center"><a class="smal red awesome" onclick="delete_item('frcon_list', {id})">&#10008;</a></td>
+				<td align="center"><a class="smal red button" onclick="delete_item('frcon_list', {id})">&#10008;</a></td>
 			</tr>
 		{/frcon_list}
 
@@ -56,11 +56,11 @@
 	</div>
 
 	<div id="aliases" class="tab_content">
-		<p class="hr">{lang_adm_servers_aliases}</p>
+		<h2>{lang_adm_servers_aliases}</h2>
 		<table class="zebra" id="aliases_list" width="100%">
 			
 				<tr>
-					<td colspan="4"><a class="small awesome" href="#" onclick="add_new_item('aliases_list'); return false;" id="add">{lang_add}</a></td>
+					<td colspan="4"><a class="small button" href="#" onclick="add_new_item('aliases_list'); return false;" id="add">{lang_add}</a></td>
 				</tr>
 
 				<tr>
@@ -77,7 +77,7 @@
 					<td>{desc}</td>
 					<td>{default_value}</td>
 					<td align="center">{only_admins}</td>
-					<td align="center"><a class="smal red awesome" onclick="delete_item('aliases_list', {id})">&#10008;</a></td>
+					<td align="center"><a class="smal red button" onclick="delete_item('aliases_list', {id})">&#10008;</a></td>
 				</tr>
 			{/aliases_list}
 		</table>
@@ -88,7 +88,7 @@
 		<table class="zebra" width="100%">
 			<tbody>
 				<tr>
-					<td width="45%"><p class="hr">{lang_adm_servers_rcon_commands}</p></td>
+					<td width="45%"><h2>{lang_adm_servers_rcon_commands}</h2></td>
 					<td></td>
 				</tr>
 			</tbody>
@@ -135,7 +135,7 @@
 			
 			<tbody>
 				<tr>
-					<td colspan='2'><p class="hr">{lang_adm_servers_repository_parameters}</p></td>
+					<td colspan='2'><h2>{lang_adm_servers_repository_parameters}</h2></td>
 				</tr>
 			</tbody>
 			
@@ -174,7 +174,7 @@
 		if(tab == 'frcon_list') {
 			$('<tr id="'+tab+counts['frcon']+'"><td><input type="text" name="frcon_desc[]" /></td>\
 			<td><input type="text" name="frcon_command[]" /></td>\
-			<td align="center"><a class="smal red awesome" onclick="delete_item(\''+tab+'\', '+counts['frcon']+')">&#10008;</a></td></tr>').fadeIn('slow').appendTo('#frcon_list');
+			<td align="center"><a class="smal red button" onclick="delete_item(\''+tab+'\', '+counts['frcon']+')">&#10008;</a></td></tr>').fadeIn('slow').appendTo('#frcon_list');
 			counts['frcon']++;
 		}
 		
@@ -183,7 +183,7 @@
 			<td><input type="text" name="alias_desc[]" /></td>\
 			<td><input type="text" name="default_value[]" /></td>\
 			<td align="center"><input type="checkbox" name="alias_only_admins[]" value="accept"  /></td>\
-			<td align="center"><a class="smal red awesome" onclick="delete_item(\''+tab+'\', '+counts['aliases']+')">&#10008;</a></td></tr>').fadeIn('slow').appendTo('#aliases_list');
+			<td align="center"><a class="smal red button" onclick="delete_item(\''+tab+'\', '+counts['aliases']+')">&#10008;</a></td></tr>').fadeIn('slow').appendTo('#aliases_list');
 			counts['aliases']++;
 		}
 	}

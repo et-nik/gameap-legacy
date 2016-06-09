@@ -1,7 +1,7 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
 
-<a class="awesome" href="{site_url}admin/servers_log/list_logs/{server_id}">« {lang_back}</a>
-<p class="hr">{lang_servers_log_filter}</p>
+<a class="button" href="{site_url}admin/servers_log/list_logs/{server_id}">« {lang_back}</a>
+<h2>{lang_servers_log_filter}</h2>
 
 <form action="{site_url}admin/servers_log/list_logs/{server_id}/{id_dir}" method="post" accept-charset="utf-8">
 	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
@@ -40,7 +40,7 @@
 			</tr>
 		</table>
 
-<p class="hr">{lang_servers_log_files}</p>
+<h2>{lang_servers_log_files}</h2>
 <table class="zebra" width="50%">
 
 	<tr>
@@ -54,7 +54,7 @@
 		<td>{file_name}</td>
 		<td>{file_human_time}</td>
 		<td>{file_size}</td>
-		<td><a class="small awesome" href="{site_url}admin/servers_log/view/{server_id}/{id_dir}/{file_name}">{lang_view}</a></td>
+		<td><a class="small button" href="{site_url}admin/servers_log/view/{server_id}/{id_dir}/{file_name}">{lang_view}</a></td>
 	</tr>
 {/log_list}
 </table>

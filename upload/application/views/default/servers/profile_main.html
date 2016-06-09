@@ -1,4 +1,4 @@
-<p class="hr">Информация</p>
+<h2>Информация</h2>
 
 <table width="50%">
 	<tr>
@@ -24,13 +24,13 @@
 	<tr>
 		<td>&nbsp;</td>
 		<td>
-			<a class="awesome" href="{site_url}admin/profile/edit">Редактировать профиль</a>
-			<a class="awesome" href="{site_url}admin/profile/change_password">Сменить пароль</a>
+			<a class="button" href="{site_url}admin/profile/edit">Редактировать профиль</a>
+			<a class="button" href="{site_url}admin/profile/change_password">Сменить пароль</a>
 		</td>
 	</tr>
 </table>
 
-<p class="hr">Привилегии на серверы</p>
+<h2>Привилегии на серверы</h2>
 <?php if(($this->user_servers_count > 0)): ?>
 <table width="75%">
 {servers_list}
@@ -45,7 +45,7 @@
 У Вас нет серверов
 <?php endif; ?>
 
-<p class="hr">Общие привилегии</p>
+<h2>Общие привилегии</h2>
 <table width="50%">
 	<tr>
 		<td><br /><strong>Привилегии на серверы</strong></td>

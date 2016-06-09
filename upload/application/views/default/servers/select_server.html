@@ -1,7 +1,7 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
 
 <?php if ($this->users->auth_data['is_admin']): ?>
-	<a class="awesome" id="filter" href="#">{lang_filter}</a>
+	<a class="button" id="filter" href="#">{lang_filter}</a>
 
 	<script>
 	$(document).ready(function() {
@@ -47,7 +47,7 @@
 	</script>
 <?php endif; ?>
 
-<p class="hr">{lang_select_server}</p>
+<h2>{lang_select_server}</h2>
 <table width="100%" class="zebra">
 	<thead>
 		<tr>
@@ -59,14 +59,14 @@
 {games_list}
 	<tbody>
 		<tr>
-			<td colspan="5"><p class="hr"><strong>{game_name}</strong></p></td>
+			<td colspan="5"><strong>{game_name}</strong></td>
 		</tr>
 	</tbody>
 	{servers_list}
 		<tr>
 			<td>{server_name}</td>
 			<td>{server_ip}:{server_port}</td>
-			<td><a class="small awesome" href="{url}/{server_id}">{lang_select}</a></td>
+			<td><a class="small button" href="{url}/{server_id}">{lang_select}</a></td>
 		</tr>
 	{/servers_list}
 {/games_list}

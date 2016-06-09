@@ -1,8 +1,8 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
 <?php if($this->users->auth_privileges['usr_create']): ?>
-<a class="awesome" href="{site_url}admin/users_control/add">{lang_users_add_user}</a>
+<a class="button" href="{site_url}admin/users_control/add">{lang_users_add_user}</a>
 
-<a class="awesome" onclick="anichange('#filter'); return false" href="#">{lang_filter}</a>
+<a class="button" onclick="anichange('#filter'); return false" href="#">{lang_filter}</a>
 <script>
 function anichange (objName) {
   if ( $(objName).css('display') == 'none' ) {
@@ -74,10 +74,10 @@ function anichange (objName) {
 		<td>{user_reg_date}</td>
 		<td>{user_last_auth}</td>
 		<td align="center">
-			<a class="small awesome" href="{site_url}admin/users_control/base_privileges/{id}">{lang_users_base_privileges}</a>
-			<a class="small awesome" href="{site_url}admin/users_control/servers_privileges/{id}">{lang_users_servers_privileges}</a>
-			<a class="yellow small awesome" href="{site_url}admin/users_control/edit/{id}">{lang_edit}</a>
-			<a class="red small awesome" href="{site_url}admin/users_control/delete/{id}">&#10008;</a>
+			<a class="small button" href="{site_url}admin/users_control/base_privileges/{id}">{lang_users_base_privileges}</a>
+			<a class="small button" href="{site_url}admin/users_control/servers_privileges/{id}">{lang_users_servers_privileges}</a>
+			<a class="yellow small button" href="{site_url}admin/users_control/edit/{id}">{lang_edit}</a>
+			<a class="red small button" href="{site_url}admin/users_control/delete/{id}">&#10008;</a>
 		</td>
 
 	</tr>

@@ -1,6 +1,6 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
-<a class="awesome" href="{site_url}adm_servers/add/games">{lang_adm_servers_add_game}</a>
-<a class="awesome" href="{site_url}adm_servers/add/game_types">{lang_adm_servers_add_game_type}</a>
+<a class="button" href="{site_url}adm_servers/add/games">{lang_adm_servers_add_game}</a>
+<a class="button" href="{site_url}adm_servers/add/game_types">{lang_adm_servers_add_game_type}</a>
 <script type="text/javascript">
 $(document).ready(function(){
 	
@@ -37,7 +37,7 @@ $(document).ready(function(){
 							<li style="margin-left:20px;"><a href="{site_url}adm_servers/edit/game_types/{gt_id}">{gt_name}</a></li>
 						{/gt_list}
 				</td>
-				<td align="center" width="30%"><a class="small awesome" href="{site_url}adm_servers/edit/games/{game_code}">{lang_control}</a>&nbsp;<a class="red small awesome" href="{site_url}adm_servers/delete/games/{game_code}">X</a></td>
+				<td align="center" width="30%"><a class="small button" href="{site_url}adm_servers/edit/games/{game_code}">{lang_control}</a>&nbsp;<a class="red small button" href="{site_url}adm_servers/delete/games/{game_code}">X</a></td>
 			</tr>
 	{/games_list}
 </table>

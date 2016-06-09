@@ -1,4 +1,4 @@
-<p class="hr">Основные команды</p>
+<h2>Основные команды</h2>
 
 <?php 
 if((($this->users->user_privileges['start_servers'] == 2)
@@ -7,7 +7,7 @@ if((($this->users->user_privileges['start_servers'] == 2)
 ):
 
 ?>
-<a class="large green awesome" href={site_url}server_command/start/{server_id}>&#9658;&nbsp;Старт</a>
+<a class="large green button" href={site_url}server_command/start/{server_id}>&#9658;&nbsp;Старт</a>
 <?php endif; ?>
 
 <?php 
@@ -17,7 +17,7 @@ if((($this->users->user_privileges['stop_servers'] == 2)
 ):
 
 ?>
-<a class="large red awesome" href={site_url}server_command/stop/{server_id}>&#9632;&nbsp;Стоп</a>
+<a class="large red button" href={site_url}server_command/stop/{server_id}>&#9632;&nbsp;Стоп</a>
 <?php endif; ?>
 
 <?php 
@@ -26,7 +26,7 @@ if(($this->users->user_privileges['restart_servers'] == 2)
 ):
 
 ?>
-<a class="large yellow awesome" href={site_url}server_command/restart/{server_id}>&#10162;&nbsp;Рестарт</a>
+<a class="large yellow button" href={site_url}server_command/restart/{server_id}>&#10162;&nbsp;Рестарт</a>
 <?php endif; ?>
 
 <?php 
@@ -37,12 +37,12 @@ if((($this->users->user_privileges['restart_servers'] == 2)
 ):
 
 ?>
-<a class="large blue awesome" href={site_url}server_command/rcon/restart/{server_id}>&#10162;&nbsp;Мягкий рестарт</a>
+<a class="large blue button" href={site_url}server_command/rcon/restart/{server_id}>&#10162;&nbsp;Мягкий рестарт</a>
 <?php endif; ?>
 
 
 <?php if($this->players): ?>
-<p class="hr">Управление игроками на сервере</p>
+<h2>Управление игроками на сервере</h2>
 <table width="100%">
 
 <tr>
@@ -57,9 +57,9 @@ if((($this->users->user_privileges['restart_servers'] == 2)
 <td width="20%">{steam_id}</td>
 <td width="20%">{user_ip}</td>
 <td>
-<a class="small awesome" href="{site_url}server_command/rcon/pl_kick/{server_id}/{user_id}/">Кик<a/> 
-<a class="small awesome" href="{site_url}server_command/rcon/pl_ban/{server_id}/{user_id}/">Бан<a/> 
-<a class="small awesome" href="{site_url}server_command/rcon/pl_changename/{server_id}/{user_id}/">Сменить ник<a/>
+<a class="small button" href="{site_url}server_command/rcon/pl_kick/{server_id}/{user_id}/">Кик<a/> 
+<a class="small button" href="{site_url}server_command/rcon/pl_ban/{server_id}/{user_id}/">Бан<a/> 
+<a class="small button" href="{site_url}server_command/rcon/pl_changename/{server_id}/{user_id}/">Сменить ник<a/>
 </tr>
 {/users_list}
 </table>
@@ -67,7 +67,7 @@ if((($this->users->user_privileges['restart_servers'] == 2)
 
 
 <? if($this->server_data['server_status']): ?>
-<p class="hr">Чат</p>
+<h2>Чат</h2>
 <form action="{site_url}server_command/rcon/send_msg/<?=$this->uri->rsegment(3)?>/" method="post" accept-charset="utf-8">
 <table width="50%">
 <tr>
@@ -77,7 +77,7 @@ if((($this->users->user_privileges['restart_servers'] == 2)
 </table>
 </form>
 
-<p class="hr">Карты</p>
+<h2>Карты</h2>
 <form action="{site_url}server_command/rcon/changemap/<?=$this->uri->rsegment(3)?>/" method="post" accept-charset="utf-8">
 <table width="50%">
 <tr>
@@ -100,7 +100,7 @@ if((($this->users->user_privileges['restart_servers'] == 2)
 </table>
 
 <? if($this->users->servers_privileges['SERVER_SET_PASSWORD']): ?>
-<p class="hr">Пароль на сервер</p>
+<h2>Пароль на сервер</h2>
 <form action="{site_url}server_command/rcon/set_password/<?=$this->uri->rsegment(3)?>/" method="post" accept-charset="utf-8">
 <table width="50%">
 <tr>
@@ -113,7 +113,7 @@ if((($this->users->user_privileges['restart_servers'] == 2)
 <?php endif; ?>
 
 <? if($this->users->servers_privileges['RCON_SEND']): ?>
-<p class="hr">RCON</p>
+<h2>RCON</h2>
 <form action="{site_url}server_command/rcon/rcon_command/<?=$this->uri->rsegment(3)?>/" method="post" accept-charset="utf-8">
 <table width="50%">
 <tr>

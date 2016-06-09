@@ -1,6 +1,6 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
-<a class="awesome" href="{site_url}admin/users_control">« {lang_users_list}</a>
-<p class="hr">{lang_profile_servers_privileges}</p>
+<a class="button" href="{site_url}admin/users_control">« {lang_users_list}</a>
+<h2>{lang_profile_servers_privileges}</h2>
 <table width="75%" class="zebra">
 	<thead>
 	<tr>
@@ -13,7 +13,7 @@
 	<tr>
 		<td>{server_name}</td>
 		<td>{server_ip}:{server_port}</td>
-		<td><a class="small awesome" href="{site_url}admin/users_control/servers_privileges/{user_id}/{server_id}">{lang_select}</a></td>
+		<td><a class="small button" href="{site_url}admin/users_control/servers_privileges/{user_id}/{server_id}">{lang_select}</a></td>
 	</tr>
 {/servers_list}
 </table>

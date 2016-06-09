@@ -1,6 +1,6 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
-<a class="awesome" href="{site_url}adm_servers/install_game_server">{lang_adm_servers_add_game_server}</a>
-<a class="awesome" id="filter" href="#">{lang_filter}</a>
+<a class="button" href="{site_url}adm_servers/install_game_server">{lang_adm_servers_add_game_server}</a>
+<a class="button" id="filter" href="#">{lang_filter}</a>
 
 <script>
 $(document).ready(function() {
@@ -45,7 +45,7 @@ $("a#filter" ).click(function() {
 	$('select[multiple="multiple"]').multipleSelect({width:200});
 </script>
 
-<p class="hr">{lang_adm_servers_game_servers}</p>
+<h2>{lang_adm_servers_game_servers}</h2>
 <table class="zebra" width="100%">
 
 	<tr>
@@ -57,7 +57,7 @@ $("a#filter" ).click(function() {
 {games_list}
 	<tbody>
 		<tr>
-			<td colspan="5"><p class="hr"><strong>{game_name}</strong></p></td>
+			<td colspan="5"><strong>{game_name}</strong></td>
 		</tr>
 	</tbody>
 	{servers_list}
@@ -65,7 +65,7 @@ $("a#filter" ).click(function() {
 			<td>{server_name}</td>
 			<td>{server_game}</td>
 			<td>{server_ip}:{server_port}</td>
-			<td><a class="small awesome" href="{site_url}adm_servers/edit/game_servers/{server_id}">{lang_control}</a>&nbsp;<a class="red small awesome" href="{site_url}adm_servers/delete/game_servers/{server_id}">X</a></td>
+			<td><a class="small button" href="{site_url}adm_servers/edit/game_servers/{server_id}">{lang_control}</a>&nbsp;<a class="red small button" href="{site_url}adm_servers/delete/game_servers/{server_id}">X</a></td>
 		</tr>
 	{/servers_list}
 {/games_list}

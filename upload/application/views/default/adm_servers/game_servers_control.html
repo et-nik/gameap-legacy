@@ -1,8 +1,8 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
-<a class="awesome" href="{site_url}adm_servers/view/game_servers">« {lang_adm_servers_game_servers}</a>&nbsp;
-<a class="awesome" href="{site_url}admin/settings/server/{server_id}">{lang_adm_servers_game_server_settings}</a>
-<a class="awesome" href="{site_url}adm_servers/reinstall_game_server/{server_id}">{lang_adm_servers_reinstall}</a>
-<a class="awesome" onclick="$('#popup').arcticmodal()">{lang_server_control_last_actions}</a>
+<a class="button" href="{site_url}adm_servers/view/game_servers">« {lang_adm_servers_game_servers}</a>&nbsp;
+<a class="button" href="{site_url}admin/settings/server/{server_id}">{lang_adm_servers_game_server_settings}</a>
+<a class="button" href="{site_url}adm_servers/reinstall_game_server/{server_id}">{lang_adm_servers_reinstall}</a>
+<a class="button" onclick="$('#popup').arcticmodal()">{lang_server_control_last_actions}</a>
 <h2>{lang_adm_servers_game_server_control}</h2>
 
 <p>{lang_adm_servers_game_servers_documentation}</p>
@@ -15,7 +15,7 @@
 			<table width="100%" class="zebra">
 				<tbody>
 					<tr>
-						<td colspan="5"><p class="hr"><strong>{lang_server_control_last_actions}</strong></p></td>
+						<td colspan="5"><h2>{lang_server_control_last_actions}</h2></td>
 					</tr>
 				</tbody>
 				<tr>
@@ -31,7 +31,7 @@
 					<td width="20%">{log_type}</td>
 					<td width="20%">{log_command}</td>
 					<td width="20%">{log_user_name}</td>
-					<td><a class="small awesome" href={site_url}log_view/view/{log_id}>{lang_view}</a></td>
+					<td><a class="small button" href={site_url}log_view/view/{log_id}>{lang_view}</a></td>
 				</tr>
 			{/log_list}
 			</table>
@@ -41,7 +41,7 @@
 	<table class="zebra" width="100%">
 		
 		<tr>
-			<td><p class="hr">{lang_information}</p></td>
+			<td><h2>{lang_information}</h2></td>
 			<td></td>
 		</tr>
 
@@ -72,7 +72,7 @@
         <div id="base_parameters" class="tab_content">
 			<table class="zebra" width="100%">
 				<tr>
-					<td width="40%"><p class="hr">{lang_base_parameters}</p></td>
+					<td width="40%"><h2>{lang_base_parameters}</h2></td>
 					<td></td>
 				</tr>
 
@@ -151,7 +151,7 @@
 
 				<tr>
 					<td>{lang_adm_servers_rcon_password}:<br /><span class="description">[ {lang_leave_blank} ]</span></td>
-					<td><input type="text" name="rcon" />&nbsp;<a class="small awesome" href="#" onclick="generate_password();return false;"><span class="glyphicon glyphicon-refresh"></span>&nbsp;{lang_adm_servers_generate_rcon_password}</a></td>
+					<td><input type="text" name="rcon" />&nbsp;<a class="small button" href="#" onclick="generate_password();return false;"><span class="glyphicon glyphicon-refresh"></span>&nbsp;{lang_adm_servers_generate_rcon_password}</a></td>
 				</tr>
 
 				<tr>
@@ -165,7 +165,7 @@
 			<div id="limites" class="tab_content">
 				<table class="zebra" width="100%">
 					<tr>
-						<td colspan="2"><p class="hr">{lang_limites}</p></td>
+						<td colspan="2"><h2>{lang_limites}</h2></td>
 					</tr>
 					
 					<tr>
@@ -190,7 +190,7 @@
         <div id="start_parameters" class="tab_content">
 			<table class="zebra" width="100%">
 				<tr>
-					<td colspan="2"><p class="hr">{lang_adm_servers_start_parameters}</p></td>
+					<td colspan="2"><h2>{lang_adm_servers_start_parameters}</h2></td>
 				</tr>
                 
 				<tr>
@@ -210,7 +210,7 @@
 			</table>
 			
 			<div style="margin-left: 200px; margin-right: 200px;" align="center" id="block">
-				<p class="hr">{lang_adm_servers_aliases_for_command}</p>
+				<h2>{lang_adm_servers_aliases_for_command}</h2>
 				
 				<table align="center" class="zebra" width="100%">
 					<tr>
@@ -246,7 +246,7 @@
 					{/aliases_list}
 					
 					<tr>
-						<td align="right" colspan="2"><br /><a class="small awesome" href="{site_url}adm_servers/edit/game_types/{game_type_id}" target="blank">{lang_adm_servers_aliases_edit}</a></td>
+						<td align="right" colspan="2"><br /><a class="small button" href="{site_url}adm_servers/edit/game_types/{game_type_id}" target="blank">{lang_adm_servers_aliases_edit}</a></td>
 					</tr>
 					
 				</table>

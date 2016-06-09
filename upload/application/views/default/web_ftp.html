@@ -27,8 +27,8 @@
 
 <script type="text/javascript" src="{base_url}themes/system/js/web_ftp.js"></script>
 
-<a class="awesome" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>&nbsp;
-<a class="awesome" href="#" onclick="$('#upload_file').arcticmodal();">{lang_web_ftp_upload}</a>
+<a class="button" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>&nbsp;
+<a class="button" href="#" onclick="$('#upload_file').arcticmodal();">{lang_web_ftp_upload}</a>
 
 <hr />
 <strong>{lang_web_ftp_recent_files}:</strong>
@@ -95,7 +95,7 @@
 <div style="display: none;">
 	<div class="box-modal" id="upload_file">
 		<div class="box-modal_close arcticmodal-close">{lang_close}</div>
-		<p class="hr">{lang_server_files_content}</p>
+		<h2>{lang_server_files_content}</h2>
 		<form id="fupload_file" action="#" onsubmit="UploadFile();$('#upload_file').arcticmodal('close');return false;" method="post" accept-charset="utf-8" enctype="multipart/form-data">
 			<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
 			<input style="display:inline" type="file" name="userfile" size="60%" /><input class="button" type="submit" value="{lang_upload}" />

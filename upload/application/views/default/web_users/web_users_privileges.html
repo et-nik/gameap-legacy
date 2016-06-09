@@ -1,7 +1,7 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
-<a class="awesome" href="{site_url}admin/users_control/servers_privileges/{user_id}">« {lang_back}</a>
+<a class="button" href="{site_url}admin/users_control/servers_privileges/{user_id}">« {lang_back}</a>
 
-<p class="hr">{lang_users_servers_privileges}</p>
+<h2>{lang_users_servers_privileges}</h2>
 
 <form action="{site_url}admin/users_control/save_servers_privileges/{user_id}/{server_id}" method="post" accept-charset="utf-8">
 	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />

@@ -1,4 +1,4 @@
-<a class="awesome" onclick="anichange('#filter'); return false" href="#">{lang_filter}</a>
+<a class="button" onclick="anichange('#filter'); return false" href="#">{lang_filter}</a>
 <br /><br />
 
 <script>
@@ -41,7 +41,7 @@ function anichange (objName) {
 		<td width="20%"><a href="{site_url}adm_servers/edit/dedicated_servers/{task_ds_id}">{task_ds_name}</a></td>
 		<td width="20%"><a href="{site_url}adm_servers/edit/game_servers/{task_server_id}">{task_server_name}</a></td>
 		<td width="20%">{task_hstatus}</td>
-		<td><a class="small awesome" href={site_url}tasks/view/{task_id}>{lang_view}</a></td>
+		<td><a class="small button" href={site_url}tasks/view/{task_id}>{lang_view}</a></td>
 	</tr>
 {/tasks_list}
 </table>

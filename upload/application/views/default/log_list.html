@@ -1,4 +1,4 @@
-<a class="awesome" onclick="anichange('#filter'); return false" href="#">{lang_filter}</a>
+<a class="button" onclick="anichange('#filter'); return false" href="#">{lang_filter}</a>
 <script>
 function anichange (objName) {
   if ( $(objName).css('display') == 'none' ) {
@@ -60,7 +60,7 @@ function anichange (objName) {
 		<td width="20%">{log_type}</td>
 		<td width="20%">{log_command}</td>
 		<td width="20%">{log_user_name}</td>
-		<td><a class="small awesome" href={site_url}log_view/view/{log_id}>{lang_view}</a></td>
+		<td><a class="small button" href={site_url}log_view/view/{log_id}>{lang_view}</a></td>
 	</tr>
 {/log_list}
 </table>
