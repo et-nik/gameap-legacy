@@ -574,20 +574,14 @@ class Servers extends CI_Model {
 
 			$this->server_data['ds_modules_data'] 	= $this->server_ds_data['modules_data'];
 			
-			if (strtolower($this->server_data['os']) == 'windows') {
-				$execfile = $this->_exec_file['windows'];
-			} else {
-				$execfile = $this->_exec_file['linux'];
-			}
-			
 			$this->server_data['work_path'] 			= $this->server_ds_data['work_path'];
             
-			$this->server_data['script_start'] 			= $execfile . ' ' . $this->server_ds_data['script_start'];
-			$this->server_data['script_stop'] 			= $execfile . ' ' . $this->server_ds_data['script_stop'];
-			$this->server_data['script_restart'] 		= $execfile . ' ' . $this->server_ds_data['script_restart'];
-			$this->server_data['script_status'] 		= $execfile . ' ' . $this->server_ds_data['script_status'];
-			$this->server_data['script_get_console'] 	= $execfile . ' ' . $this->server_ds_data['script_get_console'];
-			$this->server_data['script_send_command'] 	= $execfile . ' ' . $this->server_ds_data['script_send_command'];
+			$this->server_data['script_start'] 			= $this->server_ds_data['script_start'];
+			$this->server_data['script_stop'] 			= $this->server_ds_data['script_stop'];
+			$this->server_data['script_restart'] 		= $this->server_ds_data['script_restart'];
+			$this->server_data['script_status'] 		= $this->server_ds_data['script_status'];
+			$this->server_data['script_get_console'] 	= $this->server_ds_data['script_get_console'];
+			$this->server_data['script_send_command'] 	= $this->server_ds_data['script_send_command'];
 		}
 		
 		// Получение сведений об игре
