@@ -182,7 +182,7 @@
 }
 
 .ms-drop input[type="checkbox"] {
-    vertical-align: middle;
+    /* vertical-align: middle; */
 }
 
 .ms-drop .ms-no-results {
