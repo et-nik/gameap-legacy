@@ -126,9 +126,21 @@ class Tasks extends CI_Controller {
         $this->gdaemon_tasks->set_filter('task', $task);
         $this->gdaemon_tasks->set_filter('status', array('waiting', 'working'));
 
-        if ($this->gdaemon_tasks->get_all_count() > 0) {
-            $this->_send_error("This task exists. Please wait.");
-            return;
+        // if ($this->gdaemon_tasks->get_all_count() > 0) {
+            // $this->_send_error("This task exists. Please wait.");
+            // return;
+        // }
+        
+        if ($this->gdaemon_tasks->get_list()) {
+            $count_tasks = count($this->gdaemon_tasks->tasks_list);
+            
+            if ($count_tasks == 1) {
+                $this->_send_response(array('status' => 1, 'message' => "Task exists", 'task_id' => $this->gdaemon_tasks->tasks_list[0]['id']));
+                return;
+            } else if ($count_tasks > 1) {
+                $this->_send_error("This task exists. Please wait.");
+                return;
+            }
         }
 
         $task_id = $this->gdaemon_tasks->add(array(

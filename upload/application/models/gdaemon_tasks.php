@@ -92,10 +92,10 @@ class Gdaemon_tasks extends CI_Model {
         if (!empty($this->_filter_list)) {
             foreach ($this->_filter_list as $fname => &$fval) {
                 if (is_array($fval)) {
-                    $this->db->where_in($fname, $fval);
+                    $this->db->where_in('gdaemon_tasks.' . $fname, $fval);
                 }
                 else {
-                    $this->db->where($fname, $fval);
+                    $this->db->where('gdaemon_tasks.' . $fname, $fval);
                 }
             }
         }
@@ -117,8 +117,12 @@ class Gdaemon_tasks extends CI_Model {
         $this->db->join('dedicated_servers', 'dedicated_servers.id = gdaemon_tasks.ds_id');
         $this->db->join('servers', 'servers.id = gdaemon_tasks.server_id');
         $this->db->order_by('gdaemon_tasks.id', 'desc');
-        
         $query = $this->db->get();
+        
+        if ($query == false) {
+            return false;
+        }
+        
         $this->tasks_list = $query->result_array();
 			
         return true;
@@ -194,7 +198,7 @@ class Gdaemon_tasks extends CI_Model {
     */
 	function add($data)
 	{
-		if ((bool)$this->db->insert('gdaemon_tasks', $data)) {
+        if ((bool)$this->db->insert('gdaemon_tasks', $data)) {
             return $this->db->insert_id();
         }
         else {
