@@ -23,14 +23,15 @@
  */
 class Files_gdaemon extends CI_Driver { 
 	
-	var $hostname		= '';
-	var $username		= '';
-	var $password		= '';
-	var $key		    = '';
+	var $hostname		        = '';
+	var $username		        = '';
+	var $password		        = '';
+
+    private $privkey_path       = "";
+    private $privkey_pass		= '';
     
 	var $port 			= 31707;
 	
-	var $crypt_key		= '';
 	var $client_key		= "";
 	
 	var $_connection 	= false;
@@ -149,10 +150,25 @@ class Files_gdaemon extends CI_Driver {
         $this->_write_binn->add_str($this->password);
         $this->_write_binn->add_int16(3); // Set mode DAEMON_SERVER_MODE_FILES
 
-        socket_write($this->_socket, $this->_write_binn->get_binn_val() . "\xFF\xFF\xFF\xFF");
-        $read = $this->_read();
+        // $fp = fopen("/home/nikita/Git/GameAP_Daemon2/keys/rsa_priv.pem","r"); 
+        $fp = fopen($this->privkey_path, "r"); 
+        $priv_key = fread($fp, 8192); 
+        fclose($fp);
 
-        $this->_read_binn->binn_open($read);
+        $res = openssl_get_privatekey($priv_key, $this->privkey_pass);
+        openssl_private_encrypt($this->_write_binn->get_binn_val() . "\00", $encoded, $res); 
+
+        socket_write($this->_socket, $encoded . "\xFF\xFF\xFF\xFF");
+        $read = $this->_read();
+        
+        $decrypted = "";
+        openssl_private_decrypt($read, $decrypted, $res);
+
+        if ($decrypted == '') {
+            return false;
+        }
+
+        $this->_read_binn->binn_open($decrypted);
 
         $results = $this->_read_binn->get_binn_arr();
 
@@ -704,8 +720,8 @@ class Files_gdaemon extends CI_Driver {
 	 * @access	private
 	 * @param	string
 	 */
-	function _error($msg, $p1 = "", $p2 = "")
+	function _error($msg, $dscr = "")
 	{
-		throw new Exception(lang($msg, $p1, $p2) . ' (GDaemon)');
+		throw new Exception(lang($msg) . ' ' . $dscr . ' (GDaemon)');
 	}
 }
