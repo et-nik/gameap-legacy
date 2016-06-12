@@ -6,12 +6,18 @@
 
 <p>{lang_adm_servers_ds_documentation}</p>
 
+<style>
+input[type='text'] {
+    width: 100%;
+}
+</style>
+
 <form action="{site_url}adm_servers/edit/dedicated_servers/{ds_id}" method="post" accept-charset="utf-8">
 	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
 	
 	<table width="50%" class="zebra">
 		<tr>
-			<td>{lang_name}:</td>
+			<td width="40%">{lang_name}:</td>
 			<td><input type="text" name="name" value="{ds_name}" /></td>
 		</tr>
 
@@ -34,18 +40,28 @@
 			<td>{lang_ip}:<br /><span class="description">{lang_adm_servers_ip_description}</span></td>
 			<td><input type="text" name="ip" value="{ds_ip}" /></td>
 		</tr>
+
+        <tr>
+            <td>{lang_adm_servers_path_to_executable_file}:</td>
+            <td><input type="text" name="work_path" value="{work_path}" /></td>
+        </tr>
+
+        <tr>
+            <td>{lang_adm_servers_steamcmd_path}:<br /><span class="description">[ {lang_adm_servers_steamcmd_path_desc} ]</span></td>
+            <td><input type="text" name="steamcmd_path" value="{steamcmd_path}" /></td>
+        </tr>
 		
+<!--
 		<tr>
 			<td>{lang_adm_servers_disable_ds}:</td>
 			<td>{disabled_checkbox}</td>
 		</tr>
+-->
 
 		<tr>
-		<tr>
-			<td></td>
-			<td><input class="button" type="submit" name="edit_ds" value="{lang_save}" /></td>
-		</tr>
 	</table>
+
+    <input class="button" type="submit" name="edit_ds" value="{lang_save}" />
 
 	<div style="display: none;">
 		<div class="box-modal" id="popup">
@@ -80,32 +96,10 @@
 	<br />
 
 	<ul class="tabs">
-		<li><a href="#access_data">{lang_adm_servers_ds_access}</a></li>
 		<li><a href="#gdaemon_data">{lang_adm_servers_gdaemon_access}</a></li>
         <li><a href="#start_parameters">{lang_adm_servers_start_parameters}</a></li>
     </ul>
     
-    <div id="access_data" class="tab_content">
-		<table class="zebra" width="100%">
-			<tbody>
-				<tr>
-					<td colspan="2"><h2><span class="description">{lang_adm_servers_ds_access_desc}</span></h2></td>
-				</tr>
-			</tbody>
-			
-			<tr>
-				<td>{lang_adm_servers_path_to_executable_file}:</td>
-				<td><input type="text" name="work_path" value="{work_path}" /></td>
-			</tr>
-			
-			<tr>
-				<td>{lang_adm_servers_steamcmd_path}:<br /><span class="description">[ {lang_adm_servers_steamcmd_path_desc} ]</span></td>
-				<td><input type="text" name="steamcmd_path" value="{steamcmd_path}" /></td>
-			</tr>
-            
-		</table>
-	</div>
-	
 	<div id="gdaemon_data" class="tab_content">
 		<table class="zebra" width="100%">
 			<tbody>
@@ -115,23 +109,28 @@
 			</tbody>
 
             <tr>
-				<td width="30%">{lang_adm_servers_gdaemon_host}:</td>
+				<td width="40%">{lang_adm_servers_gdaemon_host}:</td>
 				<td><input type="text" name="gdaemon_host" value="{gdaemon_host}" /></td>
 			</tr>
 			
 			<tr>
-				<td width="30%">{lang_adm_servers_gdaemon_login}:</td>
+				<td width="40%">{lang_adm_servers_gdaemon_login}:</td>
 				<td><input type="text" name="gdaemon_login" value="{gdaemon_login}" /></td>
 			</tr>
             
 			<tr>
-				<td width="30%">{lang_adm_servers_gdaemon_password}:</td>
-				<td><input type="text" name="gdaemon_password" value="{gdaemon_password}" /></td>
+				<td width="40%">{lang_adm_servers_gdaemon_password}:</td>
+				<td><input type="text" name="gdaemon_password" value="" /></td>
 			</tr>
 
 			<tr>
-				<td>{lang_adm_servers_gdaemon_key}:</td>
-				<td><input type="text" name="gdaemon_key" /></td>
+				<td>{lang_adm_servers_gdaemon_privkey}:</td>
+				<td><input type="text" name="gdaemon_privkey" value="{gdaemon_privkey}"/></td>
+			</tr>
+            
+			<tr>
+				<td>{lang_adm_servers_gdaemon_keypass}:</td>
+				<td><input type="text" name="gdaemon_keypass" /></td>
 			</tr>
 
 		</table>
