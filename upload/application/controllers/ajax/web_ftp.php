@@ -31,6 +31,7 @@ class Web_ftp extends CI_Controller {
 	private $_error = "";
 	
 	var $forbidden_types = array('exe', 'com', 'dll', 'bat', 'cmd', 'bin', 'so', 'sh', 'tmp', 'dmp', 'mdmp', 'core', 'dylib', 'pid');
+    var $forbidden_names = array('stdin.txt', 'stdout.txt', 'pid.txt');
 	
 	// -----------------------------------------------------------------
 	
@@ -99,11 +100,19 @@ class Web_ftp extends CI_Controller {
 		
 		// Проверка на расширения
 		if (isset($file['type'])) {
-			if ($file['type'] != 'd' && (!isset($pathinfo['extension']) OR in_array($pathinfo['extension'], $this->forbidden_types))) {
+			if ($file['type'] != 'd'
+                && (!isset($pathinfo['extension'])
+                    OR in_array($pathinfo['extension'], $this->forbidden_types)
+                    OR in_array($pathinfo['basename'], $this->forbidden_names)
+                )
+            ) {
 				return false;
 			}
 		} else {
-			if (!isset($pathinfo['extension']) OR in_array($pathinfo['extension'], $this->forbidden_types)) {
+			if (!isset($pathinfo['extension'])
+                OR in_array($pathinfo['extension'], $this->forbidden_types)
+                OR in_array($pathinfo['basename'], $this->forbidden_names)
+            ) {
 				return false;
 			}
 		}
