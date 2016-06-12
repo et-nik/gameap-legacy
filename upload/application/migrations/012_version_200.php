@@ -21,6 +21,8 @@ class Migration_Version_200 extends CI_Migration {
         if ($this->db->field_exists('ftp_login', 'dedicated_servers')) $this->dbforge->drop_column('dedicated_servers', 'ftp_login');
         if ($this->db->field_exists('ftp_password', 'dedicated_servers')) $this->dbforge->drop_column('dedicated_servers', 'ftp_password');
         if ($this->db->field_exists('ftp_path', 'dedicated_servers')) $this->dbforge->drop_column('dedicated_servers', 'ftp_path');
+        
+        if ($this->db->field_exists('gdaemon_key', 'dedicated_servers')) $this->dbforge->drop_column('dedicated_servers', 'gdaemon_key');
 
         if (!$this->db->table_exists('gdaemon_tasks')) {
             $this->dbforge->add_field(array(
@@ -113,12 +115,30 @@ class Migration_Version_200 extends CI_Migration {
         $this->dbforge->drop_table('captcha');
 
         $fields = array();
-		if (!$this->db->field_exists('gdaemon_login', 'dedicated_servers')) {
+		if (!$this->db->field_exists('gdaemon_privkey', 'dedicated_servers')) {
 			$fields = array(
-				'gdaemon_login' => array('type' => 'TEXT')
+				'gdaemon_privkey' => array('type' => 'VARCHAR', 'constraint' => 256)
 			);
 			
-			$this->dbforge->add_column('dedicated_servers', $fields, 'gdaemon_key');
+			$this->dbforge->add_column('dedicated_servers', $fields, 'gdaemon_host');
+		}
+
+        $fields = array();
+		if (!$this->db->field_exists('gdaemon_pubkey', 'dedicated_servers')) {
+			$fields = array(
+				'gdaemon_pubkey' => array('type' => 'VARCHAR', 'constraint' => 256)
+			);
+			
+			$this->dbforge->add_column('dedicated_servers', $fields, 'gdaemon_privkey');
+		}
+
+        $fields = array();
+		if (!$this->db->field_exists('gdaemon_keypass', 'dedicated_servers')) {
+			$fields = array(
+				'gdaemon_keypass' => array('type' => 'TEXT')
+			);
+			
+			$this->dbforge->add_column('dedicated_servers', $fields, 'gdaemon_pubkey');
 		}
 
         $fields = array();
