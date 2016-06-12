@@ -224,10 +224,11 @@ if ( ! function_exists('get_file_protocol_config'))
         $config['hostname'] = $explode[0];
         $config['port'] = isset($explode[1]) ? $explode[1] : 31707;
 			
-        $config['username'] = $server_data['gdaemon_login'];;
-        $config['password'] = $server_data['gdaemon_password'];;
-        $config['key']      = $server_data['gdaemon_key'];
-		
+        $config['username']         = $server_data['gdaemon_login'];;
+        $config['password']         = $server_data['gdaemon_password'];;
+        $config['privkey_path']     = $server_data['gdaemon_privkey'];
+        $config['privkey_pass']     = $server_data['gdaemon_keypass'];
+
 		return $config;
 	}
 }

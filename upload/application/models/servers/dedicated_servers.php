@@ -49,10 +49,18 @@ class Dedicated_servers extends CI_Model {
 	function _encrypt_passwords($data) {
 		
 		$this->load->library('encrypt');
-		
-        $data['gdaemon_login']	    = $this->encrypt->encode($data['gdaemon_login']);
-        $data['gdaemon_password']	= $this->encrypt->encode($data['gdaemon_password']);
-        $data['gdaemon_key']	    = $this->encrypt->encode($data['gdaemon_key']);
+
+        if (isset($data['gdaemon_login'])) {
+            $data['gdaemon_login'] = $this->encrypt->encode($data['gdaemon_login']);
+        }
+
+        if (isset($data['gdaemon_password'])) {
+            $data['gdaemon_password']= $this->encrypt->encode($data['gdaemon_password']);
+        }
+
+        if (isset($data['gdaemon_keypass'])) {
+            $data['gdaemon_keypass'] = $this->encrypt->encode($data['gdaemon_keypass']);
+        }
 		
 		return $data;
 	}
@@ -157,9 +165,11 @@ class Dedicated_servers extends CI_Model {
 				
 				$this->ds_list[$i]['modules_data'] 		= json_decode($this->ds_list[$i]['modules_data'], true);
 				
-				$this->ds_list[$i]['gdaemon_key']		    = $this->encrypt->decode($this->ds_list[$i]['gdaemon_key']);
-				$this->ds_list[$i]['gdaemon_login']			= $this->encrypt->decode($this->ds_list[$i]['gdaemon_login']);
-				$this->ds_list[$i]['gdaemon_password']		= $this->encrypt->decode($this->ds_list[$i]['gdaemon_password']);
+				$this->ds_list[$i]['gdaemon_privkey']   = $this->ds_list[$i]['gdaemon_privkey'];
+				$this->ds_list[$i]['gdaemon_pubkey']   = $this->ds_list[$i]['gdaemon_pubkey'];
+				$this->ds_list[$i]['gdaemon_keypass']   = $this->encrypt->decode($this->ds_list[$i]['gdaemon_keypass']);
+				$this->ds_list[$i]['gdaemon_login']		= $this->encrypt->decode($this->ds_list[$i]['gdaemon_login']);
+				$this->ds_list[$i]['gdaemon_password']	= $this->encrypt->decode($this->ds_list[$i]['gdaemon_password']);
 				
 				// Скрипты запуска
 				$this->ds_list[$i]['script_start'] = $this->ds_list[$i]['script_start'] 
@@ -262,8 +272,15 @@ class Dedicated_servers extends CI_Model {
     */
 	function edit_dedicated_server($id, $data)
 	{
-		$data = $this->_encrypt_passwords($data);
-		
+        if (isset($data['gdaemon_password']) && $data['gdaemon_password'] == '') {
+            unset($data['gdaemon_password']);
+        }
+
+        if (isset($data['gdaemon_keypass']) && $data['gdaemon_keypass'] == '') {
+            unset($data['gdaemon_keypass']);
+        }
+
+        $data = $this->_encrypt_passwords($data);
 		$this->db->where('id', $id);
 		
 		return (bool)$this->db->update('dedicated_servers', $data);

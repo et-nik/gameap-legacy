@@ -568,10 +568,11 @@ class Servers extends CI_Model {
 			$this->server_data['ds_disabled'] 	= $this->server_ds_data['disabled'];
 
 			$this->server_data['gdaemon_host']		= $this->server_ds_data['gdaemon_host'];
+			$this->server_data['gdaemon_privkey'] 	= $this->server_ds_data['gdaemon_privkey'];
+			$this->server_data['gdaemon_keypass'] 	= $this->server_ds_data['gdaemon_keypass'];
 			$this->server_data['gdaemon_login'] 	= $this->server_ds_data['gdaemon_login'];
 			$this->server_data['gdaemon_password'] 	= $this->server_ds_data['gdaemon_password'];
-			$this->server_data['gdaemon_key'] 		= $this->server_ds_data['gdaemon_key'];
-
+            
 			$this->server_data['ds_modules_data'] 	= $this->server_ds_data['modules_data'];
 			
 			$this->server_data['work_path'] 			= $this->server_ds_data['work_path'];
