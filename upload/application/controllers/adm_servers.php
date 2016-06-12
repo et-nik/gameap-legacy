@@ -1,15 +1,12 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Game AdminPanel (АдминПанель)
- *
+ * Game AdminPanel (GameAP)
  * 
- *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
- * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
+ * @copyright	Copyright (c) 2014-2016, Nikita Kuznetsov (http://hldm.org)
  * @license		http://www.gameap.ru/license.html
  * @link		http://www.gameap.ru
- * @filesource
 */
 
 /**
@@ -33,7 +30,7 @@
  
 class Adm_servers extends CI_Controller {
 	
-	var $available_control_protocols = array('gdaemon', 'ssh', 'telnet', 'local');
+	var $available_control_protocols = array('gdaemon');
 	
 	public function __construct()
     {
@@ -53,70 +50,53 @@ class Adm_servers extends CI_Controller {
 		$this->load->helper('string');
 		$this->load->helper('ds');
 
-        if ($this->users->check_user()) {
-			
-			//Base Template
-			$this->tpl_data['title'] 	= lang('adm_servers_title_index');
-			$this->tpl_data['heading'] 	= lang('adm_servers_heading_index');
-			$this->tpl_data['content'] 	= '';
-			
-			/* Есть ли у пользователя права */
-			if(!$this->users->auth_privileges['srv_global']) {
-				redirect('admin');
-			}
-			
-			$this->load->model('servers');
-			$this->load->library('form_validation');
-			$this->load->helper('form');
-			
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
-
-        } else {
-			redirect('auth');
+        if (!$this->users->check_user()) {
+            redirect('auth');
         }
+			
+        //Base Template
+        $this->tpl_data['title'] 	= lang('adm_servers_title_index');
+        $this->tpl_data['heading'] 	= lang('adm_servers_heading_index');
+        $this->tpl_data['content'] 	= '';
+        
+        /* Есть ли у пользователя права */
+        if(!$this->users->auth_privileges['srv_global']) {
+            redirect('admin');
+        }
+
+        $this->load->model('gdaemon_tasks');
+        
+        $this->load->model('servers');
+        $this->load->library('form_validation');
+        $this->load->helper('form');
+        
+        $this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
+        $this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
     }
     
-    // -----------------------------------------------------------
+    // -----------------------------------------------------------------
 
-    // Отображение информационного сообщения
-    function _show_message($message = false, $link = false, $link_text = false)
+    /**
+     * Show info message
+     *
+     * @param string    $message
+     * @param string    $link 
+     * @param string    $link_test
+    */ 
+    private function _show_message($message = false, $link = false, $link_text = false)
     {
-        
-        if (!$message) {
-			$message = lang('error');
-		}
-		
-        if (!$link) {
-			$link = 'javascript:history.back()';
-		}
-		
-		if (!$link_text) {
-			$link_text = lang('back');
-		}
+        $message 	OR $message = lang('error');
+		$link 		OR $link = 'javascript:history.back()';
+		$link_text 	OR $link_text = lang('back');
 
         $local_tpl['message'] = $message;
         $local_tpl['link'] = $link;
         $local_tpl['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
-        $this->parser->parse('main.html', $this->tpl_data);
+        
+        $this->tpl['content'] = $this->parser->parse('info.html', $local_tpl, true);
+        $this->parser->parse('main.html', $this->tpl);
     }
-    
-    // -----------------------------------------------------------------
-	
-	/**
-	 * Проверка Telnet
-	 * 
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @return bool
-	*/
-	private function _check_telnet($telnet_host, $telnet_login, $telnet_password, $os = 'windows')
-	{
-		return true;
-	}
-	
+
 	// -----------------------------------------------------------------
 	
 	/**
@@ -127,31 +107,9 @@ class Adm_servers extends CI_Controller {
 	 * @param string
 	 * @return bool
 	*/
-	private function _check_gdaemon($host, $key)
+	private function _check_gdaemon($host, $privkey, $keypass, $login, $password)
 	{
-		$this->load->driver('control');
-
-        return true;
-
-		if ($host == '' OR $key == '') {
-			return false;
-		}
-
-		// Разделяем на Host:Port
-		$host = explode(':', $host);
-		$host[1] = (isset($host[1])) ? (int)$host[1] : 31707;
-		
-		$this->control->set_driver('gdaemon');
-		// $this->control->set_data(array('os' => $os));
-		
-		try {
-			$this->control->connect($host[0], $host[1]);
-			$this->control->auth("NULL", $key);
-			
-			return true;
-		} catch (Exception $e) {
-			return false;
-		}
+		return true;
 	}
 
 	// -----------------------------------------------------------------
@@ -202,53 +160,15 @@ class Adm_servers extends CI_Controller {
 		$data['aliases'] = json_encode($this->installer->get_default_parameters());
 		$data['start_command'] 	= $this->installer->get_start_command();
 		
-		// Путь к картам
-		$data['maps_path'] = $this->installer->get_maps_path();
-		
 		/* Присваиваем значения пути к картам и имя screen  */
 		$data['screen_name'] = $data['game'] . '_' . random_string('alnum', 6) . '_' . $data['server_port'];
-		$data['maps_path'] = $this->games->games_list[0]['start_code'] . '/maps';
-		
+
 		// Прочие данные
 		$this->installer->change_server_data($server_data);
 		
 		return $data;
 	}
-	
-	// -----------------------------------------------------------------
-	
-	/**
-	 * 
-	 * Обработка статистики
-	*/
-	function _stats_processing($stats) 
-	{
-		$data = array();
 
-		if (!is_array($stats)) {
-			return false;
-		}
-		
-		foreach($stats as $arr) {
-			
-			if (!isset($arr['date']) OR !isset($arr['cpu_usage']) OR !isset($arr['memory_usage'])) {
-				continue;
-			}
-					
-			/* Показываем только за последние сутки */
-			if((time() - $arr['date']) > 86400) {
-				continue;
-			}
-			
-			// Оставляем от даты лишь время
-			$data['data']['axis']['categories'][] 	= preg_replace('/(\d+)\-(\d+)\-(\d+) (\d+)\:(\d+)/i', '$4:$5', unix_to_human($arr['date'], false, 'eu'));
-			$data['cpu_graph_data']['data'][] 		= $arr['cpu_usage'];
-			$data['memory_graph_data']['data'][] 	= $arr['memory_usage'];
-		}
-		
-		return $data;
-	}
-	
 	// -----------------------------------------------------------------
 	
 	/**
@@ -323,7 +243,6 @@ class Adm_servers extends CI_Controller {
     //Главная
     public function index()
     {
-		
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
 	
@@ -513,23 +432,12 @@ class Adm_servers extends CI_Controller {
 					$this->form_validation->set_rules('script_path', lang('adm_servers_script_path'), 'trim|max_length[256]|xss_clean');
 					
 					$this->form_validation->set_rules('gdaemon_host', lang('adm_servers_gdaemon_host'), 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('gdaemon_key', lang('adm_servers_gdaemon_key'), 'trim|max_length[64]|xss_clean');
+                    $this->form_validation->set_rules('gdaemon_privkey', lang('adm_servers_gdaemon_privkey'), 'trim|max_length[64]|xss_clean');
+                    $this->form_validation->set_rules('gdaemon_pubkey', lang('adm_servers_gdaemon_pubkey'), 'trim|max_length[64]|xss_clean');
+                    $this->form_validation->set_rules('gdaemon_keypass', lang('adm_servers_gdaemon_keypass'), 'trim|max_length[64]|xss_clean');
+                    $this->form_validation->set_rules('gdaemon_login', lang('adm_servers_gdaemon_login'), 'trim|max_length[64]|xss_clean');
+                    $this->form_validation->set_rules('gdaemon_password', lang('adm_servers_gdaemon_password'), 'trim|max_length[64]|xss_clean');
 					
-					$this->form_validation->set_rules('ssh_host', lang('adm_servers_ssh_host'), 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('ssh_login', 'SSH login', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('ssh_password', 'SSH password', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('ssh_path', lang('adm_servers_path_to_executable_file'), 'trim|max_length[256]|xss_clean');
-					
-					$this->form_validation->set_rules('telnet_host', lang('adm_servers_telnet_host'), 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('telnet_login', 'Telnet login', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('telnet_password', 'Telnet password', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('telnet_path', lang('adm_servers_path_to_executable_file'), 'trim|max_length[256]|xss_clean');
-					
-					$this->form_validation->set_rules('ftp_host', lang('adm_servers_ftp_host'), 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('ftp_login', 'FTP login', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('ftp_password', 'FTP password', 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('ftp_path', lang('adm_servers_path_to_executable_file'), 'trim|max_length[256]|xss_clean');
-
 					break;
 					
 				case 'game_servers':
@@ -649,23 +557,12 @@ class Adm_servers extends CI_Controller {
 						
 						$sql_data['steamcmd_path'] = $this->input->post('steamcmd_path');
 						
-						$sql_data['gdaemon_host'] = $this->input->post('gdaemon_host');
-						$sql_data['gdaemon_key'] = $this->input->post('gdaemon_key');
-						
-						$sql_data['ssh_host'] = $this->input->post('ssh_host');
-						$sql_data['ssh_login'] = $this->input->post('ssh_login');
-						$sql_data['ssh_password'] = $this->input->post('ssh_password');
-						$sql_data['ssh_path'] = $this->input->post('script_path');
-						
-						$sql_data['telnet_host'] = $this->input->post('telnet_host');
-						$sql_data['telnet_login'] = $this->input->post('telnet_login');
-						$sql_data['telnet_password'] = $this->input->post('telnet_password');
-						$sql_data['telnet_path'] = $this->input->post('script_path');
-						
-						$sql_data['ftp_host'] = $this->input->post('ftp_host');
-						$sql_data['ftp_login'] = $this->input->post('ftp_login');
-						$sql_data['ftp_password'] = $this->input->post('ftp_password');
-						$sql_data['ftp_path'] = $this->input->post('ftp_path');
+                        $sql_data['gdaemon_host'] 	    = $this->input->post('gdaemon_host');
+                        $sql_data['gdaemon_privkey'] 	= $this->input->post('gdaemon_privkey');
+                        $sql_data['gdaemon_pubkey'] 	= $this->input->post('gdaemon_pubkey');
+                        $sql_data['gdaemon_keypass'] 	= $this->input->post('gdaemon_keypass');
+                        $sql_data['gdaemon_login'] 		= $this->input->post('gdaemon_login');
+                        $sql_data['gdaemon_password'] 	= $this->input->post('gdaemon_password');
 
 						/* 
 						 * Проверка указандых данных gdaemon, ssh, telnet, ftp
@@ -679,76 +576,7 @@ class Adm_servers extends CI_Controller {
 								return false;
 							}
 						}
-						
-						// Проверка данных SSH
-						if (!empty($sql_data['ssh_host'])) {
-							if (false == $this->_check_ssh($sql_data['ssh_host'], $sql_data['ssh_login'], $sql_data['ssh_password'])) {
-								$this->_show_message(lang('adm_servers_ssh_data_unavailable'), 'javascript:history.back()');
-								return false;
-							}
-							
-							$ssh_host = explode(':', $sql_data['ssh_host']);
-							$ssh_host[1] = (isset($ssh_host[1])) ? (int)$ssh_host[1] : 22;
-							
-							$sftp_config['hostname'] 	= $ssh_host[0];
-							$sftp_config['port'] 		= $ssh_host[1];
-							$sftp_config['username'] 	= $sql_data['ssh_login'];
-							$sftp_config['password'] 	= $sql_data['ssh_password'];
-							$sftp_config['debug'] 		= false;
-							
-							// Ищем server.sh/server.exe
-							if (isset($this->config->config['disable_sftp_search']) && $this->config->config['disable_sftp_search']) {
-								if (!$sql_data['ssh_path'] = $this->_found_sftp_path($sql_data['ssh_path'], $sftp_config)) {
-									$this->_show_message(lang('adm_servers_sftp_path_not_found'), 'javascript:history.back()');
-									return false;
-								}
-							} else {
-								// Поиск sftp отключен, значит поле не должно быть пустым
-								if (!$sql_data['ssh_path']) {
-									$this->_show_message('Empty SFTP path.', 'javascript:history.back()');
-									return false;
-								}
-							}
-							
-						}
-						
-						// Проверка данных FTP, если указаны
-						if(!empty($sql_data['ftp_host'])) {
-							if (false == $this->_check_ftp($sql_data['ftp_host'], $sql_data['ftp_login'], $sql_data['ftp_password'])) {
-								$this->_show_message(lang('adm_servers_ftp_data_unavailable'), 'javascript:history.back()');
-								return false;
-							}
-							
-							// Ищем server.sh/server.exe
-							if (!$sql_data['ftp_path'] = $this->_found_ftp_path($sql_data['ftp_path'])) {
-								$this->_show_message(lang('adm_servers_ftp_path_not_found'), 'javascript:history.back()');
-								return false;
-							}
-						}
-						
-						// Проверка данных Telnet, если указаны
-						if (!empty($sql_data['telnet_host'])) {
-							if (false == $this->_check_telnet($sql_data['telnet_host'], $sql_data['telnet_login'], $sql_data['telnet_password'])) {
-								$this->_show_message(lang('adm_servers_telnet_data_unavailable'), 'javascript:history.back()');
-								return false;
-							}
-						}
-						
-						// Определение протокола управления
-						if (!$sql_data['control_protocol'] && $sql_data['os'] != 'windows') {
-							$sql_data['control_protocol'] = 'ssh';
-						} elseif (!$sql_data['control_protocol']) {
-							$sql_data['control_protocol'] = 'telnet';
-						}
-						
-						// Локальный сервер должен быть один
-						if ($sql_data['control_protocol'] == 'local') {
-							if (!$this->dedicated_servers->ds_live(array('control_protocol' => 'local'))) {
-								$this->_show_message('adm_servers_must_be_one');
-								return false;
-							}
-						}
-						
+
 						// Добавление сервера
 						if ($this->dedicated_servers->add_dedicated_server($sql_data)) {
 							$local_tpl['message'] = lang('adm_servers_add_server_successful');
@@ -1194,12 +1022,13 @@ class Adm_servers extends CI_Controller {
 				$local_tpl['steamcmd_path'] 	= $this->dedicated_servers->ds_list['0']['steamcmd_path'];
 				
 				$local_tpl['gdaemon_host'] 		= $this->dedicated_servers->ds_list['0']['gdaemon_host'];
-				$local_tpl['gdaemon_key'] 		= $this->dedicated_servers->ds_list['0']['gdaemon_key'];
+				$local_tpl['gdaemon_privkey'] 	= $this->dedicated_servers->ds_list['0']['gdaemon_privkey'];
+				$local_tpl['gdaemon_pubkey'] 	= $this->dedicated_servers->ds_list['0']['gdaemon_privkey'];
+				$local_tpl['gdaemon_keypass'] 	= $this->dedicated_servers->ds_list['0']['gdaemon_keypass'];
 				$local_tpl['gdaemon_login'] 	= $this->dedicated_servers->ds_list['0']['gdaemon_login'];
 				$local_tpl['gdaemon_password']  = $this->dedicated_servers->ds_list['0']['gdaemon_password'];
 
 				$local_tpl['disabled_checkbox'] = form_checkbox('disabled', 'accept', $this->dedicated_servers->ds_list['0']['disabled']);
-				
 				
 				// Получаем список серверов на DS
 				$gs = $this->servers->get_game_servers_list(array('ds_id' => $id));
@@ -1234,7 +1063,11 @@ class Adm_servers extends CI_Controller {
 				$this->form_validation->set_rules('work_path', lang('adm_servers_work_path'), 'trim|max_length[256]|xss_clean');
 				
 				$this->form_validation->set_rules('gdaemon_host', lang('adm_servers_gdaemon_host'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('gdaemon_key', lang('adm_servers_gdaemon_key'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('gdaemon_privkey', lang('adm_servers_gdaemon_privkey'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('gdaemon_pubkey', lang('adm_servers_gdaemon_pubkey'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('gdaemon_keypass', lang('adm_servers_gdaemon_keypass'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('gdaemon_login', lang('adm_servers_gdaemon_login'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('gdaemon_password', lang('adm_servers_gdaemon_password'), 'trim|max_length[64]|xss_clean');
 				
 				$this->form_validation->set_rules('control_protocol', lang('adm_servers_control_protocol'), 'trim|min_length[3]|max_length[16]|xss_clean');
 					
@@ -1682,25 +1515,33 @@ class Adm_servers extends CI_Controller {
 					$sql_data['work_path'] 		    = $this->input->post('work_path');
 					
 					$sql_data['gdaemon_host'] 		= $this->input->post('gdaemon_host');
-					$sql_data['gdaemon_key'] 		= $this->input->post('gdaemon_key');
+					$sql_data['gdaemon_privkey'] 	= $this->input->post('gdaemon_privkey');
+					$sql_data['gdaemon_pubkey'] 	= $this->input->post('gdaemon_pubkey');
+					$sql_data['gdaemon_keypass'] 	= $this->input->post('gdaemon_keypass');
 					$sql_data['gdaemon_login'] 		= $this->input->post('gdaemon_login');
 					$sql_data['gdaemon_password'] 	= $this->input->post('gdaemon_password');
 
 					// GDaemon check
-                    
-                    /* Ключ не задан, берем из базы */
-                    if (empty($sql_data['gdaemon_key'])) {
-                        $gdaemon_key = $this->dedicated_servers->ds_list['0']['gdaemon_key'];
-                    } else {
-                        $gdaemon_key = $sql_data['gdaemon_key'];
-                    }
+                    $gdaemon_password   = empty($sql_data['gdaemon_password'])
+                        ? $this->dedicated_servers->ds_list['0']['gdaemon_password']
+                        : $sql_data['gdaemon_password'];
+                        
+                    $gdaemon_keypass    = empty($sql_data['gdaemon_keypass'])
+                        ? $this->dedicated_servers->ds_list['0']['gdaemon_keypass']
+                        : $sql_data['gdaemon_keypass'];
 
-                    if (false == $this->_check_gdaemon($sql_data['gdaemon_host'], $gdaemon_key)) {
+                    if (false == $this->_check_gdaemon(
+                        $sql_data['gdaemon_host'],
+                        $sql_data['gdaemon_privkey'],
+                        $gdaemon_keypass,
+                        $sql_data['gdaemon_login'],
+                        $gdaemon_password)
+                    ) {
                         $this->_show_message(lang('adm_servers_gdaemon_data_unavailable'), 'javascript:history.back()');
                         return false;
                     }
 
-					if($this->dedicated_servers->edit_dedicated_server($id, $sql_data)){
+					if ($this->dedicated_servers->edit_dedicated_server($id, $sql_data)){
 						$local_tpl['message'] = lang('adm_servers_server_data_changed');
 					}else{
 						$local_tpl['message'] = lang('adm_servers_error_server_edit');
@@ -2118,7 +1959,17 @@ class Adm_servers extends CI_Controller {
 			
 			// Добавление сервера
 			if($this->servers->add_game_server($new_gs)) {
-				$new_server_id = $this->db->call_function('insert_id', $this->db->conn_id);
+				$new_server_id = $this->db->insert_id();
+                
+                if (!$new_gs['installed']) {
+                    // New task to install server
+                    $this->gdaemon_tasks->add(array(
+                        'ds_id'     => $new_gs['ds_id'],
+                        'server_id' => $new_server_id,
+                        'task' => 'gsinst',
+                    ));
+                }
+                
 				$succes_mesage = $new_gs['installed'] ? lang('adm_servers_add_server_successful') : lang('adm_servers_server_to_be_installed');
 				$this->_show_message($succes_mesage, site_url('adm_servers/edit/game_servers/' . $new_server_id), lang('adm_servers_go_to_settings'));
 				$log_data['msg'] = $succes_mesage;
@@ -2149,60 +2000,48 @@ class Adm_servers extends CI_Controller {
 	 * 
 	 * 
 	*/
-	function reinstall_game_server($id, $confirm = false)
+	function reinstall_game_server($server_id, $confirm = false)
 	{
 		$this->load->model('servers/games');
 		$this->load->model('servers/game_types');
 		
 		$local_tpl['content'] = '';
 		
-		if(!$this->servers->get_server_data($id)){
+		if(!$this->servers->get_server_data($server_id)){
 			$this->_show_message(lang('adm_servers_server_not_found'), site_url('adm_servers/view/game_servers'));
 			return false;
 		}
 		
 		if ($confirm == $this->security->get_csrf_hash()) {
 			
-			/* Удаление директории на выделенном сервере */
-			//~ if (isset($this->servers->server_data['dir'])) {
-				//~ switch($this->servers->server_data['os']) {
-				//~ case 'Windows':
-					//~ $command = 'rmdir /S ' . $this->servers->server_data['dir'];
-					//~ break;
-				//~ default:
-					//~ // Linux
-					//~ $command = 'rm -rf ' . $this->servers->server_data['dir'];
-					//~ break;
-				//~ }
-			//~ }
-			//~ 
-			//~ try {
-				//~ $result = send_command($command, $this->servers->server_data);
-			//~ } catch (Exception $e) {
-				//~ // Директория не удалена
-			//~ }
-			
-			// Остановка сервера
-			try {
-				$this->servers->stop($id);
-			} catch (Exception $e) {
-				// Сохраняем логи
-				$log_data['type'] = 'server_command';
-				$log_data['command'] = 'stop';
-				$log_data['user_name'] = $this->users->auth_login;
-				$log_data['server_id'] = $id;
-				$log_data['msg'] = 'Stop server Error';
-				$log_data['log_data'] = $e->getMessage() . "\n" . get_last_command();
-				$this->panel_log->save_log($log_data);
-			}
-			
 			$sql_data['installed'] = 0;
 			
-			if ($this->servers->edit_game_server($id, $sql_data)) {
-				$this->_show_message(lang('adm_servers_server_will_be_reinstalled'), site_url('adm_servers/edit/game_servers/' . $id), lang('next'));
-				$log_data['msg'] = lang('adm_servers_server_will_be_reinstalled');
-			} else {
-				$this->_show_message(lang('adm_servers_error_server_edit'), site_url('adm_servers/edit/game_servers/' . $id), lang('next'));
+			if ($this->servers->edit_game_server($server_id, $sql_data)) {
+
+                $task_del_id = $this->gdaemon_tasks->add(array(
+                    'ds_id'     => $this->servers->server_data['ds_id'],
+                    'server_id' => $this->servers->server_data['id'],
+                    'task'      => 'gsdel',
+                ));
+
+                if ($task_del_id == 0) {
+                    $this->_show_message(lang('adm_servers_task_add_error'), site_url('adm_servers/edit/game_servers/' . $server_id), lang('next'));
+                    $log_data['msg'] = lang('adm_servers_task_add_error');
+                    return;
+                } else {
+                    // New task to install server
+                    $this->gdaemon_tasks->add(array(
+                        'run_aft_id' => $task_del_id,
+                        'ds_id'     => $this->servers->server_data['ds_id'],
+                        'server_id' => $this->servers->server_data['id'],
+                        'task' => 'gsinst',
+                    ));
+                    
+                    $this->_show_message(lang('adm_servers_server_will_be_reinstalled'), site_url('adm_servers/edit/game_servers/' . $server_id), lang('next'));
+                    $log_data['msg'] = lang('adm_servers_server_will_be_reinstalled');
+                }
+            } else {
+				$this->_show_message(lang('adm_servers_error_server_edit'), site_url('adm_servers/edit/game_servers/' . $server_id), lang('next'));
 				$log_data['msg'] = lang('adm_servers_error_server_edit');
 			}
 			
@@ -2211,7 +2050,7 @@ class Adm_servers extends CI_Controller {
 			$log_data['command'] 		= 'edit_ds';
 			$log_data['server_id'] 		= 0;
 			$log_data['user_name'] 		= $this->users->auth_login;
-			$log_data['log_data'] 		= 'ID: ' . $id;
+			$log_data['log_data'] 		= 'ID: ' . $server_id;
 			$this->panel_log->save_log($log_data);
 			
 			return;
@@ -2219,7 +2058,7 @@ class Adm_servers extends CI_Controller {
 		} else {
 
 			$confirm_tpl['message'] = lang('adm_servers_reinstall_gs_confirm');
-			$confirm_tpl['confirmed_url'] = site_url('adm_servers/reinstall_game_server/'. $id . '/' . $this->security->get_csrf_hash());
+			$confirm_tpl['confirmed_url'] = site_url('adm_servers/reinstall_game_server/'. $server_id . '/' . $this->security->get_csrf_hash());
 
 			$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
 		}
@@ -2332,57 +2171,6 @@ class Adm_servers extends CI_Controller {
 		
 		$this->parser->parse('main.html', $this->tpl_data);
 	}
-	
-	// -----------------------------------------------------------------
-	
-	/**
-	 * Статистика выделенных серверов
-	 * 
-	 * 
-	*/
-	function ds_stats()
-	{
-		$this->load->library('highcharts');
-		$this->load->helper('date');
-		
-		$local_tpl = array();
-		$local_tpl['ds_stats'] = array();
-		
-		$this->dedicated_servers->get_ds_list();
-		
-		$i = 0;
-		foreach($this->dedicated_servers->ds_list as $ds) {
-			
-			if($stats = json_decode($ds['stats'], true) ) {
-
-				if ($stats = $this->_stats_processing($stats)) {
-					$this->highcharts->set_serie($stats['cpu_graph_data'], 'CPU');
-					$this->highcharts->set_serie($stats['memory_graph_data'], 'RAM');
-					
-					$this->highcharts->set_yAxis(array('min' => '0', 'max' => '100'));
-					
-					$this->highcharts->push_xAxis($stats['data']['axis']);
-					$this->highcharts->set_type('spline');
-					$this->highcharts->set_dimensions('', 200);
-					$this->highcharts->set_title($ds['name'] . ' stats');
-					
-					$credits = (object) array('href' => 'http://www.gameap.ru', 'text' => 'GameAP');
-					$this->highcharts->set_credits($credits);
-					
-					$local_tpl['ds_stats'][$i]['graph'] = $this->highcharts->render();
-					$local_tpl['ds_stats'][$i]['ds_name'] = $ds['name'];
-				}
-				
-				$i++;
-			
-			}
-			
-		}
-
-		$this->tpl_data['content'] = $this->parser->parse('adm_servers/dedicated_servers_stats.html', $local_tpl, true);
-		$this->parser->parse('main.html', $this->tpl_data);
-	}
-
 }
 /* End of file adm_servers.php */
 /* Location: ./application/controllers/adm_servers.php */
