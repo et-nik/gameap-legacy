@@ -207,15 +207,15 @@ class Adm_servers extends CI_Controller {
 			$games_option[ $game['code'] ] = $game['name'];
 		}
 		
-		$tpl_data['filter_name']			= isset($filter['name']) ? $filter['name'] : '';
-		$tpl_data['filter_ip']				= isset($filter['ip']) ? $filter['ip'] : '';
+		$tpl['filter_name']			= isset($filter['name']) ? $filter['name'] : '';
+		$tpl['filter_ip']				= isset($filter['ip']) ? $filter['ip'] : '';
 		
-		$tpl_data['filter_ip_dropdown']		= form_multiselect('filter_ip[]', $ip_array, $tpl_data['filter_ip']);
+		$tpl['filter_ip_dropdown']		= form_multiselect('filter_ip[]', $ip_array, $tpl['filter_ip']);
 		
 		$default = isset($filter['game']) ? $filter['game'] : null;
-		$tpl_data['filter_games_dropdown'] 	= form_multiselect('filter_game[]', $games_option, $default);
+		$tpl['filter_games_dropdown'] 	= form_multiselect('filter_game[]', $games_option, $default);
 		
-		return $tpl_data;
+		return $tpl;
 	}
 
 	// -----------------------------------------------------------------
@@ -316,7 +316,7 @@ class Adm_servers extends CI_Controller {
 						/* Получение игр */
 						if($games_list = $this->games->get_games_list()){
 							$num = 0;
-							$tpl_data = array();
+							$tpl = array();
 							foreach ($games_list as $games) {
 								
 									//~ /* Если у игры нет модификаций, то не отображаем ее */
@@ -324,18 +324,18 @@ class Adm_servers extends CI_Controller {
 										//~ continue;
 									//~ }
 
-									$tpl_data[$num]['gt_list'] = $this->game_types->tpl_data_game_types(array('game_code' => $games['code']));
+									$tpl[$num]['gt_list'] = $this->game_types->tpl_data_game_types(array('game_code' => $games['code']));
 
-									$tpl_data[$num]['game_name'] = $games['name'];
-									$tpl_data[$num]['game_code'] = $games['code'];
-									$tpl_data[$num]['game_start_code'] = $games['start_code'];
-									$tpl_data[$num]['game_engine'] = $games['engine'];
-									$tpl_data[$num]['game_engine_version'] = $games['engine_version'];
+									$tpl[$num]['game_name'] = $games['name'];
+									$tpl[$num]['game_code'] = $games['code'];
+									$tpl[$num]['game_start_code'] = $games['start_code'];
+									$tpl[$num]['game_engine'] = $games['engine'];
+									$tpl[$num]['game_engine_version'] = $games['engine_version'];
 									
 									$num++;
 								}
 
-							$local_tpl['games_list'] = $tpl_data;
+							$local_tpl['games_list'] = $tpl;
 							
 						} else {
 							$error_msg .= '<p>' . lang('adm_servers_games_unavailable') . '</p>';

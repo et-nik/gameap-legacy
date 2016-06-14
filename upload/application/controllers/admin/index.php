@@ -15,7 +15,7 @@
 class Index extends CI_Controller {
 	
 	//Template
-	var $tpl_data = array();
+	var $tpl = array();
 	
 	var $user_data = array();
 	var $server_data = array();
@@ -35,11 +35,11 @@ class Index extends CI_Controller {
 		
 		if($this->users->check_user()) {
 			//Base Template
-			$this->tpl_data['title'] 	= lang('ap_title');
-			$this->tpl_data['heading'] 	= lang('ap_header');
-			$this->tpl_data['content'] = '';
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
+			$this->tpl['title'] 	= lang('ap_title');
+			$this->tpl['heading'] 	= lang('ap_header');
+			$this->tpl['content'] = '';
+			$this->tpl['menu'] = $this->parser->parse('menu.html', $this->tpl, true);
+			$this->tpl['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
 			
 		
 		} else {
@@ -85,15 +85,15 @@ class Index extends CI_Controller {
 			$games_option[ $game['code'] ] = $game['name'];
 		}
 		
-		$tpl_data['filter_name']			= isset($filter['name']) ? $filter['name'] : '';
-		$tpl_data['filter_ip']				= isset($filter['ip']) ? $filter['ip'] : '';
+		$tpl['filter_name']			= isset($filter['name']) ? $filter['name'] : '';
+		$tpl['filter_ip']				= isset($filter['ip']) ? $filter['ip'] : '';
 		
-		$tpl_data['filter_ip_dropdown']		= form_multiselect('filter_ip[]', $ip_array, $tpl_data['filter_ip']);
+		$tpl['filter_ip_dropdown']		= form_multiselect('filter_ip[]', $ip_array, $tpl['filter_ip']);
 		
 		$default = isset($filter['game']) ? $filter['game'] : null;
-		$tpl_data['filter_games_dropdown'] 	= form_multiselect('filter_game[]', $games_option, $default);
+		$tpl['filter_games_dropdown'] 	= form_multiselect('filter_game[]', $games_option, $default);
 		
-		return $tpl_data;
+		return $tpl;
 	}
 
 	// -----------------------------------------------------------------
@@ -191,8 +191,8 @@ class Index extends CI_Controller {
 			$local_tpl['games_list'] = array();
 		}
 		
-		$this->tpl_data['content'] = $this->parser->parse('servers/servers_list_main.html', $local_tpl, true);	
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->tpl['content'] = $this->parser->parse('servers/servers_list_main.html', $local_tpl, true);	
+		$this->parser->parse('main.html', $this->tpl);
 	}
 }
 

@@ -14,7 +14,7 @@
 class Web_ftp extends CI_Controller { 
 	
 	//Template
-	var $tpl_data = array();
+	var $tpl = array();
 	
 	var $user_data = array();
 	var $server_data = array();
@@ -33,11 +33,11 @@ class Web_ftp extends CI_Controller {
 
         if ($this->users->check_user()) {
 			//Base Template
-			$this->tpl_data['title'] 		= lang('server_files_title_index');
-			$this->tpl_data['heading']		= lang('server_files_header_index');
-			$this->tpl_data['content'] 		= '';
-			$this->tpl_data['menu'] 		= $this->parser->parse('menu.html', $this->tpl_data, true);
-			$this->tpl_data['profile'] 		= $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
+			$this->tpl['title'] 		= lang('server_files_title_index');
+			$this->tpl['heading']		= lang('server_files_header_index');
+			$this->tpl['content'] 		= '';
+			$this->tpl['menu'] 		= $this->parser->parse('menu.html', $this->tpl, true);
+			$this->tpl['profile'] 		= $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
         
         } else {
             redirect('auth');
@@ -65,8 +65,8 @@ class Web_ftp extends CI_Controller {
         $local_tpl['message'] = $message;
         $local_tpl['link'] = $link;
         $local_tpl['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
-        $this->parser->parse('main.html', $this->tpl_data);
+        $this->tpl['content'] = $this->parser->parse('info.html', $local_tpl, true);
+        $this->parser->parse('main.html', $this->tpl);
     }
     
     // -----------------------------------------------------------------
@@ -107,15 +107,15 @@ class Web_ftp extends CI_Controller {
 			$games_option[ $game['code'] ] = $game['name'];
 		}
 		
-		$tpl_data['filter_name']			= isset($filter['name']) ? $filter['name'] : '';
-		$tpl_data['filter_ip']				= isset($filter['ip']) ? $filter['ip'] : '';
+		$tpl['filter_name']			= isset($filter['name']) ? $filter['name'] : '';
+		$tpl['filter_ip']				= isset($filter['ip']) ? $filter['ip'] : '';
 		
-		$tpl_data['filter_ip_dropdown']		= form_multiselect('filter_ip[]', $ip_array, $tpl_data['filter_ip']);
+		$tpl['filter_ip_dropdown']		= form_multiselect('filter_ip[]', $ip_array, $tpl['filter_ip']);
 		
 		$default = isset($filter['game']) ? $filter['game'] : null;
-		$tpl_data['filter_games_dropdown'] 	= form_multiselect('filter_game[]', $games_option, $default);
+		$tpl['filter_games_dropdown'] 	= form_multiselect('filter_game[]', $games_option, $default);
 		
-		return $tpl_data;
+		return $tpl;
 	}
 
 	// ----------------------------------------------------------------
@@ -140,9 +140,9 @@ class Web_ftp extends CI_Controller {
 		$local_tpl['url'] 			= site_url('web_ftp/server');
 		$local_tpl['games_list'] = servers_list_to_games_list($this->servers->servers_list);
 			
-		$this->tpl_data['content'] .= $this->parser->parse('servers/select_server.html', $local_tpl, true);
+		$this->tpl['content'] .= $this->parser->parse('servers/select_server.html', $local_tpl, true);
 			
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 	
 	// ----------------------------------------------------------------
@@ -195,8 +195,8 @@ class Web_ftp extends CI_Controller {
 		/* Получение данных сервера для шаблона */
 		$local_tpl['server_id'] = $this->servers->server_data['id'];
 
-		$this->tpl_data['content'] .= $this->parser->parse('web_ftp.html', $local_tpl, true);
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->tpl['content'] .= $this->parser->parse('web_ftp.html', $local_tpl, true);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 
 }

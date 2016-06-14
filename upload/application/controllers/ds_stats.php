@@ -14,7 +14,7 @@
 
 class Ds_stats extends CI_Controller {
 
-    var $tpl_data = array();
+    var $tpl = array();
 
     // -----------------------------------------------------------------
 	
@@ -35,11 +35,11 @@ class Ds_stats extends CI_Controller {
         }
         
         //Base Template
-        $this->tpl_data['title'] 		= "Ds stats";
-        $this->tpl_data['heading']		= "Ds stats";
-        $this->tpl_data['content'] 		= '';
-        $this->tpl_data['menu'] 		= $this->parser->parse('menu.html', $this->tpl_data, true);
-        $this->tpl_data['profile'] 		= $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
+        $this->tpl['title'] 		= "Ds stats";
+        $this->tpl['heading']		= "Ds stats";
+        $this->tpl['content'] 		= '';
+        $this->tpl['menu'] 		= $this->parser->parse('menu.html', $this->tpl, true);
+        $this->tpl['profile'] 		= $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
 
     }
 
@@ -61,8 +61,8 @@ class Ds_stats extends CI_Controller {
         $local_tpl['message'] = $message;
         $local_tpl['link'] = $link;
         $local_tpl['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
-        $this->parser->parse('main.html', $this->tpl_data);
+        $this->tpl['content'] = $this->parser->parse('info.html', $local_tpl, true);
+        $this->parser->parse('main.html', $this->tpl);
     }
 
     // -----------------------------------------------------------------
@@ -73,8 +73,8 @@ class Ds_stats extends CI_Controller {
     public function index()
     {
         $local_tpl = array();
-        $this->tpl_data['content'] .= $this->parser->parse('ds_stats_list.html', $local_tpl, true);
-        $this->parser->parse('main.html', $this->tpl_data);
+        $this->tpl['content'] .= $this->parser->parse('ds_stats_list.html', $local_tpl, true);
+        $this->parser->parse('main.html', $this->tpl);
     }
 
     // -----------------------------------------------------------------
@@ -106,7 +106,7 @@ class Ds_stats extends CI_Controller {
 
         // print_r($this->mds_stats->get_stats($ds_id));
 
-        $this->tpl_data['content'] .= $this->parser->parse('ds_stats.html', $local_tpl, true);
-		$this->parser->parse('main.html', $this->tpl_data);
+        $this->tpl['content'] .= $this->parser->parse('ds_stats.html', $local_tpl, true);
+		$this->parser->parse('main.html', $this->tpl);
     }
 }

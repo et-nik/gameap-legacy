@@ -27,11 +27,11 @@ class Log_view extends CI_Controller {
 			$this->load->helper('date');
 			
 			//Base Template
-			$this->tpl_data['title'] = lang('log_view_title_index');
-			$this->tpl_data['heading'] = lang('log_view_heading_index');
-			$this->tpl_data['content'] = '';
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
+			$this->tpl['title'] = lang('log_view_title_index');
+			$this->tpl['heading'] = lang('log_view_heading_index');
+			$this->tpl['content'] = '';
+			$this->tpl['menu'] = $this->parser->parse('menu.html', $this->tpl, true);
+			$this->tpl['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
 			
         }else{
             redirect('auth');
@@ -59,8 +59,8 @@ class Log_view extends CI_Controller {
 		$local_tpl['message'] = $message;
 		$local_tpl['link'] = $link;
 		$local_tpl['back_link_txt'] = $link_text;
-		$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->tpl['content'] = $this->parser->parse('info.html', $local_tpl, true);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 	
 	// -----------------------------------------------------------------
@@ -130,14 +130,14 @@ class Log_view extends CI_Controller {
 			$action_options[ $key ] = $value;
 		}
 		
-		$tpl_data['filter_command']			= isset($filter['command']) ? $filter['command'] : '';
-		$tpl_data['filter_user']			= isset($filter['user_name']) ? $filter['user_name'] : '';
-		$tpl_data['filter_contents']		= isset($filter['contents']) ? $filter['contents'] : '';
+		$tpl['filter_command']			= isset($filter['command']) ? $filter['command'] : '';
+		$tpl['filter_user']			= isset($filter['user_name']) ? $filter['user_name'] : '';
+		$tpl['filter_contents']		= isset($filter['contents']) ? $filter['contents'] : '';
 		
 		$default = isset($filter['type']) ? $filter['type'] : null;
-		$tpl_data['filter_action_dropdown'] 	= form_dropdown('filter_action', $action_options, $default);
+		$tpl['filter_action_dropdown'] 	= form_dropdown('filter_action', $action_options, $default);
 		
-		return $tpl_data;
+		return $tpl;
 	}
 	
 	// -----------------------------------------------------------------
@@ -170,9 +170,9 @@ class Log_view extends CI_Controller {
 		/* Список логов */
 		$local_tpl['log_list'] = $this->_list_log(100, $offset);
 
-		$this->tpl_data['content'] .= $this->parser->parse('log_list.html', $local_tpl, true);
+		$this->tpl['content'] .= $this->parser->parse('log_list.html', $local_tpl, true);
 		
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl);
 	}
     
     // -----------------------------------------------------------------
@@ -248,9 +248,9 @@ class Log_view extends CI_Controller {
 		$local_tpl['log_msg'] = $log_list[0]['msg'];
 		$local_tpl['log_data'] = $log_list[0]['log_data'];
 		
-		$this->tpl_data['content'] .= $this->parser->parse('log_info.html', $local_tpl, true);
+		$this->tpl['content'] .= $this->parser->parse('log_info.html', $local_tpl, true);
 		
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 	
 }

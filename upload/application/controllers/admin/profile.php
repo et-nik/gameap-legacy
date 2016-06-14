@@ -13,7 +13,7 @@
 */
 class Profile extends CI_Controller {
 	
-	var $tpl_data = array();
+	var $tpl = array();
 	var $user_servers_count = 0;
 	
 	// -----------------------------------------------------------------
@@ -29,12 +29,12 @@ class Profile extends CI_Controller {
         
         if($this->users->check_user()){
 			//Base Template
-			$this->tpl_data = $this->users->tpl_userdata();
-			$this->tpl_data['title'] 	= lang('profile_title_index');
-			$this->tpl_data['heading'] 	= lang('profile_header_index');
-			$this->tpl_data['content'] = '';
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
+			$this->tpl = $this->users->tpl_userdata();
+			$this->tpl['title'] 	= lang('profile_title_index');
+			$this->tpl['heading'] 	= lang('profile_header_index');
+			$this->tpl['content'] = '';
+			$this->tpl['menu'] = $this->parser->parse('menu.html', $this->tpl, true);
+			$this->tpl['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
         
         }else{
 			redirect('auth');
@@ -62,8 +62,8 @@ class Profile extends CI_Controller {
         $local_tpl['message'] = $message;
         $local_tpl['link'] = $link;
         $local_tpl['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
-        $this->parser->parse('main.html', $this->tpl_data);
+        $this->tpl['content'] = $this->parser->parse('info.html', $local_tpl, true);
+        $this->parser->parse('main.html', $this->tpl);
     }
     
     // -----------------------------------------------------------------
@@ -81,9 +81,9 @@ class Profile extends CI_Controller {
 			$this->user_servers_count = 1;
 		}
 		
-		$this->tpl_data['content'] .= $this->parser->parse('profile/profile_main.html', array_merge($this->tpl_data, $local_tpl), true);
+		$this->tpl['content'] .= $this->parser->parse('profile/profile_main.html', array_merge($this->tpl, $local_tpl), true);
 
-        $this->parser->parse('main.html', $this->tpl_data);
+        $this->parser->parse('main.html', $this->tpl);
     }
     
     // -----------------------------------------------------------------
@@ -94,7 +94,7 @@ class Profile extends CI_Controller {
 		if($this->users->auth_id){
 			
 			if(!$this->input->post('profile_edit_submit')){
-				$this->tpl_data['content'] .= $this->parser->parse('profile/profile_edit.html', $this->tpl_data, true);
+				$this->tpl['content'] .= $this->parser->parse('profile/profile_edit.html', $this->tpl, true);
 			}else{
 				$this->load->library('form_validation');
 				
@@ -108,7 +108,7 @@ class Profile extends CI_Controller {
 						return false;
 					}
 					
-					$this->tpl_data['content'] .= lang('profile_form_unavailable');
+					$this->tpl['content'] .= lang('profile_form_unavailable');
 				}else{
 					$user_new_data['name'] = $this->input->post('name', true);
 					$user_new_data['email'] = $this->input->post('email', true);
@@ -164,7 +164,7 @@ class Profile extends CI_Controller {
 			
         }
 
-        $this->parser->parse('main.html', $this->tpl_data);
+        $this->parser->parse('main.html', $this->tpl);
 	}
 	
 	// -----------------------------------------------------------------
@@ -218,7 +218,7 @@ class Profile extends CI_Controller {
 		if($this->users->auth_id){
 			
 			if(!$this->input->post('profile_edit_submit')){
-				$this->tpl_data['content'] .= $this->parser->parse('profile/profile_change_password.html', $this->tpl_data, true);
+				$this->tpl['content'] .= $this->parser->parse('profile/profile_change_password.html', $this->tpl, true);
 			}else{
 				$this->load->library('form_validation');
 				
@@ -269,7 +269,7 @@ class Profile extends CI_Controller {
 					$local_tpl['message'] = lang('profile_password_changed');
 					$local_tpl['link'] = site_url();
 					$local_tpl['back_link_txt'] = lang('profile');
-					$this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
+					$this->tpl['content'] = $this->parser->parse('info.html', $local_tpl, true);
 					//Смена пароля закончена
 				}
 				
@@ -277,7 +277,7 @@ class Profile extends CI_Controller {
 			
         }
 
-        $this->parser->parse('main.html', $this->tpl_data);
+        $this->parser->parse('main.html', $this->tpl);
 	}
 	
 	// -----------------------------------------------------------------
@@ -288,7 +288,7 @@ class Profile extends CI_Controller {
 		
 		$server_id = (int)$server_id;
 		
-		$this->tpl_data['heading'] = lang('profile_server_privileges');
+		$this->tpl['heading'] = lang('profile_server_privileges');
 			
 		if(!$server_id) {
 			$this->_show_message(lang('profile_empty_server_id'), site_url('admin/profile'));
@@ -322,9 +322,9 @@ class Profile extends CI_Controller {
 			$local_tpl['privilege_list'][$num]['human_name'] = $this->users->all_privileges[$privilege_name];
 		}
 		
-		$this->tpl_data['content'] .= $this->parser->parse('profile/server_privileges.html', $local_tpl, true);
+		$this->tpl['content'] .= $this->parser->parse('profile/server_privileges.html', $local_tpl, true);
 		
-        $this->parser->parse('main.html', $this->tpl_data);
+        $this->parser->parse('main.html', $this->tpl);
     }
 }
 

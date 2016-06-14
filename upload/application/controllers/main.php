@@ -27,34 +27,45 @@
  */
 class Main extends CI_Controller {
 
+    public $tpl = array();
+
     //Отображение
 	public function index()
 	{
         /* Загрузка модели проверки пользователей */
-        $this->load->model('users');
         $this->load->database();
+        $this->load->model('users');
         
         $this->lang->load('auth');
 
-        $this->tpl_data = array();
-        $this->tpl_data['code'] = '';
+        $this->tpl['code'] = '';
 
         /* 
          * Проверяем пользователя 
          * если все ок, то перенаправляем в панель
         */
-        if($this->users->check_user()){
-			redirect('admin');
+        if(!$this->users->check_user()){
+			redirect('auth/in');
 		}
 		
 		/* Пользователь не авторизован, показываем ему форму авторизации */
-		$this->tpl_data['menu'] 		= '';
-        $this->tpl_data['profile'] 		= '';
-        $this->tpl_data['content'] 		= '';
-        $this->tpl_data['title'] 		= lang('auth_title_index');
-		$this->tpl_data['heading'] 		= lang('auth_heading');
+		// $this->tpl['menu'] 		= '';
+        // $this->tpl['profile'] 		= '';
+        // $this->tpl['content'] 		= '';
+        // $this->tpl['title'] 		= lang('auth_title_index');
+		// $this->tpl['heading'] 		= lang('auth_heading');
 
+        $local_tpl = array();
 
-        $this->parser->parse('login.html', $this->tpl_data);
+        //Base Template
+        $this->tpl['title'] 	= lang('tasks_title_index');
+        $this->tpl['heading'] 	= lang('tasks_heading_index');
+        $this->tpl['content'] 	= '';
+        
+        $this->tpl['menu']      = $this->parser->parse('menu.html', $this->tpl, true);
+        $this->tpl['profile']   = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
+
+        $this->tpl['content'] .= $this->parser->parse('main_page.html', $local_tpl, true);
+        $this->parser->parse('main.html', $this->tpl);
 	}
 }

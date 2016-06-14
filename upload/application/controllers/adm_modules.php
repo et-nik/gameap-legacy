@@ -34,7 +34,7 @@
  
 class Adm_modules extends CI_Controller {
 	
-	var $tpl_data = array();
+	var $tpl = array();
 	
 	public function __construct()
     {
@@ -53,12 +53,12 @@ class Adm_modules extends CI_Controller {
 			}
 			
 			//Base Template
-			$this->tpl_data['title'] 	= lang('adm_modules_title_index');
-			$this->tpl_data['heading'] 	= lang('adm_modules_heading_index');
-			$this->tpl_data['content'] 	= '';
+			$this->tpl['title'] 	= lang('adm_modules_title_index');
+			$this->tpl['heading'] 	= lang('adm_modules_heading_index');
+			$this->tpl['content'] 	= '';
 			
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
+			$this->tpl['menu'] = $this->parser->parse('menu.html', $this->tpl, true);
+			$this->tpl['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
 		} else {
 			redirect('auth/in');
 		}
@@ -85,8 +85,8 @@ class Adm_modules extends CI_Controller {
         $local_tpl['message'] = $message;
         $local_tpl['link'] = $link;
         $local_tpl['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
-        $this->parser->parse('main.html', $this->tpl_data);
+        $this->tpl['content'] = $this->parser->parse('info.html', $local_tpl, true);
+        $this->parser->parse('main.html', $this->tpl);
     }
 	
 	// ---------------------------------------------------------------------
@@ -161,8 +161,8 @@ class Adm_modules extends CI_Controller {
 	{
 		$local_tpl['modules_list'] = ($this->gameap_modules->modules_data) ? $this->gameap_modules->modules_data : array();
 		
-		$this->tpl_data['content'] = $this->parser->parse('adm_modules/modules_list.html', $local_tpl, true);
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->tpl['content'] = $this->parser->parse('adm_modules/modules_list.html', $local_tpl, true);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 	
 	// ---------------------------------------------------------------------
@@ -205,17 +205,17 @@ class Adm_modules extends CI_Controller {
 			return false;
 		}
 
-		$this->tpl_data['content'] = $this->parser->parse('adm_modules/module_info.html', $local_tpl, true);
+		$this->tpl['content'] = $this->parser->parse('adm_modules/module_info.html', $local_tpl, true);
 		
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 	
 	// ---------------------------------------------------------------------
 	
 	public function install()
 	{
-		$this->tpl_data['content'] = 'Функция в разработке';
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->tpl['content'] = 'Функция в разработке';
+		$this->parser->parse('main.html', $this->tpl);
 	}
 	
 	// ---------------------------------------------------------------------

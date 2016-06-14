@@ -29,7 +29,7 @@
 class Server_control extends CI_Controller {
 	
 	//Template
-	var $tpl_data = array();
+	var $tpl = array();
 	
 	var $user_data = array();
 	var $server_data = array();
@@ -63,11 +63,11 @@ class Server_control extends CI_Controller {
 			$this->lang->load('servers_log');
 			
 			//Base Template
-			$this->tpl_data['title'] 	= lang('server_control_title');
-			$this->tpl_data['heading'] 	= lang('server_control_header');
-			$this->tpl_data['content'] = '';
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
+			$this->tpl['title'] 	= lang('server_control_title');
+			$this->tpl['heading'] 	= lang('server_control_header');
+			$this->tpl['content'] = '';
+			$this->tpl['menu'] = $this->parser->parse('menu.html', $this->tpl, true);
+			$this->tpl['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
         
         }else{
             redirect('auth');
@@ -95,8 +95,8 @@ class Server_control extends CI_Controller {
         $local_tpl['message'] = $message;
         $local_tpl['link'] = $link;
         $local_tpl['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
-        $this->parser->parse('main.html', $this->tpl_data);
+        $this->tpl['content'] = $this->parser->parse('info.html', $local_tpl, true);
+        $this->parser->parse('main.html', $this->tpl);
     }
     
     // --------------------------------------------------------------------------
@@ -149,7 +149,7 @@ class Server_control extends CI_Controller {
      */
 	private function _get_base_cvars()
 	{
-		$tpl_data = array();
+		$tpl = array();
 		$server_id = $this->servers->server_data['id'];
 		
 		// Список базовых кваров
@@ -162,21 +162,21 @@ class Server_control extends CI_Controller {
 		if ($base_cvars = $this->query->get_base_cvars()) {
 			$base_cvars = $base_cvars[$server_id];
 
-			$tpl_data[] = array('cvar_name' => lang('cvarname_hostname'), 'cvar_value' => $base_cvars['hostname']);
-			$tpl_data[] = array('cvar_name' => lang('cvarname_map'), 'cvar_value' => $base_cvars['map']);
-			$tpl_data[] = array('cvar_name' => lang('cvarname_players'), 
+			$tpl[] = array('cvar_name' => lang('cvarname_hostname'), 'cvar_value' => $base_cvars['hostname']);
+			$tpl[] = array('cvar_name' => lang('cvarname_map'), 'cvar_value' => $base_cvars['map']);
+			$tpl[] = array('cvar_name' => lang('cvarname_players'), 
 													'cvar_value' => $base_cvars['players'] . '/' . $base_cvars['maxplayers']
 													);
 			
 			$password_status = 	$base_cvars['password'] ? lang('set') : lang('no_set');				
-			$tpl_data[] = array('cvar_name' => lang('password'), 'cvar_value' => $password_status);
+			$tpl[] = array('cvar_name' => lang('password'), 'cvar_value' => $password_status);
 			
 			if (isset($base_cvars['joinlink']) && $base_cvars['joinlink']) {
-				$tpl_data[] = array('cvar_name' => lang('cvarname_joinlink'), 'cvar_value' => anchor($base_cvars['joinlink']));
+				$tpl[] = array('cvar_name' => lang('cvarname_joinlink'), 'cvar_value' => anchor($base_cvars['joinlink']));
 			}
 		}
 		
-		return $tpl_data;
+		return $tpl;
 	}
 
     // -----------------------------------------------------------------
@@ -337,7 +337,7 @@ class Server_control extends CI_Controller {
 			
 		} else {
 			// Ошибка соединения с сервером
-			//~ $this->tpl_data['content'] .= lang('server_control_server_down');
+			//~ $this->tpl['content'] .= lang('server_control_server_down');
 		}
 		
 		/* Получение последних действий с сервером
@@ -478,15 +478,15 @@ class Server_control extends CI_Controller {
 		$local_tpl['server_rcon_port'] 	= $this->servers->server_data['rcon_port'];
 		$local_tpl['server_query_port'] 	= $this->servers->server_data['query_port'];
 		
-		$this->tpl_data['heading'] = lang('server_control_header') . ' "' . $this->servers->server_data['name'] . '"';
+		$this->tpl['heading'] = lang('server_control_header') . ' "' . $this->servers->server_data['name'] . '"';
 
 		if (file_exists(APPPATH . 'views/' . $this->config->config['template'] . '/server_control/' . $this->servers->server_data['game'] . '.html')) {
-			$this->tpl_data['content'] .= $this->parser->parse('server_control/' . $this->servers->server_data['game'] . '.html', $local_tpl, true);
+			$this->tpl['content'] .= $this->parser->parse('server_control/' . $this->servers->server_data['game'] . '.html', $local_tpl, true);
 		} else {
-			$this->tpl_data['content'] .= $this->parser->parse('server_control/default.html', $local_tpl, true);
+			$this->tpl['content'] .= $this->parser->parse('server_control/default.html', $local_tpl, true);
 		}
 
-        $this->parser->parse('main.html', $this->tpl_data);
+        $this->parser->parse('main.html', $this->tpl);
     }
     
     //-----------------------------------------------------------
@@ -545,7 +545,7 @@ class Server_control extends CI_Controller {
 				return false;
 			}
 			
-			$this->tpl_data['content'] .= $this->parser->parse('servers/task_add.html', $local_tpl, true);
+			$this->tpl['content'] .= $this->parser->parse('servers/task_add.html', $local_tpl, true);
 		} else {
 
 			$sql_data['server_id'] = $server_id;
@@ -629,7 +629,7 @@ class Server_control extends CI_Controller {
 			
 		}
 		
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 	
 	//-----------------------------------------------------------
@@ -691,7 +691,7 @@ class Server_control extends CI_Controller {
 			/* Пользователь не подвердил намерения */
 			$confirm_tpl['message'] = lang('server_control_task_delete_confirm');
 			$confirm_tpl['confirmed_url'] = site_url('admin/server_control/delete_task/' . $task_id . '/confirm');
-			$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
+			$this->tpl['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
 
 		} else {
 			$this->db->where('id', $task_id);
@@ -710,7 +710,7 @@ class Server_control extends CI_Controller {
 			return true;
 		}
 		
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 	
 	//-----------------------------------------------------------
@@ -813,7 +813,7 @@ class Server_control extends CI_Controller {
 			$local_tpl['name'] = $task_list[0]['name'];
 			$local_tpl['date_perform'] = unix_to_human($task_list[0]['date_perform'], false, 'eu');
 			
-			$this->tpl_data['content'] .= $this->parser->parse('servers/task_edit.html', $local_tpl, true);
+			$this->tpl['content'] .= $this->parser->parse('servers/task_edit.html', $local_tpl, true);
 		} else {
 			$sql_data['name'] = $this->input->post('name') ? $this->input->post('name') : $task_list[0]['name'];
 			
@@ -854,7 +854,7 @@ class Server_control extends CI_Controller {
 			return true;
 		}
 		
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 	
 	

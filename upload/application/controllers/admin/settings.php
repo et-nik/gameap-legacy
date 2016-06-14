@@ -15,7 +15,7 @@
 class Settings extends CI_Controller {
 	
 	//Template
-	var $tpl_data = array();
+	var $tpl = array();
 	
 	var $user_data = array();
 	var $server_data = array();
@@ -35,11 +35,11 @@ class Settings extends CI_Controller {
 			 $this->load->library('form_validation');
 			
 			//Base Template
-			$this->tpl_data['title'] 		= lang('settings_title_index');
-			$this->tpl_data['heading'] 		= lang('settings_heading_index');
-			$this->tpl_data['content'] 		= '';
-			$this->tpl_data['menu'] 		= $this->parser->parse('menu.html', $this->tpl_data, true);
-			$this->tpl_data['profile'] 		= $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
+			$this->tpl['title'] 		= lang('settings_title_index');
+			$this->tpl['heading'] 		= lang('settings_heading_index');
+			$this->tpl['content'] 		= '';
+			$this->tpl['menu'] 		= $this->parser->parse('menu.html', $this->tpl, true);
+			$this->tpl['profile'] 		= $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
         
         }else{
             redirect('auth');
@@ -67,8 +67,8 @@ class Settings extends CI_Controller {
         $local_tpl['message'] = $message;
         $local_tpl['link'] = $link;
         $local_tpl['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
-        $this->parser->parse('main.html', $this->tpl_data);
+        $this->tpl['content'] = $this->parser->parse('info.html', $local_tpl, true);
+        $this->parser->parse('main.html', $this->tpl);
     }
 	
 	// ----------------------------------------------------------------
@@ -162,7 +162,7 @@ class Settings extends CI_Controller {
 			
 			$local_tpl['server_id'] = $server_id;
 
-			$this->tpl_data['content'] .= $this->parser->parse('settings/server.html', $local_tpl, true);
+			$this->tpl['content'] .= $this->parser->parse('settings/server.html', $local_tpl, true);
 		} else {
 			/* Сохранение настроек */
 			
@@ -223,7 +223,7 @@ class Settings extends CI_Controller {
             
 		}
 		
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 	
 	// ----------------------------------------------------------------

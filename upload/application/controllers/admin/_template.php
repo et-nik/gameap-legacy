@@ -3,7 +3,7 @@
 class Template extends CI_Controller {
 	
 	//Template
-	var $tpl_data = array();
+	var $tpl = array();
 	
 	var $user_data = array();
 	var $server_data = array();
@@ -18,11 +18,11 @@ class Template extends CI_Controller {
         
         if($check){
 			//Base Template
-			$this->tpl_data['title'] = 'Настройки :: АдминПанель';
-			$this->tpl_data['heading'] = 'Настройки';
-			$this->tpl_data['content'] = '';
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
+			$this->tpl['title'] = 'Настройки :: АдминПанель';
+			$this->tpl['heading'] = 'Настройки';
+			$this->tpl['content'] = '';
+			$this->tpl['menu'] = $this->parser->parse('menu.html', $this->tpl, true);
+			$this->tpl['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
         
         }else{
             header("Location: /auth");
@@ -40,10 +40,10 @@ class Template extends CI_Controller {
     public function index($user_id = false)
     {
 		
-		$this->tpl_data['content'] = 'Функция в разработке';
+		$this->tpl['content'] = 'Функция в разработке';
 		
 		
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl);
 	}
     
 }

@@ -41,12 +41,12 @@ class Adminpanel extends CI_Controller {
         if($this->users->check_user()){
 			
 			//Base Template
-			$this->tpl_data['title'] 	= lang('ap_title_index');
-			$this->tpl_data['heading'] 	= lang('ap_heading_index');
-			$this->tpl_data['content']	= '';
+			$this->tpl['title'] 	= lang('ap_title_index');
+			$this->tpl['heading'] 	= lang('ap_heading_index');
+			$this->tpl['content']	= '';
 			
-			$this->tpl_data['menu'] = $this->parser->parse('menu.html', $this->tpl_data, true);
-			$this->tpl_data['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
+			$this->tpl['menu'] = $this->parser->parse('menu.html', $this->tpl, true);
+			$this->tpl['profile'] = $this->parser->parse('profile.html', $this->users->tpl_userdata(), true);
         
         } else {
 			redirect('auth');
@@ -74,24 +74,24 @@ class Adminpanel extends CI_Controller {
         $local_tpl['message'] = $message;
         $local_tpl['link'] = $link;
         $local_tpl['back_link_txt'] = $link_text;
-        $this->tpl_data['content'] = $this->parser->parse('info.html', $local_tpl, true);
-        $this->parser->parse('main.html', $this->tpl_data);
+        $this->tpl['content'] = $this->parser->parse('info.html', $local_tpl, true);
+        $this->parser->parse('main.html', $this->tpl);
     }
     
     // -----------------------------------------------------------------
     
     private function _check_modules_updates()
     {
-		$tpl_data = array();
+		$tpl = array();
 		//~ print_r($this->gameap_modules->modules_data);
 		
 		$i = 0;
 		foreach($this->gameap_modules->modules_data as $module) {
 			
-			$tpl_data[$i] = $module;
-			$tpl_data[$i]['available_version'] 		= '-';
-			$tpl_data[$i]['download_url'] 			= '#';
-			$tpl_data[$i]['available_url'] 			= '#';
+			$tpl[$i] = $module;
+			$tpl[$i]['available_version'] 		= '-';
+			$tpl[$i]['download_url'] 			= '#';
+			$tpl[$i]['available_url'] 			= '#';
 			
 			if (!isset($module['update_info']) OR !$module['update_info']) {
 				$i++;
@@ -101,19 +101,19 @@ class Adminpanel extends CI_Controller {
 			$version_info = $this->_get_available_version($module['update_info']);
 			
 			if ($version_info) {
-				$tpl_data[$i]['download_url'] 		= $version_info['download_url'];
-				$tpl_data[$i]['available_version'] 	= $version_info['available_version'];
-				$tpl_data[$i]['available_url'] 		= $version_info['available_url'];
+				$tpl[$i]['download_url'] 		= $version_info['download_url'];
+				$tpl[$i]['available_version'] 	= $version_info['available_version'];
+				$tpl[$i]['available_url'] 		= $version_info['available_url'];
 				
 				if (version_compare($module['version'], $version_info['available_version']) == -1) {
-					$tpl_data[$i]['available_version'] = '<strong><font color="green">' . $tpl_data[$i]['available_version'] . '</font></strong>';
+					$tpl[$i]['available_version'] = '<strong><font color="green">' . $tpl[$i]['available_version'] . '</font></strong>';
 				}
 			}
 			
 			$i++;
 		}
 		
-		return $tpl_data;
+		return $tpl;
 	}
 	
 	// -----------------------------------------------------------------
@@ -163,23 +163,23 @@ class Adminpanel extends CI_Controller {
 	
 	function index()
 	{
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 	
 	// -----------------------------------------------------------------
 	
 	function help()
 	{
-		$this->tpl_data['title'] 	= lang('ap_title_help');
-		$this->tpl_data['heading'] 	= lang('ap_heading_help');
+		$this->tpl['title'] 	= lang('ap_title_help');
+		$this->tpl['heading'] 	= lang('ap_heading_help');
 										
-		$this->tpl_data['content'] = lang('ap_help_msg') . '<p align="center"><strong>Yandex Money:</strong> 410011199602260<br />
+		$this->tpl['content'] = lang('ap_help_msg') . '<p align="center"><strong>Yandex Money:</strong> 410011199602260<br />
 			<strong>WebMoney WMR:</strong> R133031427608<br />
 			<strong>WebMoney WMZ</strong>:</strong> Z140088475851</p>' . lang('ap_help_translator');
 		
 		
 					
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 	
 	// -----------------------------------------------------------------
@@ -198,8 +198,8 @@ class Adminpanel extends CI_Controller {
 			redirect('admin');
 		}
 		
-		$this->tpl_data['title'] = lang('ap_title_update');
-		$this->tpl_data['heading'] = lang('ap_heading_update');
+		$this->tpl['title'] = lang('ap_title_update');
+		$this->tpl['heading'] = lang('ap_heading_update');
 		
 		/* Получение информации о новой версии */
 		$version_info = $this->_get_available_version('http://www.gameap.ru/gameap_version.txt');
@@ -231,7 +231,7 @@ class Adminpanel extends CI_Controller {
 					/* Пользователь не подвердил намерения */
 					$confirm_tpl['message'] = 'Загрузите последнюю версию по адресу <a href="'. $version_info['download_url'] . '">' . $version_info['download_url'] . '</a>, распакуйте архив в каталог с панелью и нажмите "Да"';
 					$confirm_tpl['confirmed_url'] = site_url('adminpanel/update/manual/' . $this->security->get_csrf_hash());
-					$this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
+					$this->tpl['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
 				}
 				
 				break;
@@ -250,37 +250,37 @@ class Adminpanel extends CI_Controller {
 					//~ /* Пользователь не подвердил намерения */
 					//~ $confirm_tpl['message'] = 'Откатить к выбранной версии?';
 					//~ $confirm_tpl['confirmed_url'] = site_url('adminpanel/update/manual/' $this->security->get_csrf_hash());
-					//~ $this->tpl_data['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
+					//~ $this->tpl['content'] .= $this->parser->parse('confirm.html', $confirm_tpl, true);
 				//~ }
 				
 				break;
 				
 			default:
 
-				$this->tpl_data['content'] = '<p align="center"><strong>' . lang('ap_you_version') . ': </strong>' . AP_VERSION . ' <strong>' . lang('ap_actual_version') . ': </strong>' . $version_info['available_version'] . '</p>';
+				$this->tpl['content'] = '<p align="center"><strong>' . lang('ap_you_version') . ': </strong>' . AP_VERSION . ' <strong>' . lang('ap_actual_version') . ': </strong>' . $version_info['available_version'] . '</p>';
 				
 				if(version_compare(AP_VERSION, $version_info['available_version']) == -1) {
-					$this->tpl_data['content'] .= '<p align="center"><font color="red">' . lang('ap_you_version_old') . '</font></p>';
-					//~ $this->tpl_data['content'] .= '<p align="center"><a class="small awesome" href="#">' . lang('ap_autoupdate') . '</a></p>';
-					$this->tpl_data['content'] .= '<p align="center"><a class="small awesome" href="' . site_url('/adminpanel/update/manual') . '">Manual Update</a></p>';
+					$this->tpl['content'] .= '<p align="center"><font color="red">' . lang('ap_you_version_old') . '</font></p>';
+					//~ $this->tpl['content'] .= '<p align="center"><a class="small awesome" href="#">' . lang('ap_autoupdate') . '</a></p>';
+					$this->tpl['content'] .= '<p align="center"><a class="small awesome" href="' . site_url('/adminpanel/update/manual') . '">Manual Update</a></p>';
 				} elseif(version_compare(AP_VERSION, $version_info['available_version']) == 0) {
-					$this->tpl_data['content'] .= '<p align="center"><font color="green">' . lang('ap_you_version_actual') . '</font></p>';
-					//~ $this->tpl_data['content'] .= '<p align="center"><a class="small awesome" href="' . site_url('/adminpanel/update/back') . '">Откат к предыдущей версии</a></p>';
+					$this->tpl['content'] .= '<p align="center"><font color="green">' . lang('ap_you_version_actual') . '</font></p>';
+					//~ $this->tpl['content'] .= '<p align="center"><a class="small awesome" href="' . site_url('/adminpanel/update/back') . '">Откат к предыдущей версии</a></p>';
 				} elseif(version_compare(AP_VERSION, $version_info['available_version']) == 1) {
-					$this->tpl_data['content'] .= '<p align="center"><font color="goldenrod">' . lang('ap_you_version_dev') . '</font></p>';
-					$this->tpl_data['content'] .= '<p align="center"><a class="small awesome" href="' . site_url('/adminpanel/update/manual') . '">Manual Update</a></p>';
+					$this->tpl['content'] .= '<p align="center"><font color="goldenrod">' . lang('ap_you_version_dev') . '</font></p>';
+					$this->tpl['content'] .= '<p align="center"><a class="small awesome" href="' . site_url('/adminpanel/update/manual') . '">Manual Update</a></p>';
 				}
 
-				$this->tpl_data['content'] .= '<p align="center"><a class="small awesome" href="' . $version_info['download_url'] . '">' . lang('ap_goto_download_page') . '</a></p>';
+				$this->tpl['content'] .= '<p align="center"><a class="small awesome" href="' . $version_info['download_url'] . '">' . lang('ap_goto_download_page') . '</a></p>';
 				
 				// Проверка модулей
 				$local_tpl['modules_list'] = $this->_check_modules_updates();
-				$this->tpl_data['content'] 		.= $this->parser->parse('adminpanel/update.html', $local_tpl, true);
+				$this->tpl['content'] 		.= $this->parser->parse('adminpanel/update.html', $local_tpl, true);
 				
 				break;
 		}
 
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 	
 	// -----------------------------------------------------------------
@@ -290,8 +290,8 @@ class Adminpanel extends CI_Controller {
 	 */
 	function send_error()
 	{
-		$this->tpl_data['title'] = lang('ap_title_report_error');
-		$this->tpl_data['heading'] = lang('ap_heading_report_error');
+		$this->tpl['title'] = lang('ap_title_report_error');
+		$this->tpl['heading'] = lang('ap_heading_report_error');
 		
 		$local_tpl = array();
 		$this->load->library('form_validation');
@@ -306,7 +306,7 @@ class Adminpanel extends CI_Controller {
 				return false;
 			}
 			
-			$this->tpl_data['content'] = $this->parser->parse('adminpanel/send_error.html', $local_tpl, true);
+			$this->tpl['content'] = $this->parser->parse('adminpanel/send_error.html', $local_tpl, true);
 		} else {
 			$upload_config['upload_path'] = sys_get_temp_dir();
 			$upload_config['overwrite'] = true;
@@ -348,6 +348,6 @@ class Adminpanel extends CI_Controller {
 		}
 		
 		
-		$this->parser->parse('main.html', $this->tpl_data);
+		$this->parser->parse('main.html', $this->tpl);
 	}
 }
