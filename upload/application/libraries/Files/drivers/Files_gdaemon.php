@@ -282,12 +282,12 @@ class Files_gdaemon extends CI_Driver {
 
         $this->_binn_free();
 
-        $this->_write_binn->add_int16(self::FSERV_FILESEND);
+        $this->_write_binn->add_uint8(self::FSERV_FILESEND);
         $this->_write_binn->add_uint8(self::FSERV_UPLOAD_TO_SERVER);
         $this->_write_binn->add_str($rempath);
         $this->_write_binn->add_uint64(filesize($locpath));
-        $this->_write_binn->add_uint16($permissions);
         $this->_write_binn->add_bool(true); // Make dirs
+        $this->_write_binn->add_uint8($permissions);
 
         socket_write($this->_socket, $this->_write_binn->get_binn_val() . "\xFF\xFF\xFF\xFF");
 
@@ -371,7 +371,7 @@ class Files_gdaemon extends CI_Driver {
 
         $this->_binn_free();
 
-        $this->_write_binn->add_int16(self::FSERV_REMOVE);
+        $this->_write_binn->add_uint8(self::FSERV_REMOVE);
         $this->_write_binn->add_str($filepath);
         $this->_write_binn->add_bool(true);                // Recursively
 
@@ -415,7 +415,7 @@ class Files_gdaemon extends CI_Driver {
 
         $this->_binn_free();
 
-        $this->_write_binn->add_int16(self::FSERV_FILESEND);
+        $this->_write_binn->add_uint8(self::FSERV_FILESEND);
         $this->_write_binn->add_uint8(self::FSERV_DOWNLOAD_FR_SERVER);
         $this->_write_binn->add_str($rempath);
 
@@ -565,7 +565,7 @@ class Files_gdaemon extends CI_Driver {
 
         $this->_binn_free();
 
-        $this->_write_binn->add_int16(self::FSERV_READDIR);
+        $this->_write_binn->add_uint8(self::FSERV_READDIR);
         $this->_write_binn->add_str($path);     // Dir path
         $this->_write_binn->add_uint8(1);       // Mode
 
@@ -638,7 +638,7 @@ class Files_gdaemon extends CI_Driver {
 
         $this->_binn_free();
 
-        $this->_write_binn->add_int16(self::FSERV_MKDIR);
+        $this->_write_binn->add_uint8(self::FSERV_MKDIR);
         $this->_write_binn->add_str($path);
         $this->_write_binn->add_str($permissions);
 
@@ -678,7 +678,7 @@ class Files_gdaemon extends CI_Driver {
 
         $this->_binn_free();
 
-        $this->_write_binn->add_int16(self::FSERV_MOVE);
+        $this->_write_binn->add_uint8(self::FSERV_MOVE);
         $this->_write_binn->add_str($old_file);
         $this->_write_binn->add_str($new_file);
         $this->_write_binn->add_bool(false);            // Copy
