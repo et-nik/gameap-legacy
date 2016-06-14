@@ -147,44 +147,6 @@ class Server_control extends CI_Controller {
     /**
      * Получение списка карт для вставки в шаблон
      */
-	private function _get_maps_list()
-	{
-		$maps_list = array();
-		
-		try {
-			$maps_list = $this->servers->get_server_maps();
-		} catch(Exception $e) {
-			// Что-то с ftp или sftp
-		}
-		
-		if (empty($maps_list)) {
-			$maps_list = $this->rcon->get_maps();
-		}
-		
-		/* 
-		 * Т.к получение карт процесс долгий, а в некоторых случаях
-		 * (когда количество карт на сервере очень большое),
-		 * то в этом случае список карт лучше отправлять в данные к серверу,
-		 * что ниже и происходит.
-		*/
-		if (!empty($maps_list) && !isset($maps_list['from_cache'])) {
-			$cache_maps = $maps_list;
-			$cache_maps['time'] = time();
-				
-			$server_data['maps_list'] = json_encode($cache_maps);
-			$this->servers->edit_game_server($this->servers->server_data['id'], $server_data);
-		} elseif (!empty($maps_list)) {
-			unset($maps_list['from_cache']);
-		}
-
-		return $maps_list;
-	}
-	
-	// --------------------------------------------------------------------------
-    
-    /**
-     * Получение списка карт для вставки в шаблон
-     */
 	private function _get_base_cvars()
 	{
 		$tpl_data = array();
@@ -369,7 +331,6 @@ class Server_control extends CI_Controller {
 			$local_tpl['users_list1'] =& $local_tpl['users_list'];
 			$local_tpl['users_list2'] =& $local_tpl['users_list'];
 
-			$local_tpl['maps_list']	= $this->_get_maps_list();
 			$local_tpl['frcon_list'] 	= $this->_get_frcon_list();
 			$local_tpl['base_cvars'] 	= $this->_get_base_cvars();
 			$this->rcon->disconnect();
