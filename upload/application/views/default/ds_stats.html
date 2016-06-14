@@ -1,0 +1,262 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<link rel="stylesheet" href="{base_url}themes/system/chartist/chartist.css">
+<script type="text/javascript" src="{base_url}themes/system/chartist/chartist.min.js"></script>
+<script type="text/javascript" src="{base_url}themes/system/chartist/chartist-plugin-fill-donut.min.js"></script>
+<script type="text/javascript" src="{base_url}themes/system/chartist/chartist-plugin-axistitle.min.js"></script>
+
+<script type="text/javascript">
+	var page = {
+		'site_url' : '{site_url}',
+		'base_url' : '{base_url}',
+		'template_files': '{base_url}themes/{template}/{style}/',
+		'system_template': '{base_url}themes/system/',
+		'csrf_token_name' : '{csrf_token_name}',
+		'csrf_hash' : '{csrf_hash}',
+		'ds_id' : '{ds_id}'
+	};
+</script>
+
+<script>
+    var ramblockset = false;
+    var ramload;
+
+    var cpublockset = [];
+    var cpuload = [];
+    
+    var netblockset = {};
+    var netload = {};
+
+    var diskblockset = [];
+    var diskload = [];
+
+    function skipLabels(value, index, chart) {
+        // console.log(chart.length);
+        
+        if (chart.length > 10)
+            return index % Math.round(chart.length/10)  === 0 ? value : null;
+        else
+            return value;
+    }
+
+    datestart = '';
+    dateend = '';
+    
+    function update_stats() {
+        
+        ajax_data = {'datestart': datestart, 'dateend': dateend};
+        ajax_data[page.csrf_token_name] = page.csrf_hash;
+    
+        $.ajax({ 
+            url:     sprintf("%sajax/ds_stats/get_stats/%s", page.site_url, page.ds_id),
+            type:     "POST",
+            data: 	ajax_data,
+            dataType: "json",
+            success: function(response) {
+                if (response.status == 0) {
+                    noty({layout: 'bottomCenter', type: 'error', text: response.error_text});
+                    return;
+                }
+                
+                if (response.data.length == 0) {
+                    return;
+                }
+
+                $('#last-time').html(response.data.time[response.data.time.length-1]);
+                $('#loa').html(response.data.loa[response.data.loa.length-1]);
+
+                if (!ramblockset) {
+                    $('.ram-block').append('<div id="ramload"></div>');
+
+                    ramload = new Chartist.Line('#ramload', {
+                        // series: [val.rxb, val.rxp, val.txb, val.txp]
+                        labels: response.data.time,
+                        series: [response.data.ram, response.data.ramav]
+                    }, {
+                        high: response.data.ram_total,
+                        low: 0,
+                        height: '225px',
+                        showPoint: false,
+                        fullWidth: true,
+                        showArea: true,
+                        axisX: {
+                            labelInterpolationFnc: skipLabels
+                        }
+                    });
+
+                    ramblockset = true;
+                } else {
+                    ramload.update({
+                        labels: response.data.time,
+                        series: [response.data.ram, response.data.ramav]
+                    });
+                }
+
+                $.each(response.data.cpu, function(k, val) {
+                    if (!cpublockset[k]) {
+                        $('.cpuload-block').append(
+                            '<h3>CPU #' + k + '</h3>\
+                            <div id="cpuload_' + k + '"></div>'
+                        );
+
+                        id = '#cpuload_' + k;
+                        
+                        cpuload[k] = new Chartist.Line(id, {
+                            labels: response.data.time,
+                            series: [val]
+                        }, {
+                            high: 100,
+                            low: 0,
+                            height: '225px',
+                            showPoint: false,
+                            showArea: true,
+                            axisX: {
+                                labelInterpolationFnc: skipLabels
+                            }
+                        });
+
+                        cpublockset[k] = true;
+                    } else {
+                        cpuload[k].update({
+                            labels: response.data.time,
+                            series: [val]
+                        });
+                    }
+                });
+                    
+                $.each(response.data.if_stat, function(k, val) {
+                    if (!netblockset[k]) {
+                        $('.netload-block').append(
+                            '<h3>' + k + '</h3>\
+                            <div id="netload_' + k + '"></div>'
+                        );
+
+                        id = '#netload_' + k;
+                        netload[k] = new Chartist.Line(id, {
+                            // series: [val.rxb, val.rxp, val.txb, val.txp]
+                            labels: response.data.time,
+                            series: [val.rxb, val.txb]
+                        }, {
+                            height: '225px',
+                            showPoint: false,
+                            showArea: true,
+                            axisX: {
+                                labelInterpolationFnc: skipLabels
+                            }
+                        });
+
+                        netblockset[k] = true;
+                    } else {
+                        netload[k].update({
+                            // series: [val.rxb, val.rxp, val.txb, val.txp]
+                            labels: response.data.time,
+                            series: [val.rxb, val.txb]
+                        });
+                    }
+                });
+
+                di = 0;
+                $.each(response.data.drvspace, function(k, val) {
+                    if (!diskblockset[di]) {
+                        $('.disk-block').append(
+                            '<h3>' + k + '</h3>\
+                            <div id="diskload_' + di + '"></div>'
+                        );
+
+                        id = '#diskload_' + di;
+                        
+                        diskload[di] = new Chartist.Line(id, {
+                            labels: response.data.time,
+                            series: [val]
+                        }, {
+                            height: '225px',
+                            showPoint: false,
+                            showArea: true,
+                            axisX: {
+                                labelInterpolationFnc: skipLabels
+                            }
+                        });
+
+                        diskblockset[di] = true;
+                    } else {
+                        diskload[di].update({
+                            labels: response.data.time,
+                            series: [val]
+                        });
+                    }
+
+                    di++;
+                });
+                
+            },
+            error: function() {
+                noty({layout: 'bottomCenter', type: 'error', text: "unknown error"});
+                last = false;
+            },
+            complete: function() {
+                // HideLoad();
+            }
+        });
+    }
+
+    update_stats();
+    setInterval(update_stats, 10000);
+</script>
+
+<a class="button" href="{site_url}ds_stats">< {lang_back}</a>
+<a class="button" onclick="anichange('#filter'); return false" href="#">{lang_filter}</a>
+<script>
+function anichange (objName) {
+  if ( $(objName).css('display') == 'none' ) {
+    $(objName).animate({height: 'show'}, 400);
+  } else {
+    $(objName).animate({height: 'hide'}, 200);
+  }
+}
+</script>
+
+<div id="filter" style="display: none">
+    <table>
+        <tr>
+            <td>Период:</td>
+            <td>
+                <input type="text" id="datetimepicker1" name="period_datestart" value="{default_datestart}"/>&nbsp;-&nbsp;
+                <input type="text" id="datetimepicker2" name="period_dateend" value="{default_dateend}"/>
+                <button id="change-period" class="button">{lang_apply}</button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script>
+	jQuery('#datetimepicker1, #datetimepicker2').datetimepicker({
+	  format:'d-m-Y H:i',
+	  lang:'{language}',
+	});
+
+    $('#change-period').click(function() {
+        datestart = $("input[name='period_datestart']").val();
+        dateend = $("input[name='period_dateend']").val();
+        update_stats();
+        anichange('#filter');
+    });
+</script>
+
+<div>Последнее обновление статистики: <span id="last-time"></span></div>
+<div>Load Average: <span id="loa"></span></div>
+<hr>
+
+<h2>RAM</h2>
+<div class="ram-block"></div>
+<hr>
+
+<h2>CPU</h2>
+<div class="cpuload-block"></div>
+<hr>
+
+<h2>Network</h2>
+<div class="netload-block"></div>
+<p><font color="#161616">&#9632;</font> - входящая скорость, <font color="#636363">&#9632;</font> - исходящая скорость</p>
+<hr>
+
+<h2>Disk</h2>
+<div class="disk-block"></div>
