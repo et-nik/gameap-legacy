@@ -62,9 +62,6 @@
 
     <ul class="tabs">
         <li><a href="#base_parameters">{lang_base_parameters}</a></li>
-        <?php if (strtolower($this->servers->server_data['os']) != 'windows'): ?>
-			<li><a href="#limites">{lang_limites}</a></li>
-		<?php endif; ?>
         <li><a href="#start_parameters">{lang_adm_servers_start_parameters}</a></li>
     </ul>
 		
@@ -160,32 +157,6 @@
 				</tr>
 				</table>
         </div>
-        
-        <?php if (strtolower($this->servers->server_data['os']) != 'windows'): ?>
-			<div id="limites" class="tab_content">
-				<table class="zebra" width="100%">
-					<tr>
-						<td colspan="2"><h2>{lang_limites}</h2></td>
-					</tr>
-					
-					<tr>
-						<td width="25%">{lang_adm_servers_cpu_limit}:</td>
-						<td><input type="text" name="cpu_limit" size="3" value="{cpu_limit}"/>&nbsp;%</td>
-					</tr>
-					
-					<tr>
-						<td>{lang_adm_servers_ram_limit}:</td>
-						<td><input type="text" name="ram_limit" size="3" value="{ram_limit}"/>&nbsp;Mb</td>
-					</tr>
-					
-					<tr>
-						<td>{lang_adm_servers_net_limit}:</td>
-						<td><input type="text" name="net_limit" size="3" value="{net_limit}"/>&nbsp;Kbit/s</td>
-					</tr>
-				
-				</table>
-			</div>
-		<?php endif; ?>
 
         <div id="start_parameters" class="tab_content">
 			<table class="zebra" width="100%">
@@ -205,7 +176,7 @@
 
 				<tr>
 					<td width="45%">{lang_adm_servers_command_start}:</td>
-					<td><textarea style="height:50px" rows="2" name="start_command">{start_command}</textarea></td>
+					<td><textarea style="height:200px" rows="2" name="start_command">{start_command}</textarea></td>
 				</tr>
 			</table>
 			
