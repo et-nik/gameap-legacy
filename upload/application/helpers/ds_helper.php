@@ -67,11 +67,12 @@ if ( ! function_exists('replace_shotcodes'))
 		$command = str_replace('{command}', 	$server_data['start_command'] , $command);
 		// ID сервера
 		$command = str_replace('{id}', 			strip_quotes($server_data['id']) 			, $command);
-		$command = str_replace('{script_path}', strip_quotes($server_data['script_path']) 	, $command);
+		$command = str_replace('{script_path}', strip_quotes($server_data['work_path']) 	, $command);
+		$command = str_replace('{work_path}',   strip_quotes($server_data['work_path']) 	, $command);
 		// Директория с игрой
 		$command = str_replace('{game_dir}', 	strip_quotes($server_data['dir'])  			, $command);
 		// Корневая директория (где скрипт запуска)
-		$command = str_replace('{dir}', 		strip_quotes($server_data['script_path'] . '/' . $server_data['dir'])  , $command);
+		$command = str_replace('{dir}', 		strip_quotes($server_data['work_path'] . '/' . $server_data['dir'])  , $command);
 		// Имя скрина
 		$command = str_replace('{name}', 		strip_quotes($server_data['screen_name']) 	, $command);
 		// IP сервера для коннекта (может не совпадать с ip дедика)
@@ -131,7 +132,7 @@ if ( ! function_exists('send_command'))
     {
 		$CI =& get_instance();
 		$CI->load->driver('control');
-		
+
 		if (isset($server_data['enabled']) && !$server_data['enabled']) {
 			throw new Exception(lang('server_command_gs_disabled'));
 		}
@@ -142,15 +143,20 @@ if ( ! function_exists('send_command'))
 		
 		$command = replace_shotcodes($command, $server_data);
 		
-		$path = $path ? $path : $server_data['script_path'];
-		$CI->control->set_data(array('os' => $server_data['os'], 'path' => $path));
-		$CI->control->set_driver($server_data['control_protocol']);
-
-		$CI->control->connect($server_data['control_ip'], $server_data['control_port']);
-		$CI->control->auth($server_data['control_login'], $server_data['control_password']);
-		$result = $CI->control->command($command, $path);
+        $CI->load->model('gdaemon_tasks');
+        
+        if (is_array($command)) {
+            $command = implode("\n", $command);
+        }
+        
+        $task_id = $CI->gdaemon_tasks->add(array(
+            'ds_id'     => $server_data['ds_id'],
+            'server_id' => $server_data['id'],
+            'task' => 'cmdexec',
+            'cmd' => $command,
+        ));
 		
-		return $result;
+		return "Task {$task_id} created";
 	}
 }
 
