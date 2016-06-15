@@ -565,7 +565,8 @@ class Servers extends CI_Model {
 			// Данные для игрового сервера из машины
 			$this->server_data['os'] 			= strtolower($this->server_ds_data['os']);
 
-			$this->server_data['ds_disabled'] 	= $this->server_ds_data['disabled'];
+			$this->server_data['ds_id'] 	        = $this->server_ds_data['id'];
+			$this->server_data['ds_disabled'] 	    = $this->server_ds_data['disabled'];
 
 			$this->server_data['gdaemon_host']		= $this->server_ds_data['gdaemon_host'];
 			$this->server_data['gdaemon_privkey'] 	= $this->server_ds_data['gdaemon_privkey'];
@@ -575,6 +576,7 @@ class Servers extends CI_Model {
             
 			$this->server_data['ds_modules_data'] 	= $this->server_ds_data['modules_data'];
 			
+			$this->server_data['script_path'] 			= $this->server_ds_data['work_path'];
 			$this->server_data['work_path'] 			= $this->server_ds_data['work_path'];
             
 			$this->server_data['script_start'] 			= $this->server_ds_data['script_start'];
@@ -1089,8 +1091,72 @@ class Servers extends CI_Model {
                 return false;
             }
 		}
+    }
 
-            
+    // -----------------------------------------------------------------
+
+    /**
+     * Запуск сервера. Функция для обратной совместимости с модулями 1.x
+     */
+    function start($server_data = array())
+    {
+        $this->load->model('gdaemon_tasks');
+        
+        if (empty($server_data)) {
+            return false;
+        }
+
+        $task_id = $CI->gdaemon_tasks->add(array(
+            'ds_id'     => $this->server_data['ds_id'],
+            'server_id' => $this->server_data['id'],
+            'task' => 'gsstart',
+        ));
+
+        return true;
+    }
+
+    // -----------------------------------------------------------------
+
+    /**
+     * Остановка сервера. Функция для обратной совместимости с модулями 1.x
+     */
+    function stop($server_id = 0)
+    {
+        $this->load->model('gdaemon_tasks');
+        
+        if (empty($server_data)) {
+            return false;
+        }
+
+        $task_id = $CI->gdaemon_tasks->add(array(
+            'ds_id'     => $this->server_data['ds_id'],
+            'server_id' => $this->server_data['id'],
+            'task' => 'gsstop',
+        ));
+
+        return true;
+    }
+
+    // -----------------------------------------------------------------
+
+    /**
+     * Перезапуск сервера. Функция для обратной совместимости с модулями 1.x
+     */
+    function restart($server_id = 0)
+    {
+        $this->load->model('gdaemon_tasks');
+        
+        if (empty($server_data)) {
+            return false;
+        }
+        
+        $task_id = $CI->gdaemon_tasks->add(array(
+            'ds_id'     => $this->server_data['ds_id'],
+            'server_id' => $this->server_data['id'],
+            'task' => 'gsrest',
+        ));
+
+        return true;
     }
 }
 
