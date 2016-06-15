@@ -69,12 +69,12 @@
 </div>
 
 <div style="display: none;">
-	<div class="box-modal" id="rename" style="width: 90%;">
+	<div class="box-modal" id="rename" style="width: 500px;">
 		<div class="box-modal_close arcticmodal-close">{lang_close}</div>
 		<h3>{lang_web_ftp_new_name}</h3>
 		<p>
 		<form action="#" accept-charset="utf-8" onsubmit="RenameFile();return false;">
-			<input name="new_file_name" type="text" style="width:100%;"/>
+			<input name="new_file_name" type="text"/>
 			<input id="rename_file" class="button" type="submit" name="new_name" value="{lang_save}" />
 		</form>
 		</p>
@@ -86,8 +86,8 @@
 		<div class="box-modal_close arcticmodal-close">{lang_close}</div>
 		<h3>{lang_web_ftp_delete_file}?</h3>
 		<p align="center">
-			<a onclick="DeleteFile()" href="#"><button form="fconfirm" class="minimal">{lang_yes}</button></a>
-			<a class="arcticmodal-close" href="#"><button class="minimal">{lang_no}</button></a>
+			<a onclick="DeleteFile()" href="#"><button form="fconfirm" class="green button">{lang_yes}</button></a>
+			<a class="arcticmodal-close" href="#"><button class="red button">{lang_no}</button></a>
 		</p>
 	</div>
 </div>
