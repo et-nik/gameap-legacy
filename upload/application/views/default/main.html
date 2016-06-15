@@ -26,15 +26,19 @@
 </head>
 <body>
 
-<div class="row">
-    {menu}
-</div>
-<script>$(document).foundation();</script>
+<?php if (isset($this->_ci_cached_vars['menu'])): ?>
+    <div class="row">
+        {menu}
+    </div>
+    <script>$(document).foundation();</script>
+<?php endif; ?>
 
 <div class="row">
-    <div class="medium-2 columns left-menu">
-        {profile}
-    </div>
+    <?php if (isset($this->_ci_cached_vars['menu'])): ?>
+        <div class="medium-2 columns left-menu">
+            {profile}
+        </div>
+    <?php endif; ?>
 
     <div class="medium-10 columns content">
         {content}
