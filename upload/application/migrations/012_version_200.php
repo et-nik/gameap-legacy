@@ -142,6 +142,15 @@ class Migration_Version_200 extends CI_Migration {
 		}
 
         $fields = array();
+		if (!$this->db->field_exists('gdaemon_login', 'dedicated_servers')) {
+			$fields = array(
+				'gdaemon_login' => array('type' => 'VARCHAR', 'constraint' => 128)
+			);
+			
+			$this->dbforge->add_column('dedicated_servers', $fields, 'gdaemon_host');
+		}
+
+        $fields = array();
 		if (!$this->db->field_exists('gdaemon_password', 'dedicated_servers')) {
 			$fields = array(
 				'gdaemon_password' => array('type' => 'TEXT')
