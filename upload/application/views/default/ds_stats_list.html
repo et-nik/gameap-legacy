@@ -57,23 +57,26 @@
 
                     var rxb_avg = 0;
                     var txb_avg = 0;
-                    
-                    $.each(val.if_stat, function(k2, val2) {
-                        rxb_avg += val2.rxb;
-                        txb_avg += val2.txb;
-                    });
+                    var rxb_dim = 'Kb/s';
+                    var txb_dim = 'Kb/s';
+                    if (typeof val.if_stat != 'undefined') {
+                        $.each(val.if_stat, function(k2, val2) {
+                            rxb_avg += val2.rxb;
+                            txb_avg += val2.txb;
+                        });
 
-                    // Kb/s
-                    rxb_avg = Math.round(rxb_avg / Object.keys(val.if_stat).length);
-                    txb_avg = Math.round(txb_avg / Object.keys(val.if_stat).length);
-                    
-                    if (rxb_avg > 1048576) { rxb_avg = Math.round(rxb_avg / 1048576); rxb_dim = 'Gb/s'}
-                    else if (rxb_avg > 1024) { rxb_avg = Math.round(rxb_avg / 1024); rxb_dim = 'Mb/s'}
-                    else { rxb_dim = 'Kb/s'}
-                    
-                    if (txb_avg > 1048576) { txb_avg = Math.round(txb_avg / 1048576); txb_dim = 'Gb/s'}
-                    else if (txb_avg > 1024) { txb_avg = Math.round(txb_avg / 1024); txb_dim = 'Mb/s'}
-                    else { txb_dim = 'Kb/s'}
+                        // Kb/s
+                        rxb_avg = Math.round(rxb_avg / Object.keys(val.if_stat).length);
+                        txb_avg = Math.round(txb_avg / Object.keys(val.if_stat).length);
+                        
+                        if (rxb_avg > 1048576) { rxb_avg = Math.round(rxb_avg / 1048576); rxb_dim = 'Gb/s'}
+                        else if (rxb_avg > 1024) { rxb_avg = Math.round(rxb_avg / 1024); rxb_dim = 'Mb/s'}
+                        else { rxb_dim = 'Kb/s'}
+                        
+                        if (txb_avg > 1048576) { txb_avg = Math.round(txb_avg / 1048576); txb_dim = 'Gb/s'}
+                        else if (txb_avg > 1024) { txb_avg = Math.round(txb_avg / 1024); txb_dim = 'Mb/s'}
+                        else { txb_dim = 'Kb/s'}
+                    }
 
                     var warn = {'ram': '', 'time': ''};
                     if ((val.ramav / val.ramtot * 100) > warn_perc) warn.ram = warn_sign;
