@@ -95,14 +95,14 @@ class Mds_Stats extends CI_Model {
                 
                 $drv_sp = explode(' ', $drv);
                 $ret_stats['drvspace'][$drv_sp[0]][$i] = round($drv_sp[1]/(1024*1024), 0, PHP_ROUND_HALF_UP);
-                // $ret_stats['drvspace'][$drv_sp[0]][$i] = array(
-                    // round($drv_sp[1]/(1024*1024), 0, PHP_ROUND_HALF_UP),
-                    // round($drv_sp[2]/(1024*1024), 0, PHP_ROUND_HALF_UP)
-                // );
+
+                isset($ret_stats['drvspace_total'][$drv_sp[0]])
+                    OR $ret_stats['drvspace_total'][$drv_sp[0]] = round($drv_sp[2]/(1024*1024), 0, PHP_ROUND_HALF_UP);;
             }
             
             $i++;
         }
+        
         $ret_stats['ds_name']       = $arr['name'];
         $ret_stats['ram_total']     = round($ram_total, 0, PHP_ROUND_HALF_UP);
         $ret_stats['cpu_count']     = $cpu_count;
