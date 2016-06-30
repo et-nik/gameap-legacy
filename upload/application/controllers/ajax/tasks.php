@@ -83,40 +83,42 @@ class Tasks extends CI_Controller {
             
             switch ($task) {
                 case 'gsstart':
-                
-                if (!$this->users->auth_servers_privileges['SERVER_START']) {
-                    $this->_send_error("Access denied");
-                    return;
-                }
+                    if (!$this->users->auth_servers_privileges['SERVER_START']) {
+                        $this->_send_error("Access denied");
+                        return;
+                    }
 
-                break;
+                    break;
 
                 case 'gsstop':
+                    if (!$this->users->auth_servers_privileges['SERVER_STOP']) {
+                        $this->_send_error("Access denied");
+                        return;
+                    }
 
-                if (!$this->users->auth_servers_privileges['SERVER_STOP']) {
-                    $this->_send_error("Access denied");
-                    return;
-                }
-
-                break;
+                    break;
                 
                 case 'gsrest':
+                    if (!$this->users->auth_servers_privileges['SERVER_RESTART']) {
+                        $this->_send_error("Access denied");
+                        return;
+                    }
 
-                if (!$this->users->auth_servers_privileges['SERVER_RESTART']) {
-                    $this->_send_error("Access denied");
-                    return;
-                }
-
-                break;
+                    break;
                 
                 case 'gsinst':
+                    if (!$this->users->auth_servers_privileges['SERVER_UPDATE']) {
+                        $this->_send_error("Access denied");
+                        return;
+                    }
 
-                if (!$this->users->auth_servers_privileges['SERVER_UPDATE']) {
-                    $this->_send_error("Access denied");
+                    break;
+
+                default:
+                    $this->_send_error("Unknown task");
                     return;
-                }
-
-                break;
+                    
+                    break;
 
             }
         }
