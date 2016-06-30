@@ -222,7 +222,7 @@ class Server_control extends CI_Controller {
                     
                     if (isset($menu_item['games'])
                         && !empty($menu_item['games'])
-                        && !in_array($this->servers->server_data['game_code'], $menu_item['games'])
+                        && !in_array($this->servers->server_data['game'], $menu_item['games'])
                     ) {
                         continue;
                     }
