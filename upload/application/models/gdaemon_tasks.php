@@ -198,6 +198,14 @@ class Gdaemon_tasks extends CI_Model {
     */
 	function add($data)
 	{
+        if (empty($data['ds_id'])) {
+            return 0;
+        }
+
+        if (!isset($data['server_id'])) {
+            $data['server_id'] = 0;
+        }
+
         if ((bool)$this->db->insert('gdaemon_tasks', $data)) {
             return $this->db->insert_id();
         }
