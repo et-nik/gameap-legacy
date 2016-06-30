@@ -29,6 +29,8 @@ class Mds_Stats extends CI_Model {
         $this->db->from('ds_stats');
         $this->db->join('dedicated_servers', 'dedicated_servers.id = ds_stats.ds_id', 'left');
 
+        $this->db->where('ds_stats.ds_id', $ds_id);
+
         if (!empty($this->_filter_time_between[0]) && !empty($this->_filter_time_between[1])) {
             $this->db->where("`time` BETWEEN {$this->_filter_time_between[0]} AND {$this->_filter_time_between[1]}");
             $this->_filter_time_between = array();
@@ -138,7 +140,7 @@ class Mds_Stats extends CI_Model {
                 LEFT JOIN `{$ds_tb}`
                     ON `{$ds_tb}`.`id` = `{$ds_stats_tb}`.`ds_id`
                 ORDER BY `{$ds_stats_tb}`.`time` DESC
-                LIMIT 999
+                LIMIT 99999
             ) AS t GROUP BY `ds_id`"
         );
 
@@ -189,6 +191,7 @@ class Mds_Stats extends CI_Model {
                 $ret_stats[$i]['drvspace'][$drv_sp[0]][0] = round($drv_sp[1]/(1024*1024), 0, PHP_ROUND_HALF_UP);
                 $ret_stats[$i]['drvspace'][$drv_sp[0]][1] = round($drv_sp[2]/(1024*1024), 0, PHP_ROUND_HALF_UP);
             }
+            $i++;
         }
 
         return $ret_stats;
