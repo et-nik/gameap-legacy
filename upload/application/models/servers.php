@@ -1106,7 +1106,7 @@ class Servers extends CI_Model {
             return false;
         }
 
-        $task_id = $CI->gdaemon_tasks->add(array(
+        $task_id = $this->gdaemon_tasks->add(array(
             'ds_id'     => $this->server_data['ds_id'],
             'server_id' => $this->server_data['id'],
             'task' => 'gsstart',
@@ -1128,7 +1128,7 @@ class Servers extends CI_Model {
             return false;
         }
 
-        $task_id = $CI->gdaemon_tasks->add(array(
+        $task_id = $this->gdaemon_tasks->add(array(
             'ds_id'     => $this->server_data['ds_id'],
             'server_id' => $this->server_data['id'],
             'task' => 'gsstop',
@@ -1150,7 +1150,7 @@ class Servers extends CI_Model {
             return false;
         }
         
-        $task_id = $CI->gdaemon_tasks->add(array(
+        $task_id = $this->gdaemon_tasks->add(array(
             'ds_id'     => $this->server_data['ds_id'],
             'server_id' => $this->server_data['id'],
             'task' => 'gsrest',
