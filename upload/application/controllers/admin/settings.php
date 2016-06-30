@@ -103,17 +103,8 @@ class Settings extends CI_Controller {
 		
 		$server_settings = $this->servers->get_server_settings($server_id);
 
-		if (!$this->input->post('save')){
-			
-			/* Отображение формы */
-			$num = -1;
-			foreach ($server_settings as $sett_id => $value) {
-				$num++;
-		
-				$local_tpl['settings'][$num]['input_field'] = form_checkbox($sett_id, '1', $value);
-				$local_tpl['settings'][$num]['human_name'] = $this->servers->all_settings[$sett_id];
-			}
-			
+		if (!$this->input->post('save')) {
+            
 			/* Допустимые алиасы */
 			if (isset($this->servers->server_data['aliases_list']) && $this->servers->server_data['aliases_list'] != '') {
 				$allowable_aliases = json_decode($this->servers->server_data['aliases_list'], true);
@@ -129,7 +120,7 @@ class Settings extends CI_Controller {
 			$aliases_values =& $this->servers->server_data['aliases_values'];
 			
 			/* Отображение алиасов */
-			if($allowable_aliases && !empty($allowable_aliases)) {
+			if ($allowable_aliases && !empty($allowable_aliases)) {
 				foreach ($allowable_aliases as $alias) {
 
 					if(!$this->users->auth_data['is_admin'] && !$this->users->auth_privileges['srv_global'] && $alias['only_admins']) {
@@ -137,12 +128,10 @@ class Settings extends CI_Controller {
 						continue;
 					}
 					
-					$num++; // Отсчет продолжаем, не сбрасываем
-					
 					// Задаем правила проверки для алиаса
 					$this->form_validation->set_rules('alias_' . $alias['alias'], $alias['desc'], 'trim|max_length[64]|xss_clean');
 					
-					if(isset($aliases_values[$alias['alias']])) {
+					if (isset($aliases_values[$alias['alias']])) {
 						$value_alias = $aliases_values[$alias['alias']];
 					} else {
 						$value_alias = '';
@@ -154,10 +143,14 @@ class Settings extends CI_Controller {
 						  'maxlength'   => '64',
 						  'size'        => '30',
 						);
-
-					$local_tpl['settings'][$num]['input_field'] =  form_input($data);
-					$local_tpl['settings'][$num]['human_name'] = $alias['desc'];
+                        
+                    $local_tpl['settings'][] = [
+                        'input_field' => form_input($data),
+                        'human_name' => $alias['desc'],
+                    ];
 				}
+
+                $local_tpl['start_after_crash_checkbox'] = form_checkbox('start_after_crash', 'accept', $this->servers->server_data['start_after_crash']);
 			}
 			
 			$local_tpl['server_id'] = $server_id;
@@ -167,15 +160,6 @@ class Settings extends CI_Controller {
 			/* Сохранение настроек */
 			
 			$log_data['log_data'] = '';
-			
-
-            foreach ($this->servers->all_settings as $sett_id => $value) {
-
-				$value = (bool)$this->input->post($sett_id, true);
-				$this->servers->set_server_settings($sett_id, $value, $server_id);
-				
-				$log_data['log_data'] .= $sett_id . ' : ' . (int)$value . "\n";
-            }
             
             /* Допустимые алиасы */
 			$allowable_aliases = json_decode($this->servers->server_data['aliases_list'], true);
@@ -206,7 +190,7 @@ class Settings extends CI_Controller {
 				}
 			}
 			
-			// Отправляем алиасы на сервер
+			$sql_data['start_after_crash'] = (int)(bool)$this->input->post('start_after_crash');
 			$sql_data['aliases'] = json_encode($aliases_values);
 			$this->servers->edit_game_server($server_id, $sql_data);
 

@@ -23,7 +23,7 @@ class Servers extends CI_Model {
     public $server_game_data 		= array();		// Данные игры к которой принадлежит сервер
     
     public $all_settings = array(
-		'SERVER_AUTOSTART'			=> 'Автостарт сервера в случае его падения (через cron)',
+		'SERVER_AUTOSTART'			=> 'Автостарт сервера в случае его падения',
 		'SERVER_RCON_AUTOCHANGE' 	=> 'Автоматическая смена rcon пароля, в случае если в админпанели и на сервере он не совпадает',
     );
     

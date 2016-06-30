@@ -5,12 +5,16 @@
 <form action="{site_url}admin/settings/server/{server_id}" method="post" accept-charset="utf-8">
 	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
 	
-<table width="75%" class="zebra">
-	{settings}
-	<tr>
-		<td>{human_name}:</td>
-		<td align="center">{input_field}</td>
+<table>
+    <tr>
+		<td width="30%">Автозапуска в случае падения:</td>
+		<td>{start_after_crash_checkbox}</td>
 	</tr>
+	{settings}
+        <tr>
+            <td>{human_name}:</td>
+            <td>{input_field}</td>
+        </tr>
 	{/settings}
 	<tr>
 		<td>&nbsp;</td>
