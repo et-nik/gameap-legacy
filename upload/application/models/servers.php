@@ -733,7 +733,9 @@ class Servers extends CI_Model {
 	{
 		$this->load->library('query');
 		$this->load->driver('rcon');
-		
+        
+		$this->load->helper('cache');
+        
 		if (!$host) {
 			$host = $this->server_data['server_ip'];
 		}
@@ -748,11 +750,18 @@ class Servers extends CI_Model {
 			$engine 			= $engine[0];
 		}
 
-		$server['id'] = isset($this->server_data['id']) ? $this->server_data['id'] : 'get_status';
+		$server['id'] = isset($this->server_data['id']) ? $this->server_data['id'] : 0;
+
+        if ($server['id'] > 0) {
+            $cache_status = load_from_cache('server_status_' . $server['id']);
+
+            if ($cache_status !== false && $cache_status !== null) {
+                return (bool)$cache_status;
+            }
+        }
+        
 		$server['type'] = $engine;
 		$server['host'] = $host . ':' . $port;
-		$this->query->set_data($server);
-		
 		$this->query->set_data($server);
 
 		$request = $this->query->get_status();
@@ -770,8 +779,12 @@ class Servers extends CI_Model {
 			
 			$status = $this->rcon->connect();
 		}
+
+        if ($server['id'] > 0) {
+            save_to_cache('server_status_' . $server['id'], (int)$status);
+        }
 		
-		return $status;
+		return (bool)$status;
 	}
 
 	// -----------------------------------------------------------------
