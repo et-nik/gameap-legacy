@@ -102,8 +102,9 @@ class Server_control extends CI_Controller {
         $this->_send_response(array(
             'status' => 1,
             'data' => array(
-                'process_active' => $this->servers->server_data['process_active'],
-                'last_process_check' => $this->servers->server_data['last_process_check']
+                'query_active'          => (int)$this->servers->server_status(),
+                'process_active'        => (int)$this->servers->server_data['process_active'],
+                'last_process_check'    => (int)$this->servers->server_data['last_process_check']
             )
         ));
 	}
