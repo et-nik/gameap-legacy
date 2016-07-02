@@ -85,7 +85,10 @@ class Gameap_modules extends CI_Model {
 	*/
 	function clean_modules()
     {
-		$this->modules_data = array();
+        $this->load->helper('cache');
+        delete_in_cache('gameap_hooks_callbacks');
+        
+        $this->modules_data = array();
 		$this->modules_list = array();
 		$this->menu = array();
 		return (bool)$this->db->empty_table('modules');
