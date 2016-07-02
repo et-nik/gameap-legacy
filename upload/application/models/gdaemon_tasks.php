@@ -198,6 +198,8 @@ class Gdaemon_tasks extends CI_Model {
     */
 	function add($data)
 	{
+        $this->gameap_hooks->run('pre_gtask_add', array('task_data' => &$data));
+
         if (empty($data['ds_id'])) {
             return 0;
         }
@@ -207,7 +209,9 @@ class Gdaemon_tasks extends CI_Model {
         }
 
         if ((bool)$this->db->insert('gdaemon_tasks', $data)) {
-            return $this->db->insert_id();
+            $task_id = $this->db->insert_id();
+            $this->gameap_hooks->run('post_gtask_add', array('task_data' => &$data, 'task_id' => $task_id));
+            return $task_id;
         }
         else {
             return 0;
