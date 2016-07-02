@@ -76,7 +76,7 @@ class Gameap_hooks {
             }
         }
         
-        save_to_cache('gameap_hooks_callbacks', $this->_hooks_callbacks);
+        save_to_cache('gameap_hooks_callbacks', $this->_hooks_callbacks, 600);
         return true;
     }
 
