@@ -205,6 +205,39 @@ class Migration_Version_200 extends CI_Migration {
             $this->dbforge->create_table('ds_stats');
         }
 
+        /*
+        if (!$this->db->table_exists('gs_stat')) {
+            
+            $this->dbforge->add_field(array(
+                'id' => array(
+                    'type' => 'INT',
+                    'auto_increment' => true
+                ),
+                'server_id' => array(
+                    'type' => 'INT'
+                ),
+                'time' => array(
+                    'type' => 'INT'
+                ),
+                'ram' => array(
+                    'type' => 'BIGING UNSIGNED'
+                ),
+                'cpu' => array(
+                    'type' => 'INT'
+                ),
+                'ifload' => array(
+                    'type' => 'TINYTEXT'
+                ),
+                'drvspace' => array(
+                    'type' => 'BIGING UNSIGNED'
+                ),
+            ));
+            
+            $this->dbforge->add_key('id', true);
+            $this->dbforge->create_table('gs_stat');
+        }
+        */
+
         $fields = array();
 		if (!$this->db->field_exists('process_active', 'servers')) {
 			$fields = array(
@@ -214,6 +247,15 @@ class Migration_Version_200 extends CI_Migration {
 			
 			$this->dbforge->add_column('servers', $fields, 'start_command');
 		}
+
+        $fields = array();
+		if (!$this->db->field_exists('start_after_crash', 'servers')) {
+            $fields = array(
+				'start_after_crash'           => array('type' => 'INT', 'constraint' => 1),
+			);
+			
+			$this->dbforge->add_column('servers', $fields, 'process_active');
+        }
     }
 
     public function down() 
