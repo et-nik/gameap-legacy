@@ -615,6 +615,11 @@ class Files_gdaemon extends CI_Driver {
 									'type' => ($file[3] == 1) ? 'd' : 'f',
 			);
 		}
+
+        uasort($return_list, function($a, $b) {
+            return ($a['file_name'] > $b['file_name']) ? 1: -1;
+            // $a['file_name'] == $b['file_name'] ? Nooooo
+        });
 		
 		return $return_list;
 	}
