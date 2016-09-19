@@ -24,8 +24,39 @@
 Примечание! Указывайте абсолютный серверный путь, а не путь к сайту. Неправильно - "php -f http://www.gameap.ru/cron"
 
 ===============================
+== Безопасность MYSQL        ==
+===============================
+
+REVOKE ALL PRIVILEGES ON `empire-host`.`dedicated_servers` FROM 'gdaemons'@'%';
+REVOKE ALL PRIVILEGES ON `empire-host`.`ds_stats` FROM 'gdaemons'@'%';
+REVOKE ALL PRIVILEGES ON `empire-host`.`games` FROM 'gdaemons'@'%';
+REVOKE ALL PRIVILEGES ON `empire-host`.`game_types` FROM 'gdaemons'@'%';
+REVOKE ALL PRIVILEGES ON `empire-host`.`gdaemon_tasks` FROM 'gdaemons'@'%';
+REVOKE ALL PRIVILEGES ON `empire-host`.`servers` FROM 'gdaemons'@'%';
+
+GRANT SELECT (`id`, `name`, `work_path`, `script_send_command`, `script_get_console`, `script_status`, `script_restart`, `script_stop`, `script_start`) ON `empire-host`.`dedicated_servers` TO 'gdaemons'@'%';
+GRANT INSERT ON `empire-host`.`ds_stats` TO 'gdaemons'@'%';
+GRANT SELECT ON `empire-host`.`games` TO 'gdaemons'@'%';
+GRANT SELECT ON `empire-host`.`game_types` TO 'gdaemons'@'%';
+GRANT SELECT, UPDATE (`time_stchange`, `output`, `status`) ON `empire-host`.`gdaemon_tasks` TO 'gdaemons'@'%';
+GRANT SELECT, UPDATE (`installed`, `status`, `process_active`, `last_process_check`) ON `empire-host`.`servers` TO 'gdaemons'@'%';
+
+UPDATE `empire-host`.`dedicated_servers` SET `script_start` = './starter -t start -d {dir} -u {user} -c {command}' WHERE `dedicated_servers`.`id` = 4;
+UPDATE `empire-host`.`dedicated_servers` SET `script_stop` = './starter -t stop -d {dir} -u {user}' WHERE `dedicated_servers`.`id` = 4;
+
+===============================
 == Установка серверной части ==
 ===============================
+
+sudo apt-get install libboost-thread1.55.0 libboost-iostreams1.55.0 libboost-filesystem1.55.0 libboost-system1.55.0
+sudo apt-get install libjsoncpp0 libmcrypt4
+sudo apt-get install libmysqlcppconn7
+
+sudo apt-get install libboost-thread1.55.0 libboost-iostreams1.55.0 libboost-filesystem1.55.0 libboost-system1.55.0 libjsoncpp0 libmcrypt4 libmysqlcppconn7
+
+Установите библиотеку libmysqlcppconn7
+Debian/Ubuntu:
+sudo apt-get install libmysqlcppconn7
 
 1. Скопируйте содержимое каталога bin/<OS> в любую директорию на сервере, в зависимости от операционной системы
 сервера (Linux или Windows). Директория не должна быть общедоступной.
