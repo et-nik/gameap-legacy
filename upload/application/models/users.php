@@ -226,7 +226,7 @@ class Users extends CI_Model {
             return false;
         }
 
-        if ($query->num_rows > 0) {
+        if ($query->num_rows() > 0) {
 			
 			 // Проверка на разрешенные IP
             if ($this->auth_data['is_admin'] && isset($this->config->config['admin_ip'])) {
@@ -303,7 +303,7 @@ class Users extends CI_Model {
 				break;
 		}
         
-        if ($query->num_rows > 0) {
+        if ($query->num_rows() > 0) {
             
             $this->user_data = $query->row_array();
             $user_data = &$this->user_data;
