@@ -141,7 +141,7 @@ class Dedicated_servers extends CI_Model {
 		
 		$this->ds_list = array();
 
-		if ($query->num_rows > 0) {
+		if ($query->num_rows() > 0) {
 			
 			$this->ds_list = $query->result_array();
 			

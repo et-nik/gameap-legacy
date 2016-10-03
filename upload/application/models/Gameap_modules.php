@@ -110,7 +110,7 @@ class Gameap_modules extends CI_Model {
 			$query = $this->db->get('modules');
 		}
 		
-		if($query->num_rows > 0) {
+		if($query->num_rows() > 0) {
 			
 			$this->modules_data = $query->result_array();
 			

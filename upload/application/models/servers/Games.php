@@ -123,7 +123,7 @@ class Games extends CI_Model {
 		$this->db->limit($limit, $offset);
 		$query = $this->db->get('games');
 
-		if($query->num_rows > 0){
+		if($query->num_rows() > 0){
 			$this->games_list = $query->result_array();
 			
 			// Заполнение массива с именами игр

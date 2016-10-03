@@ -399,7 +399,7 @@ class Servers extends CI_Model {
 				*/
 				$query = $this->db->get_where('servers_privileges', array('user_id' => $user_id));
 				
-				if ($query->num_rows > 0) {
+				if ($query->num_rows() > 0) {
 					
 					$servers = array();
 
@@ -448,7 +448,7 @@ class Servers extends CI_Model {
 				$query = $this->db->get('servers');
 			}
 			
-			if ($query->num_rows <= 0) {
+			if ($query->num_rows() <= 0) {
 				/* Количество серверов = 0 */
 				
 				/* 
@@ -506,7 +506,7 @@ class Servers extends CI_Model {
 
 		$this->server_data = $query->row_array();
 		
-		if($query->num_rows == 0) {
+		if($query->num_rows() == 0) {
 			return false;
 		}
 		
@@ -834,7 +834,7 @@ class Servers extends CI_Model {
 		$this->db->limit($limit, $offset);
 		$query = $this->db->get('servers');
 		
-		if ($query->num_rows > 0) {
+		if ($query->num_rows() > 0) {
 			$this->servers_list = $query->result_array();
 			return $this->servers_list;
 			
@@ -1088,7 +1088,7 @@ class Servers extends CI_Model {
         $this->db->where('sett_id', $sett_id);
         $this->db->where('server_id', $server_id);
             
-        if($query->num_rows > 0){
+        if($query->num_rows() > 0){
            /* Если привилегия уже есть в базе данных, то обновляем */
            if($this->db->update('settings', $data)){
                 return true;

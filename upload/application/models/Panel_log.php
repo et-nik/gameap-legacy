@@ -98,7 +98,7 @@ class Panel_log extends CI_Model {
 			$query = $this->db->get('logs', $limit, $offset);
 		}
 
-		if($query->num_rows > 0){
+		if($query->num_rows() > 0){
 			
 			$log_list = $query->result_array();
 			return $log_list;

@@ -218,15 +218,15 @@ class Users extends CI_Model {
 		} else {
 			$md5_ipua = md5($this->input->user_agent());
 		}
-        
-        if($user_id && $user_hash) {
+
+        if ($user_id && $user_hash) {
             $query = $this->db->get_where('users', array('id' => $user_id, 'hash' => $user_hash . $md5_ipua), 1);
             $this->auth_data = $query->row_array();
         } else {
             return false;
         }
 
-        if ($query->num_rows > 0) {
+        if ($query->num_rows() > 0) {
 			
 			 // Проверка на разрешенные IP
             if ($this->auth_data['is_admin'] && isset($this->config->config['admin_ip'])) {
@@ -303,7 +303,7 @@ class Users extends CI_Model {
 				break;
 		}
         
-        if ($query->num_rows > 0) {
+        if ($query->num_rows() > 0) {
             
             $this->user_data = $query->row_array();
             $user_data = &$this->user_data;
@@ -791,7 +791,7 @@ class Users extends CI_Model {
 		
 		$query = $this->db->get('users', $limit, $offset);
 		
-		if($query->num_rows > 0){
+		if($query->num_rows() > 0){
 			
 			$this->users_list = $query->result_array();
 			

@@ -131,7 +131,7 @@ class Game_types extends CI_Model {
 			$query = $this->db->get('game_types', $limit);
 		}
 
-		if($query->num_rows > 0) {
+		if($query->num_rows() > 0) {
 			$this->game_types_list = $query->result_array();
 			return $this->game_types_list;
 		} else {

@@ -198,6 +198,8 @@ class Gdaemon_tasks extends CI_Model {
     */
 	function add($data)
 	{
+        $this->load->helper('cache');
+
         $this->gameap_hooks->run('pre_gtask_add', array('task_data' => &$data));
 
         if (empty($data['ds_id'])) {
@@ -206,6 +208,10 @@ class Gdaemon_tasks extends CI_Model {
 
         if (!isset($data['server_id'])) {
             $data['server_id'] = 0;
+        }
+
+        if ($data['server_id'] != 0) {
+            delete_in_cache('server_status_' . $data['server_id']);
         }
 
         if ((bool)$this->db->insert('gdaemon_tasks', $data)) {
