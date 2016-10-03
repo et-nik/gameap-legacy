@@ -33,6 +33,10 @@ class Ds_stats extends CI_Controller {
         if (!$this->users->check_user()) {
             redirect('auth');
         }
+
+        if ($this->users->auth_data['group'] < 50) {
+            redirect('admin');
+        }
         
         //Base Template
         $this->tpl['title'] 		= "Ds stats";

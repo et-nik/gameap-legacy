@@ -147,8 +147,6 @@ class Auth extends CI_Controller {
 			}else{
 				redirect('admin');
 			}
-
-			exit;
 		}
 		
 		/* Капча от брутфорса*/
@@ -159,7 +157,7 @@ class Auth extends CI_Controller {
 			$captcha_login = false;
 		}
 
-		$this->form_validation->set_rules('user_login', 'Username', 'trim|required|max_length[32]|xss_clean');
+		$this->form_validation->set_rules('user_login', 'Username', 'trim|required|max_length[32]');
 		$this->form_validation->set_rules('user_password', 'Password', 'trim|required');
 
 		/* Проверка формы */

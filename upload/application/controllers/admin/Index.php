@@ -80,7 +80,8 @@ class Index extends CI_Controller {
 		if (empty($this->games->games_list)) {
 			$this->games->get_active_games_list();
 		}
-		
+
+        $games_option = array();
 		foreach($this->games->games_list as &$game) {
 			$games_option[ $game['code'] ] = $game['name'];
 		}

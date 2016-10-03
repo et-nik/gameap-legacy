@@ -89,14 +89,14 @@ class Tasks extends CI_Controller {
 
         $config['base_url']         = site_url('tasks/page');
 		$config['total_rows']       = $this->gdaemon_tasks->get_all_count();
-		$config['per_page']         = 100;
+		$config['per_page']         = 25;
 		$config['full_tag_open']    = '<p id="pagination">';
 		$config['full_tag_close']   = '</p>';
 
         $this->pagination->initialize($config); 
 		$local_tpl['pagination'] = $this->pagination->create_links();
 
-        if (!$this->gdaemon_tasks->get_list()) {
+        if (!$this->gdaemon_tasks->get_list($config['per_page'])) {
             $this->_show_message($this->gdaemon_tasks->last_error);
         }
 

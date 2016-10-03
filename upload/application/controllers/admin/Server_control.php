@@ -419,7 +419,7 @@ class Server_control extends CI_Controller {
 			$query = $this->db->order_by('date_perform', 'asc');
 			$query = $this->db->get_where('cron', $where);
 			
-			if($query->num_rows > 0) {
+			if($query->num_rows() > 0) {
 				$task_list = $query->result_array();
 			} else {
 				$task_list = array();
@@ -590,7 +590,7 @@ class Server_control extends CI_Controller {
 				$where = array('code' => 'server_update', 'server_id' => $server_id);
 				$query = $this->db->get_where('cron', $where, 1);
 				
-				if ($query->num_rows > 0) {
+				if ($query->num_rows() > 0) {
 					$this->_show_message(lang('server_command_update_task_exists'), site_url('admin/server_control/main/' . $server_id));
 					return false;
 				}
@@ -657,7 +657,7 @@ class Server_control extends CI_Controller {
 		$where = array('id' => $task_id);
 		$query = $this->db->get_where('cron', $where, 1);
 		
-		if($query->num_rows > 0){
+		if($query->num_rows() > 0){
 			$task_list = $query->result_array();
 		} else {
 			$this->_show_message(lang('server_control_task_not_found'));
@@ -741,7 +741,7 @@ class Server_control extends CI_Controller {
 		$where = array('id' => $task_id);
 		$query = $this->db->get_where('cron', $where, 1);
 		
-		if($query->num_rows > 0){
+		if($query->num_rows() > 0){
 			$task_list = $query->result_array();
 		} else {
 			$this->_show_message(lang('server_control_task_not_found'));

@@ -95,42 +95,45 @@ class Adm_modules extends CI_Controller {
 	{
 		$this->load->helper('directory');
 		
-		if ($map = directory_map(APPPATH . 'modules')) {
+		if ($map = directory_map(APPPATH . 'modules', 2)) {
 			
 			/* Получение списка старых модулей */
 			$old_modules_list = $this->gameap_modules->get_modules_list();
 			
 			/* Очищаем список модулей из базы */
 			$this->gameap_modules->clean_modules();
-			
-			foreach($map as $key => $value) {
-				
-				if (!is_array($value)) {
+            
+			foreach($map as $mod_dir => $mod_files) {
+
+                // Trim / from end
+                $mod_dir = substr($mod_dir, 0, strlen($mod_dir)-1);
+
+				if (!is_array($mod_files)) {
 					/* Это файл */
 					continue;
 				}
 				
-				if (!is_dir(APPPATH . 'modules/' . $key)) {
+				if (!is_dir(APPPATH . 'modules/' . $mod_dir)) {
 					/* Это не директория */
 					continue;
 				}
 				
 				/* Если модуль небыл установлен до этого и существуют правила установки */
-				if (!in_array($key, $old_modules_list) && file_exists(APPPATH . 'modules/' . $key . '/module_install.php')) {
+				if (!in_array($mod_dir, $old_modules_list) && file_exists(APPPATH . 'modules/' . $mod_dir . '/module_install.php')) {
 					/* Инклудим файл с правилами установки */
-					include_once APPPATH . 'modules/' . $key . '/module_install.php';
+					include_once APPPATH . 'modules/' . $mod_dir . '/module_install.php';
 				}
 				
 				/* Поиск файла с информацией о модулей */
-				if (file_exists(APPPATH . 'modules/' . $key . '/module_info.php')) {
+				if (file_exists(APPPATH . 'modules/' . $mod_dir . '/module_info.php')) {
 					
 					$module_info = array();
 					$sql_data = array();
 					
 					/* Инклудим файл с инфой */
-					include_once APPPATH . 'modules/' . $key . '/module_info.php';
+					include_once APPPATH . 'modules/' . $mod_dir . '/module_info.php';
 					
-					$sql_data['short_name'] 	= $key;
+					$sql_data['short_name'] 	= $mod_dir;
 					$sql_data['name']			= (isset($module_info['name'])) 		? $module_info['name'] : '';
 					$sql_data['description']	= (isset($module_info['description'])) 	? $module_info['description'] : '';
 					$sql_data['cron_script']	= (isset($module_info['cron_script'])) 	? $module_info['cron_script'] : '';
@@ -148,6 +151,7 @@ class Adm_modules extends CI_Controller {
 					
 				}
 			}
+            
 			return true;
 		} else {
 			return false;
