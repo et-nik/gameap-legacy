@@ -19,4 +19,5 @@ echo FILE_CONTENTS >> /home/travis/build/ET-NiK/GameAP/Files/File02.txt
 sudo chmod 666 /home/travis/build/ET-NiK/GameAP/Files/File01.txt
 sudo chmod 666 /home/travis/build/ET-NiK/GameAP/Files/File02.txt
 
+pwd
 phpunit --configuration tests/phpunit.xml 
