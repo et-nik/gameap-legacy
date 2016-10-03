@@ -9,23 +9,24 @@
 $active_group = 'default';
 $active_record = TRUE;
 
-$db['default']['hostname'] = 'localhost';
-$db['default']['username'] = $GLOBALS['db_username'];
-$db['default']['password'] = $GLOBALS['db_password'];
-$db['default']['database'] = 'gameap_test';
-$db['default']['dbdriver'] = 'mysqli';
-$db['default']['dbprefix'] = 'gameap_';
+$db['default']['dsn']       = $GLOBALS['db_dsn'];
+$db['default']['hostname']  = 'localhost';
+$db['default']['username']  = $GLOBALS['db_username'];
+$db['default']['password']  = $GLOBALS['db_password'];
+$db['default']['database']  = 'gameap_test';
+$db['default']['dbdriver']  = getenv('DB');
+$db['default']['dbprefix']  = 'gameap_';
 
 /* Расширенные настройки (если всё нормально работает, то оставьте как есть)*/
-$db['default']['pconnect'] = TRUE;
-$db['default']['db_debug'] = TRUE;
-$db['default']['cache_on'] = FALSE;
-$db['default']['cachedir'] = '';
-$db['default']['char_set'] = 'utf8';
-$db['default']['dbcollat'] = 'utf8_general_ci';
-$db['default']['swap_pre'] = '';
-$db['default']['autoinit'] = TRUE;
-$db['default']['stricton'] = FALSE;
+$db['default']['pconnect']  = TRUE;
+$db['default']['db_debug']  = TRUE;
+$db['default']['cache_on']  = FALSE;
+$db['default']['cachedir']  = '';
+$db['default']['char_set']  = 'utf8';
+$db['default']['dbcollat']  = 'utf8_general_ci';
+$db['default']['swap_pre']  = '';
+$db['default']['autoinit']  = TRUE;
+$db['default']['stricton']  = FALSE;
 
 /*
 | -------------------------------------------------------------------
