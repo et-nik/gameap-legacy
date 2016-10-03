@@ -2,7 +2,7 @@
 /**
  * @group Controller
  */
-class AAATest_Test extends CIUnit_TestCase
+class Install_Test extends CIUnit_TestCase
 {
     public function setUp()
     {

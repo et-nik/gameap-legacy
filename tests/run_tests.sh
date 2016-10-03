@@ -19,8 +19,11 @@ echo FILE_CONTENTS >> /home/travis/build/ET-NiK/GameAP/Files/File02.txt
 sudo chmod 666 /home/travis/build/ET-NiK/GameAP/Files/File01.txt
 sudo chmod 666 /home/travis/build/ET-NiK/GameAP/Files/File02.txt
 
+phpunit --version
+
 mv /home/travis/build/ET-NiK/GameAP/tests/Test.php /home/travis/build/ET-NiK/GameAP/upload/application/controllers/Test.php
+phpunit --configuration /home/travis/build/ET-NiK/GameAP/tests/phpunit-dbinst.xml
+
 mv /home/travis/build/ET-NiK/GameAP/tests/database.php /home/travis/build/ET-NiK/GameAP/upload/application/config/database.php
 
-phpunit --version
 phpunit --configuration /home/travis/build/ET-NiK/GameAP/tests/phpunit.xml
