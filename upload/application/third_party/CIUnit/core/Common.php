@@ -1,24 +1,41 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-/**
- * Changed some things in here for CIUnit
- */
-
-
+<?php
 /**
  * CodeIgniter
  *
- * An open source application development framework for PHP 5.1.6 or newer
+ * An open source application development framework for PHP
  *
- * @package     CodeIgniter
- * @author      ExpressionEngine Dev Team
- * @copyright   Copyright (c) 2008 - 2011, EllisLab, Inc.
- * @license     http://codeigniter.com/user_guide/license.html
- * @link        http://codeigniter.com
- * @since       Version 1.0
+ * This content is released under the MIT License (MIT)
+ *
+ * Copyright (c) 2014 - 2015, British Columbia Institute of Technology
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @package CodeIgniter
+ * @author  EllisLab Dev Team
+ * @copyright   Copyright (c) 2008 - 2014, EllisLab, Inc. (http://ellislab.com/)
+ * @copyright   Copyright (c) 2014 - 2015, British Columbia Institute of Technology (http://bcit.ca/)
+ * @license http://opensource.org/licenses/MIT  MIT License
+ * @link    http://codeigniter.com
+ * @since   Version 1.0.0
  * @filesource
  */
-
-// ------------------------------------------------------------------------
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
  * Common Functions
@@ -26,74 +43,76 @@
  * Loads the base classes and executes the request.
  *
  * @package     CodeIgniter
- * @subpackage  codeigniter
+ * @subpackage  CodeIgniter
  * @category    Common Functions
- * @author      ExpressionEngine Dev Team
+ * @author      EllisLab Dev Team
  * @link        http://codeigniter.com/user_guide/
  */
 
 // ------------------------------------------------------------------------
 
-/**
-* Determines if the current version of PHP is greater then the supplied value
-*
-* Since there are a few places where we conditionally test for PHP > 5
-* we'll set a static variable.
-*
-* @access   public
-* @param    string
-* @return   bool    TRUE if the current version is $version or higher
-*/
-    function is_php($version = '5.0.0')
+if ( ! function_exists('is_php'))
+{
+    /**
+     * Determines if the current version of PHP is equal to or greater than the supplied value
+     *
+     * @param   string
+     * @return  bool    TRUE if the current version is $version or higher
+     */
+    function is_php($version)
     {
         static $_is_php;
-        $version = (string)$version;
+        $version = (string) $version;
 
         if ( ! isset($_is_php[$version]))
         {
-            $_is_php[$version] = (version_compare(PHP_VERSION, $version) < 0) ? FALSE : TRUE;
+            $_is_php[$version] = version_compare(PHP_VERSION, $version, '>=');
         }
 
         return $_is_php[$version];
     }
+}
 
 // ------------------------------------------------------------------------
 
-/**
- * Tests for file writability
- *
- * is_writable() returns TRUE on Windows servers when you really can't write to
- * the file, based on the read-only attribute.  is_writable() is also unreliable
- * on Unix servers if safe_mode is on.
- *
- * @access  private
- * @return  void
- */
+if ( ! function_exists('is_really_writable'))
+{
+    /**
+     * Tests for file writability
+     *
+     * is_writable() returns TRUE on Windows servers when you really can't write to
+     * the file, based on the read-only attribute. is_writable() is also unreliable
+     * on Unix servers if safe_mode is on.
+     *
+     * @link    https://bugs.php.net/bug.php?id=54709
+     * @param   string
+     * @return  bool
+     */
     function is_really_writable($file)
     {
         // If we're on a Unix server with safe_mode off we call is_writable
-        if (DIRECTORY_SEPARATOR == '/' AND @ini_get("safe_mode") == FALSE)
+        if (DIRECTORY_SEPARATOR === '/' && (is_php('5.4') OR ! ini_get('safe_mode')))
         {
             return is_writable($file);
         }
 
-        // For windows servers and safe_mode "on" installations we'll actually
-        // write a file then read it.  Bah...
+        /* For Windows servers and safe_mode "on" installations we'll actually
+         * write a file then read it. Bah...
+         */
         if (is_dir($file))
         {
-            $file = rtrim($file, '/').'/'.md5(mt_rand(1,100).mt_rand(1,100));
-
-            if (($fp = @fopen($file, FOPEN_WRITE_CREATE)) === FALSE)
+            $file = rtrim($file, '/').'/'.md5(mt_rand());
+            if (($fp = @fopen($file, 'ab')) === FALSE)
             {
                 return FALSE;
             }
 
             fclose($fp);
-            @chmod($file, DIR_WRITE_MODE);
+            @chmod($file, 0777);
             @unlink($file);
             return TRUE;
         }
-        elseif (($fp = @fopen($file, FOPEN_WRITE_CREATE)) === FALSE)
+        elseif ( ! is_file($file) OR ($fp = @fopen($file, 'ab')) === FALSE)
         {
             return FALSE;
         }
@@ -101,27 +120,29 @@
         fclose($fp);
         return TRUE;
     }
+}
 
 // ------------------------------------------------------------------------
 
-/**
-* Class registry
-*
-* This function acts as a singleton.  If the requested class does not
-* exist it is instantiated and set to a static variable.  If it has
-* previously been instantiated the variable is returned.
-*
-* @access   public
-* @param    string  the class name being requested
-* @param    string  the directory where the class should be found
-* @param    string  the class name prefix
-* @return   object
-*/
-    function &load_class($class, $directory = 'libraries', $prefix = 'CI_')
+if ( ! function_exists('load_class'))
+{
+    /**
+     * Class registry
+     *
+     * This function acts as a singleton. If the requested class does not
+     * exist it is instantiated and set to a static variable. If it has
+     * previously been instantiated the variable is returned.
+     *
+     * @param   string  the class name being requested
+     * @param   string  the directory where the class should be found
+     * @param   string  an optional argument to pass to the class constructor
+     * @return  object
+     */
+    function &load_class($class, $directory = 'libraries', $param = NULL)
     {
         static $_classes = array();
 
-        // Does the class exist?  If so, we're done...
+        // Does the class exist? If so, we're done...
         if (isset($_classes[$class]))
         {
             return $_classes[$class];
@@ -129,43 +150,42 @@
 
         $name = FALSE;
 
-        // Look for the class first in the native system/libraries folder
-        // thenin the local application/libraries folder
-        // then in the ciunit/core folder
+        // Look for the class first in the local application/libraries folder
+        // then in the native system/libraries folder
         foreach (array(BASEPATH, APPPATH, CIUPATH) as $path)
         {
-            if (file_exists($path.$directory.'/'.$class.EXT))
+            if (file_exists($path.$directory.'/'.$class.'.php'))
             {
-                $name = $prefix.$class;
+                $name = 'CI_'.$class;
 
-                if (class_exists($name) === FALSE)
+                if (class_exists($name, FALSE) === FALSE)
                 {
-                    require($path.$directory.'/'.$class.EXT);
+                    require_once($path.$directory.'/'.$class.'.php');
                 }
 
                 break;
             }
         }
 
-        // Is the request a class extension?  If so we load it too
-        if (file_exists(APPPATH.$directory.'/'.config_item('subclass_prefix').$class.EXT))
+        // Is the request a class extension? If so we load it too
+        if (file_exists(APPPATH.$directory.'/'.config_item('subclass_prefix').$class.'.php'))
         {
             $name = config_item('subclass_prefix').$class;
 
-            if (class_exists($name) === FALSE)
+            if (class_exists($name, FALSE) === FALSE)
             {
-                require(APPPATH.$directory.'/'.config_item('subclass_prefix').$class.EXT);
+                require_once(APPPATH.$directory.'/'.$name.'.php');
             }
         }
 
         // Does the class have a CIU class extension?
-        if (file_exists(CIUPATH.'/core/'.config_item('ciu_subclass_prefix').$class.EXT))
+        if (file_exists(CIUPATH.'/core/'.config_item('ciu_subclass_prefix').$class.'.php'))
         {
             $name = config_item('ciu_subclass_prefix').$class;
 
             if (class_exists($name) === FALSE)
             {
-                require(CIUPATH.'/core/'.config_item('ciu_subclass_prefix').$class.EXT);
+                require(CIUPATH.'/core/'.config_item('ciu_subclass_prefix').$class.'.php');
             }
         }
 
@@ -174,49 +194,57 @@
         {
             // Note: We use exit() rather then show_error() in order to avoid a
             // self-referencing loop with the Excptions class
-            exit('Unable to locate the specified class: '.$class.EXT);
+            exit('Unable to locate the specified class: '.$class.'.php');
         }
 
         // Keep track of what we just loaded
         is_loaded($class);
 
-        $_classes[$class] = new $name();
+        $_classes[$class] = isset($param)
+            ? new $name($param)
+            : new $name();
         return $_classes[$class];
     }
+}
 
 // --------------------------------------------------------------------
 
-/**
-* Keeps track of which libraries have been loaded.  This function is
-* called by the load_class() function above
-*
-* @access   public
-* @return   array
-*/
+if ( ! function_exists('is_loaded'))
+{
+    /**
+     * Keeps track of which libraries have been loaded. This function is
+     * called by the load_class() function above
+     *
+     * @param   string
+     * @return  array
+     */
     function is_loaded($class = '')
     {
         static $_is_loaded = array();
 
-        if ($class != '')
+        if ($class !== '')
         {
             $_is_loaded[strtolower($class)] = $class;
         }
 
         return $_is_loaded;
     }
+}
 
 // ------------------------------------------------------------------------
 
-/**
-* Loads the main config.php file
-*
-* This function lets us grab the config file even if the Config class
-* hasn't been instantiated yet
-*
-* @access   private
-* @return   array
-*/
-    function &get_config($replace = array())
+if ( ! function_exists('get_config'))
+{
+    /**
+     * Loads the main config.php file
+     *
+     * This function lets us grab the config file even if the Config class
+     * hasn't been instantiated yet
+     *
+     * @param   array
+     * @return  array
+     */
+    function &get_config(Array $replace = array())
     {
         static $_config;
 
@@ -226,23 +254,23 @@
         }
 
         // Fetch the config file
-        if ( ! file_exists(APPPATH.'config/config'.EXT))
+        if ( ! file_exists(APPPATH.'config/config.php'))
         {
             exit('The configuration file does not exist.');
         }
         else
         {
-            require(APPPATH.'config/config'.EXT);
+            require(APPPATH.'config/config.php');
         }
 
         // Fetch the CIU config file
-        if ( ! file_exists(CIUPATH .'config/config'.EXT))
+        if ( ! file_exists(CIUPATH .'config/config.php'))
         {
             exit('The configuration file does not exist.');
         }
         else
         {
-            require(CIUPATH.'config/config'.EXT);
+            require(CIUPATH.'config/config.php');
         }
 
         // Does the $config array exist in the file?
@@ -263,35 +291,33 @@
             }
         }
 
-        $_config[0] =& $config;
-        return $config;
+        return $_config[0] =& $config;
     }
+}
 
 // ------------------------------------------------------------------------
 
-/**
-* Returns the specified config item
-*
-* @access   public
-* @return   mixed
-*/
+if ( ! function_exists('config_item'))
+{
+    /**
+     * Returns the specified config item
+     *
+     * @param   string
+     * @return  mixed
+     */
     function config_item($item)
     {
-        static $_config_item = array();
+        static $_config;
 
-        if ( ! isset($_config_item[$item]))
+        if (empty($_config))
         {
-            $config =& get_config();
-
-            if ( ! isset($config[$item]))
-            {
-                return FALSE;
-            }
-            $_config_item[$item] = $config[$item];
+            // references cannot be directly assigned to static variables, so we use an array
+            $_config[0] =& get_config();
         }
 
-        return $_config_item[$item];
+        return isset($_config[0][$item]) ? $_config[0][$item] : NULL;
     }
+}
 
 // ------------------------------------------------------------------------
 
@@ -304,15 +330,22 @@ if ( ! function_exists('get_mimes'))
      */
     function &get_mimes()
     {
-        static $_mimes = array();
+        static $_mimes;
 
-        if (defined('ENVIRONMENT') && is_file(APPPATH.'config/'.ENVIRONMENT.'/mimes.php'))
+        if (empty($_mimes))
         {
-            $_mimes = include(APPPATH.'config/'.ENVIRONMENT.'/mimes.php');
-        }
-        elseif (is_file(APPPATH.'config/mimes.php'))
-        {
-            $_mimes = include(APPPATH.'config/mimes.php');
+            if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/mimes.php'))
+            {
+                $_mimes = include(APPPATH.'config/'.ENVIRONMENT.'/mimes.php');
+            }
+            elseif (file_exists(APPPATH.'config/mimes.php'))
+            {
+                $_mimes = include(APPPATH.'config/mimes.php');
+            }
+            else
+            {
+                $_mimes = array();
+            }
         }
 
         return $_mimes;
@@ -333,176 +366,225 @@ if ( ! function_exists('is_https'))
      */
     function is_https()
     {
-        return ( ! empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off');
+        if ( ! empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
+        {
+            return TRUE;
+        }
+        elseif (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+        {
+            return TRUE;
+        }
+        elseif ( ! empty($_SERVER['HTTP_FRONT_END_HTTPS']) && strtolower($_SERVER['HTTP_FRONT_END_HTTPS']) !== 'off')
+        {
+            return TRUE;
+        }
+
+        return FALSE;
+    }
+}
+
+// ------------------------------------------------------------------------
+
+if ( ! function_exists('is_cli'))
+{
+
+    /**
+     * Is CLI?
+     *
+     * Test to see if a request was made from the command line.
+     *
+     * @return  bool
+     */
+    function is_cli()
+    {
+        return (PHP_SAPI === 'cli' OR defined('STDIN'));
     }
 }
 
 
 // ------------------------------------------------------------------------
 
-/**
-* Error Handler
-*
-* This function lets us invoke the exception class and
-* display errors using the standard error template located
-* in application/errors/errors.php
-* This function will send the error page directly to the
-* browser and exit.
-*
-* @access   public
-* @return   void
-*/
+if ( ! function_exists('show_error'))
+{
+    /**
+     * Error Handler
+     *
+     * This function lets us invoke the exception class and
+     * display errors using the standard error template located
+     * in application/views/errors/error_general.php
+     * This function will send the error page directly to the
+     * browser and exit.
+     *
+     * @param   string
+     * @param   int
+     * @param   string
+     * @return  void
+     */
     function show_error($message, $status_code = 500, $heading = 'An Error Was Encountered')
     {
         $_error =& load_class('Exceptions', 'core');
         echo $_error->show_error($heading, $message, 'error_general', $status_code);
         exit;
     }
+}
 
 // ------------------------------------------------------------------------
 
-/**
-* 404 Page Handler
-*
-* This function is similar to the show_error() function above
-* However, instead of the standard error template it displays
-* 404 errors.
-*
-* @access   public
-* @return   void
-*/
+if ( ! function_exists('show_404'))
+{
+    /**
+     * 404 Page Handler
+     *
+     * This function is similar to the show_error() function above
+     * However, instead of the standard error template it displays
+     * 404 errors.
+     *
+     * @param   string
+     * @param   bool
+     * @return  void
+     */
     function show_404($page = '', $log_error = TRUE)
     {
         $_error =& load_class('Exceptions', 'core');
         $_error->show_404($page, $log_error);
-        exit;
+        exit(4); // EXIT_UNKNOWN_FILE
     }
+}
 
 // ------------------------------------------------------------------------
 
-/**
-* Error Logging Interface
-*
-* We use this as a simple mechanism to access the logging
-* class and send messages to be logged.
-*
-* @access   public
-* @return   void
-*/
-    function log_message($level = 'error', $message, $php_error = FALSE)
+if ( ! function_exists('log_message'))
+{
+    /**
+     * Error Logging Interface
+     *
+     * We use this as a simple mechanism to access the logging
+     * class and send messages to be logged.
+     *
+     * @param   string  the error level: 'error', 'debug' or 'info'
+     * @param   string  the error message
+     * @return  void
+     */
+    function log_message($level, $message)
     {
         static $_log;
 
-        if (config_item('log_threshold') == 0)
+        if ($_log === NULL)
+        {
+            // references cannot be directly assigned to static variables, so we use an array
+            $_log[0] =& load_class('Log', 'core');
+        }
+
+        $_log[0]->write_log($level, $message);
+    }
+}
+
+// ------------------------------------------------------------------------
+
+if ( ! function_exists('set_status_header'))
+{
+    /**
+     * Set HTTP Status Header
+     *
+     * @param   int the status code
+     * @param   string
+     * @return  void
+     */
+    function set_status_header($code = 200, $text = '')
+    {
+        if (is_cli())
         {
             return;
         }
 
-        $_log =& load_class('Log');
-        $_log->write_log($level, $message, $php_error);
-    }
-
-// ------------------------------------------------------------------------
-
-/**
- * Set HTTP Status Header
- *
- * @access  public
- * @param   int     the status code
- * @param   string
- * @return  void
- */
-    function set_status_header($code = 200, $text = '')
-    {
-        $stati = array(
-                            200 => 'OK',
-                            201 => 'Created',
-                            202 => 'Accepted',
-                            203 => 'Non-Authoritative Information',
-                            204 => 'No Content',
-                            205 => 'Reset Content',
-                            206 => 'Partial Content',
-
-                            300 => 'Multiple Choices',
-                            301 => 'Moved Permanently',
-                            302 => 'Found',
-                            304 => 'Not Modified',
-                            305 => 'Use Proxy',
-                            307 => 'Temporary Redirect',
-
-                            400 => 'Bad Request',
-                            401 => 'Unauthorized',
-                            403 => 'Forbidden',
-                            404 => 'Not Found',
-                            405 => 'Method Not Allowed',
-                            406 => 'Not Acceptable',
-                            407 => 'Proxy Authentication Required',
-                            408 => 'Request Timeout',
-                            409 => 'Conflict',
-                            410 => 'Gone',
-                            411 => 'Length Required',
-                            412 => 'Precondition Failed',
-                            413 => 'Request Entity Too Large',
-                            414 => 'Request-URI Too Long',
-                            415 => 'Unsupported Media Type',
-                            416 => 'Requested Range Not Satisfiable',
-                            417 => 'Expectation Failed',
-
-                            500 => 'Internal Server Error',
-                            501 => 'Not Implemented',
-                            502 => 'Bad Gateway',
-                            503 => 'Service Unavailable',
-                            504 => 'Gateway Timeout',
-                            505 => 'HTTP Version Not Supported'
-                        );
-
-        if ($code == '' OR ! is_numeric($code))
+        if (empty($code) OR ! is_numeric($code))
         {
             show_error('Status codes must be numeric', 500);
         }
 
-        if (isset($stati[$code]) AND $text == '')
+        if (empty($text))
         {
-            $text = $stati[$code];
+            is_int($code) OR $code = (int) $code;
+            $stati = array(
+                200 => 'OK',
+                201 => 'Created',
+                202 => 'Accepted',
+                203 => 'Non-Authoritative Information',
+                204 => 'No Content',
+                205 => 'Reset Content',
+                206 => 'Partial Content',
+
+                300 => 'Multiple Choices',
+                301 => 'Moved Permanently',
+                302 => 'Found',
+                303 => 'See Other',
+                304 => 'Not Modified',
+                305 => 'Use Proxy',
+                307 => 'Temporary Redirect',
+
+                400 => 'Bad Request',
+                401 => 'Unauthorized',
+                403 => 'Forbidden',
+                404 => 'Not Found',
+                405 => 'Method Not Allowed',
+                406 => 'Not Acceptable',
+                407 => 'Proxy Authentication Required',
+                408 => 'Request Timeout',
+                409 => 'Conflict',
+                410 => 'Gone',
+                411 => 'Length Required',
+                412 => 'Precondition Failed',
+                413 => 'Request Entity Too Large',
+                414 => 'Request-URI Too Long',
+                415 => 'Unsupported Media Type',
+                416 => 'Requested Range Not Satisfiable',
+                417 => 'Expectation Failed',
+                422 => 'Unprocessable Entity',
+
+                500 => 'Internal Server Error',
+                501 => 'Not Implemented',
+                502 => 'Bad Gateway',
+                503 => 'Service Unavailable',
+                504 => 'Gateway Timeout',
+                505 => 'HTTP Version Not Supported'
+            );
+
+            if (isset($stati[$code]))
+            {
+                $text = $stati[$code];
+            }
+            else
+            {
+                show_error('No status text available. Please check your status code number or supply your own message text.', 500);
+            }
         }
 
-        if ($text == '')
+        if (strpos(PHP_SAPI, 'cgi') === 0)
         {
-            show_error('No status text available.  Please check your status code number or supply your own message text.', 500);
-        }
-
-        $server_protocol = (isset($_SERVER['SERVER_PROTOCOL'])) ? $_SERVER['SERVER_PROTOCOL'] : FALSE;
-
-        if (substr(php_sapi_name(), 0, 3) == 'cgi')
-        {
-            header("Status: {$code} {$text}", TRUE);
-        }
-        elseif ($server_protocol == 'HTTP/1.1' OR $server_protocol == 'HTTP/1.0')
-        {
-            header($server_protocol." {$code} {$text}", TRUE, $code);
+            header('Status: '.$code.' '.$text, TRUE);
         }
         else
         {
-            header("HTTP/1.1 {$code} {$text}", TRUE, $code);
+            $server_protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+            header($server_protocol.' '.$code.' '.$text, TRUE, $code);
         }
     }
+}
 
 // --------------------------------------------------------------------
 
-/**
-* Exception Handler
-*
-* This is the custom exception handler that is declaired at the top
-* of Codeigniter.php.  The main reason we use this is to permit
-* PHP errors to be logged in our own log files since the user may
-* not have access to server logs. Since this function
-* effectively intercepts PHP errors, however, we also need
-* to display errors based on the current error_reporting level.
-* We do that with the use of a PHP error template.
-*
-* @access   private
-* @return   void
-*/
+if ( ! function_exists('_exception_handler'))
+{
+    /**
+     * Exception Handler
+     *
+     * Sends uncaught exceptions to the logger and displays them
+     * only if display_errors is On so that they don't show up in
+     * production environments.
+     *
+     * @param   Exception   $exception
+     * @return  void
+     */
     function _exception_handler($severity, $message, $filepath, $line)
     {
          // We don't bother with "strict" notices since they tend to fill up
@@ -532,150 +614,41 @@ if ( ! function_exists('is_https'))
 
         $_error->log_exception($severity, $message, $filepath, $line);
     }
+}
+// --------------------------------------------------------------------
 
-    // --------------------------------------------------------------------
-
+if ( ! function_exists('remove_invisible_characters'))
+{
     /**
      * Remove Invisible Characters
      *
      * This prevents sandwiching null characters
      * between ascii characters, like Java\0script.
      *
-     * @access  public
      * @param   string
-     * @return  string
-     */
-    function remove_invisible_characters($str)
-    {
-        static $non_displayables;
-
-        if ( ! isset($non_displayables))
-        {
-            // every control character except newline (dec 10), carriage return (dec 13), and horizontal tab (dec 09),
-            $non_displayables = array(
-                                        '/%0[0-8bcef]/',            // url encoded 00-08, 11, 12, 14, 15
-                                        '/%1[0-9a-f]/',             // url encoded 16-31
-                                        '/[\x00-\x08]/',            // 00-08
-                                        '/\x0b/', '/\x0c/',         // 11, 12
-                                        '/[\x0e-\x1f]/'             // 14-31
-                                    );
-        }
-
-        do
-        {
-            $cleaned = $str;
-            $str = preg_replace($non_displayables, '', $str);
-        }
-        while ($cleaned != $str);
-
-        return $str;
-    }
-
-
-// ------------------------------------------------------------------------
-
-if ( ! function_exists('html_escape'))
-{
-    /**
-     * Returns HTML escaped variable
-     *
-     * @param   mixed
-     * @return  mixed
-     */
-    function html_escape($var)
-    {
-        return is_array($var)
-            ? array_map('html_escape', $var)
-            : htmlspecialchars($var, ENT_QUOTES, config_item('charset'));
-    }
-}
-
-// ------------------------------------------------------------------------
-
-if ( ! function_exists('_stringify_attributes'))
-{
-    /**
-     * Stringify attributes for use in HTML tags.
-     *
-     * Helper function used to convert a string, array, or object
-     * of attributes to a string.
-     *
-     * @param   mixed   string, array, object
      * @param   bool
      * @return  string
      */
-    function _stringify_attributes($attributes, $js = FALSE)
+    function remove_invisible_characters($str, $url_encoded = TRUE)
     {
-        $atts = NULL;
+        $non_displayables = array();
 
-        if (empty($attributes))
+        // every control character except newline (dec 10),
+        // carriage return (dec 13) and horizontal tab (dec 09)
+        if ($url_encoded)
         {
-            return $atts;
+            $non_displayables[] = '/%0[0-8bcef]/';  // url encoded 00-08, 11, 12, 14, 15
+            $non_displayables[] = '/%1[0-9a-f]/';   // url encoded 16-31
         }
 
-        if (is_string($attributes))
+        $non_displayables[] = '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/S';   // 00-08, 11, 12, 14-31, 127
+
+        do
         {
-            return ' '.$attributes;
+            $str = preg_replace($non_displayables, '', $str, -1, $count);
         }
+        while ($count);
 
-        $attributes = (array) $attributes;
-
-        foreach ($attributes as $key => $val)
-        {
-            $atts .= ($js) ? $key.'='.$val.',' : ' '.$key.'="'.$val.'"';
-        }
-
-        return rtrim($atts, ',');
+        return $str;
     }
 }
-
-// ------------------------------------------------------------------------
-
-if ( ! function_exists('function_usable'))
-{
-    /**
-     * Function usable
-     *
-     * Executes a function_exists() check, and if the Suhosin PHP
-     * extension is loaded - checks whether the function that is
-     * checked might be disabled in there as well.
-     *
-     * This is useful as function_exists() will return FALSE for
-     * functions disabled via the *disable_functions* php.ini
-     * setting, but not for *suhosin.executor.func.blacklist* and
-     * *suhosin.executor.disable_eval*. These settings will just
-     * terminate script execution if a disabled function is executed.
-     *
-     * @link    http://www.hardened-php.net/suhosin/
-     * @param   string  $function_name  Function to check for
-     * @return  bool    TRUE if the function exists and is safe to call,
-     *          FALSE otherwise.
-     */
-    function function_usable($function_name)
-    {
-        static $_suhosin_func_blacklist;
-
-        if (function_exists($function_name))
-        {
-            if ( ! isset($_suhosin_func_blacklist))
-            {
-                $_suhosin_func_blacklist = extension_loaded('suhosin')
-                    ? array()
-                    : explode(',', trim(@ini_get('suhosin.executor.func.blacklist')));
-
-                if ( ! in_array('eval', $_suhosin_func_blacklist, TRUE) && @ini_get('suhosin.executor.disable_eval'))
-                {
-                    $_suhosin_func_blacklist[] = 'eval';
-                }
-            }
-
-            return in_array($function_name, $_suhosin_func_blacklist, TRUE);
-        }
-
-        return FALSE;
-    }
-}
-
-
-/* End of file Common.php */
-/* Location: ./system/core/Common.php */

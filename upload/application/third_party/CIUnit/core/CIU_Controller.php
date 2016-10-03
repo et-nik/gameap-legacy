@@ -1,14 +1,10 @@
 <?php
-
-if (! defined('BASEPATH')) {
-    exit('No direct script access');
-}
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 class CIU_Controller extends CI_Controller {
-    
+
     public function index()
     {
         return;
     }
-    
 }

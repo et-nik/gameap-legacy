@@ -41,7 +41,7 @@ class CIUnit {
 
     public static $spyc;
     public static $fixture;
-    
+
     /**
      * If this class is suppose to be a Singleton shouldn't the constructor be private?
      * Correct me if I am wrong but this doesn't prevent multiple instances of this class.
@@ -58,8 +58,12 @@ class CIUnit {
 
     public static function &set_controller($controller = 'CI_Controller', $path=FALSE)
     {
-        $controller_name = array_pop(explode('/', $controller));
-        //echo "\nc name ".$controller_name;
+        // Convert controller name to ucfirst.
+        $controller      = explode('/', $controller);
+        $controller_name = ucfirst(end($controller));
+        $controller[count($controller)-1] = $controller_name;
+        $controller      = implode('/', $controller);
+        // echo "\nc name ".$controller_name;
         //is it the current controller?
         if ($controller_name == self::$current)
         {
@@ -68,13 +72,13 @@ class CIUnit {
             output(); viewvars();
             return self::$controller;
         }
-        
+
         // the current controller must be archieved before littered
         //$loader = &load_class('Loader', 'core');
-        
+
         //echo 'Var Dump of self::$controllers -- ';
         //var_dump(self::$controllers);
-        
+
         /*
         =========================================================
         I don't understand this section of code.
@@ -90,7 +94,7 @@ class CIUnit {
             //'components' => $loader->_ci_components,
             //'classes' => $loader->_ci_classes
         }
-        
+
         ===================================================
         I don't understand why this code is clearing out
         all the loaded components such as autoloaded models
@@ -104,13 +108,13 @@ class CIUnit {
         //reset saved queries
         self::$controller->db->queries = array();
         */
-        
+
         //clean output / viewvars as well;
         if ( isset(self::$controller->output) )
         {
             output(); viewvars();
         }
-        
+
         //the requested controller was loaded before?
         if ( isset(self::$controllers[$controller_name]) )
         {
@@ -129,30 +133,30 @@ class CIUnit {
             //it was not loaded before
             if (!class_exists($controller_name))
             {
-                if ($path && file_exists($path . $controller . EXT))
+                if ($path && file_exists($path . $controller . '.php'))
                 {
-                     include_once($path . $controller . EXT);
+                     include_once($path . $controller . '.php');
                 }
                 else
                 {
-                    include_once(APPPATH . 'controllers/' . $controller . EXT);
+                    include_once(APPPATH . 'controllers/' . $controller . '.php');
                 }
             }
-            
+
             self::$current = new $controller_name;
-            
+
             self::$controllers[$controller_name] = Array(
                                                    'address' => new $controller_name(),
                                                    'models' => array()
                                                    );
-            self::$controller = &self::$controllers[$controller_name]['address'];                                                   
+            self::$controller = &self::$controllers[$controller_name]['address'];
         }
-        
+
 //        var_dump(self::$controllers); die();
-        
-        
+
+
 //        var_dump(self::$controller); die();
-        
+
         //CI_Base::$instance = &self::$controller; //so get_instance() provides the correct controller
         return self::$controller;
     }
