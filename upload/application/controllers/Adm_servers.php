@@ -420,22 +420,22 @@ class Adm_servers extends CI_Controller {
 					$tpl_file_add = 'adm_servers/dedicated_servers_add.html';
 					
 					/* Проверка формы */
-					$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('os', lang('os'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('location', lang('adm_servers_location'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('provider', lang('adm_servers_provider'), 'trim|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('ip', lang('ip'), 'trim|required|xss_clean');
-					$this->form_validation->set_rules('ram', lang('adm_servers_ram'), 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('cpu', lang('adm_servers_cpu'), 'trim|max_length[64]|xss_clean');
-					$this->form_validation->set_rules('steamcmd_path', lang('adm_servers_steamcmd_path'), 'trim|max_length[256]|xss_clean');
-					$this->form_validation->set_rules('script_path', lang('adm_servers_script_path'), 'trim|max_length[256]|xss_clean');
+					$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]');
+					$this->form_validation->set_rules('os', lang('os'), 'trim|required|max_length[64]|min_length[3]');
+					$this->form_validation->set_rules('location', lang('adm_servers_location'), 'trim|required|max_length[64]|min_length[3]');
+					$this->form_validation->set_rules('provider', lang('adm_servers_provider'), 'trim|max_length[64]|min_length[3]');
+					$this->form_validation->set_rules('ip', lang('ip'), 'trim|required');
+					$this->form_validation->set_rules('ram', lang('adm_servers_ram'), 'trim|max_length[64]');
+					$this->form_validation->set_rules('cpu', lang('adm_servers_cpu'), 'trim|max_length[64]');
+					$this->form_validation->set_rules('steamcmd_path', lang('adm_servers_steamcmd_path'), 'trim|max_length[256]');
+					$this->form_validation->set_rules('script_path', lang('adm_servers_script_path'), 'trim|max_length[256]');
 					
-					$this->form_validation->set_rules('gdaemon_host', lang('adm_servers_gdaemon_host'), 'trim|max_length[64]|xss_clean');
-                    $this->form_validation->set_rules('gdaemon_privkey', lang('adm_servers_gdaemon_privkey'), 'trim|max_length[64]|xss_clean');
-                    $this->form_validation->set_rules('gdaemon_pubkey', lang('adm_servers_gdaemon_pubkey'), 'trim|max_length[64]|xss_clean');
-                    $this->form_validation->set_rules('gdaemon_keypass', lang('adm_servers_gdaemon_keypass'), 'trim|max_length[64]|xss_clean');
-                    $this->form_validation->set_rules('gdaemon_login', lang('adm_servers_gdaemon_login'), 'trim|max_length[64]|xss_clean');
-                    $this->form_validation->set_rules('gdaemon_password', lang('adm_servers_gdaemon_password'), 'trim|max_length[64]|xss_clean');
+					$this->form_validation->set_rules('gdaemon_host', lang('adm_servers_gdaemon_host'), 'trim|max_length[64]');
+                    $this->form_validation->set_rules('gdaemon_privkey', lang('adm_servers_gdaemon_privkey'), 'trim|max_length[64]');
+                    $this->form_validation->set_rules('gdaemon_pubkey', lang('adm_servers_gdaemon_pubkey'), 'trim|max_length[64]');
+                    $this->form_validation->set_rules('gdaemon_keypass', lang('adm_servers_gdaemon_keypass'), 'trim|max_length[64]');
+                    $this->form_validation->set_rules('gdaemon_login', lang('adm_servers_gdaemon_login'), 'trim|max_length[64]');
+                    $this->form_validation->set_rules('gdaemon_password', lang('adm_servers_gdaemon_password'), 'trim|max_length[64]');
 					
 					break;
 					
@@ -456,17 +456,17 @@ class Adm_servers extends CI_Controller {
 					
 					$tpl_file_add = 'adm_servers/games_add.html';
 					
-					$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[32]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('code', lang('adm_servers_game_code'), 'trim|required|is_unique[games.code]|max_length[64]|min_length[2]|xss_clean');
-					$this->form_validation->set_rules('start_code', lang('adm_servers_game_start_code'), 'trim|required|max_length[32]|min_length[2]|xss_clean');
-					$this->form_validation->set_rules('engine', lang('adm_servers_engine'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-					$this->form_validation->set_rules('engine_version', lang('adm_servers_engine_version'), 'trim|numeric|max_length[11]|xss_clean');
+					$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[32]|min_length[3]');
+					$this->form_validation->set_rules('code', lang('adm_servers_game_code'), 'trim|required|is_unique[games.code]|max_length[64]|min_length[2]');
+					$this->form_validation->set_rules('start_code', lang('adm_servers_game_start_code'), 'trim|required|max_length[32]|min_length[2]');
+					$this->form_validation->set_rules('engine', lang('adm_servers_engine'), 'trim|required|max_length[64]|min_length[3]');
+					$this->form_validation->set_rules('engine_version', lang('adm_servers_engine_version'), 'trim|numeric|max_length[11]');
 					
-					$this->form_validation->set_rules('app_id', 'app_id', 'trim|integer|max_length[32]|xss_clean');
-					$this->form_validation->set_rules('app_set_config', 'app_set_config', 'trim|max_length[32]|xss_clean');
+					$this->form_validation->set_rules('app_id', 'app_id', 'trim|integer|max_length[32]');
+					$this->form_validation->set_rules('app_set_config', 'app_set_config', 'trim|max_length[32]');
 					
-					$this->form_validation->set_rules('local_repository', lang('adm_servers_local_repository'), 'trim|xss_clean');
-					$this->form_validation->set_rules('remote_repository', lang('adm_servers_remote_repository'), 'trim|xss_clean');
+					$this->form_validation->set_rules('local_repository', lang('adm_servers_local_repository'), 'trim');
+					$this->form_validation->set_rules('remote_repository', lang('adm_servers_remote_repository'), 'trim');
 
 					break;
 				
@@ -482,8 +482,8 @@ class Adm_servers extends CI_Controller {
 					$this->tpl['title'] 	= lang('adm_servers_title_add_game_type');
 					$this->tpl['heading'] 	= lang('adm_servers_heading_add_game_type');
 					
-					$this->form_validation->set_rules('code', 'код игры', 'trim|required|max_length[64]|min_length[2]|xss_clean');
-					$this->form_validation->set_rules('name', 'название игры', 'trim|required|max_length[32]|min_length[2]|xss_clean');
+					$this->form_validation->set_rules('code', 'код игры', 'trim|required|max_length[64]|min_length[2]');
+					$this->form_validation->set_rules('name', 'название игры', 'trim|required|max_length[32]|min_length[2]');
 
 					if($tpl_list = $this->games->tpl_data_games()) {
 						$local_tpl['games_list'] = $tpl_list;
@@ -1019,32 +1019,32 @@ class Adm_servers extends CI_Controller {
 				 * http://cidocs.ru/213/libraries/form_validation.html
 				 * 
 				*/
-				$this->form_validation->set_rules('name', lang('title'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('os', lang('operationg_system'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('location', lang('adm_servers_location'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('provider', 'adm_servers_provider', 'trim|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('ip', 'IP', 'trim|required|xss_clean');
-				$this->form_validation->set_rules('ram', 'RAM', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('cpu', 'CPU', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('name', lang('title'), 'trim|required|max_length[64]|min_length[3]');
+				$this->form_validation->set_rules('os', lang('operationg_system'), 'trim|required|max_length[64]|min_length[3]');
+				$this->form_validation->set_rules('location', lang('adm_servers_location'), 'trim|required|max_length[64]|min_length[3]');
+				$this->form_validation->set_rules('provider', 'adm_servers_provider', 'trim|max_length[64]|min_length[3]');
+				$this->form_validation->set_rules('ip', 'IP', 'trim|required');
+				$this->form_validation->set_rules('ram', 'RAM', 'trim|max_length[64]');
+				$this->form_validation->set_rules('cpu', 'CPU', 'trim|max_length[64]');
 				
 				// Скрипты
-				$this->form_validation->set_rules('script_start', lang('adm_servers_command_start'), 'trim|max_length[512]|xss_clean');
-				$this->form_validation->set_rules('script_stop', lang('adm_servers_command_stop'), 'trim|max_length[512]|xss_clean');
-				$this->form_validation->set_rules('script_restart', lang('adm_servers_command_restart'), 'trim|max_length[512]|xss_clean');
-				$this->form_validation->set_rules('script_status', lang('adm_servers_command_status'), 'trim|max_length[512]|xss_clean');
-				$this->form_validation->set_rules('script_get_console', lang('adm_servers_command_get_console'), 'trim|max_length[512]|xss_clean');
-				$this->form_validation->set_rules('script_send_command', lang('adm_servers_send_command'), 'trim|max_length[512]|xss_clean');
+				$this->form_validation->set_rules('script_start', lang('adm_servers_command_start'), 'trim|max_length[512]');
+				$this->form_validation->set_rules('script_stop', lang('adm_servers_command_stop'), 'trim|max_length[512]');
+				$this->form_validation->set_rules('script_restart', lang('adm_servers_command_restart'), 'trim|max_length[512]');
+				$this->form_validation->set_rules('script_status', lang('adm_servers_command_status'), 'trim|max_length[512]');
+				$this->form_validation->set_rules('script_get_console', lang('adm_servers_command_get_console'), 'trim|max_length[512]');
+				$this->form_validation->set_rules('script_send_command', lang('adm_servers_send_command'), 'trim|max_length[512]');
 
 				// Редактирование данных доступа к серверу (пароли ftp, ssh)
-				$this->form_validation->set_rules('steamcmd_path', lang('adm_servers_steamcmd_path'), 'trim|max_length[256]|xss_clean');
-				$this->form_validation->set_rules('work_path', lang('adm_servers_work_path'), 'trim|max_length[256]|xss_clean');
+				$this->form_validation->set_rules('steamcmd_path', lang('adm_servers_steamcmd_path'), 'trim|max_length[256]');
+				$this->form_validation->set_rules('work_path', lang('adm_servers_work_path'), 'trim|max_length[256]');
 				
-				$this->form_validation->set_rules('gdaemon_host', lang('adm_servers_gdaemon_host'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('gdaemon_privkey', lang('adm_servers_gdaemon_privkey'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('gdaemon_pubkey', lang('adm_servers_gdaemon_pubkey'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('gdaemon_keypass', lang('adm_servers_gdaemon_keypass'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('gdaemon_login', lang('adm_servers_gdaemon_login'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('gdaemon_password', lang('adm_servers_gdaemon_password'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('gdaemon_host', lang('adm_servers_gdaemon_host'), 'trim|max_length[64]');
+				$this->form_validation->set_rules('gdaemon_privkey', lang('adm_servers_gdaemon_privkey'), 'trim|max_length[64]');
+				$this->form_validation->set_rules('gdaemon_pubkey', lang('adm_servers_gdaemon_pubkey'), 'trim|max_length[64]');
+				$this->form_validation->set_rules('gdaemon_keypass', lang('adm_servers_gdaemon_keypass'), 'trim|max_length[64]');
+				$this->form_validation->set_rules('gdaemon_login', lang('adm_servers_gdaemon_login'), 'trim|max_length[64]');
+				$this->form_validation->set_rules('gdaemon_password', lang('adm_servers_gdaemon_password'), 'trim|max_length[64]');
 				
 				break;
 				
@@ -1278,24 +1278,24 @@ class Adm_servers extends CI_Controller {
 				 * Правила для формы
 				 * --------------------------------------------
 				*/
-				$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
+				$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]');
 				
-				$this->form_validation->set_rules('server_ip', lang('ip'), 'trim|max_length[64]|min_length[4]|xss_clean');
-				$this->form_validation->set_rules('server_port', lang('port'), 'trim|required|integer|max_length[6]|min_length[2]|xss_clean');
-				$this->form_validation->set_rules('query_port', lang('adm_servers_query_port'), 'trim|integer|max_length[6]|min_length[2]|xss_clean');
-				$this->form_validation->set_rules('rcon_port', lang('adm_servers_rcon_port'), 'trim|integer|max_length[6]|min_length[2]|xss_clean');
+				$this->form_validation->set_rules('server_ip', lang('ip'), 'trim|max_length[64]|min_length[4]');
+				$this->form_validation->set_rules('server_port', lang('port'), 'trim|required|integer|max_length[6]|min_length[2]');
+				$this->form_validation->set_rules('query_port', lang('adm_servers_query_port'), 'trim|integer|max_length[6]|min_length[2]');
+				$this->form_validation->set_rules('rcon_port', lang('adm_servers_rcon_port'), 'trim|integer|max_length[6]|min_length[2]');
 				
-				$this->form_validation->set_rules('rcon', 'RCON password', 'trim|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('game_type', lang('adm_servers_game_type'), 'trim|required|integer|xss_clean');
-				$this->form_validation->set_rules('dir', lang('adm_servers_server_dir'), 'trim|required|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('rcon', 'RCON password', 'trim|max_length[64]|min_length[3]');
+				$this->form_validation->set_rules('game_type', lang('adm_servers_game_type'), 'trim|required|integer');
+				$this->form_validation->set_rules('dir', lang('adm_servers_server_dir'), 'trim|required|max_length[64]');
 				
-				$this->form_validation->set_rules('screen_name', lang('adm_servers_screen_name'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('su_user', lang('adm_servers_user_start'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('start_command', lang('adm_servers_command_start'), 'trim|max_length[1024]|xss_clean');
+				$this->form_validation->set_rules('screen_name', lang('adm_servers_screen_name'), 'trim|max_length[64]');
+				$this->form_validation->set_rules('su_user', lang('adm_servers_user_start'), 'trim|max_length[64]');
+				$this->form_validation->set_rules('start_command', lang('adm_servers_command_start'), 'trim|max_length[1024]');
 				
-				$this->form_validation->set_rules('cpu_limit', lang('adm_servers_cpu_limit'), 'trim|integer|less_than[100]|xss_clean');
-				$this->form_validation->set_rules('ram_limit', lang('adm_servers_ram_limit'), 'trim|integer|xss_clean');
-				$this->form_validation->set_rules('net_limit', lang('adm_servers_net_limit'), 'trim|integer|xss_clean');
+				$this->form_validation->set_rules('cpu_limit', lang('adm_servers_cpu_limit'), 'trim|integer|less_than[100]');
+				$this->form_validation->set_rules('ram_limit', lang('adm_servers_ram_limit'), 'trim|integer');
+				$this->form_validation->set_rules('net_limit', lang('adm_servers_net_limit'), 'trim|integer');
 
 				break;
 				
@@ -1323,18 +1323,18 @@ class Adm_servers extends CI_Controller {
 				$local_tpl['gt_list'] = $this->game_types->tpl_data_game_types(array('game_code' => $id));
 
 				/* Правила для проверки формы */
-				$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('code', lang('adm_servers_game_code'), 'trim|required|max_length[32]|min_length[2]|xss_clean');
-				$this->form_validation->set_rules('start_code', lang('adm_servers_game_start_code'), 'trim|required|max_length[64]|min_length[2]|xss_clean');
+				$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]');
+				$this->form_validation->set_rules('code', lang('adm_servers_game_code'), 'trim|required|max_length[32]|min_length[2]');
+				$this->form_validation->set_rules('start_code', lang('adm_servers_game_start_code'), 'trim|required|max_length[64]|min_length[2]');
 					
-				$this->form_validation->set_rules('engine', lang('adm_servers_engine'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('engine_version', lang('adm_servers_engine_version'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('engine', lang('adm_servers_engine'), 'trim|required|max_length[64]|min_length[3]');
+				$this->form_validation->set_rules('engine_version', lang('adm_servers_engine_version'), 'trim|max_length[64]');
 				
-				$this->form_validation->set_rules('app_id', 'app_id', 'trim|integer|max_length[32]|xss_clean');
-				$this->form_validation->set_rules('app_set_config', 'app_set_config', 'trim|max_length[32]|xss_clean');
+				$this->form_validation->set_rules('app_id', 'app_id', 'trim|integer|max_length[32]');
+				$this->form_validation->set_rules('app_set_config', 'app_set_config', 'trim|max_length[32]');
 				
-				$this->form_validation->set_rules('local_repository', lang('adm_servers_local_repository'), 'trim|xss_clean');
-				$this->form_validation->set_rules('remote_repository', lang('adm_servers_remote_repository'), 'trim|xss_clean');
+				$this->form_validation->set_rules('local_repository', lang('adm_servers_local_repository'), 'trim');
+				$this->form_validation->set_rules('remote_repository', lang('adm_servers_remote_repository'), 'trim');
 			
 				break;
 				
@@ -1410,30 +1410,30 @@ class Adm_servers extends CI_Controller {
 				 * Данные для проверки формы 
 				*/
 				
-				$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-				$this->form_validation->set_rules('game_code', lang('adm_servers_game_code'), 'trim|required|max_length[32]|min_length[2]|xss_clean');
+				$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]');
+				$this->form_validation->set_rules('game_code', lang('adm_servers_game_code'), 'trim|required|max_length[32]|min_length[2]');
 				
 				/* Сведения о fast rcon командах */
-				$this->form_validation->set_rules('frcon_desc[]', 'описание fast rcon команды', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('frcon_command[]', 'fast rcon команда', 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('frcon_desc[]', 'описание fast rcon команды', 'trim|max_length[64]');
+				$this->form_validation->set_rules('frcon_command[]', 'fast rcon команда', 'trim|max_length[64]');
 				
 				/* Сведения об алиасах */
-				$this->form_validation->set_rules('alias_name[]', 'имя алиаса', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('alias_desc[]', 'описание алиаса', 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('alias_only_admins[]', 'только для администраторов', 'trim|xss_clean');
+				$this->form_validation->set_rules('alias_name[]', 'имя алиаса', 'trim|max_length[64]');
+				$this->form_validation->set_rules('alias_desc[]', 'описание алиаса', 'trim|max_length[64]');
+				$this->form_validation->set_rules('alias_only_admins[]', 'только для администраторов', 'trim');
 				
 				/* Сведения для управления игроками */
-				$this->form_validation->set_rules('kick_cmd', 		lang('adm_servers_kick_cmd'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('ban_cmd', 		lang('adm_servers_ban_cmd'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('chname_cmd', 	lang('adm_servers_chname_cmd'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('srestart_cmd', 	lang('adm_servers_srestart_cmd'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('chmap_cmd', 		lang('adm_servers_chmap_cmd'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('sendmsg_cmd', 	lang('adm_servers_sendmsg_cmd'), 'trim|max_length[64]|xss_clean');
-				$this->form_validation->set_rules('passwd_cmd', 	lang('adm_servers_passwd_cmd'), 'trim|max_length[64]|xss_clean');
+				$this->form_validation->set_rules('kick_cmd', 		lang('adm_servers_kick_cmd'), 'trim|max_length[64]');
+				$this->form_validation->set_rules('ban_cmd', 		lang('adm_servers_ban_cmd'), 'trim|max_length[64]');
+				$this->form_validation->set_rules('chname_cmd', 	lang('adm_servers_chname_cmd'), 'trim|max_length[64]');
+				$this->form_validation->set_rules('srestart_cmd', 	lang('adm_servers_srestart_cmd'), 'trim|max_length[64]');
+				$this->form_validation->set_rules('chmap_cmd', 		lang('adm_servers_chmap_cmd'), 'trim|max_length[64]');
+				$this->form_validation->set_rules('sendmsg_cmd', 	lang('adm_servers_sendmsg_cmd'), 'trim|max_length[64]');
+				$this->form_validation->set_rules('passwd_cmd', 	lang('adm_servers_passwd_cmd'), 'trim|max_length[64]');
 				
 				/* Репозитории */
-				$this->form_validation->set_rules('local_repository', lang('adm_servers_local_repository'), 'trim|xss_clean');
-				$this->form_validation->set_rules('remote_repository', lang('adm_servers_remote_repository'), 'trim|xss_clean');
+				$this->form_validation->set_rules('local_repository', lang('adm_servers_local_repository'), 'trim');
+				$this->form_validation->set_rules('remote_repository', lang('adm_servers_remote_repository'), 'trim');
 				
 				break;
 			default:
@@ -1840,15 +1840,15 @@ class Adm_servers extends CI_Controller {
 		$this->tpl['title'] 	= lang('adm_servers_title_install_game_server');
 		$this->tpl['heading'] 	= lang('adm_servers_heading_install_game_server');
 		
-		$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-		$this->form_validation->set_rules('server_ip', lang('ip'), 'trim|max_length[64]|min_length[3]|xss_clean');
-		$this->form_validation->set_rules('server_port', lang('port'), 'trim|required|max_length[64]|min_length[3]|xss_clean');
-		//$this->form_validation->set_rules('rcon', 'RCON пароль', 'trim|max_length[64]|min_length[3]|xss_clean');
-		$this->form_validation->set_rules('code', 'игра', 'trim|required|max_length[64]|min_length[3]|xss_clean');
-		$this->form_validation->set_rules('game_type', 'модификация', 'trim|required|integer|xss_clean');
-		$this->form_validation->set_rules('ds_id', 'выделенный сервер', 'trim|integer|max_length[16]|xss_clean');
-		$this->form_validation->set_rules('dir', 'директория', 'trim|required|max_length[64]|min_length[3]|xss_clean');
-		//$this->form_validation->set_rules('screen_name', 'имя screen', 'trim|required|max_length[64]|min_length[3]|xss_clean');
+		$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|min_length[3]');
+		$this->form_validation->set_rules('server_ip', lang('ip'), 'trim|max_length[64]|min_length[3]');
+		$this->form_validation->set_rules('server_port', lang('port'), 'trim|required|max_length[64]|min_length[3]');
+		//$this->form_validation->set_rules('rcon', 'RCON пароль', 'trim|max_length[64]|min_length[3]');
+		$this->form_validation->set_rules('code', 'игра', 'trim|required|max_length[64]|min_length[3]');
+		$this->form_validation->set_rules('game_type', 'модификация', 'trim|required|integer');
+		$this->form_validation->set_rules('ds_id', 'выделенный сервер', 'trim|integer|max_length[16]');
+		$this->form_validation->set_rules('dir', 'директория', 'trim|required|max_length[64]|min_length[3]');
+		//$this->form_validation->set_rules('screen_name', 'имя screen', 'trim|required|max_length[64]|min_length[3]');
 
 		if ($this->form_validation->run() == false) {
 			
@@ -2099,8 +2099,8 @@ class Adm_servers extends CI_Controller {
 			return false;
 		}
 		
-		$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]|xss_clean');
-		$this->form_validation->set_rules('code', lang('game'), 'trim|required|max_length[64]|xss_clean');
+		$this->form_validation->set_rules('name', lang('name'), 'trim|required|max_length[64]');
+		$this->form_validation->set_rules('code', lang('game'), 'trim|required|max_length[64]');
 		
 		if ($this->form_validation->run() == false) {
 			

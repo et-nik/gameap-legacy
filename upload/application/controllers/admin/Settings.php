@@ -129,7 +129,7 @@ class Settings extends CI_Controller {
 					}
 					
 					// Задаем правила проверки для алиаса
-					$this->form_validation->set_rules('alias_' . $alias['alias'], $alias['desc'], 'trim|max_length[64]|xss_clean');
+					$this->form_validation->set_rules('alias_' . $alias['alias'], $alias['desc'], 'trim|max_length[64]');
 					
 					if (isset($aliases_values[$alias['alias']])) {
 						$value_alias = $aliases_values[$alias['alias']];
@@ -220,26 +220,26 @@ class Settings extends CI_Controller {
 		
 		switch($filter_name) {
 			case 'servers_list':
-				$this->form_validation->set_rules('filter_name', lang('name'), 'trim|xss_clean');
-				$this->form_validation->set_rules('filter_ip', lang('ip'), 'xss_clean');
-				$this->form_validation->set_rules('filter_game', lang('game'), 'xss_clean');
+				$this->form_validation->set_rules('filter_name', lang('name'), 'trim');
+				$this->form_validation->set_rules('filter_ip', lang('ip'), '');
+				$this->form_validation->set_rules('filter_game', lang('game'), '');
 				break;
 			
 			case 'panel_log':
-				$this->form_validation->set_rules('filter_type', lang('action'), 'trim|xss_clean');
-				$this->form_validation->set_rules('filter_command', lang('command'), 'trim|xss_clean');
-				$this->form_validation->set_rules('filter_user', lang('user'), 'trim|xss_clean');
-				$this->form_validation->set_rules('filter_contents', lang('contents'), 'trim|xss_clean');
+				$this->form_validation->set_rules('filter_type', lang('action'), 'trim');
+				$this->form_validation->set_rules('filter_command', lang('command'), 'trim');
+				$this->form_validation->set_rules('filter_user', lang('user'), 'trim');
+				$this->form_validation->set_rules('filter_contents', lang('contents'), 'trim');
 				break;
 				
 			case 'users_list':
-				$this->form_validation->set_rules('filter_login', lang('login'), 'trim|xss_clean');
+				$this->form_validation->set_rules('filter_login', lang('login'), 'trim');
 				
-				$this->form_validation->set_rules('filter_register_before', lang('lang_profile_registered'), 'trim|xss_clean');
-				$this->form_validation->set_rules('filter_register_after', lang('lang_profile_registered'), 'trim|xss_clean');
+				$this->form_validation->set_rules('filter_register_before', lang('lang_profile_registered'), 'trim');
+				$this->form_validation->set_rules('filter_register_after', lang('lang_profile_registered'), 'trim');
 				
-				$this->form_validation->set_rules('filter_last_visit_before', lang('lang_profile_last_visit'), 'trim|xss_clean');
-				$this->form_validation->set_rules('filter_last_visit_after', lang('lang_profile_last_visit'), 'trim|xss_clean');
+				$this->form_validation->set_rules('filter_last_visit_before', lang('lang_profile_last_visit'), 'trim');
+				$this->form_validation->set_rules('filter_last_visit_after', lang('lang_profile_last_visit'), 'trim');
 				break;
 				
 			default:

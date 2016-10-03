@@ -528,12 +528,12 @@ class Server_control extends CI_Controller {
 		}
 		
 		/* Правила для формы */
-		$this->form_validation->set_rules('name', lang('title'), 'trim|max_length[64]|xss_clean');
-		$this->form_validation->set_rules('code', lang('code'), 'trim|required|max_length[32]|xss_clean');
-		$this->form_validation->set_rules('command', lang('server_control_param_for_command'), 'trim|max_length[128]|xss_clean');
+		$this->form_validation->set_rules('name', lang('title'), 'trim|max_length[64]');
+		$this->form_validation->set_rules('code', lang('code'), 'trim|required|max_length[32]');
+		$this->form_validation->set_rules('command', lang('server_control_param_for_command'), 'trim|max_length[128]');
 		
-		$this->form_validation->set_rules('date_perform', lang('server_control_execution_date'), 'trim|required|max_length[19]|xss_clean');
-		$this->form_validation->set_rules('time_add', lang('server_control_repeat_period'), 'trim|required|integer|max_length[16]|xss_clean');
+		$this->form_validation->set_rules('date_perform', lang('server_control_execution_date'), 'trim|required|max_length[19]');
+		$this->form_validation->set_rules('time_add', lang('server_control_repeat_period'), 'trim|required|integer|max_length[16]');
 		
 		$local_tpl['server_id'] 	= $server_id;
 		$local_tpl['date_perform'] = unix_to_human(time()+86400, false, 'eu');
@@ -771,11 +771,11 @@ class Server_control extends CI_Controller {
 		}
 		
 		/* Правила для формы */
-		$this->form_validation->set_rules('name', lang('title'), 'trim|max_length[64]|xss_clean');
-		$this->form_validation->set_rules('command', lang('server_control_param_for_command'), 'trim|max_length[128]|xss_clean');
+		$this->form_validation->set_rules('name', lang('title'), 'trim|max_length[64]');
+		$this->form_validation->set_rules('command', lang('server_control_param_for_command'), 'trim|max_length[128]');
 		
-		$this->form_validation->set_rules('date_perform', lang('server_control_execution_date'), 'trim|required|max_length[19]|xss_clean');
-		$this->form_validation->set_rules('time_add', lang('server_control_repeat_period'), 'trim|required|integer|max_length[16]|xss_clean');
+		$this->form_validation->set_rules('date_perform', lang('server_control_execution_date'), 'trim|required|max_length[19]');
+		$this->form_validation->set_rules('time_add', lang('server_control_repeat_period'), 'trim|required|integer|max_length[16]');
 		
 		if($this->form_validation->run() == false) {
 			

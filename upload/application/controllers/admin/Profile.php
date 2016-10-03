@@ -98,7 +98,7 @@ class Profile extends CI_Controller {
 			}else{
 				$this->load->library('form_validation');
 				
-				$this->form_validation->set_rules('name', 'Имя', 'trim|xss_clean');
+				$this->form_validation->set_rules('name', 'Имя', 'trim');
 				$this->form_validation->set_rules('email', 'E-Mail', 'trim|required|valid_email');
 				
 				if (!$this->form_validation->run()) {

@@ -266,7 +266,7 @@ class Web_ftp extends CI_Controller {
 			return;
 		}
 		
-		$this->form_validation->set_rules('dir', lang('directory'), 'trim|xss_clean');
+		$this->form_validation->set_rules('dir', lang('directory'), 'trim');
 		
 		if($this->form_validation->run() == false) {
 			if (validation_errors()) {
@@ -329,8 +329,8 @@ class Web_ftp extends CI_Controller {
 			return;
 		}
 		
-		$this->form_validation->set_rules('dir', lang('directory'), 'trim|xss_clean');
-		$this->form_validation->set_rules('file', lang('file'), 'trim|required|xss_clean');
+		$this->form_validation->set_rules('dir', lang('directory'), 'trim');
+		$this->form_validation->set_rules('file', lang('file'), 'trim');
 		
 		if($this->form_validation->run() == false) {
 			if (validation_errors()) {
@@ -387,8 +387,8 @@ class Web_ftp extends CI_Controller {
 			return;
 		}
 		
-		$this->form_validation->set_rules('dir', lang('directory'), 'trim|xss_clean');
-		$this->form_validation->set_rules('file', lang('file'), 'trim|required|xss_clean');
+		$this->form_validation->set_rules('dir', lang('directory'), 'trim');
+		$this->form_validation->set_rules('file', lang('file'), 'trim|required');
 		$this->form_validation->set_rules('contents', lang('contents'), 'trim');
 		
 		if($this->form_validation->run() == false) {
@@ -436,9 +436,9 @@ class Web_ftp extends CI_Controller {
 			return;
 		}
 		
-		$this->form_validation->set_rules('dir', lang('directory'), 'trim|xss_clean');
-		$this->form_validation->set_rules('file', lang('file'), 'trim|required|xss_clean');
-		$this->form_validation->set_rules('new_name', lang('new_name'), 'trim|required|xss_clean');
+		$this->form_validation->set_rules('dir', lang('directory'), 'trim');
+		$this->form_validation->set_rules('file', lang('file'), 'trim|required');
+		$this->form_validation->set_rules('new_name', lang('new_name'), 'trim|required');
 		
 		if($this->form_validation->run() == false) {
 			if (validation_errors()) {
@@ -481,8 +481,8 @@ class Web_ftp extends CI_Controller {
 			return;
 		}
 		
-		$this->form_validation->set_rules('dir', lang('directory'), 'trim|xss_clean');
-		$this->form_validation->set_rules('file', lang('file'), 'trim|required|xss_clean');
+		$this->form_validation->set_rules('dir', lang('directory'), 'trim');
+		$this->form_validation->set_rules('file', lang('file'), 'trim|required');
 
 		if($this->form_validation->run() == false) {
 			if (validation_errors()) {
@@ -529,7 +529,7 @@ class Web_ftp extends CI_Controller {
 			return;
 		}
 		
-		$this->form_validation->set_rules('dir', lang('directory'), 'trim|xss_clean');
+		$this->form_validation->set_rules('dir', lang('directory'), 'trim');
 
 		if($this->form_validation->run() == false) {
 			if (validation_errors()) {

@@ -184,7 +184,7 @@ class Server_control extends CI_Controller {
             return;
 		}
 
-        $this->form_validation->set_rules('command', 'rcon command', 'trim|required|max_length[64]|min_length[1]|xss_clean');
+        $this->form_validation->set_rules('command', 'rcon command', 'trim|required|max_length[64]|min_length[1]');
 
         if($this->form_validation->run() == false) {
 			if (validation_errors()) {

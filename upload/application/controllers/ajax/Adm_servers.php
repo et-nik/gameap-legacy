@@ -63,7 +63,7 @@ class Adm_servers extends CI_Controller {
     */
     public function get_gametypes()
     {
-		$this->form_validation->set_rules('code', 'код игры', 'trim|xss_clean');
+		$this->form_validation->set_rules('code', 'код игры', 'trim');
 
 		if($this->form_validation->run() == false){
 			show_404();
@@ -100,7 +100,7 @@ class Adm_servers extends CI_Controller {
 	*/
 	public function get_ds_path()
 	{
-		$this->form_validation->set_rules('ds_id', 'id физ сервера', 'trim|integer|xss_clean');
+		$this->form_validation->set_rules('ds_id', 'id физ сервера', 'trim|integer');
 		
 		if($this->form_validation->run() == false){
 			show_404();

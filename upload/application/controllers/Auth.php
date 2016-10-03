@@ -372,12 +372,12 @@ class Auth extends CI_Controller {
 			return false;
 		}
 
-		$this->form_validation->set_rules('login', 'логин', 'trim|required|alpha_dash|is_unique[users.login]|max_length[32]|xss_clean');
-		$this->form_validation->set_rules('password', 'пароль', 'trim|required|max_length[64]|matches[passconf]|xss_clean');
-		$this->form_validation->set_rules('passconf', 'подтверждение пароля', 'trim|required|max_length[64]|xss_clean');
-		$this->form_validation->set_rules('email', 'email адрес', 'trim|required|is_unique[users.email]|max_length[64]|valid_email|xss_clean');
+		$this->form_validation->set_rules('login', 'логин', 'trim|required|alpha_dash|is_unique[users.login]|max_length[32]');
+		$this->form_validation->set_rules('password', 'пароль', 'trim|required|max_length[64]|matches[passconf]');
+		$this->form_validation->set_rules('passconf', 'подтверждение пароля', 'trim|required|max_length[64]');
+		$this->form_validation->set_rules('email', 'email адрес', 'trim|required|is_unique[users.email]|max_length[64]|valid_email');
 		
-		//~ $this->form_validation->set_rules('image', 'капча', 'trim|required|max_length[12]|xss_clean');
+		//~ $this->form_validation->set_rules('image', 'капча', 'trim|required|max_length[12]');
 		
 		/* Проверка формы */
 		if ($this->form_validation->run() == false) {
@@ -527,8 +527,8 @@ class Auth extends CI_Controller {
 		/* Код указан неверно, либо вообще не указан, отображем форму */
 		/* ---------------------------------------------------------- */
 		
-		$this->form_validation->set_rules('login', 'логин', 'trim|max_length[12]|xss_clean');
-		$this->form_validation->set_rules('email', 'email адрес', 'trim|max_length[64]|min_length[0]|valid_email|xss_clean');
+		$this->form_validation->set_rules('login', 'логин', 'trim|max_length[12]');
+		$this->form_validation->set_rules('email', 'email адрес', 'trim|max_length[64]|min_length[0]|valid_email');
 		
 		if ($this->form_validation->run() == false) {
 			$this->parser->parse('recovery_password.html', $this->tpl);

@@ -251,7 +251,7 @@ class Server_command extends CI_Controller {
 					*/
 					switch($command) {
 						case 'pl_ban':
-							$this->form_validation->set_rules('reason', 'причина', 'trim|required|max_length[32]|min_length[3]|xss_clean');
+							$this->form_validation->set_rules('reason', 'причина', 'trim|required|max_length[32]|min_length[3]');
 							$this->form_validation->set_rules('time', 'время', 'trim|max_length[2]|integer');
 							$this->form_validation->set_rules('time_multiply', 'отсчет времени', 'trim|max_length[6]|integer');
 							break;
@@ -261,15 +261,15 @@ class Server_command extends CI_Controller {
 							break;
 							
 						case 'pl_changename':
-							$this->form_validation->set_rules('new_name', 'новое имя', 'trim|required|max_length[32]|min_length[1]|xss_clean');
+							$this->form_validation->set_rules('new_name', 'новое имя', 'trim|required|max_length[32]|min_length[1]');
 							break;
 							
 						case 'send_msg';
-							$this->form_validation->set_rules('msg_text', 'текст', 'trim|required|max_length[64]|min_length[1]|xss_clean');
+							$this->form_validation->set_rules('msg_text', 'текст', 'trim|required|max_length[64]|min_length[1]');
 							break;
 							
 						case 'changemap';
-							$this->form_validation->set_rules('map', 'карта', 'trim|required|max_length[64]|min_length[1]|xss_clean');
+							$this->form_validation->set_rules('map', 'карта', 'trim|required|max_length[64]|min_length[1]');
 							break;
 							
 						case 'restart':
@@ -277,7 +277,7 @@ class Server_command extends CI_Controller {
 							break;
 							
 						case 'set_password':
-							$this->form_validation->set_rules('password', 'пароль', 'trim|max_length[32]|min_length[1]|xss_clean');
+							$this->form_validation->set_rules('password', 'пароль', 'trim|max_length[32]|min_length[1]');
 							break;
 							
 						case 'fast':
@@ -285,7 +285,7 @@ class Server_command extends CI_Controller {
 							break;
 							
 						case 'rcon_command';
-							$this->form_validation->set_rules('rcon_command', 'команда', 'required|xss_clean');
+							$this->form_validation->set_rules('rcon_command', 'команда', 'required');
 							break;
 					}
 						

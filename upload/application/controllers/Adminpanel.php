@@ -296,8 +296,8 @@ class Adminpanel extends CI_Controller {
 		$local_tpl = array();
 		$this->load->library('form_validation');
 		
-		$this->form_validation->set_rules('description', 'описание', 'trim|required|min_length[3]|xss_clean');
-		$this->form_validation->set_rules('actions', 'действия', 'trim|min_length[3]|xss_clean');
+		$this->form_validation->set_rules('description', 'описание', 'trim|required|min_length[3]');
+		$this->form_validation->set_rules('actions', 'действия', 'trim|min_length[3]');
 		
 		if ($this->form_validation->run() == false) {
 			

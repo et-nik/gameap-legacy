@@ -158,7 +158,7 @@ class Users_control extends CI_Controller {
 		$this->load->library('form_validation');
 		$this->load->helper('form');
 		
-		$this->form_validation->set_rules('login', lang('login'), 'trim|required|is_unique[users.login]|max_length[32]|min_length[3]|xss_clean');
+		$this->form_validation->set_rules('login', lang('login'), 'trim|required|is_unique[users.login]|max_length[32]|min_length[3]');
 		$this->form_validation->set_rules('password', lang('password'), 'trim|required|max_length[64]');
 		$this->form_validation->set_rules('email', 'E-Mail', 'trim|required|is_unique[users.email]|valid_email');
 			
@@ -419,7 +419,7 @@ class Users_control extends CI_Controller {
 		
 		$this->load->library('form_validation');
 		
-		$this->form_validation->set_rules('name', lang('name'), 'trim|xss_clean');
+		$this->form_validation->set_rules('name', lang('name'), 'trim');
 		$this->form_validation->set_rules('email', lang('email'), 'trim|required|valid_email');
 		$this->form_validation->set_rules('new_password', lang('password'), 'trim');
 		$this->form_validation->set_rules('group', lang('group'), 'integer|reqired');
