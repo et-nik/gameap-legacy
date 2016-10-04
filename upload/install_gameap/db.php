@@ -9,7 +9,6 @@
  * @copyright   Copyright (c) 2013-2016, Nikita Kuznetsov (http://hldm.org)
  * @license     http://gameap.ru/license.html
  * @link        http://gameap.ru
- * @filesource  
  */
 
 /**
@@ -24,26 +23,28 @@
 
 $this->load->dbforge();
 
-// Удаление таблиц, если есть
+// Delete tables, if exists
 $this->dbforge->drop_table('actions', true);
-$this->dbforge->drop_table('captcha', true);
-$this->dbforge->drop_table('cron', true);
-$this->dbforge->drop_table('dedicated_servers', true);
-$this->dbforge->drop_table('games', true);
-$this->dbforge->drop_table('game_types', true);
-$this->dbforge->drop_table('logs', true);
-$this->dbforge->drop_table('modules', true);
-$this->dbforge->drop_table('servers', true);
-$this->dbforge->drop_table('servers_privileges', true);
-$this->dbforge->drop_table('settings', true);
-$this->dbforge->drop_table('sessions', true);
-$this->dbforge->drop_table('users', true);
+$this->dbforge->drop_table('cron' true);
+$this->dbforge->drop_table('dedicated_servers' true);
+$this->dbforge->drop_table('ds_stats' true);
+$this->dbforge->drop_table('ds_users' true);
+$this->dbforge->drop_table('games' true);
+$this->dbforge->drop_table('game_types' true);
+$this->dbforge->drop_table('gdaemon_tasks' true);
+$this->dbforge->drop_table('logs' true);
+$this->dbforge->drop_table('modules' true);
+$this->dbforge->drop_table('servers' true);
+$this->dbforge->drop_table('servers_privileges' true);
+$this->dbforge->drop_table('settings' true);
+$this->dbforge->drop_table('sessions' true);
+$this->dbforge->drop_table('users' true);
 
 /*----------------------------------*/
 /*              actions             */
 /*----------------------------------*/
 
-$fields = array(
+$this->dbforge->add_field(array(
     'id' => array(
         'type' => 'TINYTEXT',
     ),
@@ -56,47 +57,14 @@ $fields = array(
     'data' => array(
         'type' => 'MEDIUMTEXT',
     ),
-);
-
-$this->dbforge->add_field($fields);
+));
 $this->dbforge->create_table('actions');
-
-/*----------------------------------*/
-/*              captcha             */
-/*----------------------------------*/
-
-$fields = array(
-    'captcha_id' => array(
-        'type' => 'INT',
-        'constraint' => 16, 
-        'auto_increment' => TRUE
-    ),
-    
-    'captcha_time' => array(
-        'type' => 'INT',
-        'constraint' => 32, 
-    ),
-    
-    'ip_address' => array(
-        'type' => 'VARCHAR',
-        'constraint' => 64, 
-    ),
-    
-    'word' => array(
-        'type' => 'VARCHAR',
-        'constraint' => 64, 
-    ),
-);
-
-$this->dbforge->add_field($fields);
-$this->dbforge->add_key('captcha_id', TRUE);
-$this->dbforge->create_table('captcha');
 
 /*----------------------------------*/
 /*              cron                */
 /*----------------------------------*/
 
-$fields = array(
+$this->dbforge->add_field($fields = array(
     'id' => array(
         'type' => 'INT',
         'constraint' => 16, 
@@ -145,9 +113,7 @@ $fields = array(
         'type' => 'INT',
         'constraint' => 32, 
     ),
-);
-
-$this->dbforge->add_field($fields);
+););
 $this->dbforge->add_key('id', TRUE);
 $this->dbforge->create_table('cron');
 
@@ -155,7 +121,7 @@ $this->dbforge->create_table('cron');
 /*      dedicated_servers           */
 /*----------------------------------*/
 
-$fields = array(
+$this->dbforge->add_field(array(
     'id' => array(
         'type' => 'INT',
         'constraint' => 16, 
@@ -173,11 +139,6 @@ $fields = array(
     
     'os' => array(
         'type' => 'TINYTEXT',
-    ),
-    
-    'control_protocol' => array(
-        'type' => 'VARCHAR',
-        'constraint' => 8,
     ),
     
     'location' => array(
@@ -203,67 +164,43 @@ $fields = array(
     'stats' => array(
         'type' => 'TEXT',
     ),
+
+    'work_path' => array(
+        'type' => 'VARCHAR',
+        'constraint' => 256
+    ),
     
     'steamcmd_path' => array(
         'type' => 'TINYTEXT',
     ),
-    
+
     'gdaemon_host' => array(
         'type' => 'TINYTEXT',
     ),
-    
-    'gdaemon_key' => array(
-        'type' => 'TINYTEXT',
+
+    'gdaemon_login' => array(
+        'type' => 'VARCHAR',
+        'constraint' => 128
     ),
-    
-    'ssh_host' => array(
-        'type' => 'TINYTEXT',
+
+    'gdaemon_password' => array(
+        'type' => 'TEXT'
     ),
-    
-    'ssh_login' => array(
-        'type' => 'TINYTEXT',
+
+    'gdaemon_privkey' => array(
+        'type' => 'VARCHAR',
+        'constraint' => 256
     ),
-    
-    'ssh_password' => array(
-        'type' => 'TINYTEXT',
+
+    'gdaemon_pubkey' => array(
+        'type' => 'VARCHAR',
+        'constraint' => 256
     ),
-    
-    'ssh_path' => array(
-        'type' => 'TINYTEXT',
+
+    'gdaemon_keypass' => array(
+        'type' => 'TEXT'
     ),
-    
-    'telnet_host' => array(
-        'type' => 'TINYTEXT',
-    ),
-    
-    'telnet_login' => array(
-        'type' => 'TINYTEXT',
-    ),
-    
-    'telnet_password' => array(
-        'type' => 'TINYTEXT',
-    ),
-    
-    'telnet_path' => array(
-        'type' => 'TINYTEXT',
-    ),
-    
-    'ftp_host' => array(
-        'type' => 'TINYTEXT',
-    ),
-    
-    'ftp_login' => array(
-        'type' => 'TINYTEXT',
-    ),
-    
-    'ftp_password' => array(
-        'type' => 'TINYTEXT',
-    ),
-    
-    'ftp_path' => array(
-        'type' => 'TINYTEXT',
-    ),
-    
+
     'script_start' => array(
         'type' => 'TEXT',
     ),
@@ -291,17 +228,84 @@ $fields = array(
     'modules_data' => array(
         'type' => 'MEDIUMTEXT',
     ),
-);
-
-$this->dbforge->add_field($fields);
+));
 $this->dbforge->add_key('id', TRUE);
 $this->dbforge->create_table('dedicated_servers');
 
 /*----------------------------------*/
+/*              ds_stats            */
+/*----------------------------------*/
+
+$this->dbforge->add_field(array(
+    'id' => array(
+        'type' => 'INT',
+        'auto_increment' => true
+    ),
+    'ds_id' => array(
+        'type' => 'INT'
+    ),
+    'time' => array(
+        'type' => 'INT'
+    ),
+    'loa' => array(
+        'type' => 'TINYTEXT'
+    ),
+    'ram' => array(
+        'type' => 'TINYTEXT'
+    ),
+    'cpu' => array(
+        'type' => 'TINYTEXT'
+    ),
+    'ifstat' => array(
+        'type' => 'TINYTEXT'
+    ),
+    'ping' => array(
+        'type' => 'INT',
+        'constraint' => 4
+    ),
+    'drvspace' => array(
+        'type' => 'TINYTEXT'
+    ),
+));
+
+$this->dbforge->add_key('id', true);
+$this->dbforge->create_table('ds_stats');
+            
+/*----------------------------------*/
+/*              ds_users            */
+/*----------------------------------*/
+
+$this->dbforge->add_field(array(
+    'id' => array(
+        'type' => 'INT',
+        'auto_increment' => true
+    ),
+    'ds_id' => array(
+        'type' => 'INT'
+    ),
+    'username' => array(
+        'type' => 'VARCHAR',
+        'constraint' => 32
+    ),
+    'uid' => array(
+        'type' => 'INT'
+    ),
+    'gid' => array(
+        'type' => 'INT'
+    ),
+    'password' => array(
+        'type' => 'TEXT'
+    ),
+));
+
+$this->dbforge->add_key('id', true);
+$this->dbforge->create_table('ds_users');
+            
+/*----------------------------------*/
 /*              games               */
 /*----------------------------------*/
 
-$fields = array(
+$this->dbforge->add_field(array(
     'code' => array(
         'type' => 'VARCHAR',
         'constraint' => 16, 
@@ -344,17 +348,15 @@ $fields = array(
     'local_repository' => array(
         'type' => 'TEXT',
     ),
-);
-
+));
 $this->dbforge->add_key('code', TRUE);
-$this->dbforge->add_field($fields);
 $this->dbforge->create_table('games');
 
 /*----------------------------------*/
 /*              game_types          */
 /*----------------------------------*/
 
-$fields = array(
+$this->dbforge->add_field(array(
     'id' => array(
         'type' => 'INT',
         'constraint' => 16, 
@@ -376,11 +378,6 @@ $fields = array(
 
     'aliases' => array(
         'type' => 'TEXT',
-    ),
-
-    'disk_size' => array(
-        'type' => 'INT',
-        'constraint' => 16, 
     ),
 
     'remote_repository' => array(
@@ -431,23 +428,72 @@ $fields = array(
         'type' => 'VARCHAR',
         'constraint' => 64,
         'default' => '',
-    ),
-
-    'game_types' => array(
-        'type' => 'TINYTEXT',
-    ),
-
-);
-
-$this->dbforge->add_field($fields);
+    )
+));
 $this->dbforge->add_key('id', TRUE);
 $this->dbforge->create_table('game_types');
+
+/*----------------------------------*/
+/*       gdaemon_tasks              */
+/*----------------------------------*/
+
+$this->dbforge->add_field(array(
+    'id' => array(
+        'type' => 'INT',
+        'auto_increment' => true
+    ),
+
+    'run_aft_id' => array(
+        'type' => 'INT'
+    ),
+    
+    'time_create' => array(
+        'type' => 'INT'
+    ),
+    
+    'time_stchange' => array(
+        'type' => 'INT'
+    ),
+    
+    'ds_id' => array(
+        'type' => 'INT'
+    ),
+    
+    'server_id' => array(
+        'type' => 'INT'
+    ),
+
+    'task' => array(
+        'type' => 'VARCHAR',
+        'constraint' => 8
+    ),
+
+    'data' => array(
+        'type' => 'MEDIUMTEXT'
+    ),
+    
+    'cmd' => array(
+        'type' => 'TEXT'
+    ),
+    
+    'output' => array(
+        'type' => 'MEDIUMTEXT'
+    ),
+    
+    'status' => array(
+        'type' => 'ENUM("waiting", "working", "error", "success")',
+        'default' => 'waiting',
+        'null' => false,
+    )
+));
+$this->dbforge->add_key('id', true);
+$this->dbforge->create_table('gdaemon_tasks');
 
 /*----------------------------------*/
 /*              logs                */
 /*----------------------------------*/
 
-$fields = array(
+$this->dbforge->add_field(array(
     'id' => array(
         'type' => 'INT',
         'constraint' => 16, 
@@ -490,9 +536,7 @@ $fields = array(
     ),
     
 
-);
-
-$this->dbforge->add_field($fields);
+));
 $this->dbforge->add_key('id', TRUE);
 $this->dbforge->create_table('logs');
 
@@ -500,7 +544,7 @@ $this->dbforge->create_table('logs');
 /*              modules             */
 /*----------------------------------*/
 
-$fields = array(
+$this->dbforge->add_field(array(
     'short_name' => array(
         'type' => 'VARCHAR',
         'constraint' => 32, 
@@ -556,9 +600,7 @@ $fields = array(
     'license' => array(
         'type' => 'TINYTEXT',
     ),
-);
-
-$this->dbforge->add_field($fields);
+));
 $this->dbforge->add_key('short_name', TRUE);
 $this->dbforge->create_table('modules');
 
@@ -566,7 +608,7 @@ $this->dbforge->create_table('modules');
 /*              servers             */
 /*----------------------------------*/
 
-$fields = array(
+$this->dbforge->add_field(array(
     'id' => array(
         'type'          => 'INT',
         'constraint'    => 16, 
@@ -678,6 +720,20 @@ $fields = array(
     'start_command' => array(
         'type' => 'TEXT',
     ),
+
+    'start_after_crash' => array(
+        'type' => 'INT',
+        'constraint' => 1
+    ),
+
+    'process_active' => array(
+        'type' => 'INT',
+        'constraint' => 1
+    ),
+    
+    'last_process_check' => array(
+        'type' => 'INT'
+    ),
     
     'aliases' => array(
         'type' => 'TEXT',
@@ -686,9 +742,7 @@ $fields = array(
     'modules_data' => array(
         'type' => 'MEDIUMTEXT',
     ),  
-);
-
-$this->dbforge->add_field($fields);
+));
 $this->dbforge->add_key('id', TRUE);
 $this->dbforge->create_table('servers');
 
@@ -696,7 +750,7 @@ $this->dbforge->create_table('servers');
 /*      servers_privileges          */
 /*----------------------------------*/
 
-$fields = array(
+$this->dbforge->add_field(array(
     'user_id' => array(
         'type'          => 'INT',
         'constraint'    => 16, 
@@ -710,16 +764,14 @@ $fields = array(
     'privileges' => array(
         'type' => 'TEXT',
     ),
-);
-
-$this->dbforge->add_field($fields);
+));
 $this->dbforge->create_table('servers_privileges');
 
 /*----------------------------------*/
 /*              settings            */
 /*----------------------------------*/
 
-$fields = array(
+$this->dbforge->add_field(array(
     'sett_id' => array(
         'type' => 'VARCHAR',
         'constraint' => 32, 
@@ -739,16 +791,14 @@ $fields = array(
         'type' => 'VARCHAR',
         'constraint' => 64, 
     ),
-);
-
-$this->dbforge->add_field($fields);
+));
 $this->dbforge->create_table('settings');
 
 /*----------------------------------*/
 /*              sessoins            */
 /*----------------------------------*/
 
-$fields = array(
+$this->dbforge->add_field(array(
     'user_id' => array(
         'type' => 'INT',
     ),
@@ -769,16 +819,14 @@ $fields = array(
     'expires' => array(
         'type' => 'INT',
     ),
-);
-
-$this->dbforge->add_field($fields);
+));
 $this->dbforge->create_table('sessions');
             
 /*----------------------------------*/
 /*              users               */
 /*----------------------------------*/
 
-$fields = array(
+$this->dbforge->add_field(array(
     'id' => array(
         'type'          => 'INT',
         'constraint'    => 16, 
@@ -856,8 +904,6 @@ $fields = array(
     'notices' => array(
         'type' => 'MEDIUMTEXT',
     ),
-);
-
-$this->dbforge->add_field($fields);
+));
 $this->dbforge->add_key('id', TRUE);
 $this->dbforge->create_table('users');
