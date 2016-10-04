@@ -32,7 +32,7 @@ class Ds_helper_test extends CIUnit_TestCase
 			'start_command' => 'start',
 			'id' 			=> 1337,
 			'dir' 			=> 'my_server',
-			'script_path' 	=> '/home/servers',
+			'work_path' 	=> '/home/servers',
 			'start_code' 	=> 'cstrike',
 			'su_user' 		=> 'nik',
 			
@@ -48,6 +48,7 @@ class Ds_helper_test extends CIUnit_TestCase
 		$this->assertEquals('start', replace_shotcodes('{command}', $server_data));
 		$this->assertEquals('1337', replace_shotcodes('{id}', $server_data));
 		$this->assertEquals('/home/servers', replace_shotcodes('{script_path}', $server_data));
+		$this->assertEquals('/home/servers', replace_shotcodes('{work_path}', $server_data));
 		$this->assertEquals('my_server', replace_shotcodes('{game_dir}', $server_data));
 		$this->assertEquals('/home/servers/my_server', replace_shotcodes('{dir}', $server_data));
 		$this->assertEquals('gameap', replace_shotcodes('{name}', $server_data));
@@ -65,14 +66,7 @@ class Ds_helper_test extends CIUnit_TestCase
 
     public function test_get_file_protocol()
     {
-		$this->assertEquals('ftp', $this->_get_file_protocol(array('ftp_host' => 'localhost')));
-		$this->assertEquals('sftp', $this->_get_file_protocol(array('ssh_host' => 'localhost')));
 		$this->assertEquals('gdaemon', $this->_get_file_protocol(array('gdaemon_host' => 'localhost')));
-		$this->assertEquals('local', $this->_get_file_protocol(array('local_server' => 1)));
-		
-		$this->assertEquals('ftp', $this->_get_file_protocol(array('ftp_host' => 'localhost', 'ssh_host' => 'localhost')));
-		$this->assertEquals('sftp', $this->_get_file_protocol(array('ssh_host' => 'localhost', 'gdaemon_host' => 'localhost')));
-		$this->assertEquals('gdaemon', $this->_get_file_protocol(array('gdaemon_host' => 'localhost', 'local_server' => 1)));
 	}
 	
 	public function test_get_ds_file_path()
