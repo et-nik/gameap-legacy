@@ -25,19 +25,19 @@
 $this->load->dbforge();
 
 // Удаление таблиц, если есть
-$this->dbforge->drop_table('actions');
-$this->dbforge->drop_table('captcha');
-$this->dbforge->drop_table('cron');
-$this->dbforge->drop_table('dedicated_servers');
-$this->dbforge->drop_table('games');
-$this->dbforge->drop_table('game_types');
-$this->dbforge->drop_table('logs');
-$this->dbforge->drop_table('modules');
-$this->dbforge->drop_table('servers');
-$this->dbforge->drop_table('servers_privileges');
-$this->dbforge->drop_table('settings');
-$this->dbforge->drop_table('sessions');
-$this->dbforge->drop_table('users');
+$this->dbforge->drop_table('actions', true);
+$this->dbforge->drop_table('captcha', true);
+$this->dbforge->drop_table('cron', true);
+$this->dbforge->drop_table('dedicated_servers', true);
+$this->dbforge->drop_table('games', true);
+$this->dbforge->drop_table('game_types', true);
+$this->dbforge->drop_table('logs', true);
+$this->dbforge->drop_table('modules', true);
+$this->dbforge->drop_table('servers', true);
+$this->dbforge->drop_table('servers_privileges', true);
+$this->dbforge->drop_table('settings', true);
+$this->dbforge->drop_table('sessions', true);
+$this->dbforge->drop_table('users', true);
 
 /*----------------------------------*/
 /*              actions             */
