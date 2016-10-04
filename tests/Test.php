@@ -6,7 +6,7 @@ class Test extends CI_Controller
     {
         parent::__construct();
 
-        include_once FCPATH . 'install_gameap/db.php';
+        include_once FCPATH . '../../../install_gameap/db.php';
 
         $this->load->library('migration');
         if (!$this->migration->latest()) {
