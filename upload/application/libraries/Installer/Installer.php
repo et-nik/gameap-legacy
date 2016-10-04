@@ -50,8 +50,8 @@ class Installer extends CI_Driver_Library {
         $this->_CI->load->helper('patterns_helper');
         $this->_CI->load->helper('string');
         $this->_CI->load->helper('ds');
-        $this->valid_drivers = array('installer_goldsource', 'installer_source', 'installer_hurtworld' , 'installer_minecraft', 'installer_cod4',
-										'installer_mta', 'installer_samp', 'installer_rust', 'installer_teamspeak3',
+        $this->valid_drivers = array('goldsource', 'source', 'hurtworld' , 'minecraft', 'cod4',
+										'mta', 'samp', 'irust', 'teamspeak3',
 									);
     }
     
@@ -112,12 +112,12 @@ class Installer extends CI_Driver_Library {
 	 */
 	public function get_ports($connect_port = 0)
 	{
-		if (false == in_array('installer_' . $this->_engine, $this->valid_drivers)) {
+		if (false == in_array($this->_engine, $this->valid_drivers)) {
 			$this->errors = 'Driver' . $this->_engine . ' not found';
 			return '';
 		}
 		
-		return $this->{$this->_engine}->get_ports($this->server_data['server_port']);
+		return $this->{$this->_engine}->get_ports($connect_port);
 	}
 	
 	// -----------------------------------------------------------------
@@ -127,7 +127,7 @@ class Installer extends CI_Driver_Library {
 	 */
 	public function get_maps_path($game_code = 'valve')
 	{
-		if (false == in_array('installer_' . $this->_engine, $this->valid_drivers)) {
+		if (false == in_array($this->_engine, $this->valid_drivers)) {
 			$this->errors = 'Driver' . $this->_engine . ' not found';
 			return '';
 		}
@@ -142,7 +142,7 @@ class Installer extends CI_Driver_Library {
 	*/
 	public function get_start_command()
 	{
-		if (false == in_array('installer_' . $this->_engine, $this->valid_drivers)) {
+		if (false == in_array($this->_engine, $this->valid_drivers)) {
 			$this->errors = 'Driver' . $this->_engine . ' not found';
 			return '';
 		}
@@ -157,7 +157,7 @@ class Installer extends CI_Driver_Library {
 	*/
 	public function get_default_parameters($aliases_values = array())
 	{
-		if (false == in_array('installer_' . $this->_engine, $this->valid_drivers)) {
+		if (false == in_array($this->_engine, $this->valid_drivers)) {
 			$this->errors = 'Driver' . $this->_engine . ' not found';
 			return '';
 		}
@@ -172,7 +172,7 @@ class Installer extends CI_Driver_Library {
 	*/
 	public function change_server_data(&$server_data)
 	{
-		if (false == in_array('installer_' . $this->_engine, $this->valid_drivers)) {
+		if (false == in_array($this->_engine, $this->valid_drivers)) {
 			$this->errors = 'Driver' . $this->_engine . ' not found';
 		}
 		
@@ -188,7 +188,7 @@ class Installer extends CI_Driver_Library {
 	*/
 	public function change_config()
 	{
-		if (false == in_array('installer_' . $this->_engine, $this->valid_drivers)) {
+		if (false == in_array($this->_engine, $this->valid_drivers)) {
 			$this->errors = 'Driver' . $this->_engine . ' not found';
 			return false;
 		}

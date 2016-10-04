@@ -38,7 +38,7 @@ class Files extends CI_Driver_Library {
 		$this->CI->lang->load('ftp');
 		$this->CI->lang->load('sftp');
 		
-		$this->valid_drivers = array('files_ftp', 'files_sftp', 'files_gdaemon');
+		$this->valid_drivers = array('ftp', 'sftp', 'gdaemon');
 
 		$this->_get_tmp_dir();
 	}
@@ -76,7 +76,7 @@ class Files extends CI_Driver_Library {
 	
 	public function set_driver($driver) 
 	{
-		if (!in_array('files_' . $driver, $this->valid_drivers)) {
+		if (!in_array($driver, $this->valid_drivers)) {
 			throw new Exception(lang('server_files_driver_not_set'));
 		}
 		

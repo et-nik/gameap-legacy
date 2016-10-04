@@ -62,7 +62,7 @@ class Rcon extends CI_Driver_Library {
 	*/
 	public function connect()
 	{
-		if (false == in_array('rcon_' . $this->engine, $this->valid_drivers)) {
+		if (false == in_array($this->engine, $this->valid_drivers)) {
 			$this->errors = 'Driver' . $this->engine . ' not found';
 			return false;
 		}
@@ -102,12 +102,12 @@ class Rcon extends CI_Driver_Library {
 	{
 		$engine = $this->engine;
 		
-		if (false == in_array('rcon_' . $this->engine, $this->valid_drivers)) {
+		if (false == in_array($this->engine, $this->valid_drivers)) {
 			$this->errors = 'Driver' . $this->engine . ' not found';
 			return false;
 		}
 		
-		if (false == in_array('rcon_' . $this->engine, $this->valid_drivers)) {
+		if (false == in_array($this->engine, $this->valid_drivers)) {
 			$this->errors = 'Driver' . $this->engine . ' not found';
 			return false;
 		}
@@ -127,7 +127,7 @@ class Rcon extends CI_Driver_Library {
 	{
 		$engine = $this->engine;
 		
-		if (false == in_array('rcon_' . $this->engine, $this->valid_drivers)) {
+		if (false == in_array($this->engine, $this->valid_drivers)) {
 			$this->errors = 'Driver' . $this->engine . ' not found';
 			return false;
 		}
@@ -145,7 +145,7 @@ class Rcon extends CI_Driver_Library {
 	{
 		$engine = $this->engine;
 		
-		if (false == in_array('rcon_' . $this->engine, $this->valid_drivers)) {
+		if (false == in_array($this->engine, $this->valid_drivers)) {
 			$this->errors = 'Driver' . $this->engine . ' not found';
 			return false;
 		}
@@ -165,7 +165,7 @@ class Rcon extends CI_Driver_Library {
 		
 		$engine = $this->engine;
 		
-		if (false == in_array('rcon_' . $this->engine, $this->valid_drivers)) {
+		if (false == in_array($this->engine, $this->valid_drivers)) {
 			$this->errors = 'Driver' . $this->engine . ' not found';
 			return false;
 		}

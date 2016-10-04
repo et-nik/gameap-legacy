@@ -44,7 +44,7 @@ class Control extends CI_Driver_Library {
 		$this->CI->load->helper('string');
 		$this->CI->lang->load('server_command');
 		
-		$this->valid_drivers = array('control_gdaemon');
+		$this->valid_drivers = array('gdaemon');
 	}
 	
 	// ---------------------------------------------------------------------
@@ -148,7 +148,7 @@ class Control extends CI_Driver_Library {
 	
 	public function set_driver($driver) 
 	{
-		if (!in_array('control_' . $driver, $this->valid_drivers)) {
+		if (!in_array($driver, $this->valid_drivers)) {
 			return false;
 		}
 		
