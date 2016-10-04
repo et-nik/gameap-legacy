@@ -51,18 +51,18 @@ class Dedicated_servers_test extends CIUnit_TestCase
 		$this->assertTrue( is_array($this->CI->dedicated_servers->get_ds_list()) );
 		$this->assertCount(3, $this->CI->dedicated_servers->ds_list);
 		$this->assertEquals('ds3', $this->CI->dedicated_servers->ds_list[2]['name']);
-		$this->assertCount(39, $this->CI->dedicated_servers->ds_list[2]);
+		$this->assertCount(25, $this->CI->dedicated_servers->ds_list[2]);
 		
 		$this->assertTrue( is_array($this->CI->dedicated_servers->get_ds_list(array('id' => 2))) );
 		$this->assertCount(1, $this->CI->dedicated_servers->ds_list);
 		$this->assertEquals('ds2', $this->CI->dedicated_servers->ds_list[0]['name']);
-		$this->assertCount(39, $this->CI->dedicated_servers->ds_list[0]);
+		$this->assertCount(25, $this->CI->dedicated_servers->ds_list[0]);
 		$this->assertFalse( isset($this->CI->dedicated_servers->ds_list[1]) );
 		
 		$this->assertTrue( is_array($this->CI->dedicated_servers->get_ds_list(array('name' => 'ds1'))) );
 		$this->assertCount(1, $this->CI->dedicated_servers->ds_list);
 		$this->assertEquals('ds1', $this->CI->dedicated_servers->ds_list[0]['name']);
-		$this->assertCount(39, $this->CI->dedicated_servers->ds_list[0]);
+		$this->assertCount(25, $this->CI->dedicated_servers->ds_list[0]);
 		$this->assertFalse( isset($this->CI->dedicated_servers->ds_list[1]) );
 	}
 	
@@ -88,7 +88,7 @@ class Dedicated_servers_test extends CIUnit_TestCase
 		$this->assertTrue( is_array($this->CI->dedicated_servers->get_ds_data(2)) );
 		
 		$this->assertEquals('ds2', $this->CI->dedicated_servers->ds_list[0]['name']);
-		$this->assertCount(39, $this->CI->dedicated_servers->ds_list[0]);
+		$this->assertCount(25, $this->CI->dedicated_servers->ds_list[0]);
 		
 		$this->assertFalse( is_array($this->CI->dedicated_servers->get_ds_data(3)) );
 	}
@@ -114,7 +114,7 @@ class Dedicated_servers_test extends CIUnit_TestCase
 		$this->assertTrue( is_array($this->CI->dedicated_servers->get_ds_data(1)) );
 		
 		$this->assertCount(1, $this->CI->dedicated_servers->ds_list);
-		$this->assertCount(39, $this->CI->dedicated_servers->ds_list[0]);
+		$this->assertCount(25, $this->CI->dedicated_servers->ds_list[0]);
 		
 		$this->assertEquals('ds1_edited', $this->CI->dedicated_servers->ds_list[0]['name']);
 		$this->assertEquals('windows', $this->CI->dedicated_servers->ds_list[0]['os']);
