@@ -3,13 +3,13 @@
 class Gameap_modules_test extends CIUnit_TestCase
 { 
 	var $new_module = array(
-						'short_name' 	=> 'module',
-						'name'	 		=> 'My Module',
-						'description' 	=> 'This is my module',
-						'version' 		=> '1.0 beta',
-						'developer' 	=> 'ET-NiK',
-						'site' 			=> 'http://gameap.ru',
-						'show_in_menu' 	=> 1,
+        'short_name' 	=> 'module',
+        'name'	 		=> 'My Module',
+        'description' 	=> 'This is my module',
+        'version' 		=> '1.0 beta',
+        'developer' 	=> 'ET-NiK',
+        'site' 			=> 'http://gameap.ru',
+        'show_in_menu' 	=> 1,
 	);
 	
 	public function setUp()
@@ -58,13 +58,13 @@ class Gameap_modules_test extends CIUnit_TestCase
 	public function test_get_modules_list()
 	{			
 		$this->assertTrue($this->CI->gameap_modules->add_module(array(
-						'short_name' 	=> 'module2',
-						'name'	 		=> 'My Module 2',
-						'description' 	=> 'This is my module',
-						'version' 		=> '1.0 beta',
-						'developer' 	=> 'ET-NiK',
-						'site' 			=> 'http://gameap.ru',
-						'show_in_menu' 	=> 0,
+            'short_name' 	=> 'module2',
+            'name'	 		=> 'My Module 2',
+            'description' 	=> 'This is my module',
+            'version' 		=> '1.0 beta',
+            'developer' 	=> 'ET-NiK',
+            'site' 			=> 'http://gameap.ru',
+            'show_in_menu' 	=> 0,
 		)));
 
 		$this->assertTrue( (count($this->CI->gameap_modules->get_modules_list(false)) == 2) );
