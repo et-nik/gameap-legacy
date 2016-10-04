@@ -25,20 +25,20 @@ $this->load->dbforge();
 
 // Delete tables, if exists
 $this->dbforge->drop_table('actions', true);
-$this->dbforge->drop_table('cron' true);
-$this->dbforge->drop_table('dedicated_servers' true);
-$this->dbforge->drop_table('ds_stats' true);
-$this->dbforge->drop_table('ds_users' true);
-$this->dbforge->drop_table('games' true);
-$this->dbforge->drop_table('game_types' true);
-$this->dbforge->drop_table('gdaemon_tasks' true);
-$this->dbforge->drop_table('logs' true);
-$this->dbforge->drop_table('modules' true);
-$this->dbforge->drop_table('servers' true);
-$this->dbforge->drop_table('servers_privileges' true);
-$this->dbforge->drop_table('settings' true);
-$this->dbforge->drop_table('sessions' true);
-$this->dbforge->drop_table('users' true);
+$this->dbforge->drop_table('cron', true);
+$this->dbforge->drop_table('dedicated_servers', true);
+$this->dbforge->drop_table('ds_stats', true);
+$this->dbforge->drop_table('ds_users', true);
+$this->dbforge->drop_table('games', true);
+$this->dbforge->drop_table('game_types', true);
+$this->dbforge->drop_table('gdaemon_tasks', true);
+$this->dbforge->drop_table('logs', true);
+$this->dbforge->drop_table('modules', true);
+$this->dbforge->drop_table('servers', true);
+$this->dbforge->drop_table('servers_privileges', true);
+$this->dbforge->drop_table('settings', true);
+$this->dbforge->drop_table('sessions', true);
+$this->dbforge->drop_table('users', true);
 
 /*----------------------------------*/
 /*              actions             */
@@ -113,7 +113,7 @@ $this->dbforge->add_field($fields = array(
         'type' => 'INT',
         'constraint' => 32, 
     ),
-););
+));
 $this->dbforge->add_key('id', TRUE);
 $this->dbforge->create_table('cron');
 
