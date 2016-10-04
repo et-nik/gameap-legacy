@@ -15,29 +15,9 @@ class Dedicated_servers_test extends CIUnit_TestCase
 		$sql_data = array(
 			'name' => 'ds1',
 			'os' => 'linux',
-			'control_protocol' => 'ssh',
 			'location' => 'russia',
 			'provider' => 'gameap',
 			'ip' => json_encode(array('127.0.0.1', '1.3.3.7')),
-			
-			'gdaemon_host' => '127.0.0.1',
-			'gdaemon_key' => '1234567890123456',
-			
-			'ssh_host' => '127.0.0.2',
-			'ssh_login' => 'root',
-			'ssh_password' => 'travis',
-			'ssh_path' => '/home/servers',
-			
-			'telnet_host' => '127.0.0.3',
-			'telnet_login' => 'Administrator',
-			'telnet_password' => 'telpen_password',
-			'telnet_path' => 'C:/servers',
-			
-			'ftp_host' => '127.0.0.4',
-			'ftp_login' => 'ftp',
-			'ftp_password' => 'ftppass',
-			'ftp_path' => '/',
-
 		);
 			
 		$this->assertTrue($this->CI->dedicated_servers->add_dedicated_server($sql_data));
@@ -47,29 +27,9 @@ class Dedicated_servers_test extends CIUnit_TestCase
 		$sql_data = array(
 			'name' => 'ds2',
 			'os' => 'windows',
-			'control_protocol' => 'ssh',
 			'location' => 'russia',
 			'provider' => 'gameap',
 			'ip' => json_encode(array('127.0.0.5')),
-			
-			'gdaemon_host' => '127.0.0.6',
-			'gdaemon_key' => '0000000000',
-			
-			'ssh_host' => '127.0.0.7',
-			'ssh_login' => 'root',
-			'ssh_password' => 'travis',
-			'ssh_path' => '/home/servers',
-			
-			'telnet_host' => '127.0.0.8',
-			'telnet_login' => 'Administrator',
-			'telnet_password' => 'telpen_password',
-			'telnet_path' => 'C:/servers',
-			
-			'ftp_host' => '127.0.0.9',
-			'ftp_login' => 'ftp',
-			'ftp_password' => 'ftppass',
-			'ftp_path' => '/',
-
 		);
 			
 		$this->assertTrue($this->CI->dedicated_servers->add_dedicated_server($sql_data));
@@ -78,7 +38,6 @@ class Dedicated_servers_test extends CIUnit_TestCase
 		$sql_data = array(
 			'name' => 'ds3',
 			'os' => 'windows',
-			'control_protocol' => 'ssh',
 			'location' => 'russia',
 			'provider' => 'gameap',
 			'ip' => json_encode(array('127.0.0.10')),
@@ -145,29 +104,9 @@ class Dedicated_servers_test extends CIUnit_TestCase
 		$sql_data = array(
 			'name' => 'ds1_edited',
 			'os' => 'windows',
-			'control_protocol' => 'gdaemon',
 			'location' => 'russia',
 			'provider' => 'gameap',
 			'ip' => json_encode(array('127.0.0.1', '1.3.3.7')),
-			
-			'gdaemon_host' => '127.0.0.1',
-			'gdaemon_key' => '1234567890123456',
-			
-			'ssh_host' => '127.0.0.2',
-			'ssh_login' => 'root',
-			'ssh_password' => 'travis',
-			'ssh_path' => '/home/servers',
-			
-			'telnet_host' => '127.0.0.3',
-			'telnet_login' => 'Administrator',
-			'telnet_password' => 'telpen_password',
-			'telnet_path' => 'C:/servers',
-			
-			'ftp_host' => '127.0.0.4',
-			'ftp_login' => 'ftp',
-			'ftp_password' => 'ftppass',
-			'ftp_path' => '/',
-
 		);
 		
 		$this->assertTrue( $this->CI->dedicated_servers->edit_dedicated_server(1, $sql_data) );
@@ -179,7 +118,6 @@ class Dedicated_servers_test extends CIUnit_TestCase
 		
 		$this->assertEquals('ds1_edited', $this->CI->dedicated_servers->ds_list[0]['name']);
 		$this->assertEquals('windows', $this->CI->dedicated_servers->ds_list[0]['os']);
-		$this->assertEquals('gdaemon', $this->CI->dedicated_servers->ds_list[0]['control_protocol']);
 	}
 	
 	function test_select_ids()
