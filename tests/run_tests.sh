@@ -17,6 +17,7 @@ sudo chmod 666 /home/travis/build/ET-NiK/GameAP/Files/File02.txt
 phpunit --version
 
 mv /home/travis/build/ET-NiK/GameAP/tests/Test.php /home/travis/build/ET-NiK/GameAP/upload/application/controllers/Test.php
+mv /home/travis/build/ET-NiK/GameAP/tests/gameap_config.php /home/travis/build/ET-NiK/GameAP/upload/application/config/gameap_config.php
 phpunit --configuration /home/travis/build/ET-NiK/GameAP/tests/phpunit-dbinst.xml
 
 phpunit --configuration /home/travis/build/ET-NiK/GameAP/tests/phpunit.xml
