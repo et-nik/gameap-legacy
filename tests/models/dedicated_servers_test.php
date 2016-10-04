@@ -99,7 +99,6 @@ class Dedicated_servers_test extends CIUnit_TestCase
 		
 		$this->assertEquals('ds1', $this->CI->dedicated_servers->ds_list[0]['name']);
 		$this->assertEquals('linux', $this->CI->dedicated_servers->ds_list[0]['os']);
-		$this->assertEquals('ssh', $this->CI->dedicated_servers->ds_list[0]['control_protocol']);
 		
 		$sql_data = array(
 			'name' => 'ds1_edited',
