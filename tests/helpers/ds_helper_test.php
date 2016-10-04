@@ -72,50 +72,42 @@ class Ds_helper_test extends CIUnit_TestCase
 	public function test_get_ds_file_path()
 	{
 		$this->assertEquals('/home/serv01/cstrike/', $this->_get_ds_file_path(array(
-			'ftp_host' 	=> 'localhost',
-			'ftp_path' 	=> '/home/serv01',
+			'work_path' => '/home/serv01',
 			'dir' 		=> 'cstrike',
 		)));
 		
 		$this->assertEquals('/home/serv01/cstrike/', $this->_get_ds_file_path(array(
-			'ftp_host' 	=> 'localhost',
-			'ftp_path' 	=> '/home/serv01//',
+			'work_path' => '/home/serv01//',
 			'dir' 		=> '/cstrike/',
 		)));
 		
 		$this->assertEquals('/home/serv01/cstrike/', $this->_get_ds_file_path(array(
-			'ssh_host' 	=> 'localhost',
-			'ssh_path' 	=> '/home/serv01',
+			'work_path' => '/home/serv01',
 			'dir' 		=> 'cstrike',
 		)));
 		
 		$this->assertEquals('/home/serv01/cstrike/', $this->_get_ds_file_path(array(
-			'ssh_host' 	=> 'localhost',
-			'ssh_path' 	=> '/home/serv01//',
+			'work_path' => '/home/serv01//',
 			'dir' 		=> '/cstrike/',
 		)));
 		
 		$this->assertEquals('/home/serv01/cstrike/', $this->_get_ds_file_path(array(
-			'gdaemon_host' 	=> 'localhost',
-			'script_path' 	=> '/home/serv01',
+			'work_path' => '/home/serv01',
 			'dir' 		=> 'cstrike',
 		)));
 		
 		$this->assertEquals('/home/serv01/cstrike/', $this->_get_ds_file_path(array(
-			'gdaemon_host' 	=> 'localhost',
-			'script_path' 	=> '/home/serv01//',
+			'work_path' => '/home/serv01//',
 			'dir' 		=> '/cstrike/',
 		)));
 		
 		$this->assertEquals('/home/serv01/cstrike/', $this->_get_ds_file_path(array(
-			'local_server' => 1,
-			'script_path' 	=> '/home/serv01',
+			'work_path' => '/home/serv01',
 			'dir' 		=> 'cstrike',
 		)));
 		
 		$this->assertEquals('/home/serv01/cstrike/', $this->_get_ds_file_path(array(
-			'local_server' => 1,
-			'script_path' 	=> '/home/serv01//',
+			'work_path' => '/home/serv01//',
 			'dir' 		=> '/cstrike/',
 		)));
 	}
