@@ -24,6 +24,4 @@ phpunit --version
 mv /home/travis/build/ET-NiK/GameAP/tests/Test.php /home/travis/build/ET-NiK/GameAP/upload/application/controllers/Test.php
 phpunit --configuration /home/travis/build/ET-NiK/GameAP/tests/phpunit-dbinst.xml
 
-mv /home/travis/build/ET-NiK/GameAP/tests/database.php /home/travis/build/ET-NiK/GameAP/upload/application/config/database.php
-
 phpunit --configuration /home/travis/build/ET-NiK/GameAP/tests/phpunit.xml
