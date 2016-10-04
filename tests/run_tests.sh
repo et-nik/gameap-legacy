@@ -20,4 +20,4 @@ mv /home/travis/build/ET-NiK/GameAP/tests/Test.php /home/travis/build/ET-NiK/Gam
 phpunit --configuration /home/travis/build/ET-NiK/GameAP/tests/phpunit-dbinst.xml
 
 phpunit --configuration /home/travis/build/ET-NiK/GameAP/tests/phpunit.xml
-echo "Result $?"
+exit $?
