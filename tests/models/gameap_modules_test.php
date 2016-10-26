@@ -15,6 +15,8 @@ class Gameap_modules_test extends CIUnit_TestCase
 	public function setUp()
     {
 		$this->CI->db->db_debug = 0;
+
+        $this->CI->load->model('gameap_modules');
     }
     
     public function test_add_module()
