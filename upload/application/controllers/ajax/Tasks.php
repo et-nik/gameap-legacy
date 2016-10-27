@@ -1,7 +1,7 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * Game AdminPanel (GameAP)
- * 
+ *
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (NiK)
@@ -19,7 +19,7 @@ class Tasks extends CI_Controller {
     public function __construct()
     {
         parent::__construct();
-        
+
         $this->load->database();
         $this->load->model('users');
         $this->lang->load('main');
@@ -29,7 +29,7 @@ class Tasks extends CI_Controller {
         // if (!$this->input->is_ajax_request()) {
 		   // show_404();
 		// }
-        
+
         if(!$this->users->check_user()) {
             show_404();
         }
@@ -38,20 +38,20 @@ class Tasks extends CI_Controller {
     }
 
     // -----------------------------------------------------------------
-    
+
     private function _send_response($array)
     {
 		$response = json_encode($array);
-		
+
 		if (!$response) {
 			$this->_send_error('Invalid data');
 		}
-		
+
 		$this->output->append_output($response);
 	}
-    
+
     // -----------------------------------------------------------------
-    
+
     private function _send_error($error = "")
     {
 		$this->output->append_output(json_encode(array('status' => 0, 'error_text' => $error)));
@@ -80,7 +80,7 @@ class Tasks extends CI_Controller {
         if (!$this->users->auth_data['is_admin']) {
 
             $this->users->get_server_privileges($server_id);
-            
+
             switch ($task) {
                 case 'gsstart':
                     if (!$this->users->auth_servers_privileges['SERVER_START']) {
@@ -97,7 +97,7 @@ class Tasks extends CI_Controller {
                     }
 
                     break;
-                
+
                 case 'gsrest':
                     if (!$this->users->auth_servers_privileges['SERVER_RESTART']) {
                         $this->_send_error("Access denied");
@@ -105,7 +105,7 @@ class Tasks extends CI_Controller {
                     }
 
                     break;
-                
+
                 case 'gsinst':
                     if (!$this->users->auth_servers_privileges['SERVER_UPDATE']) {
                         $this->_send_error("Access denied");
@@ -117,7 +117,7 @@ class Tasks extends CI_Controller {
                 default:
                     $this->_send_error("Unknown task");
                     return;
-                    
+
                     break;
 
             }
@@ -132,10 +132,10 @@ class Tasks extends CI_Controller {
             // $this->_send_error("This task exists. Please wait.");
             // return;
         // }
-        
+
         if ($this->gdaemon_tasks->get_list()) {
             $count_tasks = count($this->gdaemon_tasks->tasks_list);
-            
+
             if ($count_tasks == 1) {
                 $this->_send_response(array('status' => 1, 'message' => "Task exists", 'task_id' => $this->gdaemon_tasks->tasks_list[0]['id']));
                 return;
@@ -155,6 +155,15 @@ class Tasks extends CI_Controller {
         ));
 
         if ($task_id) {
+			$this->panel_log->save_log(array(
+                'type'          => 'gdaemon_task_add',
+                'command'       => $task,
+                'user_name'     => $this->users->auth_login,
+                'server_id'     => $server_id,
+                'msg'           => 'Task successfully added',
+                'log_data'      => "TaskID: {$task_id}",
+            ));
+
             $this->_send_response(array('status' => 1, 'message' => "Task added", 'task_id' => $task_id));
         } else {
             $this->_send_error("DB error");
