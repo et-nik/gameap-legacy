@@ -2,7 +2,7 @@
 /**
  * Game AdminPanel (АдминПанель)
  *
- * 
+ *
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (NiK)
@@ -11,12 +11,12 @@
  * @link		http://www.gameap.ru
 */
 class Gdaemon_tasks extends CI_Model {
-    
+
     public $last_error     = "";
 
     public $tasks_list     = array();
     public $single_task    = array();
-    
+
     private $_filter_list    = array();
 
     private $_task_human_names = array(
@@ -41,15 +41,15 @@ class Gdaemon_tasks extends CI_Model {
             case 'ds_id':
                 $this->_filter_list[$fname] = $fvalue;
                 break;
-                
+
             case 'server_id':
                 $this->_filter_list[$fname] = $fvalue;
                 break;
-                
+
             case 'task':
                 $this->_filter_list[$fname] = $fvalue;
                 break;
-                
+
             case 'status':
                 $this->_filter_list[$fname] = $fvalue;
                 break;
@@ -59,20 +59,20 @@ class Gdaemon_tasks extends CI_Model {
             case 'time_create <':
                 $this->_filter_list[$fname] = $fvalue;
                 break;
-                
+
             case 'time_stchange':
             case 'time_stchange >':
             case 'time_stchange <':
                 $this->_filter_list[$fname] = $fvalue;
                 break;
-            
+
 
             default:
                 // Unknown filter
                 break;
         }
     }
-    
+
     // -----------------------------------------------------------------
 
     /**
@@ -118,13 +118,13 @@ class Gdaemon_tasks extends CI_Model {
         $this->db->join('servers', 'servers.id = gdaemon_tasks.server_id');
         $this->db->order_by('gdaemon_tasks.id', 'desc');
         $query = $this->db->get();
-        
+
         if ($query == false) {
             return false;
         }
-        
+
         $this->tasks_list = $query->result_array();
-			
+
         return true;
     }
 
@@ -155,7 +155,7 @@ class Gdaemon_tasks extends CI_Model {
 
         $this->db->join('dedicated_servers', 'dedicated_servers.id = gdaemon_tasks.ds_id');
         $this->db->join('servers', 'servers.id = gdaemon_tasks.server_id');
-        
+
         $query = $this->db->get();
         $this->single_task = $query->row_array();
 
@@ -186,10 +186,10 @@ class Gdaemon_tasks extends CI_Model {
     }
 
     // -----------------------------------------------------------------
-	
+
 	/**
      * Add new task
-     * 
+     *
      * @param array $data
      * @return bool
      *
@@ -216,6 +216,16 @@ class Gdaemon_tasks extends CI_Model {
 
         if ((bool)$this->db->insert('gdaemon_tasks', $data)) {
             $task_id = $this->db->insert_id();
+            
+            $this->panel_log->save_log(array(
+                'type'          => 'gdaemon_task_add',
+                'command'       => $data['task'],
+                'user_name'     => isset($this->users->auth_login) ? $this->users->auth_login : '',
+                'server_id'     => $data['server_id'],
+                'msg'           => 'Task successfully added',
+                'log_data'      => "TaskID: {$task_id}",
+            ));
+
             $this->gameap_hooks->run('post_gtask_add', array('task_data' => &$data, 'task_id' => $task_id));
             return $task_id;
         }
@@ -223,12 +233,12 @@ class Gdaemon_tasks extends CI_Model {
             return 0;
         }
 	}
-	
+
 	// -----------------------------------------------------------------
-	
+
 	/**
      * Delete task
-     * 
+     *
      * @param id $id
      * @return bool
      *
@@ -239,10 +249,10 @@ class Gdaemon_tasks extends CI_Model {
 	}
 
     // -----------------------------------------------------------------
-	
+
 	/**
      * Update task
-     * 
+     *
      * @param int $id
      * @param array $data
      * @return bool
@@ -256,7 +266,7 @@ class Gdaemon_tasks extends CI_Model {
 		else {
 			$this->db->where('id', $id);
 		}
-		
+
 		return (bool)$this->db->update('gdaemon_tasks', $data);
 	}
 
@@ -281,5 +291,5 @@ class Gdaemon_tasks extends CI_Model {
             return $task_status;
         }
     }
-    
+
 }

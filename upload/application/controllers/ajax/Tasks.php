@@ -155,15 +155,6 @@ class Tasks extends CI_Controller {
         ));
 
         if ($task_id) {
-			$this->panel_log->save_log(array(
-                'type'          => 'gdaemon_task_add',
-                'command'       => $task,
-                'user_name'     => $this->users->auth_login,
-                'server_id'     => $server_id,
-                'msg'           => 'Task successfully added',
-                'log_data'      => "TaskID: {$task_id}",
-            ));
-
             $this->_send_response(array('status' => 1, 'message' => "Task added", 'task_id' => $task_id));
         } else {
             $this->_send_error("DB error");
