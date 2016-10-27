@@ -47,6 +47,8 @@
     };
 </script>
 
+<script type="text/javascript" src="{base_url}themes/system/js/tasks.js"></script>
+
 <script>
     // 0 - not get, 1 - getting, 2 - active, 3 - not active
     var server_status = 0;
@@ -55,7 +57,7 @@
     {
         server_status = 1;
 
-        $.ajax({ 
+        $.ajax({
             url:    sprintf("%sajax/server_control/get_status/%s", page.site_url, server_id),
             type:     "GET",
             dataType: "json",
@@ -72,7 +74,7 @@
             }
         });
     }
-    
+
     function server_act(task)
     {
         noty({
@@ -102,14 +104,12 @@
     {
         $('#view-task-status').arcticmodal();
     }
-    
+
     function tmodal_close()
     {
         $('#view-task-status').arcticmodal('close');
     }
 </script>
-
-<script type="text/javascript" src="{base_url}themes/system/js/tasks.js"></script>
 
 <h2>{lang_server_control_base_commands}</h2>
 
@@ -119,19 +119,19 @@
         <h2 class="task-progress-header"></h2>
 
         <div id="vts-content">
-            
+
         </div>
 
         <div class="secondary progress" role="progressbar" tabindex="0" aria-valuenow="25" aria-valuemin="0" aria-valuetext="25 percent" aria-valuemax="100">
             <div class="progress-meter" style="width: 0%"></div>
         </div>
-        
-        
+
+
     </div>
 </div>
 
-<?php 
-if(($this->users->auth_privileges['srv_start'] == 1 
+<?php
+if(($this->users->auth_privileges['srv_start'] == 1
 		AND $this->users->auth_servers_privileges['SERVER_START'])
 	AND ($this->servers->server_data['server_status'] == 0)
 ):
@@ -140,8 +140,8 @@ if(($this->users->auth_privileges['srv_start'] == 1
 	<a id="start-server" class="green button" href="#">&#9658;&nbsp;{lang_start}</a>
 <?php endif; ?>
 
-<?php 
-if(($this->users->auth_privileges['srv_stop'] == 1 
+<?php
+if(($this->users->auth_privileges['srv_stop'] == 1
 		AND $this->users->auth_servers_privileges['SERVER_STOP'])
 	AND ($this->servers->server_data['server_status'] == 1)
 ):
@@ -149,8 +149,8 @@ if(($this->users->auth_privileges['srv_stop'] == 1
 	<a id="stop-server" class="red button" href="#">&#9632;&nbsp;{lang_stop}</a>
 <?php endif; ?>
 
-<?php 
-if($this->users->auth_privileges['srv_restart'] == 1 
+<?php
+if($this->users->auth_privileges['srv_restart'] == 1
 	AND $this->users->auth_servers_privileges['SERVER_RESTART']
 ):
 ?>
@@ -172,7 +172,7 @@ if($this->users->auth_privileges['srv_restart'] == 1
 		<?php if( $this->users->auth_servers_privileges['UPLOAD_CONTENTS'] && $this->users->auth_servers_privileges['CHANGE_CONFIG']): ?>
 			<div class="menu_icons"><a href="{site_url}web_ftp/server/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/remote_folder.png" /><br />{lang_server_files_cfg_files}</a></div>
 		<?php endif; ?>
-      
+
 		<?php if($this->users->auth_servers_privileges['CONSOLE_VIEW']): ?>
 			<div class="menu_icons"><a href="{site_url}server_command/console_view/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/console.png" /><br />{lang_server_control_console_view}</a></div>
 		<?php endif; ?>
@@ -180,26 +180,26 @@ if($this->users->auth_privileges['srv_restart'] == 1
 		<?php if($this->users->auth_servers_privileges['SERVER_SETTINGS']): ?>
 			<div class="menu_icons"><a href="{site_url}admin/settings/server/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/settings.png" /><br />{lang_server_control_settings}</a></div>
 		<?php endif; ?>
-		
-		<?php if (module_exists('amxx_plugins_control') 
+
+		<?php if (module_exists('amxx_plugins_control')
 					&& strtolower($this->servers->server_data['engine']) == 'goldsource'
-					&& $this->users->auth_servers_privileges['UPLOAD_CONTENTS'] 
+					&& $this->users->auth_servers_privileges['UPLOAD_CONTENTS']
 					&& $this->users->auth_servers_privileges['CHANGE_CONFIG']
 		): ?>
 			<div class="menu_icons"><a href="{site_url}amxx_plugins_control/server/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/plugins.png" /><br />AMXX Plugins</a></div>
 		<?php endif; ?>
-		
-		<?php if (module_exists('chat') 
+
+		<?php if (module_exists('chat')
 					&& strtolower($this->servers->server_data['engine']) == 'goldsource'
 					&& $this->users->auth_servers_privileges['SERVER_CHAT_MSG']
 		): ?>
 			<div class="menu_icons"><a href="{site_url}chat/server/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/chat.png" /><br />Chat</a></div>
 		<?php endif; ?>
-		
+
 		<?php if($this->users->auth_data['is_admin']): ?>
 			<div class="menu_icons"><a href="{site_url}adm_servers/edit/game_servers/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/administration.png" /><br />{lang_administration}</a></div>
 		<?php endif; ?>
-		
+
 		<?php if($this->users->auth_servers_privileges['CHANGE_RCON']): ?>
 			<div class="menu_icons"><a href="{site_url}rcon_changer/change/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/field.png" /><br />Сменить RCON пароль</a></div>
 		<?php endif; ?>
@@ -207,15 +207,15 @@ if($this->users->auth_privileges['srv_restart'] == 1
         {modules_menu}
             <div class="menu_icons"><a href="{modules_menu_link}"><img src="{modules_menu_icon}" /><br />{modules_menu_text}</a></div>
         {/modules_menu}
-		
+
 	</div>
 </div>
 
 <?php if ($this->servers->server_data['server_status']): ?>
 	<?php /* Сервер запущен */ ?>
-	
+
 	<h2>{lang_status}</h2>
-	
+
 	<table style="margin-left:100px;width:60%;" class="zebra">
 		{base_cvars}
 		<tr>
@@ -243,13 +243,13 @@ if($this->users->auth_privileges['srv_restart'] == 1
 				<td width="20%">{user_ip}</td>
 				<td>
 					<?php if ($this->servers->server_data['kick_cmd']): ?>
-						<a class="small button" href="{site_url}server_command/rcon/pl_kick/{server_id}/{user_id}/">{lang_server_control_kick}<a/> 
+						<a class="small button" href="{site_url}server_command/rcon/pl_kick/{server_id}/{user_id}/">{lang_server_control_kick}<a/>
 					<?php endif; ?>
-					
+
 					<?php if ($this->servers->server_data['ban_cmd']): ?>
-						<a class="small button" href="{site_url}server_command/rcon/pl_ban/{server_id}/{user_id}/">{lang_server_control_ban}<a/> 
+						<a class="small button" href="{site_url}server_command/rcon/pl_ban/{server_id}/{user_id}/">{lang_server_control_ban}<a/>
 					<?php endif; ?>
-					
+
 					<?php if ($this->servers->server_data['chname_cmd']): ?>
 						<a class="small button" href="{site_url}server_command/rcon/pl_changename/{server_id}/{user_id}/">{lang_server_control_ch_name}<a/>
 					<?php endif; ?>
@@ -306,22 +306,46 @@ if($this->users->auth_privileges['srv_restart'] == 1
 
 <?php endif; ?>
 
+<?php if ($this->users->auth_servers_privileges['LOGS_VIEW']): ?>
+	<p class="hr"><strong>{lang_server_control_last_actions}</strong></p>
+	<table width="100%" class="zebra">
+		<thead>
+		<tr>
+			<th><strong>{lang_time}</strong></th>
+			<th><strong>{lang_action}</strong></th>
+			<th><strong>{lang_command}</strong></th>
+			<th><strong>{lang_user}</strong></th>
+			<th>&nbsp;</td>
+		</tr>
+		</thead>
+	{log_list}
+		<tr>
+			<td width="20%">{log_date}</td>
+			<td width="20%">{log_type}</td>
+			<td width="20%">{log_command}</td>
+			<td width="20%">{log_user_name}</td>
+			<td><a class="small awesome" href={site_url}log_view/view/{log_id}>{lang_view}</a></td>
+		</tr>
+	{/log_list}
+	</table>
+<?php endif; ?>
+
 <script>
     $('#start-server').click(function() {
         server_act('gsstart');
         return false;
     });
-    
+
     $('#stop-server').click(function() {
         server_act('gsstop');
         return false;
     });
-    
+
     $('#restart-server').click(function() {
         server_act('gsrest');
         return false;
     });
-    
+
     $('#update-server').click(function() {
         server_act('gsinst');
         return false;
