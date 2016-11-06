@@ -229,7 +229,7 @@ class Servers extends CI_Model {
      *
      *
     */
-    function add_game_server($data)
+    public function add_game_server($data)
     {
 		$this->load->helper('string');
 		$this->load->model('games');
@@ -251,7 +251,7 @@ class Servers extends CI_Model {
      *
      *
     */
-    function edit_game_server($id, $data)
+    public function edit_game_server($id, $data)
     {
 		$this->db->where('id', $id);
         $this->gameap_hooks->run('pre_server_edit', array('server_id' => $id, 'server_data' => &$data));
@@ -281,7 +281,7 @@ class Servers extends CI_Model {
      * @return bool
      *
     */
-	function update_modules_data($id, $data, $module_name, $erase = false)
+	public function update_modules_data($id, $data, $module_name, $erase = false)
 	{
 		$server_data = $this->get_server_data($id, true, true, true);
 
@@ -306,7 +306,7 @@ class Servers extends CI_Model {
      *
      *
     */
-    function delete_game_server($id)
+    public function delete_game_server($id)
     {
         $this->gameap_hooks->run('pre_server_delete', array('server_id' => $id));
 
@@ -334,7 +334,7 @@ class Servers extends CI_Model {
      * @param array - where для запроса sql
      *
     */
-	function get_list($user_id = false, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1', ))
+	public function get_list($user_id = false, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1', ))
 	{
 		return $this->get_servers_list($user_id, $privilege_name, $where);
 	}
@@ -350,7 +350,7 @@ class Servers extends CI_Model {
      * @param array - where для запроса sql
      *
     */
-	function get_server_list($user_id = false, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1', ))
+	public function get_server_list($user_id = false, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1', ))
 	{
 		return $this->get_servers_list($user_id, $privilege_name, $where);
 	}
@@ -360,7 +360,7 @@ class Servers extends CI_Model {
 	/**
      * Задает фильтры для получения серверов с определенными данными
     */
-	function set_filter($filter)
+	public function set_filter($filter)
 	{
 		if (is_array($filter)) {
 			$this->_filter_servers_list['name'] = (isset($filter['name']) && $filter['name']) ? $filter['name'] : null;
@@ -374,7 +374,7 @@ class Servers extends CI_Model {
 	/**
 	 * Сортировка для списка серверов
 	 */
-	function order_by($field, $order = 'asc')
+	public function order_by($field, $order = 'asc')
 	{
 		$this->_order_by['field'] = $field;
 		$this->_order_by['order'] = $order;
@@ -390,7 +390,7 @@ class Servers extends CI_Model {
      * @param array - where для запроса sql
      *
     */
-    function get_servers_list($user_id = false, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1'), $limit = 99999, $offset = 0, $engine = false, $engine_version = false)
+    public function get_servers_list($user_id = false, $privilege_name = 'VIEW', $where = array('enabled' => '1', 'installed' => '1'), $limit = 99999, $offset = 0, $engine = false, $engine_version = false)
     {
 		/* Если задан движок, то получаем список игр на этом движке,
 		 * а после выбираем серверы только этих игр
@@ -539,7 +539,7 @@ class Servers extends CI_Model {
      * @return array
      *
     */
-    function get_server_data($server_id, $no_get_ds = false, $no_get_game = false, $no_get_gt = false)
+    public function get_server_data($server_id, $no_get_ds = false, $no_get_game = false, $no_get_gt = false)
     {
 		// Загрузка необходимых моделей
 		$this->load->model('servers/dedicated_servers');
@@ -696,7 +696,7 @@ class Servers extends CI_Model {
      *
      *
     */
-	function tpl_data()
+	public function tpl_data()
     {
 		$this->load->model('servers/games');
 		$num = -1;
@@ -742,7 +742,7 @@ class Servers extends CI_Model {
      *
      * @return bool
     */
-	function server_live($server_id)
+	public function server_live($server_id)
 	{
 		$this->db->where('id', $server_id);
 		return (bool)($this->db->count_all_results('servers') > 0);
@@ -750,7 +750,7 @@ class Servers extends CI_Model {
 
 	// -----------------------------------------------------------------
 
-	function select_fields($fields)
+	public function select_fields($fields)
 	{
 		$this->_fields = $fields;
 	}
@@ -762,7 +762,7 @@ class Servers extends CI_Model {
      *
      * @return bool
     */
-	function ds_server_live($server_id)
+	public function ds_server_live($server_id)
 	{
 		$this->db->where('id', $server_id);
 		return (bool)($this->db->count_all_results('dedicated_servers') > 0);
@@ -775,7 +775,7 @@ class Servers extends CI_Model {
      *
      * @return bool
     */
-	function server_status($host = false, $port = false, $engine = false, $engine_version = false)
+	public function server_status($host = false, $port = false, $engine = false, $engine_version = false)
 	{
 		$this->load->library('query');
 		$this->load->driver('rcon');
@@ -850,7 +850,7 @@ class Servers extends CI_Model {
      * @return array
      *
     */
-    function get_game_servers_list($where = false, $limit = 10000, $offset = 0, $engine = false, $engine_version = false)
+    public function get_game_servers_list($where = false, $limit = 10000, $offset = 0, $engine = false, $engine_version = false)
     {
 		/* Если задан движок, то получаем список игр на этом движке,
 		 * а после выбираем серверы только этих игр
@@ -894,10 +894,10 @@ class Servers extends CI_Model {
 	/**
 	 * Получение количества игровых серверов в зависимости от условия
 	 *
-	 * @param array 	условие
+	 * @param array $where
 	 * @return int
 	 */
-	function get_servers_count($where = array())
+	public function get_servers_count($where = array())
 	{
 		$this->db->where($where);
 		return $this->db->count_all_results('servers');
@@ -929,7 +929,7 @@ class Servers extends CI_Model {
      * @return array - возвращает список файлов с полным путем к файлу
      *
     */
-	function get_local_files($server_data, $dir, $file_time = false, $file_size = false)
+	public function get_local_files($server_data, $dir, $file_time = false, $file_size = false)
 	{
 		$this->load->helper('ds');
 		return list_ds_files($dir, $server_data, true);
@@ -949,7 +949,7 @@ class Servers extends CI_Model {
      * @return array - возвращает список файлов с полным путем к файлу
      *
     */
-	function get_remote_files($server_data, $dir, $file_time = false, $file_size = false)
+	public function get_remote_files($server_data, $dir, $file_time = false, $file_size = false)
 	{
 		$this->load->helper('ds');
 		return list_ds_files($dir, $server_data, true);
@@ -985,7 +985,7 @@ class Servers extends CI_Model {
      * @param str
      * @return str
     */
-	function read_local_file($file)
+	public function read_local_file($file)
 	{
 		$server_data = empty($server_data) ? $this->server_data : $server_data;
 		$this->load->helper('ds');
@@ -1017,7 +1017,7 @@ class Servers extends CI_Model {
      * @return str
      *
     */
-	function read_remote_file($file, $server_data = array())
+	public function read_remote_file($file, $server_data = array())
 	{
 		$server_data = empty($server_data) ? $this->server_data : $server_data;
 		$this->load->helper('ds');
@@ -1035,7 +1035,7 @@ class Servers extends CI_Model {
      *
      * @return bool
     */
-    function change_rcon($new_rcon, $server_data = false, $update_db = false)
+    public function change_rcon($new_rcon, $server_data = false, $update_db = false)
     {
 		$this->load->helper('patterns_helper');
 		$this->load->driver('rcon');
@@ -1075,7 +1075,7 @@ class Servers extends CI_Model {
      *
      * @return array
     */
-    function get_server_settings($server_id, $user_id = false)
+    public function get_server_settings($server_id, $user_id = false)
     {
 		if(!$user_id) {
             $where = array('server_id' => $server_id);
@@ -1110,7 +1110,7 @@ class Servers extends CI_Model {
      *
      * @return bool
     */
-    function set_server_settings($sett_id, $value, $server_id, $user_id = false)
+    public function set_server_settings($sett_id, $value, $server_id, $user_id = false)
     {
         $where = array('sett_id' => $sett_id, 'server_id' => $server_id);
 
@@ -1156,7 +1156,7 @@ class Servers extends CI_Model {
     /**
      * Запуск сервера. Функция для обратной совместимости с модулями 1.x
      */
-    function start($server_data = array())
+    public function start($server_data = array())
     {
         $this->load->model('gdaemon_tasks');
 
@@ -1178,7 +1178,7 @@ class Servers extends CI_Model {
     /**
      * Остановка сервера. Функция для обратной совместимости с модулями 1.x
      */
-    function stop($server_id = 0)
+    public function stop($server_id = 0)
     {
         $this->load->model('gdaemon_tasks');
 
@@ -1200,7 +1200,7 @@ class Servers extends CI_Model {
     /**
      * Перезапуск сервера. Функция для обратной совместимости с модулями 1.x
      */
-    function restart($server_id = 0)
+    public function restart($server_id = 0)
     {
         $this->load->model('gdaemon_tasks');
 
