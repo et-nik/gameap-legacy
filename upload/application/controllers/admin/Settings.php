@@ -179,7 +179,7 @@ class Settings extends CI_Controller {
 					/* Для безопасности запрещаем пробелы, табы и кавычки */
 					//~ $alias_arr = explode(' ', $this->input->post('alias_' . $alias['alias'], true));
 					//~ $aliases_values[$alias['alias']] = $alias_arr[0];
-					$aliases_values[$alias['alias']] = $this->input->post('alias_' . $alias['alias'], true);
+					$aliases_values[$alias['alias']] = $this->input->post('alias_' . $alias['alias']);
 					$aliases_values[$alias['alias']] = str_replace('\'', '', $aliases_values[$alias['alias']]);
 					$aliases_values[$alias['alias']] = str_replace('&', '', $aliases_values[$alias['alias']]);
 					$aliases_values[$alias['alias']] = str_replace('|', '', $aliases_values[$alias['alias']]);
