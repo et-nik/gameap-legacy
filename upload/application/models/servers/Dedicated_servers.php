@@ -1,34 +1,34 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Dedicated_servers extends CI_Model {
-	
+
 	var $ds_list = array();				// Список удаленных серверов
-	
+
     var $errors; 						// Строка с ошибкой (если имеются)
-    
+
     private $_commands = array();
     private $_errors	= false;
-    
+
     private $_scripts_default = array(
-		'script_start' 			=> './starter -t start -d {dir} -u {user} -c "{command}"',
-		'script_stop' 			=> './starter -t start -d {dir} -u {user}',
-		'script_restart' 		=> '',
-		'script_status' 		=> '',
+		'script_start' 			=> 'su {user} -c -- \'gameap-starter -t start -d {dir} -c {command}\'',
+		'script_stop' 			=> 'gameap-starter -t stop -d {dir} -u {user}',
+		'script_restart' 		=> 'gameap-starter -t restart -d {dir} -n {name} -i {ip} -p {port} -c "{command}" -u {user}',
+		'script_status' 		=> 'gameap-starter -t status -d {dir} -u {user}',
 		'script_get_console' 	=> '',
 		'script_send_command' 	=> '',
     );
-    
+
     public $available_control_protocols = array('gdaemon');
-    
+
     //-----------------------------------------------------------
 
     public function __construct()
 	{
 		parent::__construct();
 	}
-	
+
 	//-----------------------------------------------------------
-	
+
 	/**
 	 * Дефолтные параметры
 	 */
@@ -36,18 +36,18 @@ class Dedicated_servers extends CI_Model {
 	{
 		return $this->_scripts_default[$param];
 	}
-	
+
 	//-----------------------------------------------------------
-	
+
 	/**
      * Шифровка паролей
-     * 
+     *
      * @param array
      * @return bool
      *
     */
 	function _encrypt_passwords($data) {
-		
+
 		$this->load->library('encrypt');
 
         if (isset($data['gdaemon_login'])) {
@@ -61,17 +61,17 @@ class Dedicated_servers extends CI_Model {
         if (isset($data['gdaemon_keypass'])) {
             $data['gdaemon_keypass'] = $this->encrypt->encode($data['gdaemon_keypass']);
         }
-		
+
 		return $data;
 	}
-	
+
 	//-----------------------------------------------------------
-    
+
     /*
      * Проверяет директорию на необходимые права
     */
-	private function _check_path($path) {
-		
+	private function _check_path($path)
+	{
 		if (!is_dir($path)) {
 			/* Это не директория */
 			$this->errors = "Dir " . $path . " not found";
@@ -80,12 +80,12 @@ class Dedicated_servers extends CI_Model {
 
 		return true;
 	}
-	
+
 	//-----------------------------------------------------------
-	
+
 	/**
      * Добавление выделенного сервера
-     * 
+     *
      * @param array
      * @return bool
      *
@@ -95,12 +95,12 @@ class Dedicated_servers extends CI_Model {
 		$data = $this->_encrypt_passwords($data);
 		return (bool)$this->db->insert('dedicated_servers', $data);
 	}
-	
+
 	//-----------------------------------------------------------
-	
+
 	/**
      * Удаление выделенного сервера
-     * 
+     *
      * @param array
      * @return bool
      *
@@ -109,15 +109,15 @@ class Dedicated_servers extends CI_Model {
 	{
 		return (bool)$this->db->delete('dedicated_servers', array('id' => $id));
 	}
-	
+
 	//-----------------------------------------------------------
-	
+
 	/**
      * Получение списка удаленных сервров (машин)
-     * 
+     *
      * @param array - условия для выборки
      * @param int
-     * 
+     *
      * @return array
      *
     */
@@ -130,7 +130,7 @@ class Dedicated_servers extends CI_Model {
 		 * Например:
 		 * 		$where = array('id' => 1);
 		 * в этом случае будет выбран сервер id которого = 1
-		 * 
+		 *
 		*/
 
 		if(is_array($where)){
@@ -138,19 +138,19 @@ class Dedicated_servers extends CI_Model {
 		}else{
 			$query = $this->db->get('dedicated_servers');
 		}
-		
+
 		$this->ds_list = array();
 
 		if ($query->num_rows() > 0) {
-			
+
 			$this->ds_list = $query->result_array();
-			
+
 			/* Выполняем необходимые действия с данными
 			 * Расшифровываем пароли, преобразуем списки из json в понятный массив */
 			$i = 0;
 			$count_ds_list = count($this->ds_list);
 			while($i < $count_ds_list) {
-				
+
 				$ds_ip = $this->ds_list[$i]['ip'];
 				if (!$this->ds_list[$i]['ip'] = json_decode($ds_ip, true)) {
 					/* Строка с данными не является json, в этом случае присваиваем первому
@@ -160,55 +160,55 @@ class Dedicated_servers extends CI_Model {
 					$this->ds_list[$i]['ip'] = array();
 					$this->ds_list[$i]['ip'][] = $ds_ip;
 				}
-				
+
 				unset($ds_ip);
-				
+
 				$this->ds_list[$i]['modules_data'] 		= json_decode($this->ds_list[$i]['modules_data'], true);
-				
+
 				$this->ds_list[$i]['gdaemon_privkey']   = $this->ds_list[$i]['gdaemon_privkey'];
 				$this->ds_list[$i]['gdaemon_pubkey']   = $this->ds_list[$i]['gdaemon_pubkey'];
 				$this->ds_list[$i]['gdaemon_keypass']   = $this->encrypt->decode($this->ds_list[$i]['gdaemon_keypass']);
 				$this->ds_list[$i]['gdaemon_login']		= $this->encrypt->decode($this->ds_list[$i]['gdaemon_login']);
 				$this->ds_list[$i]['gdaemon_password']	= $this->encrypt->decode($this->ds_list[$i]['gdaemon_password']);
-				
+
 				// Скрипты запуска
-				$this->ds_list[$i]['script_start'] = $this->ds_list[$i]['script_start'] 
+				$this->ds_list[$i]['script_start'] = $this->ds_list[$i]['script_start']
 					OR $this->ds_list[$i]['script_start'] = $this->_get_default_script('script_start');
-					
-				$this->ds_list[$i]['script_stop'] = $this->ds_list[$i]['script_stop'] 
+
+				$this->ds_list[$i]['script_stop'] = $this->ds_list[$i]['script_stop']
 					OR $this->ds_list[$i]['script_stop'] = $this->_get_default_script('script_stop');
-					
-				$this->ds_list[$i]['script_restart'] = $this->ds_list[$i]['script_restart'] 
+
+				$this->ds_list[$i]['script_restart'] = $this->ds_list[$i]['script_restart']
 					OR $this->ds_list[$i]['script_restart'] = $this->_get_default_script('script_restart');
-					
-				$this->ds_list[$i]['script_status'] = $this->ds_list[$i]['script_status'] 
+
+				$this->ds_list[$i]['script_status'] = $this->ds_list[$i]['script_status']
 					OR $this->ds_list[$i]['script_status'] = $this->_get_default_script('script_status');
-					
-				$this->ds_list[$i]['script_get_console'] = $this->ds_list[$i]['script_get_console'] 
+
+				$this->ds_list[$i]['script_get_console'] = $this->ds_list[$i]['script_get_console']
 					OR $this->ds_list[$i]['script_get_console'] = $this->_get_default_script('script_get_console');
-					
-				$this->ds_list[$i]['script_send_command'] = $this->ds_list[$i]['script_send_command'] 
+
+				$this->ds_list[$i]['script_send_command'] = $this->ds_list[$i]['script_send_command']
 					OR $this->ds_list[$i]['script_send_command'] = $this->_get_default_script('script_send_command');
-                    
+
 				$i ++;
 			}
-			
+
 			return $this->ds_list;
-			
+
 		}else{
 			return array();
 		}
 	}
-	
+
 	// ----------------------------------------------------------------
-    
+
     /**
      * Проверяет, существует ли выделенный сервер с данным id
      * Параметру id может быть передан id сервера, либо массив where
-     * 
+     *
      * @return bool
-    */  
-    function ds_live($id = false) 
+    */
+    function ds_live($id = false)
     {
 		if (false == $id) {
 			return false;
@@ -219,12 +219,12 @@ class Dedicated_servers extends CI_Model {
 		} else {
 			$this->db->where(array('id' => $id));
 		}
-		
+
 		return (bool)($this->db->count_all_results('dedicated_servers') > 0);
     }
-    
+
     // -----------------------------------------------------------
-	
+
 	/**
 	 * Массив с id выделенных серверов
 	 */
@@ -233,38 +233,38 @@ class Dedicated_servers extends CI_Model {
 		if (empty($ds_ids)) {
 			return false;
 		}
-		
+
 		$this->db->where_in('id', $ds_ids);
 	}
-    
+
     // ----------------------------------------------------------------
-    
+
     /**
      * Получает данные выделенного сервера
-     * 
+     *
      * @return bool
-    */  
-    function get_ds_data($id = false) 
+    */
+    function get_ds_data($id = false)
     {
 		if (false == $id) {
 			return false;
 		}
-		
+
 		$where = array('id' => $id);
 		$this->get_ds_list($where, 1);
-		
+
 		if (isset($this->ds_list[0])) {
 			return $this->ds_list[0];
 		} else {
 			return false;
 		}
 	}
-	
+
 	//-----------------------------------------------------------
-	
+
 	/**
      * Редактирование выделенного сервера
-     * 
+     *
      * @param id - id сервера
      * @param array - новые данные
      * @return bool
@@ -282,27 +282,27 @@ class Dedicated_servers extends CI_Model {
 
         $data = $this->_encrypt_passwords($data);
 		$this->db->where('id', $id);
-		
+
 		return (bool)$this->db->update('dedicated_servers', $data);
 	}
-	
+
 	//-----------------------------------------------------------
-	
+
 	/**
      * Обновляет поле с данными для модулей
-     * 
+     *
      * @param id 	 	id сервера
      * @param array 	новые данные
      * @param string	имя модуля
      * @param bool
-     * 
+     *
      * @return bool
      *
     */
 	function update_modules_data($id, $data, $module_name, $erase = false)
 	{
 		$ds_data = $this->get_ds_data($id);
-		
+
 		if (!$erase) {
 			$ds_data['modules_data'][$module_name] = isset($ds_data['modules_data'][$module_name]) && is_array($ds_data['modules_data'][$module_name])
 													? array_merge($ds_data['modules_data'][$module_name], $data)
@@ -311,33 +311,33 @@ class Dedicated_servers extends CI_Model {
 		else {
 			$ds_data['modules_data'][$module_name] = $data;
 		}
-												
+
 		$sql_data['modules_data'] = json_encode($ds_data['modules_data']);
 
 		return (bool)$this->edit_dedicated_server($id, $sql_data);
 	}
-	
+
 	//-----------------------------------------------------------
-	
+
 	/**
      * Получение данных выделенного сервера для шаблона
      * (вырезаны ненужные данные - пароли и пр.)
-     * 
+     *
      *
     */
 	function tpl_data_ds()
     {
 		$num = -1;
-		
+
 		if(!$this->ds_list){
 			$this->get_ds_list();
 		}
-		
+
 		if ($this->ds_list) {
-		
+
 			foreach ($this->ds_list as $dedicated_servers) {
 				$num++;
-				
+
 				$tpl_data[$num]['ds_name'] = $dedicated_servers['name'];
 				$tpl_data[$num]['ds_location'] = $dedicated_servers['location'];
 				$tpl_data[$num]['ds_provider'] = $dedicated_servers['provider'];
@@ -345,45 +345,45 @@ class Dedicated_servers extends CI_Model {
 				$tpl_data[$num]['ds_ram'] = $dedicated_servers['ram'];
 				$tpl_data[$num]['ds_cpu'] = $dedicated_servers['cpu'];
 				$tpl_data[$num]['ds_id'] = $dedicated_servers['id'];
-				
+
 				/* Список IP адресов */
 				$tpl_data[$num]['ds_ip'] = implode(', ', $dedicated_servers['ip']);
-				
+
 				/* Количество игровых серверов */
 				$this->db->count_all();
-				
+
 				$this->db->where('ds_id', $dedicated_servers['id']);
 				$this->db->from('servers');
 				$tpl_data[$num]['servers_count'] = $this->db->count_all_results();
-				
+
 			}
-			
+
 			return $tpl_data;
-			
+
 		} else {
 			return array();
 		}
 	}
-	
+
 	// ----------------------------------------------------------------
-	
+
 	/*
-	 * Проверка занятости портов 
-	 * 
+	 * Проверка занятости портов
+	 *
 	 * @param str, array
 	*/
 	function check_ports($ds_id, $ports, $server_ip = false)
 	{
 		$this->db->where('ds_id', $ds_id);
-		
+
 		if ($server_ip) {
 			$this->db->where('server_ip', $server_ip);
 		}
-		
+
 		$this->db->where_in('server_port', $ports);
 		$this->db->or_where_in('query_port', $ports);
 		$this->db->or_where_in('rcon_port', $ports);
-		
+
 		return (bool)$this->db->count_all_results('servers');
 	}
 }
