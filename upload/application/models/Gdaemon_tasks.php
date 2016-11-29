@@ -39,12 +39,48 @@ class Gdaemon_tasks extends CI_Model {
         parent::__construct();
 
         $this->lang->load('gdaemon_tasks');
+
+        foreach ($this->_task_human_names as &$task_name) {
+            $task_name = lang($task_name);
+        }
+
+        foreach ($this->_task_human_statuses as &$task_status) {
+            $task_status = lang($task_status);
+        }
+    }
+
+    // -----------------------------------------------------------------
+
+    /**
+     * Get all available task names
+     *
+     * @return array
+     */
+    public function get_names()
+    {
+        return $this->_task_human_names;
+    }
+
+    // -----------------------------------------------------------------
+
+    /**
+     * Get all available task statuses
+     *
+     * @return array
+     */
+    public function get_statuses()
+    {
+        return $this->_task_human_statuses;
     }
 
     // -----------------------------------------------------------------
 
     public function set_filter($fname, $fvalue)
     {
+        if (empty($fvalue)) {
+            return;
+        }
+        
         switch ($fname) {
             case 'ds_id':
                 $this->_filter_list[$fname] = $fvalue;
@@ -299,7 +335,7 @@ class Gdaemon_tasks extends CI_Model {
     public function human_name($task_code)
     {
         if (array_key_exists($task_code, $this->_task_human_names)) {
-            return lang($this->_task_human_names[$task_code]);
+            return $this->_task_human_names[$task_code];
         } else {
             return $task_code;
         }
@@ -316,7 +352,7 @@ class Gdaemon_tasks extends CI_Model {
     public function human_status($task_status)
     {
         if (array_key_exists($task_status, $this->_task_human_statuses)) {
-            return lang($this->_task_human_statuses[$task_status]);
+            return $this->_task_human_statuses[$task_status];
         } else {
             return $task_status;
         }

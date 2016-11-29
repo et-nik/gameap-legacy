@@ -13,10 +13,19 @@ function anichange (objName) {
 
 <div id="filter" style="display: none">
 	<br />
-	<form action="{site_url}admin/settings/set_filter/panel_log" method="post" accept-charset="utf-8">
+	<form action="{site_url}tasks/set_filter" method="post" accept-charset="utf-8">
 		<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
-		
+
 		<table class="zebra" width="100%">
+            <tr>
+                <td width="30%">{lang_task_name}:</td>
+                <td>{task_names_dropdown}</td>
+            </tr>
+
+            <tr>
+                <td width="30%">{lang_task_status}:</td>
+                <td>{task_statuses_dropdown}</td>
+            </tr>
 
 		</table>
 			<p align="center">
@@ -46,3 +55,7 @@ function anichange (objName) {
 {/tasks_list}
 </table>
 {pagination}
+
+<script>
+    $('select[multiple="multiple"]').multipleSelect({width:200});
+</script>
