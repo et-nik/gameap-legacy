@@ -20,22 +20,30 @@ class Gdaemon_tasks extends CI_Model {
     private $_filter_list    = array();
 
     private $_task_human_names = array(
-        'gsinst'    => 'Установка сервера',
-        'gsstart'   => 'Запуск сервера',
-        'gsstop'    => 'Остановка сервера',
-        'gsrest'    => 'Перезапуск сервера',
+        'gsinst'    => 'gdaemon_tasks_gsinst',
+        'gsupd'     => 'gdaemon_tasks_gsupd',
+        'gsstart'   => 'gdaemon_tasks_gsstart',
+        'gsstop'    => 'gdaemon_tasks_gsstop',
+        'gsrest'    => 'gdaemon_tasks_gsrest',
     );
 
     private $_task_human_statuses = array(
-        'waiting'   => 'Ожидает',
-        'working'   => 'В процессе',
-        'error'     => 'Ошибка',
-        'success'   => 'Завершено',
+        'waiting'   => 'gdaemon_tasks_waiting',
+        'working'   => 'gdaemon_tasks_working',
+        'error'     => 'gdaemon_tasks_error',
+        'success'   => 'gdaemon_tasks_success',
     );
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->lang->load('gdaemon_tasks');
+    }
 
     // -----------------------------------------------------------------
 
-    function set_filter($fname, $fvalue)
+    public function set_filter($fname, $fvalue)
     {
         switch ($fname) {
             case 'ds_id':
@@ -83,7 +91,7 @@ class Gdaemon_tasks extends CI_Model {
      *
      * @return array
      */
-    function get_list($limit = 0, $offset = 0)
+    public function get_list($limit = 0, $offset = 0)
     {
         if ($limit > 0) {
             $this->db->limit($limit, $offset);
@@ -130,7 +138,7 @@ class Gdaemon_tasks extends CI_Model {
 
     // -----------------------------------------------------------------
 
-    function get_single($task_id = 0)
+    public function get_single($task_id = 0)
     {
         if (!$task_id) {
             $this->last_error = lang('task_empty');
@@ -169,7 +177,7 @@ class Gdaemon_tasks extends CI_Model {
 
     // -----------------------------------------------------------------
 
-    function get_all_count()
+    public function get_all_count()
     {
         if (!empty($this->_filter_list)) {
             foreach ($this->_filter_list as $fname => &$fval) {
@@ -196,8 +204,9 @@ class Gdaemon_tasks extends CI_Model {
      * @return int
      *
     */
-	function add($data)
+	public function add($data)
 	{
+        $this->load->helper('date');
         $this->load->helper('cache');
 
         $this->gameap_hooks->run('pre_gtask_add', array('task_data' => &$data));
@@ -214,9 +223,18 @@ class Gdaemon_tasks extends CI_Model {
             delete_in_cache('server_status_' . $data['server_id']);
         }
 
-        if ((bool)$this->db->insert('gdaemon_tasks', $data)) {
+        $insert_data = [
+            'ds_id'         => $data['ds_id'],
+            'server_id'     => $data['server_id'],
+            'time_create'   => !empty($data['time_create']) ? $data['time_create'] : now(),
+            'time_stchange' => !empty($data['time_stchange']) ? $data['time_stchange'] : now(),
+            'task'          => $data['task'],
+            'status'        => !empty($data['status']) ? $data['status'] : 'waiting',
+        ];
+
+        if ((bool)$this->db->insert('gdaemon_tasks', $insert_data)) {
             $task_id = $this->db->insert_id();
-            
+
             $this->panel_log->save_log(array(
                 'type'          => 'gdaemon_task_add',
                 'command'       => $data['task'],
@@ -243,7 +261,7 @@ class Gdaemon_tasks extends CI_Model {
      * @return bool
      *
     */
-	function delete($id)
+	public function delete($id)
 	{
 		return (bool)$this->db->delete('gdaemon_tasks', array('id' => $id));
 	}
@@ -258,7 +276,7 @@ class Gdaemon_tasks extends CI_Model {
      * @return bool
      *
     */
-	function update($id, $data)
+	public function update($id, $data)
 	{
 		if (is_array($id)) {
 			$this->db->where($id);
@@ -272,10 +290,16 @@ class Gdaemon_tasks extends CI_Model {
 
     // -----------------------------------------------------------------
 
-    function human_name($task_code)
+    /**
+     * Task human name
+     *
+     * @param string $task_code
+     * @return string
+     */
+    public function human_name($task_code)
     {
         if (array_key_exists($task_code, $this->_task_human_names)) {
-            return $this->_task_human_names[$task_code];
+            return lang($this->_task_human_names[$task_code]);
         } else {
             return $task_code;
         }
@@ -283,10 +307,16 @@ class Gdaemon_tasks extends CI_Model {
 
     // -----------------------------------------------------------------
 
-    function human_status($task_status)
+    /**
+     * Human status
+     *
+     * @param string $task_status
+     * @return string
+     */
+    public function human_status($task_status)
     {
         if (array_key_exists($task_status, $this->_task_human_statuses)) {
-            return $this->_task_human_statuses[$task_status];
+            return lang($this->_task_human_statuses[$task_status]);
         } else {
             return $task_status;
         }
