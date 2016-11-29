@@ -69,8 +69,8 @@ class Servers extends CI_Model {
      * @var array
      */
     public $all_settings = array(
-		'SERVER_AUTOSTART'			=> 'Автостарт сервера в случае его падения',
-		'SERVER_RCON_AUTOCHANGE' 	=> 'Автоматическая смена rcon пароля, в случае если в админпанели и на сервере он не совпадает',
+		'SERVER_AUTOSTART'			=> 'servers_autostart',
+		'SERVER_RCON_AUTOCHANGE' 	=> 'servers_rcon_autochange',
     );
 
     public $server_settings 		= array();
@@ -85,6 +85,10 @@ class Servers extends CI_Model {
 
         $this->load->helper('safety');
         $this->load->library('encrypt');
+
+        foreach ($this->all_settings as &$setting) {
+            $setting = lang($setting);
+        }
     }
 
 	// -----------------------------------------------------------------
