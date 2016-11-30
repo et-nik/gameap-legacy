@@ -25,6 +25,8 @@ class Gdaemon_tasks extends CI_Model {
         'gsstart'   => 'gdaemon_tasks_gsstart',
         'gsstop'    => 'gdaemon_tasks_gsstop',
         'gsrest'    => 'gdaemon_tasks_gsrest',
+        'gsdel'     => 'gdaemon_tasks_gsdel',
+        'cmdexec'   => 'gdaemon_tasks_cmdexec',
     );
 
     private $_task_human_statuses = array(
@@ -80,7 +82,7 @@ class Gdaemon_tasks extends CI_Model {
         if (empty($fvalue)) {
             return;
         }
-        
+
         switch ($fname) {
             case 'ds_id':
                 $this->_filter_list[$fname] = $fvalue;
@@ -147,6 +149,8 @@ class Gdaemon_tasks extends CI_Model {
 
         $this->db->select('
             gdaemon_tasks.id,
+            gdaemon_tasks.time_create,
+            gdaemon_tasks.time_stchange,
             gdaemon_tasks.ds_id,
             dedicated_servers.name AS ds_name,
             gdaemon_tasks.server_id,
