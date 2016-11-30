@@ -34,8 +34,10 @@ class Tasks extends CI_Controller {
 
         $this->load->model('gdaemon_tasks');
 
+        $this->lang->load('server_control');
+
         //Base Template
-        $this->tpl['title'] 	= lang('tasks_title_index');
+        $this->tpl['title'] 	= lang('gdaemon_tasks_title_index');
         $this->tpl['heading'] 	= lang('tasks_heading_index');
         $this->tpl['content'] 	= '';
 
@@ -86,9 +88,10 @@ class Tasks extends CI_Controller {
     /**
      * Index page. Show GDaemon tasks list
      */
-    public function index()
+    public function index($offset = 0)
 	{
         $this->load->helper('form');
+        $this->load->helper('date');
 
         $local_tpl = array();
 
@@ -110,7 +113,7 @@ class Tasks extends CI_Controller {
             $this->gdaemon_tasks->set_filter($filter_name, $filter_val);
         }
 
-        if (!$this->gdaemon_tasks->get_list($config['per_page'])) {
+        if (!$this->gdaemon_tasks->get_list($config['per_page'], $offset)) {
             $this->_show_message($this->gdaemon_tasks->last_error);
         }
 
@@ -129,16 +132,18 @@ class Tasks extends CI_Controller {
         $local_tpl['tasks_list'] = array();
         foreach ($this->gdaemon_tasks->tasks_list as &$task) {
             $local_tpl['tasks_list'][] = array(
-                'task_id'           => $task['id'],
-                'task_task'         => $task['task'],
-                'task_htask'        => $this->gdaemon_tasks->human_name($task['task']),
-                'task_ds_id'        => $task['ds_id'],
-                'task_ds_name'      => $task['ds_name'],
-                'task_server_id'    => $task['server_id'],
-                'task_server_name'  => $task['server_name'],
-                'task_cmd'          => $task['cmd'],
-                'task_status'       => $task['status'],
-                'task_hstatus'      => $this->gdaemon_tasks->human_status($task['status']),
+                'task_id'               => $task['id'],
+                'task_date_create'      => unix_to_human($task['time_create'], true),
+                'task_date_stchange'    => unix_to_human($task['time_stchange'], true),
+                'task_task'             => $task['task'],
+                'task_htask'            => $this->gdaemon_tasks->human_name($task['task']),
+                'task_ds_id'            => $task['ds_id'],
+                'task_ds_name'          => $task['ds_name'],
+                'task_server_id'        => $task['server_id'],
+                'task_server_name'      => $task['server_name'],
+                'task_cmd'              => $task['cmd'],
+                'task_status'           => $task['status'],
+                'task_hstatus'          => $this->gdaemon_tasks->human_status($task['status']),
             );
         }
 
