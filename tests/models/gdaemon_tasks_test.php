@@ -1,6 +1,6 @@
 <?php
 
-class Gdaemon_tasks extends CIUnit_TestCase {
+class Gdaemon_tasks_tests extends CIUnit_TestCase {
 
     public function setUp()
 	{
