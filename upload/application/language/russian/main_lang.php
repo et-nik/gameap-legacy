@@ -9,6 +9,7 @@ $lang['action'] 						= 'Действие';
 $lang['add'] 							= 'Добавить';
 $lang['administration']					= 'Администрирование';
 $lang['apply'] 							= 'Применить';
+$lang['apply_filter'] 					= 'Применить фильтр';
 $lang['back'] 							= 'Вернуться';
 $lang['back_to_main'] 					= 'Вернуться на главную';
 $lang['base_parameters'] 				= 'Основные параметры';
