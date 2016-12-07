@@ -147,7 +147,7 @@ class Tasks extends CI_Controller {
             );
         }
 
-		$this->tpl['content'] .= $this->parser->parse('tasks_list.html', $local_tpl, true);
+		$this->tpl['content'] .= $this->parser->parse('tasks/tasks_list.html', $local_tpl, true);
         $this->parser->parse('main.html', $this->tpl);
     }
 
@@ -215,7 +215,7 @@ class Tasks extends CI_Controller {
             'task_hstatus'      => $this->gdaemon_tasks->human_status($this->gdaemon_tasks->single_task['status']),
         );
 
-        $this->tpl['content'] .= $this->parser->parse('task_view.html', $local_tpl, true);
+        $this->tpl['content'] .= $this->parser->parse('tasks/task_view.html', $local_tpl, true);
         $this->parser->parse('main.html', $this->tpl);
     }
 }
