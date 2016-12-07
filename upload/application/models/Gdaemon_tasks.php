@@ -269,6 +269,8 @@ class Gdaemon_tasks extends CI_Model {
             'time_create'   => !empty($data['time_create']) ? $data['time_create'] : now(),
             'time_stchange' => !empty($data['time_stchange']) ? $data['time_stchange'] : now(),
             'task'          => $data['task'],
+            'data'          => !empty($data['data']) ? $data['data'] : '',
+            'cmd'           => !empty($data['cmd']) ? $data['cmd'] : '',
             'status'        => !empty($data['status']) ? $data['status'] : 'waiting',
         ];
 
