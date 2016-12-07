@@ -36,8 +36,7 @@ class Captcha_codeigniter extends CI_Driver {
 		$captcha = create_captcha($vals);
 		$this->CI->session->set_flashdata('captcha', $cap['word']);
 
-		// return $captcha['image'] . '<input type="text" id="captcha" name="captcha" />';
-		return $cap['word'] . '<input type="text" id="captcha" name="captcha" />';
+		return $captcha['image'] . '<input type="text" id="captcha" name="captcha" />';
 	}
 	
 	// -----------------------------------------------------------------
