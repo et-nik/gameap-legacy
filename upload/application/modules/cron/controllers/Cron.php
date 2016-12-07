@@ -2,7 +2,7 @@
 /**
  * Game AdminPanel (АдминПанель)
  *
- * 
+ *
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
@@ -27,20 +27,20 @@
  * @author		Nikita Kuznetsov (ET-NiK)
  * @sinse		1.0
  */
- 
+
 /*
  * Для работы этого скрипта необходимо добавить в крон следующее задание
  * php -f /path/to/adminpanel/index.php cron
- * 
+ *
  * Cron модуль необходим для работы многих функций АдминПанели.
- * Лучше всего поставить выполнение модуля каждые 5 минут, 
+ * Лучше всего поставить выполнение модуля каждые 5 минут,
  * но не реже раза в 10 минут.
- * 
+ *
 */
 class Cron extends MX_Controller {
 
 	var $servers_data = array();
-	
+
 	var $_cron_result = '';
 	private $_commands_result = array();
 	private $_install_result = '';
@@ -48,39 +48,41 @@ class Cron extends MX_Controller {
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		/* Скрипт можно запустить только из командной строки (через cron) */
 		if(php_sapi_name() != 'cli'){
 			show_404();
 		}
 
+		$this->load->model('gdaemon_tasks');
+
 		$this->load->model('servers');
 		$this->load->model('servers/dedicated_servers');
 		$this->load->model('servers/games');
 		$this->load->model('servers/game_types');
-		
+
 		$this->load->driver('control');
 		$this->load->driver('files');
 		$this->load->driver('rcon');
 		$this->load->driver('installer');
-		
+
 		$this->load->library('query');
-		
+
 		$this->load->helper('ds');
 		$this->load->helper('date');
-		
+
 		// Максимальное время выполнени 1 час
 		set_time_limit(1*3600);
-		
+
 		// Загрузка базы данных
 		$this->load->database();
 	}
-	
+
 	// ----------------------------------------------------------------
-	
+
 	/**
 	 * Отправляет сообщение в командную строку
-	 * 
+	 *
 	 * @param string
 	*/
 	private function _cmd_output($msg = '')
@@ -88,11 +90,11 @@ class Cron extends MX_Controller {
 		$this->_cron_result[] = $msg;
 		echo end($this->_cron_result) . PHP_EOL;
 	}
-	
+
 	// -----------------------------------------------------------------
-	
+
 	/**
-	 * Получает информацию о сервере информации о котором 
+	 * Получает информацию о сервере информации о котором
 	 * еще нет в массиве $this->server_data
 	*/
 	private function _get_server_data($server_id)
@@ -103,19 +105,19 @@ class Cron extends MX_Controller {
 
 		return $this->servers_data[$server_id];
 	}
-	
+
 	// ----------------------------------------------------------------
-	
+
 	/**
 	 * Получение консоли сервера
 	*/
 	private function _get_console($server_id)
 	{
-		
+
 	}
-	
+
 	// -----------------------------------------------------------------------
-	
+
 	/**
 	 * Линуксовые слеши в виндовые
 	 */
@@ -128,56 +130,56 @@ class Cron extends MX_Controller {
 	}
 
 	// ----------------------------------------------------------------
-	
+
 	/**
 	 * Выполняет cron скрипты модулей
 	*/
 	private function _modules_cron()
 	{
-		/* Массив с именами cron скриптов 
+		/* Массив с именами cron скриптов
 		 * нужен для записи выполненных скриптов
-		 * В случае одинаковых имен в разных модулях, второй и 
+		 * В случае одинаковых имен в разных модулях, второй и
 		 * последующие скрипты будут пропущены, иначе появится
 		 * ошибка об одинаковых классах.
 		*/
 		$array_scripts = array();
-		
+
 		foreach($this->gameap_modules->modules_data as &$value) {
 
 			if ($value['short_name'] == 'cron') {
 				/* Пропускает самого себя */
 				continue;
 			}
-			
+
 			if (!$value['cron_script']) {
 				/* Скрипт не задан */
 				continue;
 			}
-			
+
 			$value['cron_script'] = str_replace('.php', '', $value['cron_script']);
 			$value['cron_script'] = str_replace('..', '', $value['cron_script']);
 			$value['short_name'] = str_replace('..', '', $value['short_name']);
-			
+
 			if ($value['cron_script'] == 'cron') {
 				/* Нельзя запускать скрипты с именем cron */
 				$this->_cmd_output("--Script {$value['cron_script']} on module {$value['short_name']} omitted");
 				continue;
 			}
-			
+
 			if (in_array($value['cron_script'], $array_scripts)) {
 				/* Нельзя запускать скрипты с именем cron */
 				$this->_cmd_output("--Script {$value['cron_script']} on module {$value['short_name']} omitted");
 				continue;
 			}
-			
-			if (!file_exists(APPPATH . 'modules/' . $value['short_name'] . '/controllers/' . $value['cron_script'] . '.php')) {
+
+			if (!file_exists(APPPATH . 'modules/' . $value['short_name'] . '/controllers/' . ucfirst($value['cron_script']) . '.php')) {
 				/* Скрипт отсутствует */
 				$this->_cmd_output("--Script not found on {$value['short_name']} module");
 				continue;
 			}
-			
+
 			$array_scripts[] = $value['cron_script'];
-			
+
 			/* Выполняем cron скрипт из модуля */
 			$this->_cmd_output("--Start {$value['short_name']}");
 			echo modules::run($value['short_name'] . '/' . $value['cron_script'] . '/index');
@@ -185,37 +187,37 @@ class Cron extends MX_Controller {
 	}
 
 	// -----------------------------------------------------------------
-	
+
 	/**
 	 * Выполнение заданий
-	 * 
+	 *
 	 * @param array  список с id серверов
 	 */
 	private function _tasks($servers_id_list = array())
 	{
 		$log_data['user_name'] = 'System (cron)';
-		
+
 		if (empty($servers_id_list)) {
 			return;
 		}
-		
+
 		$this->_cmd_output("--Task manager");
-		
+
 		$cron_stats = array(
 			'success' => 0,
 			'failed' => 0,
 			'skipped' => 0,
 		);
-		
-		/* Получение заданий из базы данных 
-		 * Задания ограничиваются последним часом, если по какой либо 
-		 * причине задания двухчасовой давносте не были выполнены они не 
+
+		/* Получение заданий из базы данных
+		 * Задания ограничиваются последним часом, если по какой либо
+		 * причине задания двухчасовой давносте не были выполнены они не
 		 * будут выполнены вновь
 		 * */
 		$where = array('date_perform >' => now() - 3600, 'date_perform <' => now(), 'started' => 0);
 		$this->db->where_in('server_id', $servers_id_list);
 		$query = $this->db->get_where('cron', $where);
-		
+
 		$task_list = $query->result_array();
 
 		$i = 0;
@@ -254,26 +256,26 @@ class Cron extends MX_Controller {
 				$i ++;
 				continue;
 			}
-			
+
 			// Получение данных сервера
 			$this->_get_server_data($server_id);
 
-			/* 
-			 * Отправляем данны о том, что задание начало выполняться 
-			 * чтобы исключить повторное выполнение при следующем запуске cron скрипта, 
-			 * в случаях когда задание не завершилось 
+			/*
+			 * Отправляем данны о том, что задание начало выполняться
+			 * чтобы исключить повторное выполнение при следующем запуске cron скрипта,
+			 * в случаях когда задание не завершилось
 			*/
 			$this->db->where('id', $task_list[$i]['id']);
-			$this->db->update('cron', array('started' => '1')); 
+			$this->db->update('cron', array('started' => '1'));
 
 			// Выполняем задание
 			switch($task_list[$i]['code']) {
-					
+
 				case 'server_rcon':
 					if($this->servers->server_status($this->servers_data[$server_id]['server_ip'], $this->servers_data[$server_id]['query_port'])) {
 
 						$this->rcon->set_variables(
-								$this->servers_data[$server_id]['server_ip'], 
+								$this->servers_data[$server_id]['server_ip'],
 								$this->servers_data[$server_id]['server_port'],
 								$this->servers_data[$server_id]['rcon'],
 								$this->servers_data[$server_id]['engine'],
@@ -343,17 +345,17 @@ class Cron extends MX_Controller {
 			if ($task_list[$i]['time_add']) {
 				// Устанавливаем дату следующего выполнения
 				$sql_data[$a]['date_perform'] = $task_list[$i]['date_perform'] + $task_list[$i]['time_add'];
-			} 
+			}
 			else {
 				// Удаление задания, т.к. даты следующего выполнения нет
 				$this->db->where('id', $task_list[$i]['id']);
-				$this->db->delete('cron'); 
+				$this->db->delete('cron');
 			}
 
 			$i ++;
 			$a ++;
 		}
-		
+
 		// Обновляем данные
 		if(isset($sql_data) && is_array($sql_data) && !empty($sql_data)) {
 			$this->db->update_batch('cron', $sql_data, 'id');
@@ -363,9 +365,9 @@ class Cron extends MX_Controller {
 		//~ $this->_cmd_output("---Success: {$cron_stats['success']} Failed: {$cron_stats['failed']} Skipped: {$cron_stats['skipped']}");
 		$this->_cmd_output('-- End Task manager');
 	}
-	
+
 	// -----------------------------------------------------------------
-	
+
 	/**
 	 * Функция, выполняющаяся при запуске cron
 	*/
@@ -373,25 +375,49 @@ class Cron extends MX_Controller {
 	{
 		$start_microtime = microtime(true);
 		$log_data['user_name'] = 'System (cron)';
-		
-		// Получение данных о времени некоторых операций cron
-		if (file_exists(APPPATH . 'cache/cron_time.json')) {
-			$cron_time = json_decode(file_get_contents(APPPATH . 'cache/cron_time.json'), true);
-		} else {
-			$cron_time = array(
-				'stats' => 0,
-			);
-		}
-		
+
 		$this->_cmd_output('Cron started');
-		
+
+        // Find and fix servers errors
+
+        // Getting a list of servers that installation process
+        $this->servers->select_fields('id');
+        $this->servers->get_list(false, '', array('installed' => 2));
+
+        $install_process_servers = array();
+        foreach ($this->servers->servers_list as &$server) {
+            $install_process_servers[] = $server['id'];
+        }
+
+        $this->gdaemon_tasks->set_filter('server_id', $install_process_servers);
+        $this->gdaemon_tasks->set_filter('task', array('gsinst', 'gsupd'));
+        $this->gdaemon_tasks->get_list();
+
+        $inst_progress_approved = array();
+        foreach ($this->gdaemon_tasks->tasks_list as &$task) {
+            $inst_progress_approved[] = $task['server_id'];
+        }
+
+        $not_approved = array_diff($install_process_servers, $inst_progress_approved);
+
+		// Repeat install
+		foreach ($not_approved as &$server_id) {
+			$server_data = $this->_get_server_data($server_id);
+
+			$this->gdaemon_tasks->add([
+				'server_id' => $server_id,
+				'ds_id' 	=> $server_data['ds_id'],
+				'task' 		=> 'gsinst',
+			]);
+		}
+
 		/*==================================================*/
 		/*    	ВЫПОЛНЕНИЕ CRON СКРИПТОВ ИЗ МОДУЛЕЙ			*/
 		/*==================================================*/
 		$this->_cmd_output("-Modules cron");
-		
+
 		/* Чтобы данные выполнения пользовательского крона выводились правильно
-		 * и на своем месте, то записываем весь вывод предыдущих задач 
+		 * и на своем месте, то записываем весь вывод предыдущих задач
 		 * а после этого запускаем пользовательский крон
 		*/
 		$this->_modules_cron();
@@ -401,19 +427,12 @@ class Cron extends MX_Controller {
 		$end_mircotime = microtime(true);
 		$this->_cmd_output('-Time elapsed: ' . round($end_mircotime - $start_microtime, 4) . ' seconds');
 		$this->_cmd_output('-Memory peak usage: ' . round(memory_get_peak_usage()/1024, 2) . ' Kb');
-		
-		if ((now()-1800) > $cron_time['stats']) {
-			$cron_time['stats'] = now();
-		}
-		
-		// Запись информации о времени выполнения операций
-		file_put_contents(APPPATH . 'cache/cron_time.json', json_encode($cron_time));
-		
+
 		// Удаление логов за два месяца
-		$this->db->delete('logs', array('date <' => now()-(604800*8))); 
-		
+		$this->db->delete('logs', array('date <' => now()-(604800*8)));
+
 		$this->_cmd_output("Cron end");
-		
+
 		$log_data['server_id'] = 0;
 		$log_data['type'] = 'cron';
 		$log_data['command'] = 'cron work';
@@ -421,5 +440,5 @@ class Cron extends MX_Controller {
 		$log_data['log_data'] = implode("\n", $this->_cron_result);
 		$this->panel_log->save_log($log_data);
 	}
-	
+
 }
