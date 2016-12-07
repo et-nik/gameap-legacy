@@ -52,7 +52,7 @@ class Installer_minecraft extends CI_Driver {
 	 */
 	public function get_ports($connect_port = 0)
 	{
-		return array($connect_port, $connect_port, $connect_port);
+		return array($connect_port, $connect_port, $connect_port + 1);
 	}
 	
 	// -----------------------------------------------------------------

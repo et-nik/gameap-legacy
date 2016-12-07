@@ -109,13 +109,13 @@ class Installer_rust extends CI_Driver {
 				switch(strtolower($os)) {
 					case 'windows':
 						$start_command = 'RustDedicated.exe ';
-						$start_command .= '-batchmode -server.hostname ""{hostname}"" -load -server.maxplayers {maxplayers} -server.level ""{level}"" -server.ip {ip} -server.port {port} +rcon.ip {ip} +rcon.port {rcon_port} +rcon.password {rcon_password} +server.saveinterval {saveinterval} -server.worldsize {worldsize} -server.seed {seed} -server.secure {secure} -autoupdate';
+						$start_command .= '-batchmode -server.hostname "{hostname}" -load -server.maxplayers {maxplayers} -server.level "{level}" -server.ip {ip} -server.port {port} +rcon.ip {ip} +rcon.port {rcon_port} +rcon.password {rcon_password} +server.saveinterval {saveinterval} -server.worldsize {worldsize} -server.seed {seed} -server.secure {secure} -autoupdate';
 						break;
 						
 					default:
 						// $start_command = './RustDedicated '; // Linux native
 						$start_command = 'RustDedicated.exe '; // Wine
-						$start_command .= '-batchmode -server.hostname \\"{hostname}\\" -load -server.maxplayers {maxplayers} -server.level \\"{level}\\" -server.ip {ip} -server.port {port} +rcon.ip {ip} +rcon.port {rcon_port} +rcon.password {rcon_password} +server.saveinterval {saveinterval} -server.worldsize {worldsize} -server.seed {seed} -server.secure {secure} -autoupdate';
+						$start_command .= '-batchmode -server.hostname "{hostname}" -load -server.maxplayers {maxplayers} -server.level "{level}" -server.ip {ip} -server.port {port} +rcon.ip {ip} +rcon.port {rcon_port} +rcon.password {rcon_password} +server.saveinterval {saveinterval} -server.worldsize {worldsize} -server.seed {seed} -server.secure {secure} -autoupdate';
 						break;
 				}
 				
