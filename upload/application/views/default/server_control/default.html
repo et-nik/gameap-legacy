@@ -200,10 +200,6 @@ if($this->users->auth_privileges['srv_restart'] == 1
 			<div class="menu_icons"><a href="{site_url}adm_servers/edit/game_servers/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/administration.png" /><br />{lang_administration}</a></div>
 		<?php endif; ?>
 
-		<?php if($this->users->auth_servers_privileges['CHANGE_RCON']): ?>
-			<div class="menu_icons"><a href="{site_url}rcon_changer/change/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/field.png" /><br />Сменить RCON пароль</a></div>
-		<?php endif; ?>
-
         {modules_menu}
             <div class="menu_icons"><a href="{modules_menu_link}"><img src="{modules_menu_icon}" /><br />{modules_menu_text}</a></div>
         {/modules_menu}
@@ -324,7 +320,7 @@ if($this->users->auth_privileges['srv_restart'] == 1
 			<td width="20%">{log_type}</td>
 			<td width="20%">{log_command}</td>
 			<td width="20%">{log_user_name}</td>
-			<td><a class="small awesome" href={site_url}log_view/view/{log_id}>{lang_view}</a></td>
+			<td><a class="small button" href={site_url}log_view/view/{log_id}>{lang_view}</a></td>
 		</tr>
 	{/log_list}
 	</table>
