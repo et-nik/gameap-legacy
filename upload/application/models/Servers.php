@@ -69,7 +69,7 @@ class Servers extends CI_Model {
      * @var array
      */
     public $all_settings = array(
-		'SERVER_AUTOSTART'			=> 'servers_autostart',
+        'SERVER_AUTOSTART'			=> 'servers_autostart',
 		'SERVER_RCON_AUTOCHANGE' 	=> 'servers_rcon_autochange',
     );
 

@@ -2,7 +2,7 @@
 /**
  * Game AdminPanel (АдминПанель)
  *
- * 
+ *
  *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
@@ -24,7 +24,7 @@
 
 /**
  * Вставляет данные сервера в массив с играми
- * 
+ *
  * @param array
  * @param array
  * @return array
@@ -35,10 +35,10 @@ if ( ! function_exists('game_server_insert'))
 	{
 		$CI =& get_instance();
 		$CI->load->model('servers/games');
-		
+
 		$i = 0;
 		while($i < count($games_array)){
-			
+
 			if(isset($games_array[$i]['game_code']) && $games_array[$i]['game_code'] == $game_server_data['server_game']){
 				$games_array[$i]['servers_list'][] = $game_server_data;
 				$i++;
@@ -48,10 +48,10 @@ if ( ! function_exists('game_server_insert'))
 				$i++;
 				break;
 			}
-			
+
 			$i ++;
 		}
-		
+
 		return $games_array;
 	}
 }
@@ -65,24 +65,24 @@ if ( ! function_exists('clean_games_list'))
 {
 	function clean_games_list($games_array)
 	{
-		
+
 		$i = 0;
-		
+
 		$count_array = count($games_array);
-		
+
 		while($i < $count_array){
-			
+
 			//echo $i . '<br />';
-			
+
 			if(empty($games_array[$i]['servers_list'])){
 				unset($games_array[$i]);
 			}
-			
+
 			$i ++;
 		}
 
 		return $games_array;
-		
+
 	}
 }
 
@@ -94,11 +94,11 @@ if ( ! function_exists('clean_games_list'))
  */
 if ( ! function_exists('servers_list_to_games_list'))
 {
-	function servers_list_to_games_list($servers_list = array()) 
+	function servers_list_to_games_list($servers_list = array())
 	{
 		$CI =& get_instance();
 		$CI->load->model('servers/games');
-		
+
 		$games_list = $CI->games->tpl_data_games();
 
 		foreach ($servers_list as $server) {
@@ -108,10 +108,10 @@ if ( ! function_exists('servers_list_to_games_list'))
 								'server_ip' => $server['server_ip'],
 								'server_port' => $server['server_port'],
 			);
-			
+
 			$games_list = game_server_insert($gs_data, $games_list);
 		}
-		
+
 		return clean_games_list($games_list);
 	}
 }
@@ -124,7 +124,7 @@ if ( ! function_exists('servers_list_to_games_list'))
  */
 if ( ! function_exists('steamid64_to_steamid'))
 {
-	function steamid64_to_steamid($steamid) 
+	function steamid64_to_steamid($steamid)
 	{
 		$steamY = $steamid - 76561197960265728;
 		$steamX = (int)($steamY%2 == 1);
@@ -142,7 +142,7 @@ if ( ! function_exists('steamid64_to_steamid'))
  */
 if ( ! function_exists('steamid_to_steamid64'))
 {
-	function steamid_to_steamid64($steamid) 
+	function steamid_to_steamid64($steamid)
 	{
 		list( , $m1, $m2) = explode(':', $steamid, 3);
 		list($steam_cid, ) = explode('.', bcadd((((int) $m2 * 2) + $m1), '76561197960265728'), 2);
