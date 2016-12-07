@@ -1,8 +1,7 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
-<link rel="stylesheet" href="{base_url}themes/system/chartist/chartist.css">
-<script type="text/javascript" src="{base_url}themes/system/chartist/chartist.min.js"></script>
-<script type="text/javascript" src="{base_url}themes/system/chartist/chartist-plugin-fill-donut.min.js"></script>
-<script type="text/javascript" src="{base_url}themes/system/chartist/chartist-plugin-axistitle.min.js"></script>
+
+<script type="text/javascript" src="{base_url}themes/system/dygraphs/dygraph-combined.js"></script>
+<script type="text/javascript" src="{base_url}themes/system/js/date.format.js"></script>
 
 <script type="text/javascript">
 	var page = {
@@ -20,8 +19,8 @@
     var ramblockset = false;
     var ramload;
 
-    var cpublockset = [];
-    var cpuload = [];
+    var cpublockset = false;
+    var cpuload;
     
     var netblockset = {};
     var netload = {};
@@ -38,9 +37,19 @@
             return value;
     }
 
+    function netprefix(value, index, chart) {
+        if (value > 1048576) {
+            return Math.round((value/1048576)) + 'G';
+        } else if (value > 1024) {
+            return Math.round((value/1024)) + 'M';
+        } else {
+            return value + 'K';
+        }
+    }
+
     datestart = '';
     dateend = '';
-    
+
     function update_stats() {
         
         ajax_data = {'datestart': datestart, 'dateend': dateend};
@@ -64,128 +73,151 @@
                 $('#last-time').html(response.data.time[response.data.time.length-1]);
                 $('#loa').html(response.data.loa[response.data.loa.length-1]);
 
+                var graph_data = [];
+                
+                response.data.timestamp.forEach(function(item, i, arr) {
+                    graph_data.push([new Date(item * 1000), response.data.ram[i]*1024*1024, response.data.ramav[i]*1024*1024]);
+                });
+
                 if (!ramblockset) {
-                    $('.ram-block').append('<div id="ramload"></div>');
+                    $('.ram-block').append('<div id="ramload" style="height:250px; width: 100%"></div>');
 
-                    ramload = new Chartist.Line('#ramload', {
-                        // series: [val.rxb, val.rxp, val.txb, val.txp]
-                        labels: response.data.time,
-                        series: [response.data.ram, response.data.ramav]
-                    }, {
-                        high: response.data.ram_total,
-                        low: 0,
-                        height: '225px',
-                        showPoint: false,
-                        fullWidth: true,
-                        showArea: true,
-                        axisX: {
-                            labelInterpolationFnc: skipLabels
+                    ramload = new Dygraph(
+                        document.getElementById("ramload"),
+                        graph_data,
+                        {
+                            valueRange: [0, response.data.ram_total*1024*1024],
+                            labels: ['Date', 'RAM (With cache)', 'Ram usage'],
+                            fillGraph: true,
+                            axes: {
+                                y: {
+                                  labelsKMG2: true,
+                                }
+                            }
                         }
-                    });
-
+                        
+                    );
                     ramblockset = true;
                 } else {
-                    ramload.update({
-                        labels: response.data.time,
-                        series: [response.data.ram, response.data.ramav]
+                    ramload.updateOptions( { 'file': graph_data } );
+                }
+
+                if (response.data.cpu !== undefined) {
+                    graph_data = [];
+                    response.data.timestamp.forEach(function(item, i, arr) {
+                        var sg_data = [];
+                        sg_data.push(new Date(item * 1000));
+
+                        $.each(response.data.cpu, function(k, val) {
+                            sg_data.push(val[i]);
+                        });
+                        
+                        graph_data.push(sg_data);
+                    });
+                    
+                    if (!cpublockset) {
+                        $('.cpuload-block').append('<div id="cpuload" style="height:250px; width: 100%"></div>');
+
+                        var cpu_glabels = ['Date'];
+                        $.each(response.data.cpu, function(k, val) {
+                            cpu_glabels.push('CPU #' + k);
+                        });
+
+                        cpuload = new Dygraph(
+                            document.getElementById("cpuload"),
+                            graph_data,
+                            {
+                                valueRange: [0, 100],
+                                labels: cpu_glabels,
+                                highlightSeriesOpts: {
+                                  strokeWidth: 1,
+                                  strokeBorderWidth: 1,
+                                  highlightCircleSize: 5
+                                }
+                            }
+                            
+                        );
+                        cpublockset = true;
+                    } else {
+                        cpuload.updateOptions( { 'file': graph_data } ); 
+                    }
+                }
+
+                if (response.data.if_stat !== undefined) {
+                    $.each(response.data.if_stat, function(k, val) {
+                        graph_data = [];
+                        response.data.timestamp.forEach(function(item, i, arr) {
+                            graph_data.push([new Date(item * 1000), val.rxb[i]*1000, val.txb[i]*1000]);
+                        });
+
+                        if (!netblockset[k]) {
+                            $('.netload-block').append(
+                                '<h3>' + k + '</h3>\
+                                <div id="netload_' + k + '" style="height:250px; width: 100%"></div>'
+                            );
+
+                            id = '#netload_' + k;
+
+                            netload[k] = new Dygraph(
+                                document.getElementById('netload_' + k),
+                                graph_data,
+                                {
+                                    labels: ['Date', 'Incoming', 'Outgoing'],
+                                    'Incoming': {fillGraph: true},
+                                    axes: {
+                                        y: {
+                                          labelsKMG2: true,
+                                        }
+                                    }
+                                }
+                            );
+                            
+                            netblockset[k] = true;
+                        } else {
+                            netload[k].updateOptions( { 'file': graph_data } );
+                        }
                     });
                 }
 
-                $.each(response.data.cpu, function(k, val) {
-                    if (!cpublockset[k]) {
-                        $('.cpuload-block').append(
-                            '<h3>CPU #' + k + '</h3>\
-                            <div id="cpuload_' + k + '"></div>'
-                        );
-
-                        id = '#cpuload_' + k;
+                if (response.data.drvspace !== undefined) {
+                    di = 0;
+                    $.each(response.data.drvspace, function(k, val) {
+                        graph_data = [];
+                        response.data.timestamp.forEach(function(item, i, arr) {
+                            graph_data.push([new Date(item * 1000), val[i]*1000*1000]);
+                        });
                         
-                        cpuload[k] = new Chartist.Line(id, {
-                            labels: response.data.time,
-                            series: [val]
-                        }, {
-                            high: 100,
-                            low: 0,
-                            height: '225px',
-                            showPoint: false,
-                            showArea: true,
-                            axisX: {
-                                labelInterpolationFnc: skipLabels
-                            }
-                        });
+                        if (!diskblockset[di]) {
+                            $('.disk-block').append(
+                                '<h3>' + k + '</h3>\
+                                <div id="diskload_' + di + '" style="height:250px; width: 100%"></div>'
+                            );
 
-                        cpublockset[k] = true;
-                    } else {
-                        cpuload[k].update({
-                            labels: response.data.time,
-                            series: [val]
-                        });
-                    }
-                });
-                    
-                $.each(response.data.if_stat, function(k, val) {
-                    if (!netblockset[k]) {
-                        $('.netload-block').append(
-                            '<h3>' + k + '</h3>\
-                            <div id="netload_' + k + '"></div>'
-                        );
+                            id = '#diskload_' + di;
 
-                        id = '#netload_' + k;
-                        netload[k] = new Chartist.Line(id, {
-                            // series: [val.rxb, val.rxp, val.txb, val.txp]
-                            labels: response.data.time,
-                            series: [val.rxb, val.txb]
-                        }, {
-                            height: '225px',
-                            showPoint: false,
-                            showArea: true,
-                            axisX: {
-                                labelInterpolationFnc: skipLabels
-                            }
-                        });
+                            diskload[di] = new Dygraph(
+                                document.getElementById('diskload_' + di),
+                                graph_data,
+                                {
+                                    valueRange: [0, response.data.drvspace_total[k]*1000*1000],
+                                    labels: ['Date', 'Usage'],
+                                    fillGraph: true,
+                                    axes: {
+                                        y: {
+                                          labelsKMG2: true,
+                                        }
+                                    }
+                                }
+                            );
 
-                        netblockset[k] = true;
-                    } else {
-                        netload[k].update({
-                            // series: [val.rxb, val.rxp, val.txb, val.txp]
-                            labels: response.data.time,
-                            series: [val.rxb, val.txb]
-                        });
-                    }
-                });
+                            diskblockset[di] = true;
+                        } else {
+                            diskload[di].updateOptions( { 'file': graph_data } );
+                        }
 
-                di = 0;
-                $.each(response.data.drvspace, function(k, val) {
-                    if (!diskblockset[di]) {
-                        $('.disk-block').append(
-                            '<h3>' + k + '</h3>\
-                            <div id="diskload_' + di + '"></div>'
-                        );
-
-                        id = '#diskload_' + di;
-                        
-                        diskload[di] = new Chartist.Line(id, {
-                            labels: response.data.time,
-                            series: [val]
-                        }, {
-                            height: '225px',
-                            showPoint: false,
-                            showArea: true,
-                            axisX: {
-                                labelInterpolationFnc: skipLabels
-                            }
-                        });
-
-                        diskblockset[di] = true;
-                    } else {
-                        diskload[di].update({
-                            labels: response.data.time,
-                            series: [val]
-                        });
-                    }
-
-                    di++;
-                });
+                        di++;
+                    });
+                }
                 
             },
             error: function() {
@@ -215,6 +247,10 @@ function anichange (objName) {
 </script>
 
 <div id="filter" style="display: none">
+    <a id="stats-hour" class="small orange button" href="#">За час</a>
+    <a id="stats-today" class="small orange button" href="#">За сегодня</a>
+    <a id="stats-yesterday" class="small orange button" href="#">За вчера</a>
+    <a id="stats-week" class="small orange button" href="#">За неделю</a>
     <table>
         <tr>
             <td>Период:</td>
@@ -228,10 +264,49 @@ function anichange (objName) {
 </div>
 
 <script>
-	jQuery('#datetimepicker1, #datetimepicker2').datetimepicker({
+	$('#datetimepicker1, #datetimepicker2').datetimepicker({
 	  format:'d-m-Y H:i',
 	  lang:'{language}',
 	});
+
+    function update_period(dstart, dend)
+    {
+        $("input[name='period_datestart']").val(dstart);
+
+        if (dend) {
+            $("input[name='period_dateend']").val(dend);
+            dateend = dend;
+        } else {
+            dateend = '';
+        }
+
+        datestart = dstart;
+
+        update_stats();
+        anichange('#filter');
+    }
+
+    $('#stats-hour').click(function() {
+        var dstart = new Date((Date.now()-3600*1000));
+        update_period(dstart.format("dd-mm-yyyy HH:MM"));
+    });
+
+    $('#stats-today').click(function() {
+        var curdate = new Date((Date.now()));
+        update_period(curdate.format("dd-mm-yyyy 00:00"));
+    });
+
+    $('#stats-yesterday').click(function() {
+        var dstart = new Date((Date.now()-2*86400*1000));
+        var dend = new Date(Date.now()-86400*1000);
+
+        update_period(dstart.format("dd-mm-yyyy 00:00"), dend.format("dd-mm-yyyy 00:00"));
+    });
+
+    $('#stats-week').click(function() {
+        var dstart = new Date((Date.now()-604800*1000));
+        update_period(dstart.format("dd-mm-yyyy HH:MM"));
+    });
 
     $('#change-period').click(function() {
         datestart = $("input[name='period_datestart']").val();
@@ -255,7 +330,6 @@ function anichange (objName) {
 
 <h2>Network</h2>
 <div class="netload-block"></div>
-<p><font color="#161616">&#9632;</font> - входящая скорость, <font color="#636363">&#9632;</font> - исходящая скорость</p>
 <hr>
 
 <h2>Disk</h2>
