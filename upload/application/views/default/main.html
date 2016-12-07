@@ -8,15 +8,15 @@
 	<script type="text/javascript" src="{base_url}themes/system/js/gameap.js"></script>
 
     <script type="text/javascript" src="{base_url}themes/system/foundation/js/foundation.min.js"></script>
-	
+
 	<script src="{base_url}themes/{template}/{style}/js/jquery.arcticmodal-0.3.min.js"></script>
 	<script src="{base_url}themes/{template}/{style}/js/jquery.noty.packaged.min.js"></script>
 	<script src="{base_url}themes/{template}/{style}/js/jquery.multiple.select.js"></script>
-	
+
 	<script src="{base_url}themes/{template}/{style}/js/tabs.js"></script>
-	
+
 	<link rel="stylesheet" type="text/css" href="{base_url}themes/system/foundation/css/foundation.min.css" />
-	
+
 	<link rel="stylesheet" type="text/css" href="{base_url}themes/{template}/{style}/css/style.css" />
 	<link rel="stylesheet" type="text/css" href="{base_url}themes/{template}/{style}/css/multiple-select.css" />
 
@@ -30,7 +30,6 @@
     <div class="row">
         {menu}
     </div>
-    <script>$(document).foundation();</script>
 <?php endif; ?>
 
 <div class="row">
@@ -45,11 +44,14 @@
     </div>
 </div>
 
+<script>$(document).foundation();</script>
+
 <div class="row">
     <div class="medium-12 columns content">
         <p class="footer">Page rendered in <strong>{elapsed_time}</strong> seconds, Memory usage: <strong>{memory_usage}</strong></p>
         <p class="copyright">Game AdminPanel <?php echo AP_VERSION; ?> [<?php echo AP_DATE; ?>]<br />{lang_developer}: ET-NiK | <a href="http://www.gameap.ru">www.GameAP.ru</a>&nbsp;|&nbsp;<a href="http://hldm.org">HLDM.org</a></p>
     </div>
 </div>
+
 </body>
 </html>
