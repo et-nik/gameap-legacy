@@ -4,21 +4,28 @@
         <td>{lang_task}</td>
         <td>{task_htask}</td>
     </tr>
-    
+
     <tr>
         <td>{lang_ds_name}</td>
         <td>{task_ds_name}</td>
     </tr>
-    
+
     <tr>
         <td>{lang_server_name}</td>
         <td>{task_htask}</td>
     </tr>
-    
+
     <tr>
         <td>{lang_status}</td>
         <td>{task_hstatus}</td>
     </tr>
+
+    <?php if (!empty($this->_ci_cached_vars['task_cmd'])): ?>
+        <tr>
+            <td>{lang_gdaemon_tasks_cmd}</td>
+            <td>{task_cmd}</td>
+        </tr>
+    <?php endif; ?>
 </table>
 
 <h2>Task output</h2>
