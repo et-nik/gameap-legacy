@@ -59,7 +59,7 @@ function check_task(task, task_id)
 
         if (server_status == 2) {
             // Server online
-            if (task == 'gsstart') {
+            if (task == 'gsstart' || task == 'gsrest') {
                 set_progress(100);
                 report_task_end(task, true);
                 return;
@@ -70,7 +70,7 @@ function check_task(task, task_id)
             }
         } else if (server_status == 3) {
             // Server offline
-            if (task == 'gsstart') {
+            if (task == 'gsstart' || task == 'gsrest') {
                 set_progress(100);
                 report_task_end(task, false);
                 return;
