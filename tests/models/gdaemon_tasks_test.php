@@ -6,6 +6,7 @@ class Gdaemon_tasks_tests extends CIUnit_TestCase {
 	{
 		$this->CI->load->database();
 		$this->CI->db->db_debug = 0;
+		$this->CI->load->library('gameap_hooks');
 		$this->CI->load->model('gdaemon_tasks');
 	}
 
