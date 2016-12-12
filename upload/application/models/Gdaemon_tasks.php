@@ -263,6 +263,11 @@ class Gdaemon_tasks extends CI_Model {
             delete_in_cache('server_status_' . $data['server_id']);
         }
 
+        if ($data['task'] == 'cmdexec' && empty($data['cmd'])) {
+            $this->last_error = lang('gdaemon_tasks_cmd_empty');
+            return 0;
+        }
+
         $insert_data = [
             'ds_id'         => $data['ds_id'],
             'server_id'     => $data['server_id'],
