@@ -1,9 +1,11 @@
 <?php
 
-class Dedicated_servers_test extends CIUnit_TestCase
+class Dedicated_servers_test extends TestCase
 {
 	public function setUp()
     {
+        $this->CI =& get_instance();
+        
         $this->CI->load->database();
         $this->CI->load->model('servers/dedicated_servers');
     }

@@ -1,9 +1,11 @@
 <?php
 
-class Game_types_test extends CIUnit_TestCase { 
+class Game_types_test extends TestCase { 
 	
 	public function setUp()
     {
+        $this->CI =& get_instance();
+        
         $this->CI->load->database();
         $this->CI->load->model('servers/game_types');
     }

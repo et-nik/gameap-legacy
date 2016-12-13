@@ -1,9 +1,11 @@
 <?php
 
-class Date_helper_test extends CIUnit_TestCase
+class Date_helper_test extends TestCase
 {
 	public function setUp()
     {
+        $this->CI =& get_instance();
+        
         date_default_timezone_set("Greenwich");
         $this->CI->load->helper('date');
     }

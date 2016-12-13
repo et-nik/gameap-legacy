@@ -4,10 +4,12 @@
  * @group Model
  */
 
-class Users_test extends CIUnit_TestCase
+class Users_test extends TestCase
 {
     public function setUp()
     {
+		$this->CI =& get_instance();
+		
 		$this->CI->load->database();
 		$this->CI->load->model('users');
     }

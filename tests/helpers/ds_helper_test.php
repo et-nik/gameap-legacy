@@ -3,10 +3,11 @@
 /**
  * @group Helper
  */
-class Ds_helper_test extends CIUnit_TestCase
+class Ds_helper_test extends TestCase
 {
     public function setUp()
     {
+        $this->CI =& get_instance();
         $this->CI->load->helper('ds');
     }
     

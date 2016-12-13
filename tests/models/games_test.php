@@ -1,6 +1,6 @@
 <?php
 
-class Games_test extends CIUnit_TestCase {
+class Games_test extends TestCase {
 
 	var $new_game_0 = array(
 					'code' 				=> 'cstrike',
@@ -28,6 +28,8 @@ class Games_test extends CIUnit_TestCase {
 
 	public function setUp()
 	{
+		$this->CI =& get_instance();
+		
 		$this->CI->load->database();
 		$this->CI->db->db_debug = 0;
 		$this->CI->load->model('servers/games');

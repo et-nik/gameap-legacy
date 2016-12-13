@@ -3,10 +3,11 @@
 /**
  * @group Helper
  */
-class Games_helper_test extends CIUnit_TestCase
+class Games_helper_test extends TestCase
 { 
 	public function setUp()
     {
+        $this->CI =& get_instance();
         $this->CI->load->helper('games');
     }
     

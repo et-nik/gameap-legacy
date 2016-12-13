@@ -4,7 +4,7 @@
  * @group System
  */
 
-class PHPTest extends CIUnit_TestCase
+class PHPTest extends TestCase
 {
     function setUp()
     {
