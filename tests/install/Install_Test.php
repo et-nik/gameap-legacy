@@ -8,7 +8,7 @@ class Install_Test extends TestCase
     {
         $this->CI =& get_instance();
         
-        rename('/GameAP/tests/database.php', '/home/travis/build/ET-NiK/GameAP/upload/application/config/database.php');
+        rename('/home/travis/build/ET-NiK/GameAP/tests/database.php', '/home/travis/build/ET-NiK/GameAP/upload/application/config/database.php');
         $this->request('GET', 'test');
     }
 
