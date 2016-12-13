@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit
-    bootstrap="/home/travis/build/ET-NiK/GameAP/upload/application/third_party/tests/Bootstrap.php"
+    bootstrap="/home/travis/build/ET-NiK/GameAP/upload/application/tests/Bootstrap.php"
     colors="true"
     convertNoticesToExceptions="true"
     convertWarningsToExceptions="true"
