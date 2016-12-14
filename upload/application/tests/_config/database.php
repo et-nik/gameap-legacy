@@ -14,7 +14,7 @@ $db['default']['hostname']  = 'localhost';
 $db['default']['username']  = $GLOBALS['db_username'];
 $db['default']['password']  = $GLOBALS['db_password'];
 $db['default']['database']  = 'gameap_test';
-$db['default']['dbdriver']  = getenv('DB');
+$db['default']['dbdriver']  = $GLOBALS['db_driver'];
 $db['default']['dbprefix']  = 'gameap_';
 
 /* Расширенные настройки (если всё нормально работает, то оставьте как есть)*/

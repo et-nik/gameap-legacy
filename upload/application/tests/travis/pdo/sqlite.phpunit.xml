@@ -16,24 +16,26 @@
         <server name="CI_ENV" value="testing" />
 
         <var name="db_dsn" value="sqlite::memory:"/>
+        <var name="db_driver" value="pdo"/>
+
         <var name="db_username" value="root"/>
         <var name="db_password" value=""/>
     </php>
     <testsuites>
         <testsuite name="ControllerTests">
-            <directory>controllers</directory>
+            <directory>../../controllers</directory>
         </testsuite>
         <testsuite name="HelperTests">
-            <directory suffix=".php">helpers</directory>
+            <directory suffix=".php">../../helpers</directory>
         </testsuite>
         <testsuite name="LibTests">
-            <directory suffix=".php">libs</directory>
+            <directory suffix=".php">../../libs</directory>
         </testsuite>
         <testsuite name="ModelTests">
-            <directory suffix=".php">models</directory>
+            <directory suffix=".php">../../models</directory>
         </testsuite>
         <testsuite name="SystemTests">
-            <directory suffix=".php">system</directory>
+            <directory suffix=".php">../../system</directory>
         </testsuite>
     </testsuites>
 </phpunit>
