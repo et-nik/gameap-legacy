@@ -15,7 +15,7 @@
         <server name="REMOTE_ADDR" value="0.0.0.0" />
         <server name="CI_ENV" value="testing" />
 
-        <var name="db_dsn" value="pgsql:dbname=gameap_test;host=localhost"/>
+        <var name="db_dsn" value="host=localhost dbname=gameap_test"/>
         <var name="db_driver" value="postgre"/>
 
         <var name="db_username" value="postgres"/>
