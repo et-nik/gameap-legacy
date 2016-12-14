@@ -5,9 +5,18 @@ class Test extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-
+		
+		$this->CI =& get_instance();
+		
         $this->load->database();
-        include FCPATH . '../../../install_gameap/db.php';
+		$this->load->dbforge();
+		$this->load->library('migration');
+		
+		$this->db 			= $this->CI->db;
+		$this->dbforge 		= $this->CI->dbforge;
+		$this->migration	= $this->CI->migration;
+		
+        include FCPATH . '/install_gameap/db.php';
 
         if (!$this->db->table_exists('migrations')) {
 			$this->dbforge->add_field(array(

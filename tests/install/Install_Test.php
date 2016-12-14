@@ -7,13 +7,11 @@ class Install_Test extends TestCase
     public function setUp()
     {
         $this->CI =& get_instance();
-        
         rename('/home/travis/build/ET-NiK/GameAP/tests/database.php', '/home/travis/build/ET-NiK/GameAP/upload/application/config/database.php');
-        $this->request('GET', 'test');
     }
 
     public function testTestController()
     {
-        $this->CI->index();
+        $this->request('GET', 'test');
     }
 }
