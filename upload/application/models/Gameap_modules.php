@@ -24,15 +24,17 @@
  */
  
 class Gameap_modules extends CI_Model {
-	
+
 	var $modules_data 	= array();	// Массив со всеми данными модулей
 	var $modules_list 	= array();	// Массив с именами модулей
 	var $menu 			= array();	// Меню
-	
+
 	function __construct()
     {
         // Call the Model constructor
         parent::__construct();
+
+        $this->load->helper('cache');
 
         /* 
          * Получение списка модулей 
@@ -85,9 +87,9 @@ class Gameap_modules extends CI_Model {
 	*/
 	function clean_modules()
     {
-        $this->load->helper('cache');
         delete_in_cache('gameap_hooks_callbacks');
-        
+        delete_in_cache('modules_data');
+
         $this->modules_data = array();
 		$this->modules_list = array();
 		$this->menu = array();
@@ -95,14 +97,26 @@ class Gameap_modules extends CI_Model {
 	}
 	
 	// ----------------------------------------------------------
-	
-	/**
-     * Список модулей
-     * 
-    */
+
+    /**
+     * Get All Modules data
+     *
+     * @param bool $where
+     * @param int $limit
+     * @return array
+     */
     function get_modules_data($where = FALSE, $limit = 10000)
     {
-		$this->db->order_by('name', 'asc'); 
+		if ($modules_data = load_from_cache('modules_data')) {
+            $this->modules_data = $modules_data;
+            return $this->modules_data;
+        }
+
+        if (!$this->db->table_exists('modules')) {
+            return [];
+        }
+
+        $this->db->order_by('name', 'asc');
 		
 		if (is_array($where)) {
 			$query = $this->db->get_where('modules', $where, $limit);
@@ -110,14 +124,12 @@ class Gameap_modules extends CI_Model {
 			$query = $this->db->get('modules');
 		}
 		
-		if($query->num_rows() > 0) {
-			
+		if ($query->num_rows() > 0) {
 			$this->modules_data = $query->result_array();
-			
+			save_to_cache('modules_data', $this->modules_data, 600);
 			return $this->modules_data;
-			
-		}else{
-			return NULL;
+		} else {
+			return [];
 		}
 	}
 	
