@@ -10,13 +10,12 @@ php:
   - hhvm
   
 env:
-  #- DB=mysql
   - DB=mysqli
 
 before_script:
-  - sh -c "if [ '$DB' = 'mysql' ] || [ '$DB' = 'mysqli' ] || [ '$DB' = 'pdo/mysql' ]; then mysql -e 'create database IF NOT EXISTS gameap_test;' -uroot; fi"
+  - sh -c "if [ '$DB' = 'mysqli' ] || [ '$DB' = 'pdo/mysql' ]; then mysql -e 'create database IF NOT EXISTS gameap_test;' -uroot; fi"
   
-script: tests/run_tests.sh
+script: ./run_tests.sh
 
 matrix:
   allow_failures:
