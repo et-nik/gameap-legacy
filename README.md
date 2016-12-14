@@ -7,17 +7,21 @@ Build Status: [![Build Status](https://api.travis-ci.org/ET-NiK/GameAP.svg?branc
 Server Requirements
 ======
 
-
 Web-server
 ------
-* PHP version 5.3 or newer.
-* GD module PHP
+* PHP version 5.4 or newer.
+* GD PHP Module
+* Mcrypt PHP Module
+* Curl PHP Module
 
 Dedicated Server (Linux)
 ------
+
+* Installed GameAP Daemon
 
 
 Dedicated Server (Windows)
 ------
 
+* Installed GameAP Daemon
 * Administration privileges
