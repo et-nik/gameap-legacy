@@ -8,16 +8,20 @@ php:
   - 7
   - 7.1
   - hhvm
-  
+
 env:
   - DB=mysqli
+  - DB=pdo/mysql
+  - DB=pdo/pgsql
+  - DB=pdo/sqlite
 
 before_script:
   - sh -c "if [ '$DB' = 'mysqli' ] || [ '$DB' = 'pdo/mysql' ]; then mysql -e 'create database IF NOT EXISTS gameap_test;' -uroot; fi"
+  - sh -c "if [ '$DB' = 'pgsql' ] || [ '$DB' = 'pdo/pgsql' ]; then psql -c 'DROP DATABASE IF EXISTS gameap_test;' -U postgres; fi"
+  - sh -c "if [ '$DB' = 'pgsql' ] || [ '$DB' = 'pdo/pgsql' ]; then psql -c 'create database gameap_test;' -U postgres; fi"
   
 script: ./run_tests.sh
 
 matrix:
   allow_failures:
-    - php: 5.3
     - php: hhvm

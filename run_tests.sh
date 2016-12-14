@@ -21,5 +21,5 @@ phpunit --version
 mv ${ROOT_DIR}/upload/application/tests/_config/gameap_config.php ${ROOT_DIR}/upload/application/config/gameap_config.php
 mv ${ROOT_DIR}/upload/application/tests/_config/database.php ${ROOT_DIR}/upload/application/config/database.php
 
-phpunit --configuration ${ROOT_DIR}/upload/application/tests/phpunit.xml
+phpunit --configuration ${ROOT_DIR}/upload/application/tests/travis/$DB.phpunit.xml
 exit $?
