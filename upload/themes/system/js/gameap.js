@@ -8,7 +8,7 @@ function sprintf( format ) {
 function ShowLoad() {
 	$("body").append('\
 				<div id="loading" style="top: 50%;left: 50%;position: fixed;">\
-					<img src="/themes/system/images/loading.gif" />\
+					<img src="' + page.base_url + 'themes/system/images/loading.gif" />\
 				</div>'
 	);
 }
@@ -137,3 +137,13 @@ function utf8_decode(utftext) {
 	return string;
 }
 
+function str_rand() {
+    var result       = '';
+    var words        = '0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
+    var max_position = words.length - 1;
+    for( i = 0; i < 10; ++i ) {
+        position = Math.floor ( Math.random() * max_position );
+        result = result + words.substring(position, position + 1);
+    }
+    return result;
+}
