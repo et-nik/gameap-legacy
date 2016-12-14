@@ -18,9 +18,8 @@ sudo chmod 666 ${ROOT_DIR}/Files/File02.txt
 
 phpunit --version
 
-mv ${ROOT_DIR}/tests/Test.php ${ROOT_DIR}/upload/application/controllers/Test.php
 mv ${ROOT_DIR}/tests/gameap_config.php ${ROOT_DIR}/upload/application/config/gameap_config.php
-phpunit --configuration ${ROOT_DIR}/tests/phpunit-dbinst.xml
+mv ${ROOT_DIR}/tests/database.php ${ROOT_DIR}/upload/application/config/database.php
 
 phpunit --configuration ${ROOT_DIR}/tests/phpunit.xml
 exit $?
