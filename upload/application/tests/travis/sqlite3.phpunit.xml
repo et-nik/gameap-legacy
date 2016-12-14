@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit
+    bootstrap="../../Bootstrap.php"
+    colors="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    stopOnError="true"
+    stopOnFailure="true"
+    stopOnIncomplete="false"
+    stopOnSkipped="false">
+    <php>
+        <const name="PHPUNIT_TEST" value="1" />
+        <const name="PHPUNIT_CHARSET" value="UTF-8" />
+        <server name="REMOTE_ADDR" value="0.0.0.0" />
+        <server name="CI_ENV" value="testing" />
+
+        <var name="db_dsn" value="sqlite::memory:"/>
+        <var name="db_driver" value="sqlite3"/>
+
+        <var name="db_username" value="root"/>
+        <var name="db_password" value=""/>
+    </php>
+    <testsuites>
+        <testsuite name="ControllerTests">
+            <directory>../../controllers</directory>
+        </testsuite>
+        <testsuite name="HelperTests">
+            <directory suffix=".php">../../helpers</directory>
+        </testsuite>
+        <testsuite name="LibTests">
+            <directory suffix=".php">../../libs</directory>
+        </testsuite>
+        <testsuite name="ModelTests">
+            <directory suffix=".php">../../models</directory>
+        </testsuite>
+        <testsuite name="SystemTests">
+            <directory suffix=".php">../../system</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
