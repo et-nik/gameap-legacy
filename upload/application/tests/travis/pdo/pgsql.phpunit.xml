@@ -18,7 +18,7 @@
         <var name="db_dsn" value="pgsql:dbname=gameap_test;host=localhost"/>
         <var name="db_driver" value="pdo"/>
 
-        <var name="db_username" value="root"/>
+        <var name="db_username" value="postgres"/>
         <var name="db_password" value=""/>
     </php>
     <testsuites>
