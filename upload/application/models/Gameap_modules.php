@@ -141,34 +141,26 @@ class Gameap_modules extends CI_Model {
 	 * 
 	 * @return array
 	 */
-	function get_modules_list($for_menu = FALSE, $access = '') {
-		
-		//~ if(empty($this->modules_data)) {
-			//~ $this->get_cache_modules_data();
-		//~ }
-		
+	function get_modules_list($for_menu = FALSE, $access = '')
+    {
 		if (!empty($this->modules_list)) {
 			return $this->modules_list;
 		}
 		
-		if (!empty($this->modules_data)) {
+		if (empty($this->modules_data)) {
 			$this->get_modules_data();
 		}
-		
-		$i = 0;
+
 		foreach ($this->modules_data as $module) {
 
 			if ($for_menu) {
 				if ($module['show_in_menu']) {
-					$this->modules_list[$i] = str_replace(' ', '_', strtolower($module['short_name']));	
+					$this->modules_list[] = str_replace(' ', '_', strtolower($module['short_name']));
 				}
 				
 			} else {
-				$this->modules_list[$i] = str_replace(' ', '_', strtolower($module['short_name']));	
+				$this->modules_list[] = str_replace(' ', '_', strtolower($module['short_name']));
 			}
-			
-			$i++;
-			
 		}
 		
 		return $this->modules_list;
