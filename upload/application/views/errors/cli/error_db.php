@@ -1,8 +1,5 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-echo "\nDatabase error: ",
-	$heading,
-	"\n\n",
-	$message,
-	"\n\n";
+echo \Myth\CLI::error("\n\tDatabase Error: $heading");
+echo \Myth\CLI::write("$message\n");

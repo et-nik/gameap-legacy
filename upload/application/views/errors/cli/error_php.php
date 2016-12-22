@@ -1,21 +1,25 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+?>
 
-A PHP Error was encountered
+<?php echo \Myth\CLI::error("\n\tA PHP Error was encountered"); ?>
 
-Severity:    <?php echo $severity, "\n"; ?>
-Message:     <?php echo $message, "\n"; ?>
-Filename:    <?php echo $filepath, "\n"; ?>
-Line Number: <?php echo $line; ?>
+<?php echo \Myth\CLI::write("\tSeverity: {$severity}"); ?>
+<?php echo \Myth\CLI::write("\tMessage: {$message}"); ?>
+<?php echo \Myth\CLI::write("\tFilename: {$filepath}"); ?>
+<?php echo \Myth\CLI::write("\tLine Number: {$line}"); ?>
 
-<?php if (defined('SHOW_DEBUG_BACKTRACE') && SHOW_DEBUG_BACKTRACE === TRUE): ?>
+<?php
+    if (defined('SHOW_DEBUG_BACKTRACE') && SHOW_DEBUG_BACKTRACE === TRUE) {
 
-Backtrace:
-<?php	foreach (debug_backtrace() as $error): ?>
-<?php		if (isset($error['file']) && strpos($error['file'], realpath(BASEPATH)) !== 0): ?>
-	File: <?php echo $error['file'], "\n"; ?>
-	Line: <?php echo $error['line'], "\n"; ?>
-	Function: <?php echo $error['function'], "\n\n"; ?>
-<?php		endif ?>
-<?php	endforeach ?>
+        echo \Myth\CLI::write("\n\tBacktrace");
 
-<?php endif ?>
+        foreach (debug_backtrace() as $error) {
+            if (isset($error['file']) && strpos($error['file'], realpath(BASEPATH)) !== 0) {
+                echo \Myth\CLI::write("\t\t- {$error['function']}() - Line {$error['line']} in {$error['file']}");
+            }
+        }
+}
+
+echo \Myth\CLI::new_line();
+?>

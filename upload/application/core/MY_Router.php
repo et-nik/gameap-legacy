@@ -1,6 +1,5 @@
-<?php (defined('BASEPATH')) OR exit('No direct script access allowed');
+<?php
 
-/* load the MX_Router class */
-require APPPATH."third_party/MX/Router.php";
+require_once APPPATH .'third_party/HMVC/Router.php';
 
-class MY_Router extends MX_Router {}
+class MY_Router extends HMVC_Router {}

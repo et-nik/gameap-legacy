@@ -1,21 +1,25 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+?>
 
-An uncaught Exception was encountered
+<?php echo \Myth\CLI::error("\n\tAn uncaught Exception was encountered"); ?>
 
-Type:        <?php echo get_class($exception), "\n"; ?>
-Message:     <?php echo $message, "\n"; ?>
-Filename:    <?php echo $exception->getFile(), "\n"; ?>
-Line Number: <?php echo $exception->getLine(); ?>
+<?php echo \Myth\CLI::write("\Type: {get_class($exception)}"); ?>
+<?php echo \Myth\CLI::write("\Message: {$message}"); ?>
+<?php echo \Myth\CLI::write("\Filename: {$exception->getFile()}"); ?>
+<?php echo \Myth\CLI::write("\ine Number: {$exception->getLine()}"); ?>
 
-<?php if (defined('SHOW_DEBUG_BACKTRACE') && SHOW_DEBUG_BACKTRACE === TRUE): ?>
+<?php
+	if (defined('SHOW_DEBUG_BACKTRACE') && SHOW_DEBUG_BACKTRACE === TRUE) {
 
-Backtrace:
-<?php	foreach ($exception->getTrace() as $error): ?>
-<?php		if (isset($error['file']) && strpos($error['file'], realpath(BASEPATH)) !== 0): ?>
-	File: <?php echo $error['file'], "\n"; ?>
-	Line: <?php echo $error['line'], "\n"; ?>
-	Function: <?php echo $error['function'], "\n\n"; ?>
-<?php		endif ?>
-<?php	endforeach ?>
+		echo \Myth\CLI::write("\n\tBacktrace");
 
-<?php endif ?>
+		foreach ($exception->getTrace() as $error) {
+			if (isset($error['file']) && strpos($error['file'], realpath(BASEPATH)) !== 0) {
+				echo \Myth\CLI::write("\t\t- {$error['function']}() - Line {$error['line']} in {$error['file']}");
+			}
+		}
+	}
+
+echo \Myth\CLI::new_line();
+?>

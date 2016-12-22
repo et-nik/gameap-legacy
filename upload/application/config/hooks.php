@@ -1,4 +1,6 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
 /*
 | -------------------------------------------------------------------------
 | Hooks
@@ -11,31 +13,29 @@
 */
 
 $hook['post_controller'][] = array(
-  'class'    => 'Tpl_replace',
-  'function' => 'parse_lang',
-  'filename' => 'tpl_replace.php',
-  'filepath' => 'hooks'
+    'class'    => 'Tpl_replace',
+    'function' => 'parse_lang',
+    'filename' => 'tpl_replace.php',
+    'filepath' => 'hooks'
 );
 
 $hook['post_controller'][] = array(
-  'class'    => 'Tpl_replace',
-  'function' => 'parse_url',
-  'filename' => 'tpl_replace.php',
-  'filepath' => 'hooks'
+    'class'    => 'Tpl_replace',
+    'function' => 'parse_url',
+    'filename' => 'tpl_replace.php',
+    'filepath' => 'hooks'
 );
 
 $hook['post_controller'][] = array(
-  'class'    => 'Tpl_replace',
-  'function' => 'parse_template',
-  'filename' => 'tpl_replace.php',
-  'filepath' => 'hooks'
+    'class'    => 'Tpl_replace',
+    'function' => 'parse_template',
+    'filename' => 'tpl_replace.php',
+    'filepath' => 'hooks'
 );
 
 $hook['post_controller'][] = array(
-  'class'    => 'Tpl_replace',
-  'function' => 'parse_notices',
-  'filename' => 'tpl_replace.php',
-  'filepath' => 'hooks'
+    'class'    => 'Tpl_replace',
+    'function' => 'parse_notices',
+    'filename' => 'tpl_replace.php',
+    'filepath' => 'hooks'
 );
-/* End of file hooks.php */
-/* Location: ./application/config/hooks.php */
