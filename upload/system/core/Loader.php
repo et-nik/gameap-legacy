@@ -1161,28 +1161,32 @@ class CI_Loader {
 			}
 		}
 
-		include_once(BASEPATH.'libraries/'.$file_path.$library_name.'.php');
-
-		// Check for extensions
-		$subclass = config_item('subclass_prefix').$library_name;
-		foreach ($paths as $path)
+		// Set the variable name we will assign the class to
+		// Was a custom class name supplied? If so we'll use it
+		if (empty($object_name))
 		{
-			if (file_exists($path = $path.'libraries/'.$file_path.$subclass.'.php'))
+			$object_name = strtolower($library_name);
+			if (isset($this->_ci_varmap[$object_name]))
 			{
-				include_once($path);
-				if (class_exists($subclass, FALSE))
-				{
-					$prefix = config_item('subclass_prefix');
-					break;
-				}
-				else
-				{
-					log_message('debug', $path.' exists, but does not declare '.$subclass);
-				}
+				$object_name = $this->_ci_varmap[$object_name];
 			}
 		}
 
-		return $this->_ci_init_library($library_name, $prefix, $params, $object_name);
+		// Don't overwrite existing properties
+		$CI =& get_instance();
+		if (isset($CI->$object_name))
+		{
+			if ($CI->$object_name instanceof $library_name)
+			{
+				log_message('debug', $library_name." has already been instantiated as '".$object_name."'. Second attempt aborted.");
+				return;
+			}
+
+			show_error("Resource '".$object_name."' already exists and is not a ".$library_name." instance.");
+		}
+
+		$CI->$object_name = load_class($library_name, 'libraries/'.$file_path);
+		return $CI->$object_name;
 	}
 
 	// --------------------------------------------------------------------
