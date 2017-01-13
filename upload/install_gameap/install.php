@@ -347,24 +347,24 @@ switch($page) {
 		$content = '<h2>' . lang('install_end_stage') . '</h2>';
 		
 		// Для SQLite базы некоторые данные можно опустить.
-		$isSqlite OR $this->form_validation->set_rules('hostname', lang('install_db_hostname'), 'trim|required|xss_clean');
-		$isSqlite OR $this->form_validation->set_rules('username', lang('install_db_username'), 'trim|required|xss_clean');
-		$isSqlite OR $this->form_validation->set_rules('password', lang('install_db_password'), 'trim|xss_clean');
-		$this->form_validation->set_rules('database', lang('install_db_database'), 'trim|required|xss_clean');
-		$this->form_validation->set_rules('dbdriver', lang('install_db_dbdriver'), 'trim|required|xss_clean');
-		$this->input->post('dbdriver') != 'pdo' OR $this->form_validation->set_rules('pdodriver', lang('install_pdo_dbdriver'), 'trim|required|xss_clean');
-		$this->form_validation->set_rules('dbprefix', lang('install_db_dbprefix'), 'trim|xss_clean');
+		$isSqlite OR $this->form_validation->set_rules('hostname', lang('install_db_hostname'), 'trim|required');
+		$isSqlite OR $this->form_validation->set_rules('username', lang('install_db_username'), 'trim|required');
+		$isSqlite OR $this->form_validation->set_rules('password', lang('install_db_password'), 'trim');
+		$this->form_validation->set_rules('database', lang('install_db_database'), 'trim|required');
+		$this->form_validation->set_rules('dbdriver', lang('install_db_dbdriver'), 'trim|required');
+		$this->input->post('dbdriver') != 'pdo' OR $this->form_validation->set_rules('pdodriver', lang('install_pdo_dbdriver'), 'trim|required');
+		$this->form_validation->set_rules('dbprefix', lang('install_db_dbprefix'), 'trim');
 		
-		$this->form_validation->set_rules('base_url', lang('install_site_url'), 'trim|required|xss_clean');
-		$this->form_validation->set_rules('encryption_key', lang('install_secret_key'), 'trim|required|min_length[6]|xss_clean');
-		$this->form_validation->set_rules('system_email', lang('install_system_email'), 'trim|required|valid_email|xss_clean');
-		$this->form_validation->set_rules('local_os', lang('install_local_os'), 'trim|required|xss_clean');
-		$this->form_validation->set_rules('local_script_path', lang('install_script_path'), 'trim|xss_clean');
-		$this->form_validation->set_rules('local_steamcmd_path', lang('install_steamcmd_path'), 'trim|xss_clean');
+		$this->form_validation->set_rules('base_url', lang('install_site_url'), 'trim|required');
+		$this->form_validation->set_rules('encryption_key', lang('install_secret_key'), 'trim|required|min_length[6]');
+		$this->form_validation->set_rules('system_email', lang('install_system_email'), 'trim|required|valid_email');
+		$this->form_validation->set_rules('local_os', lang('install_local_os'), 'trim|required');
+		$this->form_validation->set_rules('local_script_path', lang('install_script_path'), 'trim');
+		$this->form_validation->set_rules('local_steamcmd_path', lang('install_steamcmd_path'), 'trim');
 		
-		$this->form_validation->set_rules('admin_login', lang('login'), 'trim|required|max_length[64]|xss_clean');
-		$this->form_validation->set_rules('admin_email', lang('email'), 'trim|required|valid_email|xss_clean');
-		$this->form_validation->set_rules('admin_password', lang('password'), 'trim|required|min_length[6]|max_length[64]|xss_clean');
+		$this->form_validation->set_rules('admin_login', lang('login'), 'trim|required|max_length[64]');
+		$this->form_validation->set_rules('admin_email', lang('email'), 'trim|required|valid_email');
+		$this->form_validation->set_rules('admin_password', lang('password'), 'trim|required|min_length[6]|max_length[64]');
 		
 		if ($this->form_validation->run() == FALSE)
 		{
