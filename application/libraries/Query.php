@@ -12,6 +12,8 @@
  * @filesource
 */
 
+use \GameQ\GameQ;
+
 /**
  * Query библиотека для опроса серверов
  *
@@ -20,12 +22,12 @@
  * @author		Nikita Kuznetsov (ET-NiK)
  * @sinse		0.9
 */
-class Query {
+class Query
+{
+	private $gameq          = null;
 	
-	private $gameq = false;			// Объект GameQ
-	
-	private $request 	= false;		// Данные получены
-	private $request_data = array();	// Массив с данными
+	private $request 	    = false;
+	private $request_data   = array();
 	
 	// ---------------------------------------------------------------------
 	
@@ -43,9 +45,7 @@ class Query {
 	 */
 	private function _load()
 	{
-		require APPPATH . 'libraries/Gameq.php';
-		
-		$this->gameq = new Gameq;
+		$this->gameq = new GameQ;
 		$this->gameq->setOption('timeout', 5);
 	}
 	
@@ -91,10 +91,10 @@ class Query {
 		if ($this->request) {
 			return $this->request_data;
 		}
+
+        $this->request_data = $this->gameq->process();
 		
-		$this->request_data = $this->gameq->requestData();
-		
-		$this->request = $this->request_data ? true : false;
+		$this->request = (bool)$this->request_data;
 		return $this->request_data;
 	}
 	
@@ -107,8 +107,7 @@ class Query {
 	public function get_base_cvars()
 	{
 		$info = array();
-		$this->gameq->setFilter('normalise');
-		
+
 		if ($this->_request()) {
 			foreach($this->request_data as $key => $array) {
 				$info[$key]['hostname'] 	= htmlspecialchars($array['gq_hostname']);
@@ -155,8 +154,7 @@ class Query {
 	public function get_cvars()
 	{
 		$cvars = array();
-		$this->gameq->setFilter('normalise');
-		
+
 		if ($this->_request()) {
 			foreach($this->request_data as $key => $array) {
 				$cvars[$key]		= $this->_remove_gq_cvars($array);
@@ -196,8 +194,6 @@ class Query {
 	 */
 	public function get_players()
 	{
-		$this->gameq->setFilter('normalise');
-		
 		if ($this->_request()) {
 			foreach($this->request_data as $key => $array) {
 				$players[$key] = $this->_extract_players($array);
@@ -214,8 +210,6 @@ class Query {
 	 */
 	public function get_status()
 	{
-		$this->gameq->setFilter('normalise');
-		
 		if ($this->_request()) {
 			foreach($this->request_data as $key => $array) {
 				$status[$key] = (bool)$array['gq_online'];
