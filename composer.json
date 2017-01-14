@@ -1,11 +1,31 @@
 {
-    "name": "et-nik/gameap",
+    "name": "knik/gameap",
     "description": "GameAP",
-    "minimum-stability": "dev",
     "license": "MIT",
+    "authors": [
+        {
+          "name": "Nikita Kuznetsov",
+          "email": "nikita.hldm@gmail.com",
+          "role": "Developer",
+          "homepage": "https://github.com/ET-Nik"
+        }
+    ],
     "require": {
-		"php": ">=5.2.4",
+		"php": ">=5.4",
+        "knik/binn": "0.1",
+        "austinb/gameq": "3.0.10",
+        "mobiledetect/mobiledetectlib": "dev-master",
+        "raveren/kint": "1.0.*",
+        "league/commonmark": "0.7.*",
+        "zendframework/zend-escaper": "2.4.2"
+    },
+    "require-dev": {
         "phpunit/phpunit": "4.4.*",
         "mustangostang/spyc": "0.5.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Myth\\": "myth/"
+        }
     }
 }
