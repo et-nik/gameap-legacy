@@ -83,7 +83,7 @@ $config['migration_version'] = 0;
 | The key is the alias that you will refer to when running migrations.
 */
 $config['migration_paths'] = array(
-    'app'       => APPPATH . 'database/migrations/'
+    'gameap'       => APPPATH . 'database/migrations/'
 );
 
 
