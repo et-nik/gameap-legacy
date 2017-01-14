@@ -1,0 +1,30 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+
+<a class="button" href="{site_url}adm_servers/add/dedicated_servers">{lang_adm_servers_add_ds}</a>
+<a class="button" href="{site_url}ds_stats">{lang_adm_servers_ds_stats}</a>
+
+<h2>{lang_adm_servers_dedicated_servers}</h2>
+<table width="100%" class="zebra">
+	<thead>
+	<tr>
+		<th>{lang_name}</th>
+		<th>{lang_adm_servers_location}</th>
+		<th>{lang_adm_servers_provider}</th>
+		<th>{lang_ip}</th>
+		<th>{lang_os}</th>
+		<th>{lang_adm_servers_count_game_servers}</th>
+		<th>{lang_commands}</th>
+	</tr>
+	</thead>
+{ds_list}
+	<tr align="center">
+		<td>{ds_name}</td>
+		<td>{ds_location}</td>
+		<td>{ds_provider}</td>
+		<td>{ds_ip}</td>
+		<td>{ds_os}</td>
+		<td>{servers_count}</td>
+		<td><a class="small button" href="{site_url}adm_servers/edit/dedicated_servers/{ds_id}">{lang_control}</a>&nbsp;<a class="red small button" href="{site_url}adm_servers/delete/dedicated_servers/{ds_id}">X</a></td>
+	</tr>
+{/ds_list}
+</table>

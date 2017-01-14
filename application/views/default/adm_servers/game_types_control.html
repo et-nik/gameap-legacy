@@ -1,0 +1,200 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}adm_servers/view/game_types">« {lang_adm_servers_back_to_game_types}</a>
+<a class="button" href="{site_url}adm_servers/edit/games/{game_code}">{lang_adm_servers_go_to_game}</a>
+<a class="button" href="{site_url}adm_servers/dublicate_game_type/{gt_id}">{lang_adm_servers_dublicate_game_type}</a>
+<a class="button red" href="{site_url}adm_servers/delete/game_types/{gt_id}">{lang_delete}</a>
+<h2>{lang_adm_servers_game_type_control}</h2>
+
+<p>{lang_adm_servers_game_types_documentation}</p>
+
+<form action="{site_url}adm_servers/edit/game_types/{gt_id}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+		<table class="zebra" width="100%">
+			<tr>
+				<td width="50%">{lang_name}:</td>
+				<td><input type="text" name="name" value="{gt_name}" /></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_game_code}:<br /><span class="description">{lang_adm_servers_game_code_desc_for_gt_control}</span></td>
+				<td>{gt_code}</td>
+			</tr>
+		</table>
+
+	<p align="center"><input class="button" type="submit" value="{lang_save}" /></p>
+
+	<br />
+	<ul class="tabs">
+		<li><a href="#fast_rcon" onclick="return false;">Fast Rcon</a></li>
+		<li><a href="#aliases" onclick="return false;">{lang_adm_servers_aliases}</a></li>
+		<li><a href="#rcon_control_parameters" onclick="return false;">{lang_adm_servers_rcon_commands}</a></li>
+		<li><a href="#repositories" onclick="return false;">{lang_adm_servers_repository_parameters}</a></li>
+	</ul>
+
+
+	<div id="fast_rcon" class="tab_content">
+		<h2>Fast RCON</h2>
+		<table class="zebra" id="frcon_list" width="100%">
+			<tr>
+				<td colspan="4"><a class="small button" href="#" onclick="add_new_item('frcon_list'); return false;" id="add">{lang_add}</a></td>
+			</tr>
+
+			<tr>
+				<th>{lang_description}</th>
+				<th>{lang_command}</th>
+				<th>{lang_delete}</th>
+			</tr>
+		{frcon_list}
+			<tr id="frcon_list{id}">
+				<td>{desc}</td>
+				<td>{rcon_command}</td>
+				<td align="center"><a class="smal red button" onclick="delete_item('frcon_list', {id})">&#10008;</a></td>
+			</tr>
+		{/frcon_list}
+
+		</table>
+	</div>
+
+	<div id="aliases" class="tab_content">
+		<h2>{lang_adm_servers_aliases}</h2>
+		<table class="zebra" id="aliases_list" width="100%">
+			
+				<tr>
+					<td colspan="4"><a class="small button" href="#" onclick="add_new_item('aliases_list'); return false;" id="add">{lang_add}</a></td>
+				</tr>
+
+				<tr>
+					<th>{lang_adm_servers_alias}</th>
+					<th>{lang_description}</th>
+					<th>{lang_default_value}</th>
+					<th>{lang_adm_servers_only_for_admins}</th>
+					<th>{lang_delete}</th>
+				</tr>
+
+			{aliases_list}
+				<tr id="aliases_list{id}">
+					<td>{alias}</td>
+					<td>{desc}</td>
+					<td>{default_value}</td>
+					<td align="center">{only_admins}</td>
+					<td align="center"><a class="smal red button" onclick="delete_item('aliases_list', {id})">&#10008;</a></td>
+				</tr>
+			{/aliases_list}
+		</table>
+	</div>
+
+
+	<div id="rcon_control_parameters" class="tab_content">
+		<table class="zebra" width="100%">
+			<tbody>
+				<tr>
+					<td width="45%"><h2>{lang_adm_servers_rcon_commands}</h2></td>
+					<td></td>
+				</tr>
+			</tbody>
+			<tr>
+				<td>{lang_adm_servers_kick_cmd}:<br /><span class="description">[ {lang_adm_servers_kick_cmd_desc} ]</span></td>
+				<td><input style="width: 50%" type="text" name="kick_cmd" value="{kick_cmd}" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_ban_cmd}:<br /><span class="description">[ {lang_adm_servers_ban_cmd_desc} ]</span></td>
+				<td><input style="width: 50%" type="text" name="ban_cmd" value="{ban_cmd}" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_chname_cmd}:<br /><span class="description">[ {lang_adm_servers_chname_cmd_desc} ]</span></td>
+				<td><input style="width: 50%" type="text" name="chname_cmd" value="{chname_cmd}" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_srestart_cmd}:</td>
+				<td><input style="width: 50%" type="text" name="srestart_cmd" value="{srestart_cmd}" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_chmap_cmd}:<br /><span class="description">[ {lang_adm_servers_chmap_cmd_desc} ]</span></td>
+				<td><input style="width: 50%" type="text" name="chmap_cmd" value="{chmap_cmd}" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_sendmsg_cmd}:<br /><span class="description">[ {lang_adm_servers_sendmsg_cmd_desc} ]</span></td>
+				<td><input style="width: 50%" type="text" name="sendmsg_cmd" value="{sendmsg_cmd}" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_passwd_cmd}:<br /><span class="description">[ {lang_adm_servers_passwd_cmd_desc} ]</span></td>
+				<td><input style="width: 50%" type="text" name="passwd_cmd" value="{passwd_cmd}" /></td>
+			</tr>
+
+		</table>
+	</div>
+	
+	<div id="repositories" class="tab_content">
+		<table class="zebra" width="100%">
+			
+			<tbody>
+				<tr>
+					<td colspan='2'><h2>{lang_adm_servers_repository_parameters}</h2></td>
+				</tr>
+			</tbody>
+			
+			<tr>
+				<td>{lang_adm_servers_local_repository}:<br /><span class="description">[ {lang_adm_servers_local_repository_gtdesc} ] </span></td>
+				<td><input size="50" type="text" name="local_repository" value="{local_repository}" /></td>
+			</tr>
+			
+			<tr>
+				<td>{lang_adm_servers_remote_repository}:<br /><span class="description">[ {lang_adm_servers_remote_repository_gtdesc} ] </span></td>
+				<td><input size="50" type="text" name="remote_repository" value="{remote_repository}" /></td>
+			</tr>
+			
+		</table>
+	</div>
+
+
+	<script type="text/javascript">
+		
+	var counts = { 
+		frcon: {frcon_count},
+		aliases: {aliases_count},
+	};
+		
+	$(document).ready(function(){
+
+		$('#hide').hide();
+		$('#selected').toggle(function(){
+		$('#hide').fadeIn(800);
+		$(this).html('');}, function(){
+		$('#hide').fadeOut(800);
+		$(this).html('');});
+	})
+		
+	function add_new_item(tab) {
+		if(tab == 'frcon_list') {
+			$('<tr id="'+tab+counts['frcon']+'"><td><input type="text" name="frcon_desc[]" /></td>\
+			<td><input type="text" name="frcon_command[]" /></td>\
+			<td align="center"><a class="smal red button" onclick="delete_item(\''+tab+'\', '+counts['frcon']+')">&#10008;</a></td></tr>').fadeIn('slow').appendTo('#frcon_list');
+			counts['frcon']++;
+		}
+		
+		if(tab == 'aliases_list') {
+			$('<tr id="'+tab+counts['aliases']+'"><td><input type="text" name="alias_name[]" /></td>\
+			<td><input type="text" name="alias_desc[]" /></td>\
+			<td><input type="text" name="default_value[]" /></td>\
+			<td align="center"><input type="checkbox" name="alias_only_admins[]" value="accept"  /></td>\
+			<td align="center"><a class="smal red button" onclick="delete_item(\''+tab+'\', '+counts['aliases']+')">&#10008;</a></td></tr>').fadeIn('slow').appendTo('#aliases_list');
+			counts['aliases']++;
+		}
+	}
+	
+	function delete_item(tab, id) {
+		$("#" + tab + id ).fadeOut('slow', function(){ $(this).remove();});
+		counts['cfg']--;
+	}
+		
+	</script>
+	
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+	<p align="center"><input class="button" type="submit" value="{lang_save}" /></p>
+</form>

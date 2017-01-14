@@ -1,0 +1,12 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<p align="center" class="hr">{message}</p>
+<form id="fconfirm" action="{confirmed_url}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+	<?php if(isset($this->_ci_cached_vars['extra_checkbox'])): ?>
+	<label>{extra_checkbox}&nbsp;{extra_text}</label>
+	<?php endif; ?>
+</form>
+<p align="center">
+	<a href="{confirmed_url}"><button form="fconfirm" class="green button">{lang_yes}</button></a>
+	<a href="javascript:history.back()"><button class="red button">{lang_no}</button></a>
+</p>

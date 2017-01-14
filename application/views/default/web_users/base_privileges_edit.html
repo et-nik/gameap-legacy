@@ -1,0 +1,23 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}admin/users_control">« {lang_back}</a>
+
+<form action="{site_url}admin/users_control/base_privileges/{user_id}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+
+<table class="zebra" width="50%">
+	
+	{privileges_list}
+	<tr>
+		<td>{privilege_name}</td>
+		<td>{privilege_option}</td>
+	</tr>
+	{/privileges_list}
+	
+<tr>
+	<td><input class="button" type="submit" name="submit" value="{lang_save}" /></td>
+	<td></td>
+</tr>
+	
+</table>
+
+</form>

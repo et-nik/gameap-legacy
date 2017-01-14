@@ -1,0 +1,32 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<h2>{lang_adm_servers_dublicate_game_type}</h2>
+
+<form action="{site_url}adm_servers/dublicate_game_type/{gt_id}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+	<table class="zebra" width="75%">
+		<tr>
+			<td width="40%">{lang_name}:</td>
+			<td><input type="text" name="name" /></td>
+		</tr>
+		
+		<tr>
+			<td>{lang_game}:</td>
+			<td>
+				<select name="code">
+					{games_list}
+					<option value="{game_code}">{game_name}</option>
+					{/games_list}
+				 </select>
+			</td>
+		</tr>
+		
+		<tr>
+			<td></td>
+			<td><input class="button" type="submit" name="server_install" value="{lang_send}" /></td>
+		</tr>
+		
+	</table>
+	
+		
+	
+</form>

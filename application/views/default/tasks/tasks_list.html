@@ -1,0 +1,96 @@
+<a class="button" onclick="anichange('#filter'); return false" href="#">{lang_filter}</a>
+<br /><br />
+
+<script>
+function anichange (objName) {
+  if ( $(objName).css('display') == 'none' ) {
+    $(objName).animate({height: 'show'}, 400);
+  } else {
+    $(objName).animate({height: 'hide'}, 200);
+  }
+}
+
+function apply_server_filter(server_id) {
+    $('#set-filter').append('<input type="hidden" name="filter_gdaemon_tasks_server_id" value="' + server_id + '" />');
+    $('#set-filter').submit();
+}
+
+function apply_ds_filter(ds_id) {
+    $('#set-filter').append('<input type="hidden" name="filter_gdaemon_tasks_ds_id" value="' + ds_id + '" />');
+    $('#set-filter').submit();
+}
+</script>
+
+<div id="filter" style="display: none">
+	<br />
+	<form id="set-filter" action="{site_url}tasks/set_filter" method="post" accept-charset="utf-8">
+		<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+
+		<table class="zebra" width="100%">
+            <tr>
+                <td width="30%">{lang_task_name}:</td>
+                <td>{task_names_dropdown}</td>
+            </tr>
+
+            <tr>
+                <td width="30%">{lang_task_status}:</td>
+                <td>{task_statuses_dropdown}</td>
+            </tr>
+
+		</table>
+			<p align="center">
+				<input class="button" type="submit" name="submit_filter" value="{lang_apply}" />
+				<input class="button" type="submit" name="reset" value="{lang_reset}" />
+			</p>
+	</form>
+</div>
+
+{pagination}
+<table width="100%" class="zebra">
+	<thead>
+		<th>{lang_task}</th>
+		<th>{lang_tasks_date_create}</th>
+		<th>{lang_tasks_date_stchange}</th>
+		<th>{lang_ds_name}</th>
+		<th>{lang_server_name}</th>
+		<th>{lang_status}</th>
+		<th>&nbsp;</td>
+	</thead>
+{tasks_list}
+	<tr>
+		<td width="20%">{task_htask}</td>
+		<td width="20%">{task_date_create}</td>
+		<td width="20%">{task_date_stchange}</td>
+		<td width="15%">
+            <ul class="dropdown menu" data-dropdown-menu data-click-open="true" data-disable-hover="true">
+                <li>
+                    <a href="#">{task_ds_name}</a>
+                    <ul class="menu">
+                        <li><a href="#" onclick="apply_ds_filter({task_ds_id})">{lang_apply_filter}</a></li>
+                        <li><a target="_blank" href="{site_url}adm_servers/edit/dedicated_servers/{task_ds_id}">{lang_administration}</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </td>
+		<td width="15%">
+            <ul class="dropdown menu" data-dropdown-menu data-click-open="true" data-disable-hover="true">
+                <li>
+                    <a href="#">{task_server_name}</a>
+                    <ul class="menu">
+                        <li><a href="#" onclick="apply_server_filter({task_server_id})">{lang_apply_filter}</a></li>
+                        <li><a target="_blank" href="{site_url}adm_servers/edit/game_servers/{task_server_id}">{lang_administration}</a></li>
+                        <li><a target="_blank" href="{site_url}admin/server_control/main/{task_server_id}">{lang_server_control_header}</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </td>
+		<td width="10%">{task_hstatus}</td>
+		<td><a class="small button" href={site_url}tasks/view/{task_id}>{lang_view}</a></td>
+	</tr>
+{/tasks_list}
+</table>
+{pagination}
+
+<script>
+    $('select[multiple="multiple"]').multipleSelect({width:200});
+</script>

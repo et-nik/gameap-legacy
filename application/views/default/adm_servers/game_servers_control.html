@@ -1,0 +1,218 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}adm_servers/view/game_servers">« {lang_adm_servers_game_servers}</a>&nbsp;
+<a class="button" href="{site_url}admin/settings/server/{server_id}">{lang_adm_servers_game_server_settings}</a>
+<a class="button" href="{site_url}adm_servers/reinstall_game_server/{server_id}">{lang_adm_servers_reinstall}</a>
+<a class="button" onclick="$('#popup').arcticmodal()">{lang_server_control_last_actions}</a>
+<h2>{lang_adm_servers_game_server_control}</h2>
+
+<p>{lang_adm_servers_game_servers_documentation}</p>
+
+<div style="display: none;">
+    <div class="box-modal" id="popup">
+        <div class="box-modal_close arcticmodal-close">close</div>
+			
+        
+			<table width="100%" class="zebra">
+				<tbody>
+					<tr>
+						<td colspan="5"><h2>{lang_server_control_last_actions}</h2></td>
+					</tr>
+				</tbody>
+				<tr>
+					<th><strong>{lang_time}</strong></th>
+					<th><strong>{lang_action}</strong></th>
+					<th><strong>{lang_command}</strong></th>
+					<th><strong>{lang_user}</strong></th>
+					<th>&nbsp;</th>
+				</tr>
+			{log_list}
+				<tr>
+					<td width="20%">{log_date}</td>
+					<td width="20%">{log_type}</td>
+					<td width="20%">{log_command}</td>
+					<td width="20%">{log_user_name}</td>
+					<td><a class="small button" href={site_url}log_view/view/{log_id}>{lang_view}</a></td>
+				</tr>
+			{/log_list}
+			</table>
+    </div>
+</div>
+
+	<table class="zebra" width="100%">
+		
+		<tr>
+			<td><h2>{lang_information}</h2></td>
+			<td></td>
+		</tr>
+
+		<tr>
+			<td colspan="2">
+				<ul>
+				{information}
+				<li>{text}</li>
+				{/information}
+				</ul>
+			</td>
+		</tr>
+	</table>
+	<br />
+	
+<form action="{site_url}adm_servers/edit/game_servers/{server_id}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />	
+
+    <ul class="tabs">
+        <li><a href="#base_parameters">{lang_base_parameters}</a></li>
+        <li><a href="#start_parameters">{lang_adm_servers_start_parameters}</a></li>
+    </ul>
+		
+    
+        <div id="base_parameters" class="tab_content">
+			<table class="zebra" width="100%">
+				<tr>
+					<td width="40%"><h2>{lang_base_parameters}</h2></td>
+					<td></td>
+				</tr>
+
+				<tr>
+					<td width="40%">{lang_name}:</td>
+					<td><input type="text" name="name" value="{server_name}" /></td>
+				</tr>
+
+				<tr>
+					<td>{lang_game}:</td>
+					<td><a href="{site_url}adm_servers/edit/games/{server_game_code}" target="blank">{server_game}</a></td>
+				</tr>
+
+				<tr>
+					<td>{lang_dedicated_server}:</td>
+					<td>{ds_list_dropdown}</td>
+				</tr>
+				
+				<tr>
+					<td>{lang_adm_servers_game_type}:</td>
+					<td>{game_type_dropdown}&nbsp;<a id="game_type_link" href="#" target="blank">{lang_go} ></a></td>
+				</tr>
+				
+				<script lang="javascript">
+					var gt_id =	$("select[name='game_type']").val();
+
+					$(document).ready(function() {
+						
+						$('#game_type_link').attr('href', '{site_url}adm_servers/edit/game_types/' + gt_id);
+						
+						$("select[name='game_type']").change(function() {
+							gt_id =	$("select[name='game_type']").val();
+							$('#game_type_link').attr('href', '{site_url}adm_servers/edit/game_types/' + gt_id);
+						});
+						
+					});
+				</script>
+
+				<tr>
+					<td>{lang_adm_servers_connect_data}:</td>
+					<td><input type="text" name="server_ip" value="{server_ip}" />:<input type="text" name="server_port" value="{server_port}" size="6" /><span id="server_port_info"></span></td>
+				</tr>
+				
+				<tr>
+					<td>{lang_adm_servers_query_port}:<span id="query_port_info"></span><br /><span class="description">[ {lang_adm_servers_query_port_desc} ]</span></td>
+					<td><input type="text" name="query_port" value="{query_port}" /></td>
+				</tr>
+				
+				<tr>
+					<td>{lang_adm_servers_rcon_port}:<span id="rcon_port_info"></span><br /><span class="description">[ {lang_adm_servers_rcon_port_desc} ]</span></td>
+					<td><input type="text" name="rcon_port" value="{rcon_port}" /></td>
+				</tr>
+
+				<tr>
+					<td>{lang_adm_servers_server_dir}:<br /><span class="description">[ {lang_adm_servers_server_dir_desc} ]</span></td>
+					<td>{work_path}/<input type="text" name="dir" value="{server_dir}" /></td>
+				</tr>
+
+				<script type="text/javascript">
+                    function generate_password() {
+                        $("input[name='rcon']").val(str_rand());
+                        return;
+                    }
+				</script>
+
+				<tr>
+					<td>{lang_adm_servers_rcon_password}:<br /><span class="description">[ {lang_leave_blank} ]</span></td>
+					<td><input type="text" name="rcon" />&nbsp;<a class="small button" href="#" onclick="generate_password();return false;"><span class="glyphicon glyphicon-refresh"></span>&nbsp;{lang_adm_servers_generate_rcon_password}</a></td>
+				</tr>
+
+				<tr>
+					<td>{lang_adm_servers_server_enabled}:</td>
+					<td>{server_enabled_checkbox}</td>
+				</tr>
+				</table>
+        </div>
+
+        <div id="start_parameters" class="tab_content">
+			<table class="zebra" width="100%">
+				<tr>
+					<td colspan="2"><h2>{lang_adm_servers_start_parameters}</h2></td>
+				</tr>
+                
+				<tr>
+					<td>{lang_adm_servers_screen_name}:</td>
+					<td><input type="text" name="screen_name" value="{screen_name}"/></td>
+				</tr>
+
+				<tr>
+					<td>{lang_adm_servers_user_start}:</td>
+					<td><input type="text" name="su_user" value="{su_user}" /></td>
+				</tr>
+
+				<tr>
+					<td width="45%">{lang_adm_servers_command_start}:</td>
+					<td><textarea style="height:200px" rows="2" name="start_command">{start_command}</textarea></td>
+				</tr>
+			</table>
+			
+			<div style="margin-left: 200px; margin-right: 200px;" align="center" id="block">
+				<h2>{lang_adm_servers_aliases_for_command}</h2>
+				
+				<table align="center" class="zebra" width="100%">
+					<tr>
+						<th width="40%">{lang_name}:</th>
+						<th>{lang_value}</th>
+					</tr>
+				
+					<tr>
+						<td>&#123;ip&#125;</td>
+						<td>{server_ip}</td>
+					</tr>
+					
+					<tr>
+						<td>&#123;port&#125;</td>
+						<td>{server_port}</td>
+					</tr>
+					
+					<tr>
+						<td>&#123;game&#125;</td>
+						<td>{server_start_code}</td>
+					</tr>
+					
+					<tr>
+						<td>&#123;id&#125;</td>
+						<td>{server_id}</td>
+					</tr>
+					
+					{aliases_list}
+					<tr>
+						<td>&#123;{alias}&#125;</td>
+						<td>{alias_value}<br /><span class="description">[ {desc} ]</span></td>
+					</tr>
+					{/aliases_list}
+					
+					<tr>
+						<td align="right" colspan="2"><br /><a class="small button" href="{site_url}adm_servers/edit/game_types/{game_type_id}" target="blank">{lang_adm_servers_aliases_edit}</a></td>
+					</tr>
+					
+				</table>
+			</div>
+			
+		</div>
+
+<input class="button" type="submit" name="edit_gs" value="{lang_save}" />
+</form>

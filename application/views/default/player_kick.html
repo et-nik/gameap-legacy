@@ -1,0 +1,10 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>
+
+<form action="{site_url}server_command/rcon/pl_kick/{server_id}/{custom_id}/{csrf_hash}" id="form_kick" method="post">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+	<h2>Кикнуть игрока?</h2>
+	<input type="hidden" name="submit_kick" value="1" />
+	<button class="minimal" type="submit" form="form_kick">{lang_yes}</button>
+	<a class="minimal" href="javascript:history.back()"><button class="minimal">{lang_no}</button></a>
+</form>

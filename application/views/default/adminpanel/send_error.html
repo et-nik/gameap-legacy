@@ -1,0 +1,39 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<h2>{lang_ap_heading_report_error}</h2>
+
+<form action="{site_url}adminpanel/send_error" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+
+	<table width="100%">
+
+	<tr>
+		<td width="10%"><strong>{lang_ap_error_description}:</strong></td>
+	</tr>
+
+	<tr>
+		<td><textarea name="description" style="height: 100px;"></textarea></td>
+	</tr>
+
+	<tr>
+		<td><strong>{lang_ap_error_you_action}:</strong></td>
+	</tr>
+
+	<tr>
+		<td><textarea name="actions" style="height: 100px;"></textarea></td>
+	</tr>
+
+	<tr>
+		<td><strong>{lang_ap_error_file_attach}:</strong></td>
+	</tr>
+
+	<tr>
+		<td><input type="file" name="userfile" size="40" /></td>
+	</tr>
+
+	<tr>
+		<td><p align="center"><input class="button" type="submit" name="submit" value="{lang_send}" /></p></td>
+	</tr>
+
+	</table>
+
+</form>

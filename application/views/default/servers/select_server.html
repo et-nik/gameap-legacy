@@ -1,0 +1,73 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+
+<?php if ($this->users->auth_data['is_admin']): ?>
+	<a class="button" id="filter" href="#">{lang_filter}</a>
+
+	<script>
+	$(document).ready(function() {
+		$('div#filter').hide();
+	});
+
+	$("a#filter" ).click(function() {
+		$("div#filter").toggle('fast');
+	});
+	</script>
+
+	<div id="filter">
+		<br />
+		<form action="{site_url}admin/settings/set_filter/servers_list" method="post" accept-charset="utf-8">
+			<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+			
+			<table class="zebra" width="100%">
+				<tr>
+					<td width="30%">{lang_name}:</td>
+					<td><input type="text" name="filter_name" value="{filter_name}"/></td>
+				</tr>
+				
+				<tr>
+					<td width="30%">{lang_ip}:</td>
+					<td>{filter_ip_dropdown}</td>
+				</tr>
+				
+				<tr>
+					<td width="30%">{lang_game}:</td>
+					<td>{filter_games_dropdown}</td>
+				</tr>
+
+			</table>
+				<p align="center">
+					<input class="button" type="submit" name="submit_filter" value="{lang_apply}" />
+					<input class="button" type="submit" name="reset" value="{lang_reset}" />
+				</p>
+		</form>
+	</div>
+
+	<script>
+		$('select[multiple="multiple"]').multipleSelect({width:200});
+	</script>
+<?php endif; ?>
+
+<h2>{lang_select_server}</h2>
+<table width="100%" class="zebra">
+	<thead>
+		<tr>
+			<th>{lang_name}</th>
+			<th>{lang_ip}</th>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+{games_list}
+	<tbody>
+		<tr>
+			<td colspan="5"><strong>{game_name}</strong></td>
+		</tr>
+	</tbody>
+	{servers_list}
+		<tr>
+			<td>{server_name}</td>
+			<td>{server_ip}:{server_port}</td>
+			<td><a class="small button" href="{url}/{server_id}">{lang_select}</a></td>
+		</tr>
+	{/servers_list}
+{/games_list}
+</table>

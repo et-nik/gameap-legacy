@@ -1,0 +1,44 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}admin/users_control/servers_privileges/{user_id}">« {lang_back}</a>
+
+<h2>{lang_users_servers_privileges}</h2>
+
+<form action="{site_url}admin/users_control/save_servers_privileges/{user_id}/{server_id}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+	<table class="zebra" width="50%">
+
+		<script type="text/javascript">
+		function checkAll(obj) {
+		  'use strict';
+		  var items = obj.form.getElementsByTagName("input"), 
+			  len, i;
+		  for (i = 0, len = items.length; i < len; i += 1) {
+			if (items.item(i).type && items.item(i).type === "checkbox") {  
+			  if (obj.checked) {
+				items.item(i).checked = true;
+			  } else {
+				items.item(i).checked = false;
+			  }       
+			}
+		  }
+		}
+		</script>
+
+
+		<tr>
+			<td>&nbsp;</td>
+			<td><input id="one" type="checkbox" name="one" value="all" onclick="checkAll(this)" /></td>
+		</tr>
+
+		{privilege_list}
+		<tr>
+			<td>{human_name}</td>
+			<td>{form_checkbox}</td>
+		</tr>
+		{/privilege_list}
+		<tr>
+			<td>&nbsp;</td>
+			<td><input class="button" type="submit" name="submit_privileges" value="{lang_save}" /></td>
+		</tr>
+	</table>
+</form>

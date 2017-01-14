@@ -1,0 +1,277 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+
+<?php if ($this->users->auth_data['is_admin']): ?>
+	<a class="button" id="filter" href="#">{lang_filter}</a>
+
+	<script>
+	$(document).ready(function() {
+		$('div#filter').hide();
+	});
+
+	$("a#filter" ).click(function() {
+		$("div#filter").toggle('fast');
+	});
+	</script>
+
+	<div id="filter">
+		<br />
+		<form action="{site_url}admin/settings/set_filter" method="post" accept-charset="utf-8">
+			<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+
+			<table class="zebra" width="100%">
+				<tr>
+					<td width="30%">{lang_name}:</td>
+					<td><input type="text" name="filter_name" value="{filter_name}"/></td>
+				</tr>
+
+				<tr>
+					<td width="30%">{lang_ip}:</td>
+					<td>{filter_ip_dropdown}</td>
+				</tr>
+
+				<tr>
+					<td width="30%">{lang_game}:</td>
+					<td>{filter_games_dropdown}</td>
+				</tr>
+
+			</table>
+				<p align="center">
+					<input class="button" type="submit" name="submit_filter" value="{lang_apply}" />
+					<input class="button" type="submit" name="reset" value="{lang_reset}" />
+				</p>
+		</form>
+	</div>
+
+	<script>
+		$('select[multiple="multiple"]').multipleSelect({width:200});
+	</script>
+<?php endif; ?>
+
+<script type="text/javascript">
+    var page = {
+        'site_url' : '{site_url}',
+        'base_url' : '{base_url}',
+        'template_files': '{base_url}themes/{template}/{style}/',
+        'system_template': '{base_url}themes/system/',
+        'csrf_token_name' : '{csrf_token_name}',
+        'csrf_hash' : '{csrf_hash}',
+        'server_id' : 0
+    };
+
+    var confirm_msg = {
+        "gsstart": "Вы уверены, что хотите запустить сервер?",
+        "gsstop": "Вы уверены, что хотите остановить сервер?",
+        "gsrest": "Вы уверены, что хотите перезапустить сервер?",
+        "gsinst": "Вы уверены, что хотите обновить сервер?"
+    };
+
+    var messages = {
+        "gsstart": ["Ожидание очереди", "Запуск сервера", "Проверка статуса"],
+        "gsstop": ["Ожидание очереди", "Остановка сервера", "Проверка статуса"],
+        "gsrest": ["Ожидание очереди", "Перезапуск сервера", "Проверка статуса"],
+        "gsinst": ["Ожидание очереди", "Обновление сервера", "Проверка результата"]
+    };
+
+    var success_messages = {
+        "gsstart": "Сервер успешно запущен. <br />Некоторое время он может быть оффлайн пока не загрузятся ресурсы, плагины, карта и т.д. Результат загрузки ресурсов можно видеть в консоли и логах сервера.",
+        "gsstop": "Сервер успешно остановлен.",
+        "gsrest": "Сервер успешно перезапущен. <br />Некоторое время он может быть оффлайн пока не загрузятся ресурсы, плагины, карта и т.д. Результат загрузки ресурсов можно видеть в консоли и логах сервера.",
+        "gsinst": "Сервер обновлён."
+    };
+
+    var error_messages = {
+        "gsstart": "Ошибка запуска сервера.",
+        "gsstop": "Ошибка остановки сервера.",
+        "gsrest": "Ошибка перезапуска сервера.",
+        "gsinst": "Ошибка обновления."
+    };
+
+    var message_titles = {
+        "gsstart": "Запуск сервера",
+        "gsstop": "Остановка сервера",
+        "gsrest": "Перезапуск сервера",
+        "gsinst": "Обновление сервера"
+    };
+</script>
+
+<script>
+    // 0 - not get, 1 - getting, 2 - active, 3 - not active
+    var server_status = 0;
+
+    function get_server_status(server_id)
+    {
+        server_status = 1;
+
+        $.ajax({
+            url:    sprintf("%sajax/server_control/get_status/%s", page.site_url, server_id),
+            type:     "GET",
+            dataType: "json",
+            success: function(response) {
+                if (response.status == '0') {
+                    return;
+                } else {
+                    if (response.data.process_active == 1) {
+                        server_status = 2;
+                    } else {
+                        server_status = 3;
+                    }
+                }
+            }
+        });
+    }
+
+    function server_act(task)
+    {
+        noty({
+            layout: 'center',
+            type: 'confirm',
+            text: confirm_msg[task],
+            buttons: [
+                {addClass: 'small green button', text: '{lang_yes}', onClick: function($noty) {
+                        $noty.close();
+                        add_task(task);
+                    }
+                },
+                {addClass: 'small red button', text: '{lang_no}', onClick: function($noty) {
+                        $noty.close();
+                    }
+                }
+            ]
+        });
+    }
+
+    function set_progress(percent)
+    {
+        $(".progress-meter").width(percent + '%');
+    }
+
+    function tmodal_open()
+    {
+        $('#view-task-status').arcticmodal();
+    }
+
+    function tmodal_close()
+    {
+        $('#view-task-status').arcticmodal('close');
+    }
+</script>
+
+<script>
+    function start_server(server_id)
+    {
+        page.server_id = server_id;
+        server_act('gsstart');
+    }
+
+    function restart_server(server_id)
+    {
+        page.server_id = server_id;
+        server_act('gsrest');
+    }
+
+    function stop_server(server_id)
+    {
+        page.server_id = server_id;
+        server_act('gsstop');
+    }
+</script>
+
+<script type="text/javascript" src="{base_url}themes/system/js/tasks.js"></script>
+
+<script type="text/javascript">
+    var status = new Array();
+    var privileges = new Array(['start', 'stop', 'restart']);
+
+    function GetStatus(server_id) {
+        jQuery.ajax({
+            url:     '{site_url}ajax/server_control/get_status/' + server_id,
+            type:     "GET",
+            dataType: "json",
+            success: function(response) {
+
+                if (response.status == 0) {
+                    return;
+                }
+
+                if (response.data.process_active == 1 && response.data.query_active == 1) {
+                    $('#status_' + server_id).html( "<img src=\"{base_url}themes/system/images/bullet_green.png\" title=\"Сервер запущен и готов для подключения.\"/>");
+                }
+                else if (response.data.process_active == 1) {
+                    $('#status_' + server_id).html( "<img src=\"{base_url}themes/system/images/bullet_orange.png\" title=\"Сервер запущен, но офлайн, недоступен для подлючения.\"/>");
+                }
+                else {
+                   $('#status_' + server_id).html( "<img src=\"{base_url}themes/system/images/bullet_red.png\" title=\"Сервер не запущен.\"/>");
+                }
+
+                if (response.data.process_active == 0 && privileges['start_' + server_id] == 1) {
+                    $("#commands_" + server_id).append("<a onclick=\"start_server(" + server_id + ");return false;\" class=\"small green button\" href=\"#\">{lang_start}</a>&nbsp;");
+                }
+
+                if (response.data.process_active == 1 && privileges['stop_' + server_id] == 1) {
+                    $("#commands_" + server_id).append("<a onclick=\"stop_server(" + server_id + ");return false;\" class=\"small red button\" href=\"#\">{lang_stop}</a>&nbsp;");
+                }
+
+                if (privileges['restart_' + server_id] == 1) {
+                    $("#commands_" + server_id).append("<a onclick=\"restart_server(" + server_id + ");return false;\" class=\"small yellow button\" href=\"#\">{lang_restart}</a>&nbsp;");
+                }
+
+                $("#commands_" + server_id).append("<a class=\"small button\" href=\"{site_url}admin/server_control/main/" + server_id + "\">{lang_other_commands}&raquo;</a>&nbsp;");
+
+            },
+            error: function(response) {
+                $('#status_' + server_id).html("<img src=\"{base_url}themes/system/images/bullet_red.png\"/>");
+                $("#commands_" + server_id).append("<a class=\"small button\" href=\"{site_url}admin/server_control/main/" + server_id + "\">{lang_other_commands}&raquo;</a>&nbsp;");
+            }
+        });
+    }
+</script>
+
+<div style="display: none;">
+    <div class="box-modal" style="width: 400px;min-height: 200px;" id="view-task-status">
+        <div class="box-modal_close arcticmodal-close">close</div>
+        <h2 class="task-progress-header"></h2>
+
+        <div id="vts-content">
+
+        </div>
+
+        <div class="secondary progress" role="progressbar" tabindex="0" aria-valuenow="25" aria-valuemin="0" aria-valuetext="25 percent" aria-valuemax="100">
+            <div class="progress-meter" style="width: 0%"></div>
+        </div>
+
+
+    </div>
+</div>
+
+<table class="zebra" width="100%">
+    <thead>
+    <tr>
+        <th><strong>{lang_server_name}</strong></th>
+        <th><strong>{lang_server_ip}</strong></th>
+        <?php if(module_exists('commercial')): ?><th><strong>{lang_main_server_expires}</strong></th><?php endif; ?>
+        <th><strong>{lang_status}</strong></th>
+        <th width="40%"><strong>{lang_commands}</strong></th>
+    </tr>
+    </thead>
+{games_list}
+    <tbody>
+        <tr>
+            <td colspan="5"><strong>{game_name}</strong></td>
+        </tr>
+    </tbody>
+    {servers_list}
+        <tr>
+            <td>{server_name}</td>
+            <td>{server_ip}</td>
+            <?php if(module_exists('commercial')): ?><td>{server_expires}</td><?php endif; ?>
+            <td><div id="status_{server_id}"><img src="{base_url}themes/system/images/bullet_grey.png"/></div></td>
+            <td><div id="commands_{server_id}"></div></td>
+        </tr>
+
+        <script type="text/javascript">
+            {server_js_privileges}
+            GetStatus({server_id});
+        </script>
+    {/servers_list}
+{/games_list}
+</table>

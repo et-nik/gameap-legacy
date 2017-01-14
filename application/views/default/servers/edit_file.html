@@ -1,0 +1,11 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+
+<a class="button" href="{site_url}admin/servers_files/server/{server_id}">« {lang_back}</a>
+<h2>{lang_server_files_edit} {file_name}</h2>
+<p>
+<form action="{site_url}admin/servers_files/edit_config/{server_id}/{cfg_id}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+	<textarea name="file_contents" cols="150" rows="25">{file_contents}</textarea><br />
+	<input class="button" type="submit" name="submit" value="{lang_save}" />
+</form>
+</p>

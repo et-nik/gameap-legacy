@@ -1,0 +1,183 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}adm_servers/view/dedicated_servers">« {lang_adm_servers_dedicated_servers}</a>
+<a class="button" onclick="$('#popup').arcticmodal()">{lang_adm_servers_game_servers_on_this_ds}</a>
+
+<h2>{lang_adm_servers_ds_control}</h2>
+
+<p>{lang_adm_servers_ds_documentation}</p>
+
+<style>
+input[type='text'] {
+    width: 100%;
+}
+</style>
+
+<form action="{site_url}adm_servers/edit/dedicated_servers/{ds_id}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+
+	<table width="50%" class="zebra">
+		<tr>
+			<td width="40%">{lang_name}:</td>
+			<td><input type="text" name="name" value="{ds_name}" /></td>
+		</tr>
+
+		<tr>
+			<td>{lang_operationg_system}:</td>
+			<td><input type="text" name="os" value="{ds_os}" /></td>
+		</tr>
+
+		<tr>
+			<td>{lang_adm_servers_location}:</td>
+			<td><input type="text" name="location" value="{ds_location}" /></td>
+		</tr>
+
+		<tr>
+			<td>{lang_adm_servers_provider}:</td>
+			<td><input type="text" name="provider" value="{ds_provider}" /></td>
+		</tr>
+
+		<tr>
+			<td>{lang_ip}:<br /><span class="description">{lang_adm_servers_ip_description}</span></td>
+			<td><input type="text" name="ip" value="{ds_ip}" /></td>
+		</tr>
+
+        <tr>
+            <td>{lang_adm_servers_path_to_executable_file}:</td>
+            <td><input type="text" name="work_path" value="{work_path}" /></td>
+        </tr>
+
+        <tr>
+            <td>{lang_adm_servers_steamcmd_path}:<br /><span class="description">[ {lang_adm_servers_steamcmd_path_desc} ]</span></td>
+            <td><input type="text" name="steamcmd_path" value="{steamcmd_path}" /></td>
+        </tr>
+
+<!--
+		<tr>
+			<td>{lang_adm_servers_disable_ds}:</td>
+			<td>{disabled_checkbox}</td>
+		</tr>
+-->
+
+		<tr>
+	</table>
+
+    <input class="button" type="submit" name="edit_ds" value="{lang_save}" />
+
+	<div style="display: none;">
+		<div class="box-modal" id="popup">
+			<div class="box-modal_close arcticmodal-close">close</div>
+			<a class="button" target="_blank" href="{site_url}adm_servers/filter_ds_servers/{ds_id}">{lang_adm_servers_apply_ds_filter}</a>
+			<table class="zebra" width="100%">
+			<tr>
+				<tbody>
+					<tr>
+						<td colspan="4"><h2>{lang_adm_servers_game_servers_on_this_ds}</h2></td>
+					</tr>
+				</tbody>
+				<tr>
+					<td><strong>{lang_adm_servers_game_server_name}</strong></td>
+					<td><strong>{lang_adm_servers_game}</strong></td>
+					<td><strong>{lang_adm_servers_game_server_ip}</strong></td>
+					<td><strong>{lang_commands}</strong></td>
+				</tr>
+				{servers_list}
+				<tr>
+					<td>{server_name}</td>
+					<td>{server_game}</td>
+					<td>{server_ip}:{server_port}</td>
+					<td><a class="small button" href="{site_url}adm_servers/edit/game_servers/{server_id}">{lang_control}</a>&nbsp;<a class="red small button" href="/adm_servers/delete/game_servers/{server_id}">X</a></td>
+				</tr>
+				{/servers_list}
+
+			</table>
+		</div>
+	</div>
+
+	<br />
+
+	<ul class="tabs">
+		<li><a href="#gdaemon_data">{lang_adm_servers_gdaemon_access}</a></li>
+        <li><a href="#start_parameters">{lang_adm_servers_start_parameters}</a></li>
+    </ul>
+
+	<div id="gdaemon_data" class="tab_content">
+		<table class="zebra" width="100%">
+			<tbody>
+				<tr>
+					<td colspan="2"><h2>{lang_adm_servers_gdaemon_data}</h2></td>
+				</tr>
+			</tbody>
+
+            <tr>
+				<td width="40%">{lang_adm_servers_gdaemon_host}:</td>
+				<td><input type="text" name="gdaemon_host" value="{gdaemon_host}" /></td>
+			</tr>
+
+			<tr>
+				<td width="40%">{lang_adm_servers_gdaemon_login}:</td>
+				<td><input type="text" name="gdaemon_login" value="{gdaemon_login}" /></td>
+			</tr>
+
+			<tr>
+				<td width="40%">{lang_adm_servers_gdaemon_password}:</td>
+				<td><input type="text" name="gdaemon_password" value="" /></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_gdaemon_privkey}:</td>
+				<td><input type="text" name="gdaemon_privkey" value="{gdaemon_privkey}"/></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_gdaemon_keypass}:</td>
+				<td><input type="text" name="gdaemon_keypass" /></td>
+			</tr>
+
+		</table>
+	</div>
+
+	<div id="start_parameters" class="tab_content">
+		<table class="zebra" width="100%">
+			<tbody>
+				<tr>
+					<td width="45%"><h2>{lang_adm_servers_start_parameters}</h2></td>
+					<td></td>
+				</tr>
+			</tbody>
+
+			<tr>
+				<td>{lang_adm_servers_command_start}:</td>
+				<td><textarea style="height:50px" rows="2" name="script_start">{script_start}</textarea></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_command_stop}:</td>
+				<td><textarea style="height:50px" name="script_stop">{script_stop}</textarea></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_command_restart}:</td>
+				<td><textarea style="height:50px" name="script_restart">{script_restart}</textarea></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_command_status}:</td>
+				<td><textarea style="height:50px" name="script_status">{script_status}</textarea></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_command_get_console}:</td>
+				<td><textarea style="height:50px" name="script_get_console">{script_get_console}</textarea></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_send_command}:</td>
+				<td><textarea style="height:50px" name="script_send_command">{script_send_command}</textarea></td>
+			</tr>
+
+		</table>
+
+	</div>
+
+	<input class="button" type="submit" name="edit_access_ds" value="{lang_save}" />
+</form>

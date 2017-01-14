@@ -1,0 +1,57 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{title}</title>
+
+	<script type="text/javascript" src="{base_url}themes/system/js/jquery-2.1.3.min.js"></script>
+	<script type="text/javascript" src="{base_url}themes/system/js/gameap.js"></script>
+
+    <script type="text/javascript" src="{base_url}themes/system/foundation/js/foundation.min.js"></script>
+
+	<script src="{base_url}themes/{template}/{style}/js/jquery.arcticmodal-0.3.min.js"></script>
+	<script src="{base_url}themes/{template}/{style}/js/jquery.noty.packaged.min.js"></script>
+	<script src="{base_url}themes/{template}/{style}/js/jquery.multiple.select.js"></script>
+
+	<script src="{base_url}themes/{template}/{style}/js/tabs.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="{base_url}themes/system/foundation/css/foundation.min.css" />
+
+	<link rel="stylesheet" type="text/css" href="{base_url}themes/{template}/{style}/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="{base_url}themes/{template}/{style}/css/multiple-select.css" />
+
+	<link rel="stylesheet" type="text/css" href="{base_url}themes/system/datetimepicker/jquery.datetimepicker.css" />
+	<script type="text/javascript" src="{base_url}themes/system/datetimepicker/jquery.datetimepicker.js"></script>
+
+</head>
+<body>
+
+<?php if (isset($this->_ci_cached_vars['menu'])): ?>
+    <div class="row">
+        {menu}
+    </div>
+<?php endif; ?>
+
+<div class="row">
+    <?php if (isset($this->_ci_cached_vars['menu'])): ?>
+        <div class="medium-2 columns left-menu">
+            {profile}
+        </div>
+    <?php endif; ?>
+
+    <div class="medium-10 columns content">
+        {content}
+    </div>
+</div>
+
+<script>$(document).foundation();</script>
+
+<div class="row">
+    <div class="medium-12 columns content">
+        <p class="footer">Page rendered in <strong>{elapsed_time}</strong> seconds, Memory usage: <strong>{memory_usage}</strong></p>
+        <p class="copyright">Game AdminPanel <?php echo AP_VERSION; ?> [<?php echo AP_DATE; ?>]<br />{lang_developer}: ET-NiK | <a href="http://www.gameap.ru">www.GameAP.ru</a>&nbsp;|&nbsp;<a href="http://hldm.org">HLDM.org</a></p>
+    </div>
+</div>
+
+</body>
+</html>

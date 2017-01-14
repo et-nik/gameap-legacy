@@ -1,0 +1,31 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}adm_servers/view/game_types">« {lang_adm_servers_back_to_game_types}</a>
+<h2>{lang_adm_servers_new_game_type}</h2>
+
+<p>{lang_adm_servers_game_types_documentation}</p>
+
+<form action="{site_url}adm_servers/add/game_types" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+
+	<table class="zebra" width="50%">
+		<tr>
+			<td>{lang_game}:</td>
+			<td>
+				<select name="code">
+					{games_list}
+						<option value="{game_code}">{game_name}</option>
+					{/games_list}
+				 </select>
+			</td>
+		</tr>
+		<tr>
+			<td>{lang_name}:</td>
+			<td><input type="text" name="name" /></td>
+		</tr>
+
+		<tr>
+			<td colspan="2"><br /><input class="button" type="submit" name="gt_add" value="{lang_add}" /></td>
+		</tr>
+	</table>
+
+</form>

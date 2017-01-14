@@ -1,0 +1,78 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<div class="top-bar">
+    <div class="top-bar-left">
+        <ul class="dropdown menu" data-dropdown-menu>
+            <li style="min-width: 200px;" class="menu-text">{heading}</li>
+
+            <li><a href="{site_url}admin">{lang_menu_main}</a></li>
+            <li><a href="{site_url}web_ftp">{lang_menu_files}</a></li>
+
+            <?php if(($this->users->auth_privileges['srv_global'] == 1)): ?>
+                <li><a href="#">{lang_menu_servers}</a>
+                    <ul class="menu vertical">
+                        <li><a href="{site_url}adm_servers/view/dedicated_servers">{lang_menu_dedicated_servers}</a></li>
+                        <li><a href="{site_url}adm_servers/view/game_servers">{lang_menu_game_servers}</a></li>
+                        <li><a href="{site_url}adm_servers/view/games">{lang_menu_games}</a></li>
+                        <li><a href="{site_url}tasks">{lang_menu_gdaemon_tasks}</a></li>
+                    </ul>
+                </li>
+            <?php endif; ?>
+
+            <?php
+            if(($this->users->auth_privileges['usr_create'] == 1)
+                OR ($this->users->auth_privileges['usr_edit'] == 1)
+                OR ($this->users->auth_privileges['usr_delete'] == 1)
+            ):
+            ?>
+                <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">{lang_menu_users}<b class="caret"></b></a>
+                    <ul class="menu vertical">
+                        <li><a href="{site_url}admin/users_control">{lang_menu_users}</a></li>
+                        <li><a href="{site_url}admin/users_control/add">{lang_menu_add_user}</a></li>
+                    </ul>
+                </li>
+            <?php endif; ?>
+
+            <?php /* <меню с модулями> */ ?>
+
+            <?php $this->gameap_modules->get_menu_modules(); ?>
+
+            <?php if (count($this->gameap_modules->menu) > 0 OR $this->users->auth_data['is_admin']): ?>
+            <li ><a href="#">{lang_menu_modules}</a>
+                <ul class="menu vertical">
+                    <?php
+                    if(isset($this->gameap_modules->menu) && !empty($this->gameap_modules->menu)) {
+                        foreach ($this->gameap_modules->menu as $module) {
+                            echo '<li><a href="{site_url}' . $module['short_name'] . '">' . $module['name'] . '</a></li>';
+                        }
+                    }
+                    ?>
+
+                    <?php if ($this->users->auth_data['is_admin']): ?>
+                        <li><a href="{site_url}adm_modules">{lang_menu_control_modules}</a></li>
+                    <?php endif; ?>
+                </ul>
+            </li>
+            <?php endif; ?>
+
+            <?php /* </меню с модулями> */ ?>
+
+            <li><a href="{site_url}admin/profile">{lang_menu_profile}</a></li>
+
+            <?php if($this->users->auth_data['is_admin']): ?>
+            <li><a href="#">{lang_menu_gameap}</a>
+                <ul class="menu vertical">
+                    <?php if(($this->users->auth_data['is_admin'] == 1)): ?>
+                        <li><a href="{site_url}log_view">{lang_menu_panel_logs}</a></li>
+                    <?php endif; ?>
+                    <li><a href="http://wiki.hldm.org/index.php/%D0%9A%D0%B0%D1%82%D0%B5%D0%B3%D0%BE%D1%80%D0%B8%D1%8F:%D0%90%D0%B4%D0%BC%D0%B8%D0%BD%D0%9F%D0%B0%D0%BD%D0%B5%D0%BB%D1%8C">{lang_menu_documentation}</a></li>
+                    <?php if(($this->users->auth_privileges['srv_global'] == 1)): ?><li><a href="{site_url}adminpanel/update">{lang_menu_update}</a></li><?php endif; ?>
+                    <li><a href="{site_url}adminpanel/send_error">{lang_menu_error_report}</a></li>
+                    <li><a href="{site_url}adminpanel/help">{lang_menu_help}</a></li>
+                </ul>
+            </li>
+            <?php endif; ?>
+
+            <li><a href="{site_url}auth/out">{lang_out}</a></li>
+        </ul>
+	</div>
+</div>

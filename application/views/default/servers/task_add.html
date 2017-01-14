@@ -1,0 +1,88 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>
+<h2>{lang_server_control_add_task}</h2>
+
+<form action="{site_url}admin/server_control/add_task/{server_id}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+
+<table width="50%" class="zebra">
+
+<tr>
+	<td width="50%">Команда:</td>
+	<td>
+		<select name="code">
+			<option value="server_start">{lang_server_control_start}</option>
+			<option value="server_stop">{lang_server_control_stop}</option>
+			<option value="server_restart">{lang_server_control_restart}</option>
+			<option value="server_update">{lang_server_control_update}</option>
+			<option value="server_rcon">{lang_server_control_rcon_command}</option>
+		 </select>
+	</td>
+</tr>
+
+<tr id="param_for_command">
+	<td>{lang_server_control_param_for_command}:</td>
+	<td><input type="text" name="command" /></td>
+</tr>
+
+<script type="text/javascript">
+	
+	function show_hide_field() {
+		if ($("select[name='code']").val() == 'server_rcon') {
+			$('#param_for_command').show();
+		} else {
+			$('#param_for_command').hide();  
+		}
+	}
+	
+	$(document).ready(function() {
+		$("select[name='code']").change(function() {
+			show_hide_field();
+		});
+		
+		$("select[name='code']").keyup(function() {
+			show_hide_field();
+		});
+		
+		$("select[name='code']").keydown(function() {
+			show_hide_field();
+		});
+	});
+	
+	show_hide_field();
+</script>
+
+<tr>
+	<td>{lang_server_control_execution_date}:</td>
+	<td><input id="datetimepicker1" type="text" name="date_perform" value="{date_perform}" /><br />{lang_server_control_execution_date_desc}</td>
+</tr>
+
+<script>
+	jQuery('#datetimepicker1').datetimepicker({
+	  format:'d-m-Y H:i',
+	  lang:'{language}',
+	});
+</script>
+  
+<tr>
+	<td>{lang_server_control_repeat_period}:</td>
+	<td>
+		<select name="time_add">
+			<option value="0">{lang_server_control_never}</option>
+			<option value="43200">{lang_server_control_twelve_hours}</option>
+			<option value="86400">{lang_server_control_day}</option>
+			<option value="172800">{lang_server_control_two_day}</option>
+			<option value="604800">{lang_server_control_week}</option>
+			<option value="2592000">{lang_server_control_month}</option>
+		 </select>
+	</td>
+</tr
+
+<tr>
+	<td></td>
+	<td><input class="button" type="submit" name="server_add" value="{lang_add}" /></td>
+</tr>
+
+</table>
+
+</form>

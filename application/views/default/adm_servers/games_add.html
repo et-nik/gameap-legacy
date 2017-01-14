@@ -1,0 +1,80 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}adm_servers/view/games">« {lang_adm_servers_back_to_games}</a>
+<h2>{lang_adm_servers_new_game}</h2>
+
+<p>{lang_adm_servers_games_documentation}</p>
+
+<form action="{site_url}adm_servers/add/games" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+
+	<table class="zebra" width="100%">
+		<tbody>
+			<tr>
+				<td colspan='2'><h2>{lang_base_parameters}</h2></td>
+			</tr>
+		</tbody>
+		
+		<tr>
+			<td width="45%">{lang_name}:</td>
+			<td><input type="text" name="name" /></td>
+		</tr>
+		<tr>
+			<td>{lang_adm_servers_game_code}:<br /><span class="description">[ {lang_adm_servers_game_code_desc} ]</span></td>
+			<td><input type="text" name="code" /></td>
+		</tr>
+
+		<tr>
+			<td>{lang_adm_servers_game_start_code}:<br /><span class="description">[ {lang_adm_servers_game_start_code_desc} ]</span></td>
+			<td><input type="text" name="start_code" /></td>
+		</tr>
+
+
+		<tr>
+			<td>{lang_adm_servers_engine}:</td>
+			<td><input type="text" name="engine" /></td>
+		</tr>
+
+		<tr>
+			<td>{lang_adm_servers_engine_version}:</td>
+			<td><input type="text" name="engine_version" /></td>
+		</tr>
+		
+		<tbody>
+			<tr>
+				<td colspan='2'><h2>{lang_adm_servers_repository_parameters}</h2></td>
+			</tr>
+		</tbody>
+		
+		<tr>
+			<td>{lang_adm_servers_local_repository}:<br /><span class="description">[ {lang_adm_servers_local_repository_gdesc} ] </span></td>
+			<td><input size="50" type="text" name="local_repository" /></td>
+		</tr>
+		
+		<tr>
+			<td>{lang_adm_servers_remote_repository}:<br /><span class="description">[ {lang_adm_servers_remote_repository_gdesc} ] </span></td>
+			<td><input size="50" type="text" name="remote_repository" /></td>
+		</tr>
+
+		<tbody>
+			<tr>
+				<td colspan='2'><h2>{lang_adm_servers_steamcmd_parameters}</h2></td>
+			</tr>
+		</tbody>
+
+		<tr>
+			<td>app_id:</td>
+			<td><input type="text" name="app_id" /></td>
+		</tr>
+
+		<tr>
+			<td>app_set_config:</td>
+			<td><input type="text" name="app_set_config" /></td>
+		</tr>
+
+		<tr>
+			<td colspan="2"><p align="center"><input class="button" type="submit" name="gameadd_submit" value="{lang_add}" /></p></td>
+		</tr>
+
+	</table>
+
+</form>

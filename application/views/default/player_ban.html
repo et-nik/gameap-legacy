@@ -1,0 +1,28 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+
+<form action="{site_url}server_command/rcon/pl_ban/<?php echo $this->uri->rsegment(4); ?>/<?php  echo $this->uri->rsegment(5); ?>" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+	<table width="50%" class="zebra">
+		<tr>
+		<td>Причина:</td>
+		<td><input type="text" name="reason" /></td>
+		</tr>
+		<tr>
+		<td>Время:</td>
+		<td><input type="text" name="time" value="30"/>
+			<select name="time_multiply">
+				<option value="1" selected="selected">минут</option>
+				<option value="60">часов</option>
+				<option value="1440">дней</option>
+				<option value="10080">недель</option>
+				<option value="43200">месяцев</option>
+				<option value="525948">лет</option>
+			 </select><br />
+		Укажите <strong>0</strong> для неограниченного по времени бана.</td>
+		</tr>
+		<tr>
+		<td></td>
+		<td><input type="submit" name="submit_ban" value="Добавить" /></td>
+	</tr>
+	</table>
+</form>

@@ -1,0 +1,4 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<?php if($this->users->auth_privileges['usr_create']): ?>
+<a class="button" href="{site_url}admin/users_control/add">{lang_users_add_user}</a>
+<?php endif; ?>

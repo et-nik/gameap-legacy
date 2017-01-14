@@ -1,0 +1,43 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<table width="100%" bolder="1" class="zebra">
+	<tr>
+		<td>{lang_log_num_entry}:</td>
+		<td>{log_id}</td>
+	</tr>
+	<tr>
+		<td>{lang_date}:</td>
+		<td>{log_date}</td>
+	</tr>
+	<tr>
+		<td>{lang_type}:</td>
+		<td>{log_type}</td>
+	</tr>
+	<tr>
+		<td>{lang_command}:</td>
+		<td>{log_command}</td>
+	</tr>
+	<tr>
+		<td>{lang_user}:</td>
+		<td>{log_user}</td>
+	</tr>
+	<?php if($this->servers->server_data): ?>
+	<tr>
+		<td>{lang_server}:</td>
+		<td><a href="{site_url}admin/server_control/main/{server_id}">{server_name}</a></td>
+	</tr>
+	<?php endif; ?>
+	<tr>
+		<td>{lang_msg}:</td>
+		<td>{log_msg}</a></td>
+	</tr>
+	<?php if($this->users->auth_data['is_admin']): ?>
+	<tr>
+		<td>{lang_log_data}:</td>
+		<td><pre>{log_data}</pre></a></td>
+	</tr>
+	<?php endif; ?>
+	<tr>
+		<td><a class="small button" href="javascript:history.back()">{lang_back}</a></td>
+		<td></td>
+	</tr>
+</table>

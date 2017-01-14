@@ -1,0 +1,349 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+
+<script type="text/javascript">
+    var page = {
+        'site_url' : '{site_url}',
+        'base_url' : '{base_url}',
+        'template_files': '{base_url}themes/{template}/{style}/',
+        'system_template': '{base_url}themes/system/',
+        'csrf_token_name' : '{csrf_token_name}',
+        'csrf_hash' : '{csrf_hash}',
+        'server_id' : {server_id}
+    };
+
+    var confirm_msg = {
+        "gsstart": "Вы уверены, что хотите запустить сервер?",
+        "gsstop": "Вы уверены, что хотите остановить сервер?",
+        "gsrest": "Вы уверены, что хотите перезапустить сервер?",
+        "gsinst": "Вы уверены, что хотите обновить сервер?"
+    };
+
+    var messages = {
+        "gsstart": ["Ожидание очереди", "Запуск сервера", "Проверка статуса"],
+        "gsstop": ["Ожидание очереди", "Остановка сервера", "Проверка статуса"],
+        "gsrest": ["Ожидание очереди", "Перезапуск сервера", "Проверка статуса"],
+        "gsinst": ["Ожидание очереди", "Обновление сервера", "Проверка результата"]
+    };
+
+    var success_messages = {
+        "gsstart": "Сервер успешно запущен. <br />Некоторое время он может быть оффлайн пока не загрузятся ресурсы, плагины, карта и т.д. Результат загрузки ресурсов можно видеть в консоли и логах сервера.",
+        "gsstop": "Сервер успешно остановлен.",
+        "gsrest": "Сервер успешно перезапущен. <br />Некоторое время он может быть оффлайн пока не загрузятся ресурсы, плагины, карта и т.д. Результат загрузки ресурсов можно видеть в консоли и логах сервера.",
+        "gsinst": "Сервер обновлён."
+    };
+
+    var error_messages = {
+        "gsstart": "Ошибка запуска сервера.",
+        "gsstop": "Ошибка остановки сервера.",
+        "gsrest": "Ошибка перезапуска сервера.",
+        "gsinst": "Ошибка обновления."
+    };
+
+    var message_titles = {
+        "gsstart": "Запуск сервера",
+        "gsstop": "Остановка сервера",
+        "gsrest": "Перезапуск сервера",
+        "gsinst": "Обновление сервера"
+    };
+</script>
+
+<script type="text/javascript" src="{base_url}themes/system/js/tasks.js"></script>
+
+<script>
+    // 0 - not get, 1 - getting, 2 - active, 3 - not active
+    var server_status = 0;
+
+    function get_server_status(server_id)
+    {
+        server_status = 1;
+
+        $.ajax({
+            url:    sprintf("%sajax/server_control/get_status/%s", page.site_url, server_id),
+            type:     "GET",
+            dataType: "json",
+            success: function(response) {
+                if (response.status == '0') {
+                    return;
+                } else {
+                    if (response.data.process_active == 1) {
+                        server_status = 2;
+                    } else {
+                        server_status = 3;
+                    }
+                }
+            }
+        });
+    }
+
+    function server_act(task)
+    {
+        noty({
+            layout: 'center',
+            type: 'confirm',
+            text: confirm_msg[task],
+            buttons: [
+                {addClass: 'small green button', text: '{lang_yes}', onClick: function($noty) {
+                        $noty.close();
+                        add_task(task);
+                    }
+                },
+                {addClass: 'small red button', text: '{lang_no}', onClick: function($noty) {
+                        $noty.close();
+                    }
+                }
+            ]
+        });
+    }
+
+    function set_progress(percent)
+    {
+        $(".progress-meter").width(percent + '%');
+    }
+
+    function tmodal_open()
+    {
+        $('#view-task-status').arcticmodal();
+    }
+
+    function tmodal_close()
+    {
+        $('#view-task-status').arcticmodal('close');
+    }
+</script>
+
+<h2>{lang_server_control_base_commands}</h2>
+
+<div style="display: none;">
+    <div class="box-modal" style="width: 400px;min-height: 200px;" id="view-task-status">
+        <div class="box-modal_close arcticmodal-close">close</div>
+        <h2 class="task-progress-header"></h2>
+
+        <div id="vts-content">
+
+        </div>
+
+        <div class="secondary progress" role="progressbar" tabindex="0" aria-valuenow="25" aria-valuemin="0" aria-valuetext="25 percent" aria-valuemax="100">
+            <div class="progress-meter" style="width: 0%"></div>
+        </div>
+
+
+    </div>
+</div>
+
+<?php
+if(($this->users->auth_privileges['srv_start'] == 1
+		AND $this->users->auth_servers_privileges['SERVER_START'])
+	AND ($this->servers->server_data['server_status'] == 0)
+):
+
+?>
+	<a id="start-server" class="green button" href="#">&#9658;&nbsp;{lang_start}</a>
+<?php endif; ?>
+
+<?php
+if(($this->users->auth_privileges['srv_stop'] == 1
+		AND $this->users->auth_servers_privileges['SERVER_STOP'])
+	AND ($this->servers->server_data['server_status'] == 1)
+):
+?>
+	<a id="stop-server" class="red button" href="#">&#9632;&nbsp;{lang_stop}</a>
+<?php endif; ?>
+
+<?php
+if($this->users->auth_privileges['srv_restart'] == 1
+	AND $this->users->auth_servers_privileges['SERVER_RESTART']
+):
+?>
+	<a id="restart-server" class="yellow button" href="#">&#10162;&nbsp;{lang_restart}</a>
+<?php endif; ?>
+
+<?php if($this->users->auth_servers_privileges['SERVER_SOFT_RESTART'] AND $this->servers->server_data['srestart_cmd']): ?>
+	<a class="blue button" href="{site_url}server_command/rcon/restart/{server_id}/{csrf_hash}">&#10162;&nbsp;{lang_soft_restart}</a>
+<?php endif; ?>
+
+<?php if($this->users->auth_servers_privileges['SERVER_UPDATE']): ?>
+	<a id="update-server" class="magenta button" href="#">&#10162;&nbsp;{lang_update}</a>
+<?php endif; ?>
+
+<h2>Инструменты</h2>
+
+<div style="overflow: hidden;">
+    <div style="width: 100%;">
+		<?php if( $this->users->auth_servers_privileges['UPLOAD_CONTENTS'] && $this->users->auth_servers_privileges['CHANGE_CONFIG']): ?>
+			<div class="menu_icons"><a href="{site_url}web_ftp/server/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/remote_folder.png" /><br />{lang_server_files_cfg_files}</a></div>
+		<?php endif; ?>
+
+		<?php if($this->users->auth_servers_privileges['CONSOLE_VIEW']): ?>
+			<div class="menu_icons"><a href="{site_url}server_command/console_view/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/console.png" /><br />{lang_server_control_console_view}</a></div>
+		<?php endif; ?>
+
+		<?php if($this->users->auth_servers_privileges['SERVER_SETTINGS']): ?>
+			<div class="menu_icons"><a href="{site_url}admin/settings/server/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/settings.png" /><br />{lang_server_control_settings}</a></div>
+		<?php endif; ?>
+
+		<?php if (module_exists('amxx_plugins_control')
+					&& strtolower($this->servers->server_data['engine']) == 'goldsource'
+					&& $this->users->auth_servers_privileges['UPLOAD_CONTENTS']
+					&& $this->users->auth_servers_privileges['CHANGE_CONFIG']
+		): ?>
+			<div class="menu_icons"><a href="{site_url}amxx_plugins_control/server/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/plugins.png" /><br />AMXX Plugins</a></div>
+		<?php endif; ?>
+
+		<?php if (module_exists('chat')
+					&& strtolower($this->servers->server_data['engine']) == 'goldsource'
+					&& $this->users->auth_servers_privileges['SERVER_CHAT_MSG']
+		): ?>
+			<div class="menu_icons"><a href="{site_url}chat/server/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/chat.png" /><br />Chat</a></div>
+		<?php endif; ?>
+
+		<?php if($this->users->auth_data['is_admin']): ?>
+			<div class="menu_icons"><a href="{site_url}adm_servers/edit/game_servers/{server_id}"><img src="{base_url}themes/{template}/{style}/images/icons/administration.png" /><br />{lang_administration}</a></div>
+		<?php endif; ?>
+
+        {modules_menu}
+            <div class="menu_icons"><a href="{modules_menu_link}"><img src="{modules_menu_icon}" /><br />{modules_menu_text}</a></div>
+        {/modules_menu}
+
+	</div>
+</div>
+
+<?php if ($this->servers->server_data['server_status']): ?>
+	<?php /* Сервер запущен */ ?>
+
+	<h2>{lang_status}</h2>
+
+	<table style="margin-left:100px;width:60%;" class="zebra">
+		{base_cvars}
+		<tr>
+			<td width="35%">{cvar_name}:</td>
+			<td>{cvar_value}</td>
+		</tr>
+		{/base_cvars}
+	</table>
+
+	<?php if ($this->players): ?>
+		<h2>{lang_server_control_players_control}</h2>
+		<table width="100%" class="zebra">
+			<thead>
+				<tr>
+					<th><strong>{lang_nick}</strong></th>
+					<th><strong>{lang_steamid}</strong></th>
+					<th><strong>{lang_ip}</strong></th>
+					<th><strong>{lang_commands}</strong></th>
+				</tr>
+			</thead>
+		{users_list}
+			<tr>
+				<td width="20%">{user_name}</td>
+				<td width="20%">{steam_id}</td>
+				<td width="20%">{user_ip}</td>
+				<td>
+					<?php if ($this->servers->server_data['kick_cmd']): ?>
+						<a class="small button" href="{site_url}server_command/rcon/pl_kick/{server_id}/{user_id}/">{lang_server_control_kick}<a/>
+					<?php endif; ?>
+
+					<?php if ($this->servers->server_data['ban_cmd']): ?>
+						<a class="small button" href="{site_url}server_command/rcon/pl_ban/{server_id}/{user_id}/">{lang_server_control_ban}<a/>
+					<?php endif; ?>
+
+					<?php if ($this->servers->server_data['chname_cmd']): ?>
+						<a class="small button" href="{site_url}server_command/rcon/pl_changename/{server_id}/{user_id}/">{lang_server_control_ch_name}<a/>
+					<?php endif; ?>
+				</td>
+			</tr>
+		{/users_list}
+		</table>
+	<?php endif; ?>
+
+	<?php if ($this->users->auth_servers_privileges['FAST_RCON']): ?>
+		<h2>{lang_rcon}</h2>
+		<form action="{site_url}server_command/rcon/rcon_command/{server_id}" method="post" accept-charset="utf-8">
+			<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+		<table width="50%">
+			<tr>
+				<td colspan="2"><p>{frcon_list}<a class="small button" href="{site_url}server_command/rcon/fast/{server_id}/{id_fr}/{csrf_hash}">{desc}<a/>&nbsp;{/frcon_list}</p></td>
+			</tr>
+		<?php if ($this->users->auth_servers_privileges['RCON_SEND']): ?>
+			<tr>
+			<td>{lang_server_control_rcon_command}:</td>
+			<td><input type="text" name="rcon_command" size="32"/>&nbsp;&nbsp;<input type="submit" name="submit_rcon" value="{lang_send}" /></td>
+			</tr>
+		<?php endif; /* RCON */?>
+		</table>
+		</form>
+	<?php endif; ?>
+
+	<?php if ($this->servers->server_data['sendmsg_cmd']): ?>
+		<h2>{lang_server_control_chat}</h2>
+		<form action="{site_url}server_command/rcon/send_msg/{server_id}/" method="post" accept-charset="utf-8">
+			<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+			<table width="75%">
+				<tr>
+					<td>Сообщение:</td>
+					<td><input type="text" name="msg_text" size="50"/>&nbsp;&nbsp;<input type="submit" name="submit_sendmsg" value="{lang_send}" /></td>
+				</tr>
+			</table>
+		</form>
+	<?php endif; ?>
+
+	<?php if ($this->users->auth_servers_privileges['SERVER_SET_PASSWORD'] && $this->servers->server_data['passwd_cmd']): ?>
+	<h2>{lang_server_control_password_to_server}</h2>
+		<form action="{site_url}server_command/rcon/set_password/{server_id}" method="post" accept-charset="utf-8">
+			<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+			<table width="50%">
+				<tr>
+					<td>{lang_server_control_set_password}:</td>
+					<td><input type="text" name="password" size="16"/>&nbsp;&nbsp;<input type="submit" name="submit_set_password" value="{lang_send}" /><br />
+					{lang_server_control_leave_blank_that_unset}</td>
+				</tr>
+			</table>
+		</form>
+	<?php endif; ?>
+
+<?php endif; ?>
+
+<?php if ($this->users->auth_servers_privileges['LOGS_VIEW']): ?>
+	<p class="hr"><strong>{lang_server_control_last_actions}</strong></p>
+	<table width="100%" class="zebra">
+		<thead>
+		<tr>
+			<th><strong>{lang_time}</strong></th>
+			<th><strong>{lang_action}</strong></th>
+			<th><strong>{lang_command}</strong></th>
+			<th><strong>{lang_user}</strong></th>
+			<th>&nbsp;</td>
+		</tr>
+		</thead>
+	{log_list}
+		<tr>
+			<td width="20%">{log_date}</td>
+			<td width="20%">{log_type}</td>
+			<td width="20%">{log_command}</td>
+			<td width="20%">{log_user_name}</td>
+			<td><a class="small button" href={site_url}log_view/view/{log_id}>{lang_view}</a></td>
+		</tr>
+	{/log_list}
+	</table>
+<?php endif; ?>
+
+<script>
+    $('#start-server').click(function() {
+        server_act('gsstart');
+        return false;
+    });
+
+    $('#stop-server').click(function() {
+        server_act('gsstop');
+        return false;
+    });
+
+    $('#restart-server').click(function() {
+        server_act('gsrest');
+        return false;
+    });
+
+    $('#update-server').click(function() {
+        server_act('gsinst');
+        return false;
+    });
+</script>

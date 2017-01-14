@@ -1,0 +1,16 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>
+
+<form action="{site_url}server_command/rcon/pl_changename/{server_id}/{custom_id}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+	<table class="zebra" width="50%">
+		<tr>
+			<td>Новый ник:</td>
+			<td><input type="text" name="new_name" value="{nickname}" /></td>
+			</tr>
+			<tr>
+			<td></td>
+			<td><input type="submit" name="submit_changename" value="Сменить ник" /></td>
+		</tr>
+	</table>
+</form>

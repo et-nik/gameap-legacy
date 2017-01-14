@@ -1,0 +1,23 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}adm_modules/update_list">{lang_adm_modules_update_list}</a>
+
+<h2>{lang_modules}</h2>
+<table class="zebra" width="100%">
+
+	<tr>
+		<th><strong>{lang_name}</strong></th>
+		<th><strong>{lang_version}</strong></th>
+		<th><strong>{lang_adm_modules_developer}</strong></th>
+		<th><strong>{lang_adm_modules_license}</strong></th>
+		<th><strong>{lang_commands}</strong></th>
+	</tr>
+{modules_list}
+	<tr>
+		<td>{name}</td>
+		<td>{version}</td>
+		<td>{developer}</td>
+		<td>{license}</td>
+		<td><a class="small button" href="{site_url}adm_modules/info/{short_name}">{lang_information}</a></td>
+	</tr>
+{/modules_list}
+</table>

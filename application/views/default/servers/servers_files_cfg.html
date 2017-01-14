@@ -1,0 +1,23 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}admin/server_control/main/{server_id}">{lang_control}</a>
+
+<?php if ($this->users->auth_data['is_admin']): ?>
+	<a class="button" href="{site_url}adm_servers/edit/game_servers/{server_id}">{lang_administration}</a>
+<?php endif; ?>
+
+<h2>{lang_server_files_cfg_files}</h2>
+<table class="zebra" width="100%">
+
+	<tr>
+		<th><strong>{lang_name}</strong></th>
+		<th><strong>{lang_file}</strong></th>
+		<th><strong>&nbsp;</strong></th>
+	</tr>
+{cfg_files}
+	<tr>
+		<td>{desc}</td>
+		<td>{file}</td>
+		<td><a class="small button" href="{site_url}admin/servers_files/edit_config/{server_id}/{id_cfg}">{lang_edit}</a></td>
+	</tr>
+{/cfg_files}
+</table>

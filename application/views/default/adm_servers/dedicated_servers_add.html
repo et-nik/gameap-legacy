@@ -1,0 +1,104 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}adm_servers/view/dedicated_servers">« {lang_adm_servers_dedicated_servers}</a>
+<h2>{lang_adm_servers_heading_add_ds}</h2>
+
+<p>{lang_adm_servers_ds_documentation}</p>
+
+<style>
+input[type='text'] {
+    width: 100%;
+}
+</style>
+
+<form action="{site_url}adm_servers/add/dedicated_servers" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+
+	<table class="zebra" width="100%">
+	<tr>
+		<td width="45%">{lang_name}:</td>
+		<td><input type="text" name="name" /></td>
+	</tr>
+
+	<tr>
+		<td>{lang_operationg_system}:</td>
+		<td>
+			<select name="os">
+				<option value="Linux" selected="selected">Linux</option>
+				<option value="Windows">Windows</option>
+			 </select>
+		</td>
+	</tr>
+
+	<tr>
+		<td>{lang_adm_servers_location}:</td>
+		<td><input type="text" name="location" value="Russia" /></td>
+	</tr>
+
+	<tr>
+		<td>{lang_adm_servers_provider}:</td>
+		<td><input type="text" name="provider" /></td>
+	</tr>
+
+	<tr>
+		<td>{lang_ip}:<br /><span class="description">{lang_adm_servers_ip_description}</span></td>
+		<td><input type="text" name="ip" /></td>
+	</tr>
+
+    <tr>
+        <td>{lang_adm_servers_path_to_executable_file}:</td>
+        <td><input type="text" name="work_path" /></td>
+    </tr>
+
+    <tr>
+        <td>{lang_adm_servers_steamcmd_path}:<br /><span class="description">[ {lang_adm_servers_steamcmd_path_desc} ]</span></td>
+        <td><input type="text" name="steamcmd_path" /></td>
+    </tr>
+	
+	</table>
+
+	<br />
+
+
+	<ul class="tabs">
+		<li><a href="#gdaemon_data">{lang_adm_servers_gdaemon_access}</a></li>
+    </ul>
+    
+	<div id="gdaemon_data" class="tab_content">
+		<table class="zebra" width="100%">
+			<tbody>
+				<tr>
+					<td colspan="2"><h2>{lang_adm_servers_gdaemon_data}</h2></td>
+				</tr>
+			</tbody>
+			
+			<tr>
+				<td width="30%">{lang_adm_servers_gdaemon_host}:</td>
+				<td><input type="text" name="gdaemon_host" /></td>
+			</tr>
+
+            <tr>
+				<td width="30%">{lang_adm_servers_gdaemon_login}:</td>
+				<td><input type="text" name="gdaemon_host" /></td>
+			</tr>
+            
+			<tr>
+				<td width="30%">{lang_adm_servers_gdaemon_password}:</td>
+				<td><input type="text" name="gdaemon_host" /></td>
+			</tr>
+
+			<tr>
+				<td>{lang_adm_servers_gdaemon_privkey}:</td>
+				<td><input type="text" name="gdaemon_privkey" /></td>
+			</tr>
+            
+			<tr>
+				<td>{lang_adm_servers_gdaemon_keypass}:</td>
+				<td><input type="text" name="gdaemon_keypass" /></td>
+			</tr>
+
+		</table>
+	</div>
+
+	<br />
+	<input class="button" type="submit" name="dsadd_submit" value="{lang_add}" />
+</form>

@@ -1,0 +1,143 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}adm_servers/view/game_servers">« {lang_adm_servers_game_servers}</a>&nbsp;
+<h2>{lang_adm_servers_heading_install_game_server}</h2>
+
+<form action="{site_url}adm_servers/install_game_server" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+	<table class="zebra" width="75%">
+		<tr>
+			<td width="40%">{lang_name}:</td>
+			<td><input type="text" name="name" /></td>
+		</tr>
+
+		<tr>
+			<td>{lang_dedicated_server}:</td>
+			<td>
+				<select name="ds_id">
+					{ds_list}
+					<option value="{ds_id}">{ds_name}</option>
+					{/ds_list}
+				 </select>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>{lang_ip}:</td>
+			<td><div id="ip_dropdown"></div></td>
+		</tr>
+
+		<tr>
+			<td>{lang_port}:</td>
+			<td><input value="27015" size="6" type="text" name="server_port" /><span id="server_port_info"></span></td>
+		</tr>
+
+		<tr>
+			<td>{lang_game}:</td>
+			<td>
+				<select name="code">
+					{games_list}
+					<option value="{game_code}">{game_name}</option>
+					{/games_list}
+				 </select>
+			</td>
+		</tr>
+
+		<tr>
+			<td>{lang_adm_servers_game_type}:</td>
+			<td>
+				<span id="game_type"></span>
+			</td>
+		</tr>
+
+		<tr>
+			<td>{lang_adm_servers_server_dir}:<br /><span class="description">{lang_adm_servers_server_dir_desc}</span></td>
+			<td><input type="text" name="dir" /></td>
+		</tr>
+		
+		<tr>
+			<td colspan="2"><p>{lang_adm_servers_absolute_path_to_server} <strong>"<span id="install_dir"></span>"</strong></p></td>
+		</tr>
+		
+		<tr>
+			<td>Выполнить установку сервера: <br /><span class="description">[ Укажите, если директория пуста и требуется установить сервер в указанную директорию.  ]</span></td>
+			<td><input type="checkbox" name="install_server" value="accept" checked="checked" /></td>
+		</tr>
+		
+		<script type="text/javascript">
+		var ds_path;
+			
+		function AjaxFormRequest(result_id,form_id,url) { 
+			jQuery.ajax({ 
+				url:     	url,
+				type:    	"POST",
+				dataType:	"html",
+				data: jQuery("form").serialize(),  
+				success: function(response) {
+
+					if(result_id == 'install_dir') {
+						ds_path = response;
+						document.getElementById('install_dir').innerHTML = ds_path + '/' + $("input[name='dir']").val();
+					} else {
+						document.getElementById(result_id).innerHTML = response;
+					}
+				}, 
+				error: function(response) {
+					document.getElementById(result_id).innerHTML = "{lang_error}"; 
+				} 
+			}); 
+		}
+		
+		function GetIP() {
+			jQuery.ajax({ 
+				url:     '{site_url}ajax/adm_servers/get_ip/' + $("select[name='ds_id']").val(),
+				type:     "GET",
+				dataType: "html",
+				success: function(response) {
+					document.getElementById('ip_dropdown').innerHTML = response; 
+				}, 
+				error: function(response) {
+					document.getElementById('ip_dropdown').innerHTML = "Select other location"; 
+				} 
+			});
+		}
+
+		$(document).ready(function() {
+			$("select[name='code']").change(function(){
+				AjaxFormRequest('game_type', 'game_type', '{site_url}ajax/adm_servers/get_gametypes');
+			});
+			
+			$("select[name='ds_id']").change(function() {
+				AjaxFormRequest('install_dir', 'install_dir', '{site_url}ajax/adm_servers/get_ds_path');
+			});
+			
+			$("input[name='dir']").keyup(function() {
+				document.getElementById('install_dir').innerHTML = ds_path + '/' + $("input[name='dir']").val();
+			});
+			
+			$("input[name='server_port']").change(function() {
+				if($("input[name='server_port']").val()) {
+					AjaxFormRequest('server_port_info', 'server_port_info', '{site_url}ajax/adm_servers/check_port/' + $("input[name='server_port']").val());
+				}
+			});
+			
+			GetIP();
+		
+			$("select[name='ds_id']").change(function() {
+				document.getElementById('ip_dropdown').innerHTML = 'Получение списка IP...';
+				GetIP();
+			});
+			
+		});
+		
+		window.onload = AjaxFormRequest('game_type', 'game_type', '{site_url}ajax/adm_servers/get_gametypes');
+		window.onload = AjaxFormRequest('install_dir', 'install_dir', '{site_url}ajax/adm_servers/get_ds_path');
+		</script>
+
+		<tr>
+			<td></td>
+			<td><input class="button" type="submit" name="server_install" value="{lang_install}" /></td>
+		</tr>
+
+	</table>
+
+</form>

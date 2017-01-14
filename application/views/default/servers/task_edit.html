@@ -1,0 +1,47 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<h2>{lang_server_control_edit_task}</h2>
+
+<form action="{site_url}admin/server_control/edit_task/{task_id}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+
+	<table width="50%" class="zebra">
+
+	<tr>
+		<td>{lang_command}:</td>
+		<td>{human_code}</td>
+	</tr>
+	
+	<?php if ($this->_ci_cached_vars['code'] == 'server_rcon') :?>
+
+	<tr>
+		<td>{lang_server_control_param_for_command}:</td>
+		<td><input type="text" name="command" value="{command}" /></td>
+	</tr>
+	
+	<?php endif; ?>
+
+	<tr>
+		<td>{lang_server_control_execution_date}:</td>
+		<td><input type="text" id="datetimepicker1" name="date_perform" value="{date_perform}" /><br />{lang_server_control_execution_date_desc}</td>
+	</tr>
+
+	<tr>
+		<td>{lang_server_control_repeat_period}:</td>
+		<td>{input_time_add}</td>
+	</tr
+
+	<tr>
+		<td></td>
+		<td><input class="button" type="submit" name="edit_task" value="{lang_edit}" /></td>
+	</tr>
+
+	</table>
+
+</form>
+
+<script>
+	jQuery('#datetimepicker1').datetimepicker({
+	  format:'d-m-Y H:i',
+	  lang:'{language}',
+	});
+</script>

@@ -1,0 +1,60 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+
+<a class="button" href="{site_url}admin/servers_log/list_logs/{server_id}">« {lang_back}</a>
+<h2>{lang_servers_log_filter}</h2>
+
+<form action="{site_url}admin/servers_log/list_logs/{server_id}/{id_dir}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+		<table class="zebra" width="50%">
+			<tr>
+				<td>{lang_file_name}:</td>
+				<td><input type="text" name="file_name" value="{file_name}"/></td>
+			</tr>
+			<tr>
+				<td>{lang_servers_log_limit}:</td>
+				<td><input type="text" name="limit" value="{log_limit}" /></td>
+			</tr>
+			<tr>
+				<td>{lang_servers_log_show_last}</td>
+				<td>
+					<select name="date">
+						<option value="86400">{lang_servers_log_day}</option>
+						<option value="604800" selected="selected">{lang_servers_log_week}</option>
+						<option value="2629743">{lang_servers_log_month}</option>
+						<option value="31556926">{lang_servers_log_year}</option>
+						<option value="0">{lang_servers_log_all_time}</option>
+					 </select><br />
+				</td>
+			</tr>
+			<tr>
+			<td>Сортировка:</td>
+			<td>
+				<select name="sort">
+					<option value="DESC" selected="selected">{lang_sort_desc}</option>
+					<option value="ASC">{lang_sort_asc}</option>
+				 </select><br /></td>
+			</tr>
+			<tr>
+				<td><input class="button" type="submit" name="submit_filter" value="{lang_apply}" /></td>
+				<td>&nbsp;</td>
+			</tr>
+		</table>
+
+<h2>{lang_servers_log_files}</h2>
+<table class="zebra" width="50%">
+
+	<tr>
+		<td><strong>{lang_name}</strong></td>
+		<td><strong>{lang_servers_log_create}</strong></td>
+		<td><strong>{lang_servers_log_file_size}</strong></td>
+		<td><strong>&nbsp;</strong></td>
+	</tr>
+{log_list}
+	<tr>
+		<td>{file_name}</td>
+		<td>{file_human_time}</td>
+		<td>{file_size}</td>
+		<td><a class="small button" href="{site_url}admin/servers_log/view/{server_id}/{id_dir}/{file_name}">{lang_view}</a></td>
+	</tr>
+{/log_list}
+</table>

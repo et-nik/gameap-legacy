@@ -1,0 +1,67 @@
+<a class="button" onclick="anichange('#filter'); return false" href="#">{lang_filter}</a>
+<script>
+function anichange (objName) {
+  if ( $(objName).css('display') == 'none' ) {
+    $(objName).animate({height: 'show'}, 400);
+  } else {
+    $(objName).animate({height: 'hide'}, 200);
+  }
+}
+</script>
+
+<div id="filter" style="display: none">
+	<br />
+	<form action="{site_url}admin/settings/set_filter/panel_log" method="post" accept-charset="utf-8">
+		<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+		
+		<table class="zebra" width="100%">
+			<tr>
+				<td width="30%">{lang_action}:</td>
+				<td>
+					{filter_action_dropdown}
+				</td>
+			</tr>
+			
+			<tr>
+				<td width="30%">{lang_command}:</td>
+				<td><input type="text" name="filter_command" value="{filter_command}"/></td>
+			</tr>
+			
+			<tr>
+				<td width="30%">{lang_user}:</td>
+				<td><input type="text" name="filter_user" value="{filter_user}"/></td>
+			</tr>
+			
+			<tr>
+				<td width="30%">{lang_contents}:</td>
+				<td><input type="text" name="filter_contents" value="{filter_contents}"/></td>
+			</tr>
+
+		</table>
+			<p align="center">
+				<input class="button" type="submit" name="submit_filter" value="{lang_apply}" />
+				<input class="button" type="submit" name="reset" value="{lang_reset}" />
+			</p>
+	</form>
+</div>
+
+{pagination}
+<table width="100%" class="zebra">
+	<thead>
+		<th><strong>{lang_time}</strong></th>
+		<th><strong>{lang_action}</strong></th>
+		<th><strong>{lang_command}</strong></th>
+		<th><strong>{lang_user}</strong></th>
+		<th>&nbsp;</td>
+	</thead>
+{log_list}
+	<tr>
+		<td width="20%">{log_date}</td>
+		<td width="20%">{log_type}</td>
+		<td width="20%">{log_command}</td>
+		<td width="20%">{log_user_name}</td>
+		<td><a class="small button" href={site_url}log_view/view/{log_id}>{lang_view}</a></td>
+	</tr>
+{/log_list}
+</table>
+{pagination}

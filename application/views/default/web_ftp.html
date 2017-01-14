@@ -1,0 +1,133 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+
+<style>
+#files tr:hover {
+	background-color: #E3E3E3;
+}
+
+#files tr:nth-child(2n):hover{
+	background-color: #E3E3E3;
+}
+</style>
+
+<script type="text/javascript">
+	var page = {
+		'site_url' : '{site_url}',
+		'base_url' : '{base_url}',
+		'template_files': '{base_url}themes/{template}/{style}/',
+		'system_template': '{base_url}themes/system/',
+		'csrf_token_name' : '{csrf_token_name}',
+		'csrf_hash' : '{csrf_hash}',
+		'server_id' : '{server_id}',
+		
+		'lang_server_files_edit' : '{lang_server_files_edit}',
+		'lang_server_files_data_writed' : '{lang_server_files_data_writed}',
+	};
+</script>
+
+<script type="text/javascript" src="{base_url}themes/system/js/web_ftp.js"></script>
+
+<a class="button" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>&nbsp;
+<a class="button" href="#" onclick="$('#upload_file').arcticmodal();">{lang_web_ftp_upload}</a>
+
+<hr />
+<strong>{lang_web_ftp_recent_files}:</strong>
+<div id="last_files">
+</div><br />
+
+<form action="#" accept-charset="utf-8"><input id="current_dir" type="text" value="" style="width:90%"></form>
+
+<table class="zebra" id="files" width="100%">
+	
+	<tr id="head">
+		<th width="5%">&nbsp;</th>
+		<th width="25%">{lang_file_name}</th>
+		<th width="10%">{lang_size}</th>
+		<th>{lang_action}</th>
+	</tr>
+	
+	<tr id="up">
+		<td width="5%"><img src="{base_url}themes/{template}/{style}/images/folder_16.png" /></td>
+		<td>...</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+
+</table>
+
+<div style="display: none;">
+	<div class="box-modal" id="edit_file" style="width: 90%;height:500px;">
+		<div class="box-modal_close arcticmodal-close">{lang_close}</div>
+		<h3>{lang_server_files_edit}</h3>
+		<p>
+		<form action="#" accept-charset="utf-8">
+			<textarea style="height:350px;" name="file_contents" cols="150" rows="25">{file_contents}</textarea><br />
+			<input class="button" type="button" name="submit" value="{lang_save}" onclick="WriteFile()" />
+		</form>
+		</p>
+	</div>
+</div>
+
+<div style="display: none;">
+	<div class="box-modal" id="rename" style="width: 500px;">
+		<div class="box-modal_close arcticmodal-close">{lang_close}</div>
+		<h3>{lang_web_ftp_new_name}</h3>
+		<p>
+		<form action="#" accept-charset="utf-8" onsubmit="RenameFile();return false;">
+			<input name="new_file_name" type="text"/>
+			<input id="rename_file" class="button" type="submit" name="new_name" value="{lang_save}" />
+		</form>
+		</p>
+	</div>
+</div>
+
+<div style="display: none;">
+	<div class="box-modal" id="delete_confirm">
+		<div class="box-modal_close arcticmodal-close">{lang_close}</div>
+		<h3>{lang_web_ftp_delete_file}?</h3>
+		<p align="center">
+			<a onclick="DeleteFile()" href="#"><button form="fconfirm" class="green button">{lang_yes}</button></a>
+			<a class="arcticmodal-close" href="#"><button class="red button">{lang_no}</button></a>
+		</p>
+	</div>
+</div>
+
+<div style="display: none;">
+	<div class="box-modal" id="upload_file">
+		<div class="box-modal_close arcticmodal-close">{lang_close}</div>
+		<h2>{lang_server_files_content}</h2>
+		<form id="fupload_file" action="#" onsubmit="UploadFile();$('#upload_file').arcticmodal('close');return false;" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+			<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+			<input style="display:inline" type="file" name="userfile" size="60%" /><input class="button" type="submit" value="{lang_upload}" />
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	GetList();
+	GetLastFiles();
+	
+	function progressHandlingFunction(e){
+		if(e.lengthComputable){
+			$('progress').attr({value:e.loaded,max:e.total});
+		}
+	}
+
+	$(document).ready(function() {
+
+		$('#up').click(function() {
+			current_dir = current_dir.substr(0, current_dir.lastIndexOf("/"));
+			current_dir = current_dir.replace(/\/+/, '/');
+			
+			GetList();
+		});
+		
+		$('#current_dir').keyup(function(e) {
+			if(e.keyCode == 13){
+				current_dir = $('#current_dir').val();
+				GetList();
+			}
+		});
+
+	});
+</script>

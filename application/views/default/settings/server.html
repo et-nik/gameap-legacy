@@ -1,0 +1,25 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+
+<a class="button" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>
+
+<form action="{site_url}admin/settings/server/{server_id}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+	
+<table>
+    <tr>
+		<td width="30%">Автозапуска в случае падения:</td>
+		<td>{start_after_crash_checkbox}</td>
+	</tr>
+	{settings}
+        <tr>
+            <td>{human_name}:</td>
+            <td>{input_field}</td>
+        </tr>
+	{/settings}
+	<tr>
+		<td>&nbsp;</td>
+		<td><input class="button" type="submit" name="save" value="{lang_save}" /></td>
+	</tr>
+</table>
+
+</form>

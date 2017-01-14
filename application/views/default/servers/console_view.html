@@ -1,0 +1,88 @@
+<a class="button" href="{site_url}admin/server_control/main/{server_id}">«{lang_back}</a>
+<a onclick="update_console();return false;" href="#" class="green button">{lang_update}</a>
+
+<h2>{lang_server_command_console}</h2>
+
+<script type="text/javascript">
+		var update_time = 10 * 1000;
+		var autoupdate = 1;
+		var block = 0;
+		
+		function update_console() {
+			if (block == 1) {
+				return;
+			}
+			
+			block = 1;
+			
+			$.ajax({ 
+                url:     '{site_url}ajax/server_control/get_console/' + {server_id},
+                type:     "GET",
+                dataType: "json",
+                success: function(response) {
+                    if (response.status == 0) {
+                        noty({layout: 'bottomCenter', type: 'error', text: response.error_text});
+                        return;
+                    }
+                    
+                    document.getElementById("console_content").innerHTML = response.data.console;
+                    block = 0;
+                },
+			});
+		}
+		
+		function send_command() {
+			var command = $('#command_input').val();
+			
+			$.ajax({ 
+					url:     '{site_url}ajax/server_control/send_command/' + {server_id},
+					type:     "POST",
+					data:
+					{
+						'command': command,
+						'{csrf_token_name}': '{csrf_hash}'
+					},
+                    dataType: "json",
+					success: function(response) {
+						if (response.status == 0) {
+                            noty({layout: 'bottomCenter', type: 'error', text: response.error_text});
+                            return;
+                        }
+
+                        setTimeout(update_console, 1000);
+                        $('#command_input').val('');
+					},
+			});
+		}
+		
+		$(document).ready(function () {
+            update_console();
+            
+            setInterval(
+                function() {
+                    if (autoupdate == 1) {
+                        update_console();
+                    }
+                },
+                update_time
+            );
+
+			$('#command_input').keyup(function(event)
+			{
+				if (event.which == 13)
+				{
+					send_command();
+				}
+			});
+			
+		});
+		
+</script>
+
+<p align="left">
+    <pre class="code" style="height:250px;overflow:scroll;" id="console_content"></pre>
+</p>
+
+
+<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+<p><input id="command_input" type="text" style="width:75%" name="command" />&nbsp;<a onclick="send_command();return false;" class="small blue button">{lang_send}</a></p>

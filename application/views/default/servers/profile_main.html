@@ -1,0 +1,106 @@
+<h2>Информация</h2>
+
+<table width="50%">
+	<tr>
+		<td>Логин:</td>
+		<td>{user_login}</td>
+	</tr>
+	<tr>
+		<td>Имя:</td>
+		<td>{user_name}</td>
+	</tr>
+	<tr>
+		<td>E-Mail:</td>
+		<td>{user_email}</td>
+	</tr>
+	<tr>
+		<td>Зарегистрирован:</td>
+		<td>{user_reg_date}</td>
+	</tr>
+	<tr>
+		<td>Последнее посещение:</td>
+		<td>{user_last_auth}</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>
+			<a class="button" href="{site_url}admin/profile/edit">Редактировать профиль</a>
+			<a class="button" href="{site_url}admin/profile/change_password">Сменить пароль</a>
+		</td>
+	</tr>
+</table>
+
+<h2>Привилегии на серверы</h2>
+<?php if(($this->user_servers_count > 0)): ?>
+<table width="75%">
+{servers_list}
+	<tr>
+		<td>{server_name}</td>
+		<td>{server_ip}</td>
+		<td>Стандартный доступ</td>
+	</tr>
+{/servers_list}
+</table>
+<?php else: ?>
+У Вас нет серверов
+<?php endif; ?>
+
+<h2>Общие привилегии</h2>
+<table width="50%">
+	<tr>
+		<td><br /><strong>Привилегии на серверы</strong></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td>Создание серверов:</td>
+		<td>{create_servers}</td>
+	</tr>
+	<tr>
+		<td>Отправка RCON команд:</td>
+		<td>{commands_servers}</td>
+	</tr>
+	<tr>
+		<td>Редактирование серверов:</td>
+		<td>{edit_servers}</td>
+	</tr>
+	<tr>
+		<td>Удаление серверов:</td>
+		<td>{delete_servers}</td>
+	</tr>
+	<tr>
+		<td>Запуск серверов:</td>
+		<td>{start_servers}</td>
+	</tr>
+	<tr>
+		<td>Остановка серверов:</td>
+		<td>{stop_servers}</td>
+	</tr>
+	<tr>
+		<td>Перезапуск серверов:</td>
+		<td>{restart_servers}</td>
+	</tr>
+	<tr>
+		<td>Управление игроками (кик, бан, смена имени):</td>
+		<td>{server_users}</td>
+	</tr>
+	<tr>
+		<td><br /><strong>Привилегии на Web-пользователей</strong></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td>Создание пользователей:</td>
+		<td>{create_users}</td>
+	</tr>
+	<tr>
+		<td>Редактирование пользователей:</td>
+		<td>{edit_users}</td>
+	</tr>
+	<tr>
+		<td>Редактирование привилегий:</td>
+		<td>{edit_server_privileges}</td>
+	</tr>
+	<tr>
+		<td>Удаление пользователей:</td>
+		<td>{delete_users}</td>
+	</tr>
+</table>

@@ -1,0 +1,129 @@
+<h2>Основные команды</h2>
+
+<?php 
+if((($this->users->user_privileges['start_servers'] == 2)
+   OR ($this->users->user_privileges['start_servers'] == 1 AND $this->users->servers_privileges['SERVER_START']))
+   AND ($this->server_data['server_status'] == 0)
+):
+
+?>
+<a class="large green button" href={site_url}server_command/start/{server_id}>&#9658;&nbsp;Старт</a>
+<?php endif; ?>
+
+<?php 
+if((($this->users->user_privileges['stop_servers'] == 2)
+   OR ($this->users->user_privileges['stop_servers'] == 1 AND $this->users->servers_privileges['SERVER_STOP']))
+   AND ($this->server_data['server_status'])
+):
+
+?>
+<a class="large red button" href={site_url}server_command/stop/{server_id}>&#9632;&nbsp;Стоп</a>
+<?php endif; ?>
+
+<?php 
+if(($this->users->user_privileges['restart_servers'] == 2)
+    OR ($this->users->user_privileges['restart_servers'] == 1 && $this->users->servers_privileges['SERVER_RESTART'])
+):
+
+?>
+<a class="large yellow button" href={site_url}server_command/restart/{server_id}>&#10162;&nbsp;Рестарт</a>
+<?php endif; ?>
+
+<?php 
+if((($this->users->user_privileges['restart_servers'] == 2)
+    	OR ($this->users->user_privileges['restart_servers'] == 1 AND $this->users->servers_privileges['SERVER_SOFT_RESTART'])
+    )
+    AND ($this->server_data['server_status'])
+):
+
+?>
+<a class="large blue button" href={site_url}server_command/rcon/restart/{server_id}>&#10162;&nbsp;Мягкий рестарт</a>
+<?php endif; ?>
+
+
+<?php if($this->players): ?>
+<h2>Управление игроками на сервере</h2>
+<table width="100%">
+
+<tr>
+<td><strong>Ник</strong></td>
+<td><strong>STEAM ID</strong></td>
+<td><strong>IP</strong></td>
+<td><strong>Команды</strong></td>
+</tr>
+{users_list}
+<tr>
+<td width="20%">{user_name}</td>
+<td width="20%">{steam_id}</td>
+<td width="20%">{user_ip}</td>
+<td>
+<a class="small button" href="{site_url}server_command/rcon/pl_kick/{server_id}/{user_id}/">Кик<a/> 
+<a class="small button" href="{site_url}server_command/rcon/pl_ban/{server_id}/{user_id}/">Бан<a/> 
+<a class="small button" href="{site_url}server_command/rcon/pl_changename/{server_id}/{user_id}/">Сменить ник<a/>
+</tr>
+{/users_list}
+</table>
+<?php endif; ?>
+
+
+<? if($this->server_data['server_status']): ?>
+<h2>Чат</h2>
+<form action="{site_url}server_command/rcon/send_msg/<?=$this->uri->rsegment(3)?>/" method="post" accept-charset="utf-8">
+<table width="50%">
+<tr>
+<td>Сообщение:</td>
+<td><input type="text" name="msg_text" size="50"/>&nbsp;&nbsp;<input class="button" type="submit" name="submit_sendmsg" value="Отправить" /></td>
+</tr>
+</table>
+</form>
+
+<h2>Карты</h2>
+<form action="{site_url}server_command/rcon/changemap/<?=$this->uri->rsegment(3)?>/" method="post" accept-charset="utf-8">
+<table width="50%">
+<tr>
+<td>Выберите карту из списка</td>
+<td>
+<select name="map">
+{maps_list}
+<option value="{map_name}">{map_name}</option>
+{/maps_list}
+	 </select>
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<input class="button" type="submit" name="submit_changemap" value="Сменить карту" />
+</td>
+</tr>
+</form>
+</table>
+
+<? if($this->users->servers_privileges['SERVER_SET_PASSWORD']): ?>
+<h2>Пароль на сервер</h2>
+<form action="{site_url}server_command/rcon/set_password/<?=$this->uri->rsegment(3)?>/" method="post" accept-charset="utf-8">
+<table width="50%">
+<tr>
+<td>Установить пароль:</td>
+<td><input type="text" name="password" size="16"/>&nbsp;&nbsp;<input class="button" type="submit" name="submit_set_password" value="Отправить" /><br />
+Оставте пустым, чтобы снять пароль.</td>
+</tr>
+</table>
+</form>
+<?php endif; ?>
+
+<? if($this->users->servers_privileges['RCON_SEND']): ?>
+<h2>RCON</h2>
+<form action="{site_url}server_command/rcon/rcon_command/<?=$this->uri->rsegment(3)?>/" method="post" accept-charset="utf-8">
+<table width="50%">
+<tr>
+<td>RCON команда:</td>
+<td><input type="text" name="rcon_command" size="32"/>&nbsp;&nbsp;<input class="button" type="submit" name="submit_rcon" value="Отправить" /></td>
+</tr>
+</table>
+</form>
+<?php endif; ?>
+
+<?php endif; ?>
+
+

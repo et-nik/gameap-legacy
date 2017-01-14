@@ -1,0 +1,26 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+
+<a class="button" href="{site_url}admin/servers_log">« {lang_back}</a>
+<a class="button" href="{site_url}admin/server_control/main/{server_id}">{lang_control}</a>
+
+<?php if ($this->users->auth_data['is_admin']): ?>
+	<a class="button" href="{site_url}adm_servers/edit/game_servers/{server_id}">{lang_administration}</a>
+<?php endif; ?>
+
+<h2>{lang_servers_log_select_type}</h2>
+<table width="75%" class="zebra">
+	<thead>
+	<tr>
+		<td><strong>{lang_description}</strong></td>
+		<td><strong>{lang_path}</strong></td>
+		<td><strong>&nbsp;</strong></td>
+	</tr>
+	</thead>
+{ldir_list}
+	<tr>
+		<td>{desc}</td>
+		<td>{path}</td>
+		<td><a class="small button" href="{site_url}admin/servers_log/list_logs/{server_id}/{id_dir}">{lang_select}</a></td>
+	</tr>
+{/ldir_list}
+</table>

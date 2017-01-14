@@ -1,0 +1,121 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+
+<script type="text/javascript">
+	var page = {
+		'site_url' : '{site_url}',
+		'base_url' : '{base_url}',
+		'template_files': '{base_url}themes/{template}/{style}/',
+		'system_template': '{base_url}themes/system/',
+		'csrf_token_name' : '{csrf_token_name}',
+		'csrf_hash' : '{csrf_hash}'
+	};
+</script>
+
+<script>
+    var warn_sign = '<font color="red"><strong>(!)</strong></font> ';
+    var warn_perc = 80;
+    
+    function update_stats()
+    {
+        $.ajax({ 
+            url:     sprintf("%sajax/ds_stats/get_stats_about_all", page.site_url),
+            type:     "GET",
+            dataType: "json",
+            success: function(response) {
+                if (response.status == 0) {
+                    noty({layout: 'bottomCenter', type: 'error', text: response.error_text});
+                    return;
+                }
+
+                $("#stats td").parent().remove();
+                $.each(response.data, function(k, val) {
+                    
+                    var cpu = "";
+                    $.each(val.cpu, function(k2, val2) {
+
+                        var spaces = '&emsp;&emsp;&emsp;&nbsp;';
+                        if (val2 > warn_perc) {
+                            cpu += warn_sign;
+                            spaces = '&emsp;&emsp;';
+                        }
+                        
+                        cpu += '#' + k2 + ": " + val2 + '%' + spaces;
+                        if (val['cpu'].length > 12)
+                            cpu += ((k2 + 1) % 3 === 0) ? "<br />" : "";
+                        else if (val['cpu'].length > 4)
+                            cpu += ((k2 + 1) % 2 === 0) ? "<br />" : "";
+                        else
+                            cpu += "<br />";
+                    });
+
+                    var drv = ""
+                    $.each(val.drvspace, function(k2, val2) {
+                        if ((val2[0] / val2[1] * 100) > warn_perc) drv += warn_sign;
+                        drv += k2 + ": " + Math.round(val2[0]/1024) + ' / ' + Math.round(val2[1]/1024) + ' Gib';
+                        drv += "<br />";
+                    });
+
+                    var rxb_avg = 0;
+                    var txb_avg = 0;
+                    var rxb_dim = 'Kb/s';
+                    var txb_dim = 'Kb/s';
+                    if (typeof val.if_stat != 'undefined') {
+                        $.each(val.if_stat, function(k2, val2) {
+                            rxb_avg += val2.rxb;
+                            txb_avg += val2.txb;
+                        });
+
+                        // Kb/s
+                        rxb_avg = Math.round(rxb_avg / Object.keys(val.if_stat).length);
+                        txb_avg = Math.round(txb_avg / Object.keys(val.if_stat).length);
+                        
+                        if (rxb_avg > 1048576) { rxb_avg = Math.round(rxb_avg / 1048576); rxb_dim = 'Gb/s'}
+                        else if (rxb_avg > 1024) { rxb_avg = Math.round(rxb_avg / 1024); rxb_dim = 'Mb/s'}
+                        else { rxb_dim = 'Kb/s'}
+                        
+                        if (txb_avg > 1048576) { txb_avg = Math.round(txb_avg / 1048576); txb_dim = 'Gb/s'}
+                        else if (txb_avg > 1024) { txb_avg = Math.round(txb_avg / 1024); txb_dim = 'Mb/s'}
+                        else { txb_dim = 'Kb/s'}
+                    }
+
+                    var warn = {'ram': '', 'time': ''};
+                    if ((val.ramav / val.ramtot * 100) > warn_perc) warn.ram = warn_sign;
+
+                    if (((Date.now() / 1000 | 0) - val.timestamp) > 600) warn.time = warn_sign;
+
+                    $('#stats tr:last').after('<tr>\
+                            <td><a href="{site_url}ds_stats/full/' + val['ds_id'] + '">' + val['ds_name'] + '</a></td>\
+                            <td>' + warn.time + val['time'] + '</td>\
+                            <td>' + warn.ram + val['ramav'] + ' / ' + val['ramtot'] + ' Mib </td>\
+                            <td>' + cpu + '</td>\
+                            <td>In: ' + rxb_avg + ' ' + rxb_dim + ' Out:' + txb_avg + ' ' + txb_dim + '</td>\
+                            <td>' + drv + '</td>\
+                        </tr>'
+                    );
+                });
+                
+            },
+            error: function() {
+                noty({layout: 'bottomCenter', type: 'error', text: "unknown error"});
+                last = false;
+            },
+            complete: function() {
+
+            }
+        });
+    }
+
+    update_stats();
+    setInterval(update_stats, 10000);
+</script>
+
+<table id="stats">
+    <tr>
+        <th width="10%">DS</th>
+        <th>Update</th>
+        <th>RAM</th>
+        <th>CPU</th>
+        <th>Network</th>
+        <th>Disk</th>
+    </tr>
+</table>

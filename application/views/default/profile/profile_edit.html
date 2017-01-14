@@ -1,0 +1,18 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<form action="{site_url}admin/profile/edit" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+<table class="zebra" width="50%">
+	<tr>
+		<td>{lang_name}:</td>
+		<td><input type="text" name="name" value="{user_name}" /></td>
+	</tr>
+	<tr>
+		<td>{lang_email}:</td>
+		<td><input type="text" name="email" value="{user_email}" /></td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td><input class="button" type="submit" name="profile_edit_submit" value="{lang_edit}" /></td>
+	</tr>
+</table>
+</form>

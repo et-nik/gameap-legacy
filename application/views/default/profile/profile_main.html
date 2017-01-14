@@ -1,0 +1,47 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<h2>{lang_information}</h2>
+
+<table class="zebra" width="100%">
+	<tr>
+		<td>{lang_login}:</td>
+		<td>{user_login}</td>
+	</tr>
+	<tr>
+		<td>{lang_name}:</td>
+		<td>{user_name}</td>
+	</tr>
+	<tr>
+		<td>{lang_email}:</td>
+		<td>{user_email}</td>
+	</tr>
+	<tr>
+		<td>{lang_profile_registered}:</td>
+		<td>{user_reg_date}</td>
+	</tr>
+	<tr>
+		<td>{lang_profile_last_visit}:</td>
+		<td>{user_last_auth}</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>
+			<a class="button" href="{site_url}admin/profile/edit">{lang_profile_edit}</a></a>
+			<a class="button" href="{site_url}admin/profile/change_password">{lang_profile_change_password}</a>
+		</td>
+	</tr>
+</table>
+
+<h2>{lang_profile_servers_privileges}</h2>
+<?php if(($this->user_servers_count > 0)): ?>
+<table class="zebra" width="75%">
+{servers_list}
+	<tr>
+		<td>{server_name}</td>
+		<td>{server_ip}:{server_port}</td>
+		<td><a class="small button" href="{site_url}admin/profile/server_privileges/{server_id}">{lang_profile_view_privileges}</a></td>
+	</tr>
+{/servers_list}
+</table>
+<?php else: ?>
+{lang_profile_empty_servers_list}
+<?php endif; ?>

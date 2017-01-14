@@ -1,0 +1,15 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="small button" href="javascript:history.back()">{lang_back}</a>
+<h2>{lang_profile_server_privileges}</h2>
+
+<table class="zebra" width="30%">
+	{privilege_list}
+	<tr>
+		<td>{human_name}</td>
+		<td>{privilege_value}</td>
+	</tr>
+	{/privilege_list}
+	<tr>
+		<td colspan="2"><p align="center"><a class="small button" href="javascript:history.back()">{lang_back}</a></p></td>
+	</tr>
+</table>

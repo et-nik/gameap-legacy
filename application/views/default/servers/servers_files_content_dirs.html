@@ -1,0 +1,23 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<h2>{lang_server_files_content}</h2>
+<table class="zebra" width="100%">
+
+	<tr>
+		<th><strong>{lang_name}</strong></th>
+		<th><strong>{lang_path}</strong></th>
+		<th><strong>&nbsp;</strong></th>
+	</tr>
+{content_dirs}
+	<tr>
+		<td>{desc}</td>
+		<td>{path}</td>
+		<td>
+		<form action="{site_url}admin/servers_files/upload/{server_id}/{id_dir}" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+		<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+		<input type="file" name="userfile" size="20" />
+		<input class="button" type="submit" value="{lang_upload}" />
+		</form>
+		</td>
+	</tr>
+{/content_dirs}
+</table>

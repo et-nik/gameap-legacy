@@ -1,0 +1,43 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}adm_servers/add/games">{lang_adm_servers_add_game}</a>
+<a class="button" href="{site_url}adm_servers/add/game_types">{lang_adm_servers_add_game_type}</a>
+<script type="text/javascript">
+$(document).ready(function(){
+	
+	//~ $(".accordion tbody").hide();
+
+	//~ $(".accordion .open").click(function() {
+		//~ $(this).next("tbody").slideToggle("slow")
+		//~ .siblings("tbody:visible").slideUp("slow");
+		//~ $(this).toggleClass("active");
+		//~ $(this).siblings(".open").removeClass("active");
+	//~ });
+
+});
+</script>
+
+<br /><br />
+<table style="width:100%;" class="zebra">
+	<thead>
+		<tr>
+			<th>{lang_name}</th>
+			<th>{lang_adm_servers_game_code}</th>
+			<th>{lang_adm_servers_engine}</th>
+			<th>{lang_adm_servers_game_type}</th>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+	{games_list}
+			<tr>
+				<td width="30%">{game_name}</td>
+				<td>{game_start_code}</td>
+				<td>{game_engine}&nbsp;{game_engine_version}</td>
+				<td>
+						{gt_list}
+							<li style="margin-left:20px;"><a href="{site_url}adm_servers/edit/game_types/{gt_id}">{gt_name}</a></li>
+						{/gt_list}
+				</td>
+				<td align="center" width="30%"><a class="small button" href="{site_url}adm_servers/edit/games/{game_code}">{lang_control}</a>&nbsp;<a class="red small button" href="{site_url}adm_servers/delete/games/{game_code}">X</a></td>
+			</tr>
+	{/games_list}
+</table>

@@ -1,0 +1,52 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{title}</title>
+
+    <link rel="stylesheet" type="text/css" href="{base_url}themes/{template}/{style}/css/login.css" />
+    <link rel="stylesheet" type="text/css" href="{base_url}themes/{template}/{style}/css/style.css" />
+   <script type="text/javascript" src="{base_url}themes/system/js/jquery-1.10.2.min.js"></script>
+
+</head>
+<body>
+    <h1>{heading}</h1>
+			<div class="wrapper">
+					<div id="form_wrapper" class="form_wrapper">
+						<form action="{site_url}auth/in/{code}" class="login active" method="post" accept-charset="utf-8">
+							<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+							<h3>{lang_auth_heading}</h3>
+							<?php echo validation_errors(); ?>
+							{content}
+							<div>
+								<label>{lang_login}/{lang_email}:</label>
+								<input type="text" name="user_login" value=""  />
+							</div>
+							
+							<div>
+								<label>{lang_password}:</label>
+								<input type="password" name="user_password" value=""  />
+							</div>
+							
+							<?php if(isset($this->_ci_cached_vars['captcha']) && $this->_ci_cached_vars['captcha']): ?>
+							<div>
+								<label>Изображение:</label>
+								{captcha}
+							</div>
+							<?php endif; ?>
+
+							<div class="bottom">
+								<input type="submit" value="{lang_in}"></input>
+								<?php if($this->config->config['register_users']): ?><a href="{site_url}auth/register" rel="register" class="linkform">{lang_registration}</a><?php endif; ?>
+								<a href="{site_url}auth/recovery_password" rel="register" class="linkform">{lang_auth_reset_password}</a>
+								<div class="clear"></div>
+							</div>
+						</form>
+						<a class="back" href="{site_url}">{lang_back_to_main}</a>
+					</div>
+			</div>
+			<div style="clear: both;"></div>
+<p class="copyright">Game AdminPanel <?php echo AP_VERSION; ?> [<?php echo AP_DATE; ?>]<br />{lang_developer}: ET-NiK | <a href="http://www.gameap.ru">www.GameAP.ru</a>&nbsp;|&nbsp;<a href="http://hldm.org">HLDM.org</a></p>
+</body>
+</html>

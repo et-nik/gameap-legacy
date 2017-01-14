@@ -1,0 +1,35 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<a class="button" href="{site_url}admin/users_control">« {lang_back}</a>
+<br /><br />
+<form action="{site_url}admin/users_control/edit/{user_id}" method="post" accept-charset="utf-8">
+	<input type="hidden" name="{csrf_token_name}" value="{csrf_hash}" />
+	
+	<table class="zebra" width="100%">
+		<tr>
+			<td>{lang_name}:</td>
+			<td><input type="text" name="name" value="{user_name}" /></td>
+		</tr>
+		<tr>
+			<td>{lang_email}:</td>
+			<td><input type="text" name="email" value="{user_email}" /></td>
+		</tr>
+		<tr>
+			<td>{lang_profile_new_password}:</td>
+			<td><input type="text" name="new_password" /></td>
+		</tr>
+		<tr>
+			<td>{lang_group}:</td>
+			<td>
+				{groups_dropdown}
+<!--
+				<select name="group">
+					<option value="{user_group}">{user_groupname}</option>
+				</select>
+-->
+			</td>
+		</tr>
+	</table>
+
+	<p align="center"><input class="button" type="submit" name="user_edit_submit" value="{lang_edit}" /></p>
+
+</form>
