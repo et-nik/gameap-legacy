@@ -13,11 +13,11 @@
     "require": {
 		"php": ">=5.4",
         "knik/binn": "0.1",
-        "austinb/gameq": "3.0.10",
+        "knik/gameq": "3.x-dev",
         "mobiledetect/mobiledetectlib": "dev-master",
         "raveren/kint": "1.0.*",
         "league/commonmark": "0.7.*",
-        "zendframework/zend-escaper": "2.4.2"
+        "zendframework/zend-escaper": "2.4.2",
     },
     "require-dev": {
         "phpunit/phpunit": "4.4.*",
