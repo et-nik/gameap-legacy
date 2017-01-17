@@ -36,7 +36,10 @@ if ( ! function_exists('save_to_cache'))
 	{
         $CI =& get_instance();
 
-        if ($CI->cache->is_supported('memcached')) {
+        if ($CI->cache->is_supported('redis')) {
+            return $CI->cache->redis->save($key, $items, $time);
+        }
+        elseif ($CI->cache->is_supported('memcached')) {
             return $CI->cache->memcached->save($key, $items, $time);
         }
         elseif ($CI->cache->is_supported('apc')) {
@@ -63,7 +66,10 @@ if ( ! function_exists('load_from_cache'))
 	{
         $CI =& get_instance();
 
-        if ($CI->cache->is_supported('memcached')) {
+        if ($CI->cache->is_supported('redis')) {
+            return $CI->cache->redis->get($key);
+        }
+        elseif ($CI->cache->is_supported('memcached')) {
             return $CI->cache->memcached->get($key);
         }
         elseif ($CI->cache->is_supported('apc')) {
@@ -90,7 +96,10 @@ if ( ! function_exists('delete_in_cache'))
 	{
         $CI =& get_instance();
 
-        if ($CI->cache->is_supported('memcached')) {
+        if ($CI->cache->is_supported('redis')) {
+            return $CI->redis->memcached->delete($key);
+        }
+        elseif ($CI->cache->is_supported('memcached')) {
             return $CI->cache->memcached->delete($key);
         }
         elseif ($CI->cache->is_supported('apc')) {
