@@ -124,12 +124,12 @@ class Gameap_hooks {
             $exp = explode('/', $hook);
 
             $module_name        = $exp[0];
-            $file_name          = str_replace(EXT, '', $exp[1]);
+            $file_name          = str_replace('.php', '', $exp[1]);
             $alias              = strtolower($file_name);
             $class_name         = 'GH_' . ucfirst($alias);
             $method_name        = $exp[2];
 
-            $file = APPPATH . 'modules' . '/' . $module_name . '/hooks/' . $file_name . EXT;
+            $file = APPPATH . 'modules' . '/' . $module_name . '/hooks/' . $file_name . '.php';
         
             if (!$this->_load_file($file)) {
                 continue;
