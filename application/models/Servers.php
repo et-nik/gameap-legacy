@@ -811,7 +811,13 @@ class Servers extends CI_Model {
         }
 
 		$server['type'] = $engine;
-		$server['host'] = $host . ':' . $port;
+
+        if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $server['host'] = "[{$host}]:{$port}";
+        } else {
+            $server['host'] = $host . ':' . $port;
+        }
+
 		$this->query->set_data($server);
 
 		$request = $this->query->get_status();

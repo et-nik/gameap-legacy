@@ -65,16 +65,6 @@ class Query
 		}
 		
 		$this->request = false;
-				
-		if (isset($server_info['port'])) {
-			// Костыль для удобства
-			$explode = explode(':', $server_info['host']);
-			$server_info['host'] = $explode[0];
-			unset($explode);
-			
-			$server_info['host'] = "{$server_info['host']}:{$server_info['port']}";
-		}
-		
 		$server_info['options'] = array('timeout' => 5.0);
 		
 		try {
