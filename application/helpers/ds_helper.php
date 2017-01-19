@@ -211,6 +211,31 @@ if ( ! function_exists('get_file_protocol'))
 // ---------------------------------------------------------------------
 
 /**
+ * @param $str host:port string
+ *  Domain: gameap.ru:1337
+ *  IPv4:   127.0.0.1:1337
+ *  IPv6:   [::1:]:1337
+ * @return array
+ */
+if ( ! function_exists('parse_host_port'))
+{
+    function parse_host_port($str)
+    {
+        $host = $str;
+        $port = 0;
+
+        if (preg_match("/^\[?([a-z0-9\.\_\-\:]*)\]?(:(\d+))?/", $str, $m)) {
+            $host = $m[1];
+            $port = !empty($m[3]) ? $m[3] : 0;
+        }
+
+        return [$host, $port];
+    }
+}
+
+// ---------------------------------------------------------------------
+
+/**
  * Получение данных для соединения с sftp, ftp
  * 
  * @param array
@@ -225,10 +250,8 @@ if ( ! function_exists('get_file_protocol_config'))
 		
 		$config['driver'] = 'gdaemon';
 
-        $explode = explode(':', $server_data['gdaemon_host']);
-			
-        $config['hostname'] = $explode[0];
-        $config['port'] = isset($explode[1]) ? $explode[1] : 31707;
+        list($config['hostname'], $config['port']) = parse_host_port($server_data['gdaemon_host']);
+        $config['port'] = $config['port'] ? $config['port'] : 31707;
 			
         $config['username']         = $server_data['gdaemon_login'];;
         $config['password']         = $server_data['gdaemon_password'];;
