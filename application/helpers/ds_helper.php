@@ -229,6 +229,10 @@ if ( ! function_exists('parse_host_port'))
             $port = !empty($m[3]) ? $m[3] : 0;
         }
 
+        if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $host = "[{$host}]";
+        }
+        
         return [$host, $port];
     }
 }
