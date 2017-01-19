@@ -97,7 +97,7 @@ if ( ! function_exists('delete_in_cache'))
         $CI =& get_instance();
 
         if ($CI->cache->is_supported('redis')) {
-            return $CI->redis->memcached->delete($key);
+            return $CI->cache->redis->delete($key);
         }
         elseif ($CI->cache->is_supported('memcached')) {
             return $CI->cache->memcached->delete($key);
