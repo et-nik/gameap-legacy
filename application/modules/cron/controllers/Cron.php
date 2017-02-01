@@ -41,7 +41,7 @@ class Cron extends MX_Controller {
 
 	var $servers_data = array();
 
-	var $_cron_result = '';
+	var $_cron_result = [];
 	private $_commands_result = array();
 	private $_install_result = '';
 
