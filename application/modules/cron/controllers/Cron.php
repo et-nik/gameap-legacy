@@ -12,7 +12,8 @@
  * @filesource
 */
 
-// ------------------------------------------------------------------------
+use \Myth\Controllers\BaseController;
+use \Myth\Modules;
 
 /**
  * CRON модуль
@@ -37,7 +38,7 @@
  * но не реже раза в 10 минут.
  *
 */
-class Cron extends MX_Controller {
+class Cron extends BaseController {
 
 	var $servers_data = array();
 
@@ -182,7 +183,12 @@ class Cron extends MX_Controller {
 
 			/* Выполняем cron скрипт из модуля */
 			$this->_cmd_output("--Start {$value['short_name']}");
-			echo modules::run($value['short_name'] . '/' . $value['cron_script'] . '/index');
+
+            $this->load->add_package_path(Modules::path($value['short_name']));
+            $classname = ucfirst($value['cron_script']);
+            Modules::load_file($classname, Modules::path($value['short_name']) . 'controllers/');
+
+            (new $classname())->index();
 		}
 	}
 
