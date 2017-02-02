@@ -16,8 +16,8 @@ echo FILE_CONTENTS >> ${ROOT_DIR}/Files/File02.txt
 sudo chmod 666 ${ROOT_DIR}/Files/File01.txt
 sudo chmod 666 ${ROOT_DIR}/Files/File02.txt
 
-mv ${ROOT_DIR}/application/tests/_config/gameap_config.php ${ROOT_DIR}/upload/application/config/gameap_config.php
-mv ${ROOT_DIR}/application/tests/_config/database.php ${ROOT_DIR}/upload/application/config/database.php
+mv ${ROOT_DIR}/tests/_config/gameap_config.php ${ROOT_DIR}/upload/application/config/gameap_config.php
+mv ${ROOT_DIR}/tests/_config/database.php ${ROOT_DIR}/upload/application/config/database.php
 
 vendor/bin/codecept run unit
 
