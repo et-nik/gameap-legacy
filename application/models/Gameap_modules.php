@@ -78,7 +78,13 @@ class Gameap_modules extends CI_Model {
     function add_module($data)
     {
         delete_in_cache('modules_data');
-		return (bool)$this->db->insert('modules', $data);
+
+		if ($this->db->insert('modules', $data)) {
+		    $this->modules_data[] = $data;
+		    return true;
+		}
+
+		return false;
 	}
 	
 	// ----------------------------------------------------------
