@@ -21,16 +21,16 @@ function show_error($message, $status_code = 500, $heading = 'An Error Was Encou
 
 function show_404($page = '', $log_error = TRUE)
 {
-//	throw new PHPUnit_Framework_Exception($page, 404);
+    //debug_print_backtrace();
+	// throw new PHPUnit_Framework_Exception($page, 404);
 }
 
 //--------------------------------------------------------------------
 // Load up CodeIgniter so that we can use it!
 //--------------------------------------------------------------------
 
-
 ob_start();
-	include( ROOT . 'index.php' );
+	include( ROOT . 'tests/_ci/_bootstrap.php' );
 ob_end_clean();
 
 /**

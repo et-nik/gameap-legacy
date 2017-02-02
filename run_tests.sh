@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 sudo apt-get update -qq
 sudo apt-get install -y -qq libssh2-1-dev libssh2-php
 whoami
@@ -16,10 +17,9 @@ echo FILE_CONTENTS >> ${ROOT_DIR}/Files/File02.txt
 sudo chmod 666 ${ROOT_DIR}/Files/File01.txt
 sudo chmod 666 ${ROOT_DIR}/Files/File02.txt
 
-phpunit --version
+mv ${ROOT_DIR}/tests/_config/gameap_config.php ${ROOT_DIR}/application/config/gameap_config.php
+mv ${ROOT_DIR}/tests/_config/database.php ${ROOT_DIR}/application/config/database.php
 
-mv ${ROOT_DIR}/upload/application/tests/_config/gameap_config.php ${ROOT_DIR}/upload/application/config/gameap_config.php
-mv ${ROOT_DIR}/upload/application/tests/_config/database.php ${ROOT_DIR}/upload/application/config/database.php
+vendor/bin/codecept run unit
 
-phpunit --configuration ${ROOT_DIR}/upload/application/tests/phpunit.xml
 exit $?
