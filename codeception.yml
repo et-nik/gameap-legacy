@@ -13,9 +13,12 @@ extensions:
     enabled:
         - Codeception\Extension\RunFailed
 modules:
-    config:
-        Db:
-            dsn: ''
-            user: ''
+    enabled:
+        - Db:
+            dsn: 'mysql:dbname=gameap_test;host=localhost'
+            user: 'root'
             password: ''
             dump: tests/_data/dump.sql
+            populate: true
+            cleanup: false
+            reconnect: true
