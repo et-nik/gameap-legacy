@@ -9,10 +9,10 @@
 $active_group = 'default';
 $active_record = TRUE;
 
-$db['default']['dsn']       = $GLOBALS['db_dsn'];
+$db['default']['dsn']       = 'mysql:dbname=gameap_test;host=localhost';
 $db['default']['hostname']  = 'localhost';
-$db['default']['username']  = $GLOBALS['db_username'];
-$db['default']['password']  = $GLOBALS['db_password'];
+$db['default']['username']  = 'root';
+$db['default']['password']  = '';
 $db['default']['database']  = 'gameap_test';
 $db['default']['dbdriver']  = getenv('DB');
 $db['default']['dbprefix']  = 'gameap_';
