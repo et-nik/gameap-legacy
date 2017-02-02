@@ -23,11 +23,11 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `actions`
+-- Структура таблицы `gameap_actions`
 --
 
-DROP TABLE IF EXISTS `actions`;
-CREATE TABLE IF NOT EXISTS `actions` (
+DROP TABLE IF EXISTS `gameap_actions`;
+CREATE TABLE IF NOT EXISTS `gameap_actions` (
   `id` tinytext NOT NULL,
   `action` varchar(64) NOT NULL,
   `data` mediumtext NOT NULL
@@ -36,11 +36,11 @@ CREATE TABLE IF NOT EXISTS `actions` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `cron`
+-- Структура таблицы `gameap_cron`
 --
 
-DROP TABLE IF EXISTS `cron`;
-CREATE TABLE IF NOT EXISTS `cron` (
+DROP TABLE IF EXISTS `gameap_cron`;
+CREATE TABLE IF NOT EXISTS `gameap_cron` (
   `id` int(16) NOT NULL,
   `name` tinytext NOT NULL,
   `code` varchar(32) NOT NULL,
@@ -56,11 +56,11 @@ CREATE TABLE IF NOT EXISTS `cron` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `dedicated_servers`
+-- Структура таблицы `gameap_dedicated_servers`
 --
 
-DROP TABLE IF EXISTS `dedicated_servers`;
-CREATE TABLE IF NOT EXISTS `dedicated_servers` (
+DROP TABLE IF EXISTS `gameap_dedicated_servers`;
+CREATE TABLE IF NOT EXISTS `gameap_dedicated_servers` (
   `id` int(16) NOT NULL,
   `name` tinytext NOT NULL,
   `disabled` int(1) NOT NULL,
@@ -90,11 +90,11 @@ CREATE TABLE IF NOT EXISTS `dedicated_servers` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `ds_stats`
+-- Структура таблицы `gameap_ds_stats`
 --
 
-DROP TABLE IF EXISTS `ds_stats`;
-CREATE TABLE IF NOT EXISTS `ds_stats` (
+DROP TABLE IF EXISTS `gameap_ds_stats`;
+CREATE TABLE IF NOT EXISTS `gameap_ds_stats` (
   `id` int(11) NOT NULL,
   `ds_id` int(11) NOT NULL,
   `time` int(11) NOT NULL,
@@ -109,11 +109,11 @@ CREATE TABLE IF NOT EXISTS `ds_stats` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `ds_users`
+-- Структура таблицы `gameap_ds_users`
 --
 
-DROP TABLE IF EXISTS `ds_users`;
-CREATE TABLE IF NOT EXISTS `ds_users` (
+DROP TABLE IF EXISTS `gameap_ds_users`;
+CREATE TABLE IF NOT EXISTS `gameap_ds_users` (
   `id` int(11) NOT NULL,
   `ds_id` int(11) NOT NULL,
   `username` varchar(32) NOT NULL,
@@ -125,11 +125,11 @@ CREATE TABLE IF NOT EXISTS `ds_users` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `games`
+-- Структура таблицы `gameap_games`
 --
 
-DROP TABLE IF EXISTS `games`;
-CREATE TABLE IF NOT EXISTS `games` (
+DROP TABLE IF EXISTS `gameap_games`;
+CREATE TABLE IF NOT EXISTS `gameap_games` (
   `code` varchar(16) NOT NULL,
   `start_code` varchar(16) NOT NULL,
   `name` tinytext NOT NULL,
@@ -144,11 +144,11 @@ CREATE TABLE IF NOT EXISTS `games` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `game_types`
+-- Структура таблицы `gameap_game_types`
 --
 
-DROP TABLE IF EXISTS `game_types`;
-CREATE TABLE IF NOT EXISTS `game_types` (
+DROP TABLE IF EXISTS `gameap_game_types`;
+CREATE TABLE IF NOT EXISTS `gameap_game_types` (
   `id` int(16) NOT NULL,
   `game_code` varchar(16) NOT NULL,
   `name` tinytext NOT NULL,
@@ -168,11 +168,11 @@ CREATE TABLE IF NOT EXISTS `game_types` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `gdaemon_tasks`
+-- Структура таблицы `gameap_gdaemon_tasks`
 --
 
-DROP TABLE IF EXISTS `gdaemon_tasks`;
-CREATE TABLE IF NOT EXISTS `gdaemon_tasks` (
+DROP TABLE IF EXISTS `gameap_gdaemon_tasks`;
+CREATE TABLE IF NOT EXISTS `gameap_gdaemon_tasks` (
   `id` int(11) NOT NULL,
   `run_aft_id` int(11) NOT NULL,
   `time_create` int(11) NOT NULL,
@@ -189,11 +189,11 @@ CREATE TABLE IF NOT EXISTS `gdaemon_tasks` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `logs`
+-- Структура таблицы `gameap_logs`
 --
 
-DROP TABLE IF EXISTS `logs`;
-CREATE TABLE IF NOT EXISTS `logs` (
+DROP TABLE IF EXISTS `gameap_logs`;
+CREATE TABLE IF NOT EXISTS `gameap_logs` (
   `id` int(16) NOT NULL,
   `date` int(32) NOT NULL,
   `type` tinytext NOT NULL,
@@ -208,11 +208,11 @@ CREATE TABLE IF NOT EXISTS `logs` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `modules`
+-- Структура таблицы `gameap_modules`
 --
 
-DROP TABLE IF EXISTS `modules`;
-CREATE TABLE IF NOT EXISTS `modules` (
+DROP TABLE IF EXISTS `gameap_modules`;
+CREATE TABLE IF NOT EXISTS `gameap_modules` (
   `short_name` varchar(32) NOT NULL,
   `name` tinytext NOT NULL,
   `description` tinytext NOT NULL,
@@ -231,11 +231,11 @@ CREATE TABLE IF NOT EXISTS `modules` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `servers`
+-- Структура таблицы `gameap_servers`
 --
 
-DROP TABLE IF EXISTS `servers`;
-CREATE TABLE IF NOT EXISTS `servers` (
+DROP TABLE IF EXISTS `gameap_servers`;
+CREATE TABLE IF NOT EXISTS `gameap_servers` (
   `id` int(16) NOT NULL,
   `screen_name` varchar(64) NOT NULL DEFAULT '',
   `game` varchar(16) NOT NULL,
@@ -270,11 +270,11 @@ CREATE TABLE IF NOT EXISTS `servers` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `servers_privileges`
+-- Структура таблицы `gameap_servers_privileges`
 --
 
-DROP TABLE IF EXISTS `servers_privileges`;
-CREATE TABLE IF NOT EXISTS `servers_privileges` (
+DROP TABLE IF EXISTS `gameap_servers_privileges`;
+CREATE TABLE IF NOT EXISTS `gameap_servers_privileges` (
   `user_id` int(16) NOT NULL,
   `server_id` int(16) NOT NULL,
   `privileges` text NOT NULL
@@ -283,11 +283,11 @@ CREATE TABLE IF NOT EXISTS `servers_privileges` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `sessions`
+-- Структура таблицы `gameap_servers_sessions`
 --
 
-DROP TABLE IF EXISTS `sessions`;
-CREATE TABLE IF NOT EXISTS `sessions` (
+DROP TABLE IF EXISTS `gameap_servers_sessions`;
+CREATE TABLE IF NOT EXISTS `gameap_servers_sessions` (
   `user_id` int(11) NOT NULL,
   `hash` tinytext NOT NULL,
   `ip_address` varchar(64) NOT NULL,
@@ -298,11 +298,11 @@ CREATE TABLE IF NOT EXISTS `sessions` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `settings`
+-- Структура таблицы `gameap_settings`
 --
 
-DROP TABLE IF EXISTS `settings`;
-CREATE TABLE IF NOT EXISTS `settings` (
+DROP TABLE IF EXISTS `gameap_settings`;
+CREATE TABLE IF NOT EXISTS `gameap_settings` (
   `sett_id` varchar(32) NOT NULL,
   `user_id` int(16) NOT NULL,
   `server_id` int(16) NOT NULL,
@@ -312,11 +312,11 @@ CREATE TABLE IF NOT EXISTS `settings` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `users`
+-- Структура таблицы `gameap_users`
 --
 
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE IF NOT EXISTS `users` (
+DROP TABLE IF EXISTS `gameap_users`;
+CREATE TABLE IF NOT EXISTS `gameap_users` (
   `id` int(16) NOT NULL,
   `login` tinytext NOT NULL,
   `password` text NOT NULL,
@@ -342,69 +342,69 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 --
--- Индексы таблицы `cron`
+-- Индексы таблицы `gameap_cron`
 --
-ALTER TABLE `cron`
+ALTER TABLE `gameap_cron`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `dedicated_servers`
+-- Индексы таблицы `gameap_dedicated_servers`
 --
-ALTER TABLE `dedicated_servers`
+ALTER TABLE `gameap_dedicated_servers`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `ds_stats`
+-- Индексы таблицы `gameap_ds_stats`
 --
-ALTER TABLE `ds_stats`
+ALTER TABLE `gameap_ds_stats`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `ds_users`
+-- Индексы таблицы `gameap_ds_users`
 --
-ALTER TABLE `ds_users`
+ALTER TABLE `gameap_ds_users`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `games`
+-- Индексы таблицы `gameap_games`
 --
-ALTER TABLE `games`
+ALTER TABLE `gameap_games`
   ADD PRIMARY KEY (`code`);
 
 --
--- Индексы таблицы `game_types`
+-- Индексы таблицы `gameap_game_types`
 --
-ALTER TABLE `game_types`
+ALTER TABLE `gameap_game_types`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `gdaemon_tasks`
+-- Индексы таблицы `gameap_gdaemon_tasks`
 --
-ALTER TABLE `gdaemon_tasks`
+ALTER TABLE `gameap_gdaemon_tasks`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `logs`
+-- Индексы таблицы `gameap_logs`
 --
-ALTER TABLE `logs`
+ALTER TABLE `gameap_logs`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `modules`
+-- Индексы таблицы `gameap_modules`
 --
-ALTER TABLE `modules`
+ALTER TABLE `gameap_modules`
   ADD PRIMARY KEY (`short_name`);
 
 --
--- Индексы таблицы `servers`
+-- Индексы таблицы `gameap_servers`
 --
-ALTER TABLE `servers`
+ALTER TABLE `gameap_servers`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `users`
+-- Индексы таблицы `gameap_users`
 --
-ALTER TABLE `users`
+ALTER TABLE `gameap_users`
   ADD PRIMARY KEY (`id`);
 
 
@@ -413,49 +413,49 @@ ALTER TABLE `users`
 --
 
 --
--- AUTO_INCREMENT для таблицы `cron`
+-- AUTO_INCREMENT для таблицы `gameap_cron`
 --
-ALTER TABLE `cron`
+ALTER TABLE `gameap_cron`
   MODIFY `id` int(16) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT для таблицы `dedicated_servers`
+-- AUTO_INCREMENT для таблицы `gameap_dedicated_servers`
 --
-ALTER TABLE `dedicated_servers`
+ALTER TABLE `gameap_dedicated_servers`
   MODIFY `id` int(16) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT для таблицы `ds_stats`
+-- AUTO_INCREMENT для таблицы `gameap_ds_stats`
 --
-ALTER TABLE `ds_stats`
+ALTER TABLE `gameap_ds_stats`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT для таблицы `ds_users`
+-- AUTO_INCREMENT для таблицы `gameap_ds_users`
 --
-ALTER TABLE `ds_users`
+ALTER TABLE `gameap_ds_users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT для таблицы `game_types`
+-- AUTO_INCREMENT для таблицы `gameap_game_types`
 --
-ALTER TABLE `game_types`
+ALTER TABLE `gameap_game_types`
   MODIFY `id` int(16) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT для таблицы `gdaemon_tasks`
+-- AUTO_INCREMENT для таблицы `gameap_gdaemon_tasks`
 --
-ALTER TABLE `gdaemon_tasks`
+ALTER TABLE `gameap_gdaemon_tasks`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT для таблицы `logs`
+-- AUTO_INCREMENT для таблицы `gameap_logs`
 --
-ALTER TABLE `logs`
+ALTER TABLE `gameap_logs`
   MODIFY `id` int(16) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT для таблицы `servers`
+-- AUTO_INCREMENT для таблицы `gameap_servers`
 --
-ALTER TABLE `servers`
+ALTER TABLE `gameap_servers`
   MODIFY `id` int(16) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT для таблицы `users`
+-- AUTO_INCREMENT для таблицы `gameap_users`
 --
-ALTER TABLE `users`
+ALTER TABLE `gameap_users`
   MODIFY `id` int(16) NOT NULL AUTO_INCREMENT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
