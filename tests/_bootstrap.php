@@ -6,4 +6,4 @@ putenv('TESTING=true');
 
 require_once dirname(__FILE__) .'/MythTester.php';
 
-require_once dirname(__FILE__) .'/CodeIgniterTestCase.php';
+// require_once dirname(__FILE__) .'/CodeIgniterTestCase.php';
