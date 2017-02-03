@@ -15,7 +15,7 @@ env:
 before_script:
   - sh -c "if [ '$DB' = 'mysqli' ] || [ '$DB' = 'pdo/mysql' ]; then mysql -e 'create database IF NOT EXISTS gameap_test;' -uroot; fi"
   - composer install --prefer-source
-  - php -S 127.0.0.1:8888 index.php &
+  - php -S 127.0.0.1:8888 >/dev/null 2>&1 &
 
 script:
   - ./prep_tests.sh
