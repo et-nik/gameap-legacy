@@ -15,8 +15,15 @@ env:
 before_script:
   - sh -c "if [ '$DB' = 'mysqli' ] || [ '$DB' = 'pdo/mysql' ]; then mysql -e 'create database IF NOT EXISTS gameap_test;' -uroot; fi"
   - composer install --prefer-source
+  - php -S 127.0.0.1:8888 index.php >/dev/null 2>&1 &
 
-script: ./run_tests.sh
+script:
+  - ./prep_tests.sh
+  - php sprint database refresh app
+  - vendor/bin/codecept run unit
+  - php sprint database refresh app
+  - php sprint database seed UserSeeder
+  - vendor/bin/codecept run acceptance
 
 matrix:
   allow_failures:
