@@ -93,7 +93,32 @@ class Dedicated_servers extends CI_Model {
 	function add_dedicated_server($data)
 	{
 		$data = $this->_encrypt_passwords($data);
-		return (bool)$this->db->insert('dedicated_servers', $data);
+
+		return (bool)$this->db->insert('dedicated_servers', [
+		    'name'              => isset($data['name']) ? $data['name'] : '',
+		    'disabled'          => isset($data['disabled']) ? $data['name'] : 0,
+		    'os'                => isset($data['os']) ? $data['name'] : '',
+		    'location'          => isset($data['location']) ? $data['location'] : '',
+		    'provider'          => isset($data['provider']) ? $data['provider'] : '',
+		    'ip'                => isset($data['ip']) ? $data['ip'] : '',
+		    'ram'               => isset($data['ram']) ? $data['ram'] : '',
+		    'cpu'               => isset($data['cpu']) ? $data['cpu'] : '',
+		    'work_path'         => isset($data['work_path']) ? $data['work_path'] : '',
+		    'steamcmd_path'     => isset($data['steamcmd_path']) ? $data['steamcmd_path'] : '',
+		    'gdaemon_host'      => isset($data['gdaemon_host']) ? $data['gdaemon_host'] : '',
+		    'gdaemon_login'     => isset($data['gdaemon_login']) ? $data['gdaemon_login'] : '',
+		    'gdaemon_password'  => isset($data['gdaemon_password']) ? $data['gdaemon_password'] : '',
+		    'gdaemon_privkey'   => isset($data['gdaemon_privkey']) ? $data['gdaemon_privkey'] : '',
+		    'gdaemon_pubkey'    => isset($data['gdaemon_pubkey']) ? $data['gdaemon_pubkey'] : '',
+		    'gdaemon_keypass'   => isset($data['gdaemon_keypass']) ? $data['gdaemon_keypass'] : '',
+		    'script_start'      => isset($data['script_start']) ? $data['script_start'] : '',
+		    'script_stop'       => isset($data['script_stop']) ? $data['script_stop'] : '',
+		    'script_restart'    => isset($data['script_restart']) ? $data['script_restart'] : '',
+		    'script_status'     => isset($data['script_status']) ? $data['script_status'] : '',
+		    'script_get_console' => isset($data['script_get_console']) ? $data['script_get_console'] : '',
+		    'script_send_command' => isset($data['script_send_command']) ? $data['script_send_command'] : '',
+		    'modules_data'      => isset($data['modules_data']) ? $data['modules_data'] : ''
+        ]);
 	}
 
 	//-----------------------------------------------------------
@@ -152,7 +177,9 @@ class Dedicated_servers extends CI_Model {
 			while($i < $count_ds_list) {
 
 				$ds_ip = $this->ds_list[$i]['ip'];
-				if (!$this->ds_list[$i]['ip'] = json_decode($ds_ip, true)) {
+                $this->ds_list[$i]['ip'] = json_decode($ds_ip, true);
+
+				if (!$this->ds_list[$i]['ip']) {
 					/* Строка с данными не является json, в этом случае присваиваем первому
 					 * массиву значение этой строки
 					 * Сделано для совместимости со старыми версиями после обновления
@@ -166,7 +193,7 @@ class Dedicated_servers extends CI_Model {
 				$this->ds_list[$i]['modules_data'] 		= json_decode($this->ds_list[$i]['modules_data'], true);
 
 				$this->ds_list[$i]['gdaemon_privkey']   = $this->ds_list[$i]['gdaemon_privkey'];
-				$this->ds_list[$i]['gdaemon_pubkey']   = $this->ds_list[$i]['gdaemon_pubkey'];
+				$this->ds_list[$i]['gdaemon_pubkey']    = $this->ds_list[$i]['gdaemon_pubkey'];
 				$this->ds_list[$i]['gdaemon_keypass']   = $this->encrypt->decode($this->ds_list[$i]['gdaemon_keypass']);
 				$this->ds_list[$i]['gdaemon_login']		= $this->encrypt->decode($this->ds_list[$i]['gdaemon_login']);
 				$this->ds_list[$i]['gdaemon_password']	= $this->encrypt->decode($this->ds_list[$i]['gdaemon_password']);
