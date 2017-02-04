@@ -9,6 +9,8 @@
  * @link		http://www.gameap.ru
 */
 
+use GameQ\GameQ;
+
 /**
  * Управление серверами
  *
@@ -164,7 +166,7 @@ class Adm_servers extends CI_Controller {
 		$data['screen_name'] = $data['game'] . '_' . random_string('alnum', 6) . '_' . $data['server_port'];
 
 		// Прочие данные
-		$this->installer->change_server_data($server_data);
+		$this->installer->change_server_data($data);
 
 		return $data;
 	}
@@ -460,7 +462,7 @@ class Adm_servers extends CI_Controller {
 					$this->form_validation->set_rules('code', lang('adm_servers_game_code'), 'trim|required|is_unique[games.code]|max_length[64]|min_length[2]');
 					$this->form_validation->set_rules('start_code', lang('adm_servers_game_start_code'), 'trim|required|max_length[32]|min_length[2]');
 					$this->form_validation->set_rules('engine', lang('adm_servers_engine'), 'trim|required|max_length[64]|min_length[3]');
-					$this->form_validation->set_rules('engine_version', lang('adm_servers_engine_version'), 'trim|numeric|max_length[11]');
+					$this->form_validation->set_rules('engine_version', lang('adm_servers_engine_version'), 'trim|max_length[11]');
 
 					$this->form_validation->set_rules('app_id', 'app_id', 'trim|integer|max_length[32]');
 					$this->form_validation->set_rules('app_set_config', 'app_set_config', 'trim|max_length[32]');
@@ -624,8 +626,14 @@ class Adm_servers extends CI_Controller {
 						$sql_data['local_repository'] 	= $this->input->post('local_repository');
 						$sql_data['remote_repository'] 	= $this->input->post('remote_repository');
 
+                        // Проверка наличия файла в удалённом репозитории
+                        if ($sql_data['remote_repository'] != "" && !remote_file_exists($sql_data['remote_repository'])) {
+                            $this->_show_message('adm_servers_rep_file_not_exists');
+                            return false;
+                        }
+
 						// Проверяем наличие Query класса
-						if (!file_exists(APPPATH . 'libraries/gameq/protocols/' . strtolower($sql_data['engine']) . '.php')) {
+						if (!file_exists(FCPATH . 'vendor/knik/gameq/src/GameQ/Protocols/' . ucfirst(strtolower($sql_data['engine'])) . '.php')) {
 							$this->_show_message('adm_servers_unknown_engine');
 							return false;
 						}
@@ -1622,13 +1630,13 @@ class Adm_servers extends CI_Controller {
 						return false;
 					}
 
-					// Проверяем наличие Query класса
-					if (!file_exists(APPPATH . 'libraries/gameq/protocols/' . strtolower($sql_data['engine']) . '.php')) {
-						$this->_show_message('adm_servers_unknown_engine');
-						return false;
-					}
+                    // Проверяем наличие Query класса
+                    if (!file_exists(FCPATH . 'vendor/knik/gameq/src/GameQ/Protocols/' . ucfirst(strtolower($sql_data['engine'])) . '.php')) {
+                        $this->_show_message('adm_servers_unknown_engine');
+                        return false;
+                    }
 
-					/* Убираем кавычки из app_set_config */
+                    /* Убираем кавычки из app_set_config */
 					$sql_data['app_set_config'] = str_replace('\'', '', $sql_data['app_set_config']);
 					$sql_data['app_set_config'] = str_replace('"', '', $sql_data['app_set_config']);
 					$sql_data['app_set_config'] = str_replace('	', '', $sql_data['app_set_config']);
