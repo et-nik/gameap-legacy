@@ -132,20 +132,21 @@ class Games extends CI_Model {
      * Получение данных игр для шаблона
      * (вырезаны ненужные данные - пароли и пр.)
      *
-     * @param array
-     * @param int
+     * @param array $where
+     * @param int $limit
+     * @return array
     */
 	function tpl_data_games($where = FALSE, $limit = 99999)
     {
 		$num = -1;
 
-		if(!$this->games_list){
+		if (!$this->games_list) {
 			$this->get_games_list($where, $limit);
 		}
 
-		if($this->games_list){
+		if ($this->games_list) {
 
-			foreach ($this->games_list as $games){
+			foreach ($this->games_list as $games) {
 				$num++;
 
 				$tpl_data[$num]['game_name'] 			= $games['name'];
@@ -164,8 +165,8 @@ class Games extends CI_Model {
 
 			return $tpl_data;
 
-		}else{
-			return FALSE;
+		} else {
+			return [];
 		}
 	}
 
