@@ -97,7 +97,7 @@ class Dedicated_servers extends CI_Model {
 		return (bool)$this->db->insert('dedicated_servers', [
 		    'name'              => isset($data['name']) ? $data['name'] : '',
 		    'disabled'          => isset($data['disabled']) ? $data['name'] : 0,
-		    'os'                => isset($data['os']) ? $data['name'] : '',
+		    'os'                => isset($data['os']) ? $data['os'] : '',
 		    'location'          => isset($data['location']) ? $data['location'] : '',
 		    'provider'          => isset($data['provider']) ? $data['provider'] : '',
 		    'ip'                => isset($data['ip']) ? $data['ip'] : '',
