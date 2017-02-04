@@ -33,10 +33,9 @@ matrix:
 
 addons:
   artifacts:
-    debug: true
     paths:
       - ./tests/_output
-    target_paths: $TRAVIS_BUILD_NUMBER
+    target_paths: $TRAVIS_JOB_NUMBER
     working_dir: WORKING_DIR
     bucket: travistests
     s3_region: us-east-1
