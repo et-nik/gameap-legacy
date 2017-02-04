@@ -36,7 +36,7 @@ class Captcha extends CI_Driver_Library {
         $drivers = $this->CI->config->item('drivers');
         $this->valid_drivers = $drivers['captcha'];
 
-		if (!in_array('captcha_' . $this->CI->config->item('captcha_driver'), $this->valid_drivers)) {
+		if (!in_array($this->CI->config->item('captcha_driver'), $this->valid_drivers)) {
 			$this->driver 		= 'codeigniter';
 		} else {
 			$this->driver 		= $this->CI->config->item('captcha_driver');
