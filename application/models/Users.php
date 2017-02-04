@@ -210,8 +210,8 @@ class Users extends CI_Model {
     */
     function check_user()
     {
-        $user_id = safesql($this->input->cookie('user_id', true));
-        $user_hash = safesql($this->input->cookie('hash', true));
+        $user_id    = (int)$this->input->cookie('user_id', true);
+        $user_hash  = $this->input->cookie('hash', true);
 
         if ($this->config->item('auth_check_ip')) {
 			$md5_ipua = md5($this->input->ip_address() . $this->input->user_agent());
@@ -291,9 +291,7 @@ class Users extends CI_Model {
         if(!$user_login OR !$user_password){
             return false;
         }
-
-        $user_login = safesql($user_login);
-
+        
         switch ($type) {
 			default:
 				$query = $this->db->get_where('users', array('login' => $user_login), 1);
