@@ -12,7 +12,7 @@
  * @filesource
 */
 
-use \Myth\Controllers\BaseController;
+use \Myth\Controllers\CLIController;
 use \Myth\Modules;
 
 /**
@@ -38,7 +38,7 @@ use \Myth\Modules;
  * но не реже раза в 10 минут.
  *
 */
-class Cron extends BaseController {
+class Cron extends CLIController {
 
 	var $servers_data = array();
 
@@ -59,11 +59,7 @@ class Cron extends BaseController {
 
 		$this->load->model('servers');
 		$this->load->model('servers/dedicated_servers');
-		$this->load->model('servers/games');
-		$this->load->model('servers/game_types');
 
-		$this->load->driver('control');
-		$this->load->driver('files');
 		$this->load->driver('rcon');
 		$this->load->driver('installer');
 
