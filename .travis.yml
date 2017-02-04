@@ -39,4 +39,4 @@ addons:
     target_paths: $TRAVIS_BUILD_NUMBER
     working_dir: WORKING_DIR
     bucket: travistests
-    s3_region: us-west-1
+    s3_region: us-east-1
