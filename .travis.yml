@@ -30,3 +30,13 @@ matrix:
   allow_failures:
     - php: 5.3
     - php: hhvm
+
+addons:
+  artifacts:
+    debug: true
+    paths:
+      - ./tests/_output
+    target_paths: $TRAVIS_BUILD_NUMBER
+    working_dir: WORKING_DIR
+    bucket: travistests
+    s3_region: us-west-1
