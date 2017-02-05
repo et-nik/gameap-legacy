@@ -12,7 +12,9 @@
  * @filesource
 */
 
-class Index extends CI_Controller {
+use \Myth\Controllers\BaseController;
+
+class Index extends BaseController {
 
 	//Template
 	var $tpl = array();

@@ -9,6 +9,7 @@
  * @link		http://www.gameap.ru
 */
 
+use \Myth\Controllers\BaseController;
 use GameQ\GameQ;
 
 /**
@@ -30,7 +31,7 @@ use GameQ\GameQ;
  * @author		Nikita Kuznetsov (ET-NiK)
  */
 
-class Adm_servers extends CI_Controller {
+class Adm_servers extends BaseController {
 
 	var $available_control_protocols = array('gdaemon');
 

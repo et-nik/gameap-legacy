@@ -12,7 +12,7 @@
  * @filesource
 */
 
-// ------------------------------------------------------------------------
+use \Myth\Controllers\BaseController;
 
 /**
  * Ajax для администрирования серверов
@@ -26,7 +26,7 @@
  * @sinse		0.6
  * 
 */
-class Adm_servers extends CI_Controller {
+class Adm_servers extends BaseController {
 	
 	public function __construct()
     {

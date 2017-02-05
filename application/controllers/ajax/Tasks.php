@@ -10,7 +10,9 @@
  * @link		http://www.gameap.ru
 */
 
-class Tasks extends CI_Controller {
+use \Myth\Controllers\BaseController;
+
+class Tasks extends BaseController {
 
     private $_avaliable_tasks = array('gsinst', 'gsstart', 'gsstop', 'gsrest');
 

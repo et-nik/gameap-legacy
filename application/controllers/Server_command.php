@@ -9,7 +9,10 @@
  * @license		http://www.gameap.ru/license.html
  * @link		http://www.gameap.ru
 */
-class Server_command extends CI_Controller {
+
+use \Myth\Controllers\BaseController;
+
+class Server_command extends BaseController {
 
 	//Template
 	var $tpl = array();

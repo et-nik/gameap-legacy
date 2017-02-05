@@ -11,8 +11,8 @@
  * @link		http://www.gameap.ru
  * @filesource
 */
- 
-// ------------------------------------------------------------------------
+
+use \Myth\Controllers\BaseController;
 
 /**
  * Информационные функции АдминПанели
@@ -26,7 +26,7 @@
  * @sinse		0.6
  * 
 */
-class Adminpanel extends CI_Controller {
+class Adminpanel extends BaseController {
 	
 	// -----------------------------------------------------------------
 	

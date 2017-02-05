@@ -11,7 +11,9 @@
  * @link		http://gameap.ru
  * @filesource
 */
-class Web_ftp extends CI_Controller { 
+use \Myth\Controllers\BaseController;
+
+class Web_ftp extends BaseController {
 	
 	//Template
 	var $tpl = array();

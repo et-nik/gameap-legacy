@@ -12,7 +12,7 @@
  * @filesource
  */
 
-// ------------------------------------------------------------------------
+use \Myth\Controllers\BaseController;
 
 /**
  * Управление сервером
@@ -26,7 +26,7 @@
  * @author		Nikita Kuznetsov (ET-NiK)
  * @sinse		0.1
  */
-class Server_control extends CI_Controller {
+class Server_control extends BaseController {
 
 	//Template
 	var $tpl = array();

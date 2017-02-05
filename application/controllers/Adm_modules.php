@@ -12,6 +12,8 @@
  * @filesource
 */
 
+use \Myth\Controllers\BaseController;
+
 /**
  * Управление модулями
  *
@@ -32,7 +34,7 @@
  * @sinse       0.8
  */
 
-class Adm_modules extends CI_Controller {
+class Adm_modules extends BaseController {
 
     var $tpl = array();
 

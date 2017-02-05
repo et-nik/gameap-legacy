@@ -12,7 +12,9 @@
  * @filesource
 */
 
-class Ds_stats extends CI_Controller {
+use \Myth\Controllers\BaseController;
+
+class Ds_stats extends BaseController {
     private $_error = "";
 
     // -----------------------------------------------------------------

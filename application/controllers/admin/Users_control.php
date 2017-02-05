@@ -11,7 +11,10 @@
  * @link		http://www.gameap.ru
  * @filesource
 */
-class Users_control extends CI_Controller {
+
+use \Myth\Controllers\BaseController;
+
+class Users_control extends BaseController {
 
     //Template
     var $tpl = array();

@@ -11,7 +11,10 @@
  * @link		http://gameap.ru
  * @filesource
 */
-class Log_view extends CI_Controller {
+
+use \Myth\Controllers\BaseController;
+
+class Log_view extends BaseController {
 
 	public function __construct()
     {

@@ -11,7 +11,10 @@
  * @link		http://www.gameap.ru
  * @filesource
 */
-class Auth extends CI_Controller {
+
+use \Myth\Controllers\BaseController;
+
+class Auth extends BaseController {
 	
 	public $tpl = array();
 	public $user_data = array();

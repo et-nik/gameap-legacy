@@ -11,8 +11,8 @@
  * @link		http://www.gameap.ru
  * @filesource
  */
- 
-// ------------------------------------------------------------------------
+
+use \Myth\Controllers\BaseController;
 
 /**
  * Главная страница
@@ -25,7 +25,7 @@
  * @sinse		0.1
  * 
  */
-class Main extends CI_Controller {
+class Main extends BaseController {
 
     public $tpl = array();
 

@@ -11,7 +11,10 @@
  * @link		http://gameap.ru
  * @filesource
 */
-class Profile extends CI_Controller {
+
+use \Myth\Controllers\BaseController;
+
+class Profile extends BaseController {
 	
 	var $tpl = array();
 	var $user_servers_count = 0;

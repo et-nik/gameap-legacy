@@ -12,8 +12,7 @@
  * @filesource
 */
 
-
-// ------------------------------------------------------------------------
+use \Myth\Controllers\BaseController;
 
 /**
  * Ajax для получения базовой информации о серверах
@@ -26,7 +25,7 @@
  * @sinse		1.0
  *
 */
-class Web_ftp extends CI_Controller {
+class Web_ftp extends BaseController {
 
 	private $_error = "";
 

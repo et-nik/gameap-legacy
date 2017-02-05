@@ -11,6 +11,8 @@
  * @link		http://www.gameap.ru
  */
 
+use \Myth\Controllers\BaseController;
+
 class Settings extends CI_Controller {
 
 	//Template

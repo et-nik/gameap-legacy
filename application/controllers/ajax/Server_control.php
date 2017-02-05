@@ -10,7 +10,7 @@
  * @link		http://www.gameap.ru
 */
 
-// ---------------------------------------------------------------------
+use \Myth\Controllers\BaseController;
 
 /**
  * Ajax для получения базовой информации о серверах
@@ -23,7 +23,7 @@
  * @sinse		0.8.6
  * 
 */
-class Server_control extends CI_Controller {
+class Server_control extends BaseController {
 	
 	// -----------------------------------------------------------------
     
