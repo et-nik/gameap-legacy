@@ -15,8 +15,14 @@ class Migration_install extends CI_Migration {
                 'type' => 'VARCHAR',
                 'constraint' => 64,
             ],
+            'hash' => [
+                'type' => 'VARCHAR',
+                'constraint'  => 64,
+                'default' => '',
+            ],
             'data' => [
                 'type' => 'MEDIUMTEXT',
+                'default'   => '',
             ],
         ]);
         $this->dbforge->create_table('actions');
@@ -30,37 +36,40 @@ class Migration_install extends CI_Migration {
             ],
             'name' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'code' => [
                 'type' => 'VARCHAR',
                 'constraint' => 32,
+                'default' => '',
             ],
             'command' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'server_id' => [
                 'type' => 'INT',
-                'constraint' => 16,
             ],
             'user_id' => [
                 'type' => 'INT',
-                'constraint' => 16,
+                'default' => 0,
             ],
             'started' => [
                 'type' => 'INT',
                 'constraint' => 1,
+                'default' => 0,
             ],
             'date_perform' => [
                 'type' => 'INT',
-                'constraint' => 32,
+                'default' => 0,
             ],
             'date_performed' => [
                 'type' => 'INT',
-                'constraint' => 32,
+                'default' => 0,
             ],
             'time_add' => [
                 'type' => 'INT',
-                'constraint' => 32,
+                'default' => 0,
             ],
         ]);
         $this->dbforge->add_key('id', true);
@@ -70,7 +79,6 @@ class Migration_install extends CI_Migration {
         $this->dbforge->add_field([
             'id' => [
                 'type' => 'INT',
-                'constraint' => 16,
                 'auto_increment' => TRUE
             ],
             'name' => [
@@ -79,73 +87,95 @@ class Migration_install extends CI_Migration {
             'disabled' => [
                 'type' => 'INT',
                 'constraint' => 1,
+                'default' => 0,
             ],
             'os' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'location' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'provider' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'ip' => [
                 'type' => 'TEXT',
+                'default' => '',
             ],
             'ram' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'cpu' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'work_path' => [
                 'type' => 'VARCHAR',
-                'constraint' => 256
+                'constraint' => 256,
+                'default' => '',
             ],
             'steamcmd_path' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'gdaemon_host' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'gdaemon_login' => [
                 'type' => 'VARCHAR',
-                'constraint' => 128
+                'constraint' => 128,
+                'default' => '',
             ],
             'gdaemon_password' => [
-                'type' => 'TEXT'
+                'type' => 'TEXT',
+                'default'   => '',
             ],
             'gdaemon_privkey' => [
                 'type' => 'VARCHAR',
-                'constraint' => 256
+                'constraint' => 256,
+                'default' => '',
             ],
             'gdaemon_pubkey' => [
                 'type' => 'VARCHAR',
-                'constraint' => 256
+                'constraint' => 256,
+                'default' => '',
             ],
             'gdaemon_keypass' => [
-                'type' => 'TEXT'
+                'type' => 'TEXT',
+                'default'   => '',
             ],
             'script_start' => [
-                'type' => 'TEXT',
+                'type'      => 'TEXT',
+                'default'   => '',
             ],
             'script_stop' => [
                 'type' => 'TEXT',
+                'default'   => '',
             ],
             'script_restart' => [
                 'type' => 'TEXT',
+                'default'   => '',
             ],
             'script_status' => [
                 'type' => 'TEXT',
+                'default'   => '',
             ],
             'script_get_console' => [
                 'type' => 'TEXT',
+                'default'   => '',
             ],
             'script_send_command' => [
                 'type' => 'TEXT',
+                'default'   => '',
             ],
             'modules_data' => [
                 'type' => 'MEDIUMTEXT',
+                'default'   => '',
             ],
         ]);
         $this->dbforge->add_key('id', TRUE);
@@ -164,16 +194,20 @@ class Migration_install extends CI_Migration {
                 'type' => 'INT'
             ],
             'loa' => [
-                'type' => 'TINYTEXT'
+                'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'ram' => [
-                'type' => 'TINYTEXT'
+                'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'cpu' => [
-                'type' => 'TINYTEXT'
+                'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'ifstat' => [
-                'type' => 'TINYTEXT'
+                'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'ping' => [
                 'type' => 'INT',
@@ -221,12 +255,15 @@ class Migration_install extends CI_Migration {
             'start_code' => [
                 'type' => 'VARCHAR',
                 'constraint' => 16,
+                'default' => '',
             ],
             'name' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'engine' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'engine_version' => [
                 'type' => 'VARCHAR',
@@ -235,7 +272,6 @@ class Migration_install extends CI_Migration {
             ],
             'app_id' => [
                 'type' => 'INT',
-                'constraint' => 16,
             ],
             'app_set_config' => [
                 'type' => 'VARCHAR',
@@ -256,7 +292,6 @@ class Migration_install extends CI_Migration {
         $this->dbforge->add_field([
             'id' => [
                 'type' => 'INT',
-                'constraint' => 16,
                 'auto_increment' => TRUE
             ],
             'game_code' => [
@@ -265,6 +300,7 @@ class Migration_install extends CI_Migration {
             ],
             'name' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'fast_rcon' => [
                 'type' => 'TEXT',
@@ -340,7 +376,8 @@ class Migration_install extends CI_Migration {
             ],
             'task' => [
                 'type' => 'VARCHAR',
-                'constraint' => 8
+                'constraint' => 8,
+                'default' => '',
             ],
             'data' => [
                 'type' => 'MEDIUMTEXT'
@@ -364,12 +401,10 @@ class Migration_install extends CI_Migration {
         $this->dbforge->add_field([
             'id' => [
                 'type' => 'INT',
-                'constraint' => 16,
                 'auto_increment' => TRUE
             ],
             'date' => [
                 'type' => 'INT',
-                'constraint' => 32,
             ],
             'type' => [
                 'type' => 'TINYTEXT',
@@ -377,13 +412,14 @@ class Migration_install extends CI_Migration {
             'command' => [
                 'type' => 'VARCHAR',
                 'constraint' => 32,
+                'default' => '',
             ],
             'user_name' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'server_id' => [
                 'type' => 'INT',
-                'constraint' => 32,
             ],
             'ip' => [
                 'type' => 'TINYTEXT',
@@ -406,19 +442,24 @@ class Migration_install extends CI_Migration {
             ],
             'name' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'description' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'cron_script' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'version' => [
                 'type' => 'VARCHAR',
                 'constraint' => 64,
+                'default' => '',
             ],
             'update_info' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'show_in_menu' => [
                 'type' => 'INT',
@@ -426,22 +467,28 @@ class Migration_install extends CI_Migration {
             ],
             'access' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'developer' => [
                 'type' => 'VARCHAR',
                 'constraint' => 64,
+                'default' => '',
             ],
             'site' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'email' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'copyright' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'license' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
         ]);
         $this->dbforge->add_key('short_name', TRUE);
@@ -451,7 +498,6 @@ class Migration_install extends CI_Migration {
         $this->dbforge->add_field([
             'id' => [
                 'type'          => 'INT',
-                'constraint'    => 16,
                 'auto_increment' => TRUE
             ],
             'screen_name' => [
@@ -462,21 +508,20 @@ class Migration_install extends CI_Migration {
             'game' => [
                 'type'          => 'VARCHAR',
                 'constraint'    => 16,
+                'default'       => '',
             ],
             'game_type' => [
                 'type'          => 'INT',
-                'constraint'    => 16,
             ],
             'name' => [
                 'type'          => 'TINYTEXT',
+                'default'       => '',
             ],
             'expires' => [
                 'type'          => 'INT',
-                'constraint'    => 32,
             ],
             'ds_id' => [
                 'type'          => 'INT',
-                'constraint'    => 16,
             ],
             'enabled' => [
                 'type'          => 'INT',
@@ -489,6 +534,7 @@ class Migration_install extends CI_Migration {
             ],
             'server_ip' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'server_port' => [
                 'type' => 'INT',
@@ -504,15 +550,18 @@ class Migration_install extends CI_Migration {
             ],
             'rcon' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'maps_path' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'maps_list' => [
                 'type' => 'TEXT',
             ],
             'dir' => [
                 'type'  => 'TINYTEXT',
+                'default' => '',
             ],
             'su_user' => [
                 'type'          => 'VARCHAR',
@@ -533,6 +582,7 @@ class Migration_install extends CI_Migration {
             ],
             'script_start' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'start_command' => [
                 'type' => 'TEXT',
@@ -562,11 +612,9 @@ class Migration_install extends CI_Migration {
         $this->dbforge->add_field([
             'user_id' => [
                 'type'          => 'INT',
-                'constraint'    => 16,
             ],
             'server_id' => [
                 'type'          => 'INT',
-                'constraint'    => 16,
             ],
             'privileges' => [
                 'type' => 'TEXT',
@@ -578,19 +626,18 @@ class Migration_install extends CI_Migration {
         $this->dbforge->add_field([
             'sett_id' => [
                 'type' => 'VARCHAR',
-                'constraint' => 32,
+                'constraint' => 32
             ],
             'user_id' => [
                 'type' => 'INT',
-                'constraint' => 16,
             ],
             'server_id' => [
                 'type' => 'INT',
-                'constraint' => 16,
             ],
             'value' => [
                 'type' => 'VARCHAR',
                 'constraint' => 64,
+                'default' => '',
             ],
         ]);
         $this->dbforge->create_table('settings');
@@ -602,13 +649,16 @@ class Migration_install extends CI_Migration {
             ],
             'hash' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'ip_address' => [
                 'type' => 'VARCHAR',
                 'constraint' => 64,
+                'default'   => '',
             ],
             'user_agent' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'expires' => [
                 'type' => 'INT',
@@ -620,21 +670,21 @@ class Migration_install extends CI_Migration {
         $this->dbforge->add_field([
             'id' => [
                 'type'          => 'INT',
-                'constraint'    => 16,
                 'auto_increment' => TRUE
             ],
             'login' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'password' => [
                 'type' => 'TEXT',
             ],
             'hash' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'is_admin' => [
                 'type'          => 'INT',
-                'constraint'    => 16,
                 'default'       => 0,
             ],
             'group' => [
@@ -642,26 +692,29 @@ class Migration_install extends CI_Migration {
             ],
             'recovery_code' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'confirm_code' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'action' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'balance' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'reg_date' => [
-                'type'          => 'VARCHAR',
-                'constraint'    =>  32,
+                'type'          => 'INT'
             ],
             'last_auth' => [
-                'type'          => 'INT',
-                'constraint'    => 32,
+                'type'          => 'INT'
             ],
             'name' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'email' => [
                 'type' => 'TINYTEXT',
@@ -671,6 +724,7 @@ class Migration_install extends CI_Migration {
             ],
             'modules_data' => [
                 'type' => 'TINYTEXT',
+                'default' => '',
             ],
             'filters' => [
                 'type' => 'MEDIUMTEXT',
