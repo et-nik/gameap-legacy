@@ -1,5 +1,6 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
+
 class Captcha_codeigniter extends CI_Driver {
 	
 	private $CI;
@@ -27,10 +28,11 @@ class Captcha_codeigniter extends CI_Driver {
 			'word'	 		=> $cap['word'],
 			'img_path'	 	=> './uploads/security/',
 			'img_url'	 	=> base_url('uploads/security') . '/',
-			'font_path'	 	=> './system/fonts/U1Uabbif.ttf',
+			'font_path'	 	=> './system/fonts/DroidSans.ttf',
 			'img_width'	 	=> 300,
 			'img_height' 	=> 50,
-			'expiration' 	=> 7200
+			'expiration' 	=> 7200,
+            'font_size'     => 25,
 		);
 
 		$captcha = create_captcha($vals);
@@ -48,5 +50,4 @@ class Captcha_codeigniter extends CI_Driver {
 	{
 		return (bool)($this->CI->input->post('captcha') == $this->CI->session->flashdata('captcha'));
 	}
-
 }
