@@ -37,11 +37,23 @@
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-$lang['migration_none_found'] = 'No migrations were found.';
-$lang['migration_not_found'] = 'No migration could be found with the version number: %s.';
-$lang['migration_sequence_gap'] = 'There is a gap in the migration sequence near version number: %s.';
-$lang['migration_multiple_version'] = 'There are multiple migrations with the same version number: %s.';
-$lang['migration_class_doesnt_exist'] = 'The migration class "%s" could not be found.';
-$lang['migration_missing_up_method'] = 'The migration class "%s" is missing an "up" method.';
-$lang['migration_missing_down_method'] = 'The migration class "%s" is missing a "down" method.';
-$lang['migration_invalid_filename'] = 'Migration "%s" has an invalid filename.';
+/**
+ * SessionHandlerInterface
+ *
+ * PHP 5.4 compatibility interface
+ *
+ * @package	CodeIgniter
+ * @subpackage	Libraries
+ * @category	Sessions
+ * @author	Andrey Andreev
+ * @link	https://codeigniter.com/user_guide/libraries/sessions.html
+ */
+interface SessionHandlerInterface {
+
+	public function open($save_path, $name);
+	public function close();
+	public function read($session_id);
+	public function write($session_id, $session_data);
+	public function destroy($session_id);
+	public function gc($maxlifetime);
+}
