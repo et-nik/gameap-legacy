@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2017, British Columbia Institute of Technology
+ * Copyright (c) 2014 - 2015, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,10 +28,10 @@
  *
  * @package	CodeIgniter
  * @author	EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2017, British Columbia Institute of Technology (http://bcit.ca/)
+ * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (http://ellislab.com/)
+ * @copyright	Copyright (c) 2014 - 2015, British Columbia Institute of Technology (http://bcit.ca/)
  * @license	http://opensource.org/licenses/MIT	MIT License
- * @link	https://codeigniter.com
+ * @link	http://codeigniter.com
  * @since	Version 1.0.0
  * @filesource
  */
@@ -48,7 +48,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Drivers
  * @category	Database
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/database/
+ * @link		http://codeigniter.com/user_guide/database/
  */
 abstract class CI_DB_driver {
 
@@ -380,8 +380,7 @@ abstract class CI_DB_driver {
 	/**
 	 * Initialize Database Settings
 	 *
-	 * @return	void
-	 * @throws	RuntimeException	In case of failure
+	 * @return	bool
 	 */
 	public function initialize()
 	{
@@ -393,7 +392,7 @@ abstract class CI_DB_driver {
 		 */
 		if ($this->conn_id)
 		{
-			return;
+			return TRUE;
 		}
 
 		// ----------------------------------------------------------------
@@ -430,9 +429,19 @@ abstract class CI_DB_driver {
 			// We still don't have a connection?
 			if ( ! $this->conn_id)
 			{
-				throw new RuntimeException('Unable to connect to the database.');
+				log_message('error', 'Unable to connect to the database');
+
+				if ($this->db_debug)
+				{
+					$this->display_error('db_unable_to_connect');
+				}
+
+				return FALSE;
 			}
 		}
+
+		// Now we set the character set and that's all
+		return $this->db_set_charset($this->char_set);
 	}
 
 	// --------------------------------------------------------------------
@@ -503,6 +512,31 @@ abstract class CI_DB_driver {
 	public function error()
 	{
 		return array('code' => NULL, 'message' => NULL);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Set client character set
+	 *
+	 * @param	string
+	 * @return	bool
+	 */
+	public function db_set_charset($charset)
+	{
+		if (method_exists($this, '_db_set_charset') && ! $this->_db_set_charset($charset))
+		{
+			log_message('error', 'Unable to set database connection charset: '.$charset);
+
+			if ($this->db_debug)
+			{
+				$this->display_error('db_unable_to_set_charset', $charset);
+			}
+
+			return FALSE;
+		}
+
+		return TRUE;
 	}
 
 	// --------------------------------------------------------------------
@@ -600,6 +634,7 @@ abstract class CI_DB_driver {
 		// cached query if it exists
 		if ($this->cache_on === TRUE && $return_object === TRUE && $this->_cache_init())
 		{
+			$this->load_rdriver();
 			if (FALSE !== ($cache = $this->CACHE->read($sql)))
 			{
 				return $cache;
@@ -641,15 +676,19 @@ abstract class CI_DB_driver {
 				// if transactions are enabled. If we don't call this here
 				// the error message will trigger an exit, causing the
 				// transactions to remain in limbo.
-				while ($this->_trans_depth !== 0)
+				if ($this->_trans_depth !== 0)
 				{
-					$trans_depth = $this->_trans_depth;
-					$this->trans_complete();
-					if ($trans_depth === $this->_trans_depth)
+					do
 					{
-						log_message('error', 'Database: Failure during an automated transaction commit/rollback!');
-						break;
+						$trans_depth = $this->_trans_depth;
+						$this->trans_complete();
+						if ($trans_depth === $this->_trans_depth)
+						{
+							log_message('error', 'Database: Failure during an automated transaction commit/rollback!');
+							break;
+						}
 					}
+					while ($this->_trans_depth !== 0);
 				}
 
 				// Display errors
@@ -683,9 +722,9 @@ abstract class CI_DB_driver {
 			return TRUE;
 		}
 
-		// Instantiate the driver-specific result class
-		$driver	= 'CI_DB_'.$this->dbdriver.'_result';
-		$RES    = new $driver($this);
+		// Load and instantiate the result driver
+		$driver		= $this->load_rdriver();
+		$RES		= new $driver($this);
 
 		// Is query caching enabled? If so, we'll serialize the
 		// result object and save it to a cache file.
@@ -715,6 +754,26 @@ abstract class CI_DB_driver {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Load the result drivers
+	 *
+	 * @return	string	the name of the result class
+	 */
+	public function load_rdriver()
+	{
+		$driver = 'CI_DB_'.$this->dbdriver.'_result';
+
+		if ( ! class_exists($driver, FALSE))
+		{
+			require_once(BASEPATH.'database/DB_result.php');
+			require_once(BASEPATH.'database/drivers/'.$this->dbdriver.'/'.$this->dbdriver.'_result.php');
+		}
+
+		return $driver;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Simple Query
 	 * This is a simplified version of the query() function. Internally
 	 * we only use it when running transaction commands since they do
@@ -725,7 +784,14 @@ abstract class CI_DB_driver {
 	 */
 	public function simple_query($sql)
 	{
-		empty($this->conn_id) && $this->initialize();
+		if ( ! $this->conn_id)
+		{
+			if ( ! $this->initialize())
+			{
+				return FALSE;
+			}
+		}
+
 		return $this->_execute($sql);
 	}
 
@@ -918,7 +984,7 @@ abstract class CI_DB_driver {
 	 */
 	public function compile_binds($sql, $binds)
 	{
-		if (empty($this->bind_marker) OR strpos($sql, $this->bind_marker) === FALSE)
+		if (empty($binds) OR empty($this->bind_marker) OR strpos($sql, $this->bind_marker) === FALSE)
 		{
 			return $sql;
 		}
@@ -938,7 +1004,7 @@ abstract class CI_DB_driver {
 		$ml = strlen($this->bind_marker);
 
 		// Make sure not to replace a chunk inside a string that happens to match the bind marker
-		if ($c = preg_match_all("/'[^']*'|\"[^\"]*\"/i", $sql, $matches))
+		if ($c = preg_match_all("/'[^']*'/i", $sql, $matches))
 		{
 			$c = preg_match_all('/'.preg_quote($this->bind_marker, '/').'/i',
 				str_replace($matches[0],
@@ -1111,7 +1177,7 @@ abstract class CI_DB_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Platform-dependent string escape
+	 * Platform-dependant string escape
 	 *
 	 * @param	string
 	 * @return	string
@@ -1504,11 +1570,11 @@ abstract class CI_DB_driver {
 				'\s*>\s*',                       // >
 				'\s+IS NULL',                    // IS NULL
 				'\s+IS NOT NULL',                // IS NOT NULL
-				'\s+EXISTS\s*\(.*\)',        // EXISTS(sql)
-				'\s+NOT EXISTS\s*\(.*\)',    // NOT EXISTS(sql)
+				'\s+EXISTS\s*\([^\)]+\)',        // EXISTS(sql)
+				'\s+NOT EXISTS\s*\([^\)]+\)',    // NOT EXISTS(sql)
 				'\s+BETWEEN\s+',                 // BETWEEN value AND value
-				'\s+IN\s*\(.*\)',            // IN(list)
-				'\s+NOT IN\s*\(.*\)',        // NOT IN (list)
+				'\s+IN\s*\([^\)]+\)',            // IN(list)
+				'\s+NOT IN\s*\([^\)]+\)',        // NOT IN (list)
 				'\s+LIKE\s+\S.*('.$_les.')?',    // LIKE 'expr'[ ESCAPE '%s']
 				'\s+NOT LIKE\s+\S.*('.$_les.')?' // NOT LIKE 'expr'[ ESCAPE '%s']
 			);
@@ -1731,7 +1797,7 @@ abstract class CI_DB_driver {
 	 * the table prefix onto it. Some logic is necessary in order to deal with
 	 * column names that include the path. Consider a query like this:
 	 *
-	 * SELECT hostname.database.table.column AS c FROM hostname.database.table
+	 * SELECT * FROM hostname.database.table.column AS c FROM hostname.database.table
 	 *
 	 * Or a query with aliasing:
 	 *
