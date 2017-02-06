@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2016, British Columbia Institute of Technology
+ * Copyright (c) 2014 - 2017, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
  * @package	CodeIgniter
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2016, British Columbia Institute of Technology (http://bcit.ca/)
+ * @copyright	Copyright (c) 2014 - 2017, British Columbia Institute of Technology (http://bcit.ca/)
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.0.0
@@ -164,7 +164,7 @@ class CI_Form_validation {
 	 * @param	array	$errors
 	 * @return	CI_Form_validation
 	 */
-	public function set_rules($field, $label = '', $rules = array(), $errors = array())
+	public function set_rules($field, $label = null, $rules = null, $errors = array())
 	{
 		// No reason to set rules if we have no POST data
 		// or a validation array has not been specified
@@ -196,6 +196,10 @@ class CI_Form_validation {
 			}
 
 			return $this;
+		}
+		elseif ( ! isset($rules))
+		{
+			throw new BadMethodCallException('Form_validation: set_rules() called without a $rules parameter');
 		}
 
 		// No fields or no rules? Nothing to do...
@@ -1200,7 +1204,7 @@ class CI_Form_validation {
 			{
 				return FALSE;
 			}
-			elseif ( ! in_array($matches[1], array('http', 'https'), TRUE))
+			elseif ( ! in_array(strtolower($matches[1]), array('http', 'https'), TRUE))
 			{
 				return FALSE;
 			}
@@ -1216,18 +1220,7 @@ class CI_Form_validation {
 			$str = 'ipv6.host'.substr($str, strlen($matches[1]) + 2);
 		}
 
-		$str = 'http://'.$str;
-
-		// There's a bug affecting PHP 5.2.13, 5.3.2 that considers the
-		// underscore to be a valid hostname character instead of a dash.
-		// Reference: https://bugs.php.net/bug.php?id=51192
-		if (version_compare(PHP_VERSION, '5.2.13', '==') OR version_compare(PHP_VERSION, '5.3.2', '=='))
-		{
-			sscanf($str, 'http://%[^/]', $host);
-			$str = substr_replace($str, strtr($host, array('_' => '-', '-' => '_')), 7, strlen($host));
-		}
-
-		return (filter_var($str, FILTER_VALIDATE_URL) !== FALSE);
+		return (filter_var('http://'.$str, FILTER_VALIDATE_URL) !== FALSE);
 	}
 
 	// --------------------------------------------------------------------
@@ -1240,9 +1233,9 @@ class CI_Form_validation {
 	 */
 	public function valid_email($str)
 	{
-		if (function_exists('idn_to_ascii') && $atpos = strpos($str, '@'))
+		if (function_exists('idn_to_ascii') && sscanf($str, '%[^@]@%s', $name, $domain) === 2)
 		{
-			$str = substr($str, 0, ++$atpos).idn_to_ascii(substr($str, $atpos));
+			$str = $name.'@'.idn_to_ascii($domain);
 		}
 
 		return (bool) filter_var($str, FILTER_VALIDATE_EMAIL);
@@ -1286,6 +1279,31 @@ class CI_Form_validation {
 	public function valid_ip($ip, $which = '')
 	{
 		return $this->CI->input->valid_ip($ip, $which);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Validate MAC address
+	 *
+	 * @param	string	$mac
+	 * @return	bool
+	 */
+	public function valid_mac($mac)
+	{
+		if ( ! is_php('5.5'))
+		{
+			// Most common format, with either dash or colon delimiters
+			if (preg_match('#\A[0-9a-f]{2}(?<delimiter>[:-])([0-9a-f]{2}(?P=delimiter)){4}[0-9a-f]{2}\z#i', $mac))
+			{
+				return TRUE;
+			}
+
+			// The less common format; e.g. 0123.4567.89ab
+			return (bool) preg_match('#((\A|\.)[0-9a-f]{4}){3}\z#i', $mac);
+		}
+
+		return (bool) filter_var($mac, FILTER_VALIDATE_MAC);
 	}
 
 	// --------------------------------------------------------------------
@@ -1495,38 +1513,6 @@ class CI_Form_validation {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Prep data for form
-	 *
-	 * This function allows HTML to be safely shown in a form.
-	 * Special characters are converted.
-	 *
-	 * @deprecated	3.0.6	Not used anywhere within the framework and pretty much useless
-	 * @param	mixed	$data	Input data
-	 * @return	mixed
-	 */
-	public function prep_for_form($data)
-	{
-		if ($this->_safe_form_data === FALSE OR empty($data))
-		{
-			return $data;
-		}
-
-		if (is_array($data))
-		{
-			foreach ($data as $key => $val)
-			{
-				$data[$key] = $this->prep_for_form($val);
-			}
-
-			return $data;
-		}
-
-		return str_replace(array("'", '"', '<', '>'), array('&#39;', '&quot;', '&lt;', '&gt;'), stripslashes($data));
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
 	 * Prep URL
 	 *
 	 * @param	string
@@ -1534,12 +1520,7 @@ class CI_Form_validation {
 	 */
 	public function prep_url($str = '')
 	{
-		if ($str === 'http://' OR $str === '')
-		{
-			return '';
-		}
-
-		if (strpos($str, 'http://') !== 0 && strpos($str, 'https://') !== 0)
+		if ($str !== '' && stripos($str, 'http://') !== 0 && stripos($str, 'https://') !== 0)
 		{
 			return 'http://'.$str;
 		}

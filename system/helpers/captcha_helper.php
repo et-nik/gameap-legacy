@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2016, British Columbia Institute of Technology
+ * Copyright (c) 2014 - 2017, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
  * @package	CodeIgniter
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2016, British Columbia Institute of Technology (http://bcit.ca/)
+ * @copyright	Copyright (c) 2014 - 2017, British Columbia Institute of Technology (http://bcit.ca/)
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.0.0
@@ -68,6 +68,7 @@ if ( ! function_exists('create_captcha'))
 			'img_url'	=> '',
 			'img_width'	=> '150',
 			'img_height'	=> '30',
+			'img_alt'	=> 'captcha',
 			'font_path'	=> '',
 			'expiration'	=> 7200,
 			'word_length'	=> 8,
@@ -110,7 +111,8 @@ if ( ! function_exists('create_captcha'))
 		$current_dir = @opendir($img_path);
 		while ($filename = @readdir($current_dir))
 		{
-			if (substr($filename, -4) === '.jpg' && (str_replace('.jpg', '', $filename) + $expiration) < $now)
+			if (in_array(substr($filename, -4), array('.jpg', '.png'))
+				&& (str_replace(array('.jpg', '.png'), '', $filename) + $expiration) < $now)
 			{
 				@unlink($img_path.$filename);
 			}
@@ -332,7 +334,7 @@ if ( ! function_exists('create_captcha'))
 			return FALSE;
 		}
 
-		$img = '<img '.($img_id === '' ? '' : 'id="'.$img_id.'"').' src="'.$img_url.$img_filename.'" style="width: '.$img_width.'; height: '.$img_height .'; border: 0;" alt=" " />';
+		$img = '<img '.($img_id === '' ? '' : 'id="'.$img_id.'"').' src="'.$img_url.$img_filename.'" style="width: '.$img_width.'; height: '.$img_height .'; border: 0;" alt="'.$img_alt.'" />';
 		ImageDestroy($im);
 
 		return array('word' => $word, 'time' => $now, 'image' => $img, 'filename' => $img_filename);
