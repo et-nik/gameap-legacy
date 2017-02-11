@@ -173,7 +173,9 @@ class Dedicated_servers extends CI_Model {
 			while($i < $count_ds_list) {
 				
 				$ds_ip = $this->ds_list[$i]['ip'];
-				if (!$this->ds_list[$i]['ip'] = json_decode($ds_ip, true)) {
+                $this->ds_list[$i]['ip'] = json_decode($ds_ip, true);
+
+				if (!$this->ds_list[$i]['ip']) {
 					/* Строка с данными не является json, в этом случае присваиваем первому
 					 * массиву значение этой строки
 					 * Сделано для совместимости со старыми версиями после обновления
