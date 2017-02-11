@@ -1099,8 +1099,6 @@ class Server_command extends CI_Controller {
 					$message = lang('server_command_no_restart_privileges');
 					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
 					return false;
-					
-					break;
 			}
 		}else{
 			$message = lang('server_command_server_not_found');
@@ -1185,8 +1183,6 @@ class Server_command extends CI_Controller {
 					$message = lang('server_command_no_update_privileges');
 					$this->_show_message($message, site_url('admin/server_control/main/' . $server_id), lang('next'));
 					return false;
-					
-					break;
 			}
 		}else{
 			$message = lang('server_command_server_not_found');
