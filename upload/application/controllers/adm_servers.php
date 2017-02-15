@@ -316,6 +316,20 @@ class Adm_servers extends CI_Controller {
 			}
 		}
 
+		// Return empty data if installer driver not exists
+		if (!in_array("installer_" . strtolower($this->games->games_list[0]['engine']), $this->installer->valid_drivers)) {
+		    return array(
+                'query_port' => '',
+                'rcon_port' => '',
+
+                'aliases' => '',
+                'start_command' => '',
+                'maps_path' => '',
+                'screen_name' => '',
+                'maps_path' => ''
+            );
+        }
+
 		$this->installer->set_game_variables($this->games->games_list[0]['start_code'], 
 												$this->games->games_list[0]['engine'],
 												$this->games->games_list[0]['engine_version']
@@ -340,7 +354,7 @@ class Adm_servers extends CI_Controller {
 		$data['maps_path'] = $this->games->games_list[0]['start_code'] . '/maps';
 		
 		// Прочие данные
-		$this->installer->change_server_data($server_data);
+		$this->installer->change_server_data($data);
 		
 		return $data;
 	}
