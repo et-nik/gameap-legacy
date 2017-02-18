@@ -1,6 +1,6 @@
 <?php
 
-class GdaemonTasksTest extends CodeIgniterTestCase
+class OldGdaemonTasksTest extends CodeIgniterTestCase
 {
     private $CI;
 

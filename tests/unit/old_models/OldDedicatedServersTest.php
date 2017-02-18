@@ -1,6 +1,6 @@
 <?php
 
-class DedicatedServersTest extends CodeIgniterTestCase
+class OldDedicatedServersTest extends CodeIgniterTestCase
 {
     private $CI;
 

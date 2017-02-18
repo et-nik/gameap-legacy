@@ -1,6 +1,6 @@
 <?php
 
-class GamesTest extends CodeIgniterTestCase
+class OldGamesTest extends CodeIgniterTestCase
 {
     private $CI;
 

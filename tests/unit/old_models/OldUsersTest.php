@@ -4,7 +4,7 @@
  * @group Model
  */
 
-class UsersTest extends CodeIgniterTestCase
+class OldUsersTest extends CodeIgniterTestCase
 {
     private $CI;
 
