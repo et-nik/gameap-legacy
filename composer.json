@@ -15,6 +15,7 @@
         "ext-gd": "*",
         "ext-curl": "*",
         "ext-mcrypt": "*",
+        "ext-bcmath": "*",
         "knik/binn": "0.1",
         "knik/gameq": "3.x-dev"
     },
@@ -23,7 +24,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Myth\\": "myth/"
+            "Myth\\": "myth/",
+            "gameap\\": "application/"
         }
     }
 }
