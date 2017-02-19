@@ -52,7 +52,7 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 // Profiler
 //--------------------------------------------------------------------
 //
-    $config['show_profiler'] = true;
+    $config['show_profiler'] = (ENVIRONMENT != 'production') ? true : false;
 
 //--------------------------------------------------------------------
 // PHP Error
