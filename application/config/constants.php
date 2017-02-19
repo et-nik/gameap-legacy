@@ -95,4 +95,4 @@ defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest auto
 */
 
 define('AP_VERSION',	'2.0-dev');
-define('AP_DATE',	'02.06.2016');
+define('AP_DATE',	'19.02.2017');
