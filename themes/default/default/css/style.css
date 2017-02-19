@@ -517,3 +517,19 @@ a.menu:after, .dropdown-toggle:after {
 	width: 20%;
 	height: 85px;
 }
+
+.scroll-block {
+	position:fixed;
+	bottom:10px;
+	right:10px;
+}
+
+.scroll-to {
+	width:100px;
+	border:1px solid #ccc;
+	background:#f7f7f7;
+	text-align:center;
+	padding:5px;
+	cursor:pointer;
+	color:#333;
+}
