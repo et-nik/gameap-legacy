@@ -3,17 +3,11 @@
 
 body {
 	font: 13px/20px normal Helvetica, Arial, sans-serif;
-/*
-	background: #F3F3F3;
-*/
 }
 
 h1, h2, h3, h4, h5, h6 {
 	font-size: 18px;
 	border: 0;
-/*
-	border-bottom: 1px solid #ccc;
-*/
 }
 
 #body{
@@ -34,17 +28,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .content{
-/*
-	margin: 60px 0px 10px 150px;
-*/
-/*
-	padding: 10px;
-	border: 1px solid #D0D0D0;
-	background-color: #fff;
-	-webkit-box-shadow: 0 0 8px #D0D0D0;
-	width: 95%;
-	min-height: 740px;
-*/
     padding-top: 10px;
 }
 
@@ -118,9 +101,9 @@ span.description {
 
 
 textarea {
-	width: 98%; /* Ширина поля в процентах */
-	height: 200px; /* Высота поля в пикселах */
-	resize: vertical; /* Запрещаем изменять размер */
+	width: 98%;
+	height: 200px;
+	resize: vertical;
 }
 
 hr {
@@ -494,10 +477,6 @@ ul.tabs li.active, ul.tabs li.active a:hover  {
 .accordion .gt_list {
 	margin: 25px 0 25px 0;
 }
-
-/* ------------------------------------------------------------------ */
-/* ---------------------------- NEW --------------------------------- */
-/* ------------------------------------------------------------------ */
 
 .page-sidebar-menu {
 	list-style: none;
