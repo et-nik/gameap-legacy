@@ -128,7 +128,7 @@ class Migration_install extends CI_Migration {
             ],
             'gdaemon_login' => [
                 'type' => 'VARCHAR',
-                'constraint' => 128,
+                'constraint' => 256,
                 'default' => '',
             ],
             'gdaemon_password' => [
