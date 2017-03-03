@@ -47,15 +47,22 @@
         }
     }
 
-    datestart = '';
-    dateend = '';
+    var datestart = '';
+    var dateend = '';
+    var update_blocked = false;
 
     function update_stats() {
-        
+
+        if (update_blocked == true) {
+            return;
+        }
+
+        update_blocked = true;
+
         ajax_data = {'datestart': datestart, 'dateend': dateend};
         ajax_data[page.csrf_token_name] = page.csrf_hash;
     
-        $.ajax({ 
+        $.ajax({
             url:     sprintf("%sajax/ds_stats/get_stats/%s", page.site_url, page.ds_id),
             type:     "POST",
             data: 	ajax_data,
@@ -225,6 +232,7 @@
                 last = false;
             },
             complete: function() {
+                update_blocked = false;
                 // HideLoad();
             }
         });
