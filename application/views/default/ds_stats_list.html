@@ -14,9 +14,16 @@
 <script>
     var warn_sign = '<font color="red"><strong>(!)</strong></font> ';
     var warn_perc = 80;
+    var update_blocked = false;
     
     function update_stats()
     {
+        if (update_blocked == true) {
+            return;
+        }
+
+        update_blocked = true;
+
         $.ajax({ 
             url:     sprintf("%sajax/ds_stats/get_stats_about_all", page.site_url),
             type:     "GET",
@@ -100,7 +107,7 @@
                 last = false;
             },
             complete: function() {
-
+                update_blocked = false;
             }
         });
     }
