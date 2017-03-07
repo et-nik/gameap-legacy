@@ -30,9 +30,9 @@ class Ds_stats extends BaseController {
 
         $this->load->helper('date');
 
-        // if (!$this->input->is_ajax_request()) {
-		   // show_404();
-		// }
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
 
         if (!$this->users->check_user()) {
 			show_404();
@@ -41,22 +41,9 @@ class Ds_stats extends BaseController {
 
     // -----------------------------------------------------------------
     
-    private function _send_response($array)
-    {
-		$response = json_encode($array);
-		
-		if (!$response) {
-			$this->_send_error('Invalid data');
-		}
-		
-		$this->output->append_output($response);
-	}
-    
-    // -----------------------------------------------------------------
-    
     private function _send_error($error = "")
     {
-		$this->output->append_output(json_encode(array('status' => 0, 'error_text' => $error)));
+        $this->renderJson(array('status' => 0, 'error_text' => $error));
 	}
 
     // -----------------------------------------------------------------
@@ -85,7 +72,7 @@ class Ds_stats extends BaseController {
         $this->mds_stats->time_between($timestart, $timeend);
         $ds_stats = $this->mds_stats->get_stats($ds_id);
 
-        $this->output->append_output(json_encode(array('status' => 1, 'data' => $ds_stats)));
+        $this->renderJson(array('status' => 1, 'data' => $ds_stats));
     }
 
     // -----------------------------------------------------------------
@@ -93,7 +80,7 @@ class Ds_stats extends BaseController {
     public function get_stats_about_all()
     {
         $stats = $this->mds_stats->get_all_stats();
-        $this->output->append_output(json_encode(array('status' => 1, 'data' => $stats)));
+        $this->renderJson(array('status' => 1, 'data' => $stats));
     }
-    
+
 }

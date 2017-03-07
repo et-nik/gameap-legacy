@@ -43,21 +43,19 @@ class Tasks extends BaseController {
 
     private function _send_response($array)
     {
-		$response = json_encode($array);
+        if (empty($array)) {
+            $this->_send_error('Invalid data');
+        }
 
-		if (!$response) {
-			$this->_send_error('Invalid data');
-		}
-
-		$this->output->append_output($response);
-	}
+        $this->renderJson($response);
+    }
 
     // -----------------------------------------------------------------
 
     private function _send_error($error = "")
     {
-		$this->output->append_output(json_encode(array('status' => 0, 'error_text' => $error)));
-	}
+        $this->renderJson(array('status' => 0, 'error_text' => $error));
+    }
 
     // -----------------------------------------------------------------
 
