@@ -8,6 +8,8 @@ class Game_typesSeeder extends Seeder {
 
     public function run()
     {
+        $this->db->truncate('game_types');
+
         $this->db->insert_batch('game_types', [
             [
                 'id' => '1',
