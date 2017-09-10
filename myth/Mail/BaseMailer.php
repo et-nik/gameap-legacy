@@ -47,6 +47,7 @@ class BaseMailer {
      */
     protected $action = 'send';
 
+    protected $subject  = null;
     protected $from     = null;
     protected $to       = null;
     protected $reply_to = null;
@@ -60,12 +61,22 @@ class BaseMailer {
     protected $view     = null;
 
     /**
+     * View data
+     *
+     * @var array
+     */
+    protected $data     = [];
+
+    /**
      * The MailService to use. If NULL
      * will use the system default.
      * @var null
      */
     protected $service_name  = null;
 
+    /**
+     * @var MailServiceInterface
+     */
     protected $service = null;
 
     /**
@@ -121,38 +132,26 @@ class BaseMailer {
 
     //--------------------------------------------------------------------
 
-
-
     /**
      * Sends an email immediately using the system-defined MailService.
      *
-     * @param string $to // Who the email is being sent to.
-     * @param string $subject // The subject line for the email
-     * @param strign $data // the key/value pairs to send to the views.
-     * @param string $view // You can override the view used for the email here.
-     *                          // You can change themes by prepending theme name
-     *                          // like: 'newtheme:newview'
-     *
      * @return bool
      */
-    public function send($to, $subject, $data=[], $view=null)
+    public function send()
     {
         // Are we pretending to send?
-        if (config_item('mail.pretend') === true)
-        {
+        if (config_item('mail.pretend') === true) {
             return true;
         }
 
         $this->startMailService();
 
-        $this->service->to($to);
-        $this->service->subject($subject);
+        $this->service->to($this->to);
+        $this->service->subject($this->subject);
 
         if (is_array($this->from)) {
             $this->service->from($this->from[0], $this->from[1]);
-        }
-        else
-        {
+        } else {
             $this->service->from($this->from);
         }
 
@@ -161,41 +160,26 @@ class BaseMailer {
 
         if (is_array($this->reply_to)) {
             $this->service->reply_to($this->reply_to[0], $this->reply_to[1]);
-        }
-        else
-        {
+        } else {
             $this->service->reply_to($this->reply_to);
         }
 
-
-        // Determine the view to use. We have to hack this a bit with
-        // the debug_backtrace, though, to make it all function in the background.
-        list(, $method) = debug_backtrace(false);
-
-        $view = 'emails/'. strtolower( (new \ReflectionClass($this))->getShortName() ) .'/'. $method['function'];
-
-        // Get our message's text and html versions based on which files exist...
-        $basepath = APPPATH .'views/'. $view;
-
-        // Is a text version available?
-        if (file_exists($basepath .'.text.php'))
-        {
-            $text = $this->load->view($view .'.text.php', $data, true);
-            $this->service->text_message($text);
+        if (empty($this->message)) {
+            throw new \RuntimeException("Empty message");
         }
 
-        // If an html version is around, we need to theme it out
-        if (file_exists($basepath .'.html.php'))
-        {
+        if (empty($this->view)) {
+            $this->service->text_message($this->message);
+        } else {
             $this->startThemer();
 
             $this->themer->setTheme($this->theme);
 
             // Determine the correct layout to use
-            $layout = ! empty($this->layout) ? $this->layout : NULL;
+            $layout = ! empty($this->layout) ? $this->layout : null;
             $this->themer->setLayout($layout);
 
-            $this->themer->set($data);
+            $this->themer->set(array_merge(['message' => $this->message], $this->data));
 
             // Render the view into a var we can pass to the layout.
             $content = $this->themer->display($view .'.html.php');
@@ -205,9 +189,7 @@ class BaseMailer {
             $this->service->html_message( $this->themer->display($this->theme .':'. $layout) );
         }
 
-        if (! $this->service->send() )
-        {
-            // todo do something here
+        if (! $this->service->send() ) {
             return false;
         }
 
@@ -275,6 +257,10 @@ class BaseMailer {
         }
 
         $this->service = new $service_name();
+
+        if (!$this->service instanceof MailServiceInterface) {
+            throw new \RuntimeException("Mail service must be implemented at MailServiceInterface");
+        }
     }
 
     //--------------------------------------------------------------------

@@ -58,14 +58,14 @@ class {$model_name} extends CIDbModel {
      * Various callbacks available to the class. They are simple lists of
      * method names (methods will be ran on \$this).
      */
-    protected \$before_insert   = array();
-    protected \$after_insert    = array();
-    protected \$before_update   = array();
-    protected \$after_update    = array();
-    protected \$before_find     = array();
-    protected \$after_find      = array();
-    protected \$before_delete   = array();
-    protected \$after_delete    = array();
+    protected \$before_insert   = [];
+    protected \$after_insert    = [];
+    protected \$before_update   = [];
+    protected \$after_update    = [];
+    protected \$before_find     = [];
+    protected \$after_find      = [];
+    protected \$before_delete   = [];
+    protected \$after_delete    = [];
 
     /**
      * Protected, non-modifiable attributes
