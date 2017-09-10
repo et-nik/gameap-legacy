@@ -2,15 +2,15 @@
 /**
  * Game AdminPanel (АдминПанель)
  *
- *
- *
  * @package		Game AdminPanel
  * @author		Nikita Kuznetsov (ET-NiK)
  * @copyright	Copyright (c) 2014, Nikita Kuznetsov (http://hldm.org)
  * @license		http://www.gameap.ru/license.html
  * @link		http://www.gameap.ru
- * @filesource
 */
+
+use Myth\Mail\BaseMailer;
+
 class Users extends CI_Model {
 
 	/* Данные авторизованного пользователя */
@@ -248,6 +248,7 @@ class Users extends CI_Model {
 			$this->auth_privileges = $this->auth_data['privileges'];
 			$this->auth_servers_privileges = $this->get_server_privileges();
 
+			// TODO: Save last_auth to cache
 			// Обновление данных авторизации
 			$this->update_user(array('last_auth' => now()));
 
@@ -291,7 +292,7 @@ class Users extends CI_Model {
         if(!$user_login OR !$user_password){
             return false;
         }
-        
+
         switch ($type) {
 			default:
 				$query = $this->db->get_where('users', array('login' => $user_login), 1);
@@ -960,17 +961,14 @@ class Users extends CI_Model {
 		$message = str_replace('{user_name}', $user_name, $message);
 		$message = str_replace('{user_balance}', $user_data['balance'], $message);
 
-		$this->email->to($user_data['email']);
-		$this->email->from($this->config->config['system_email'], $this->config->config['email_sender_name']);
-		$this->email->subject($subject);
-		$this->email->message($message);
+		$mailer = new BaseMailer([
+		    'to' => $user_data['email'],
+            'from' => [$this->config->config['system_email'], $this->config->config['email_sender_name']],
+            'subject' => $subject,
+            'message' => $message,
+        ]);
 
-		if ($this->email->send()) {
-			return true;
-		} else {
-			// echo $this->email->print_debugger();
-			return false;
-		}
+		return (bool)$mailer->send();
 	}
 
     // ----------------------------------------------------------------
@@ -981,7 +979,6 @@ class Users extends CI_Model {
     */
     function admin_msg($subject = '<empty>', $message)
     {
-
 		$admin_list = $this->get_users_list(array('is_admin' => '1'), 1000);
 
 		if (empty($admin_list)) {
@@ -993,18 +990,13 @@ class Users extends CI_Model {
 			$email_list[] = $admin_data['email'];
 		}
 
-		$this->load->library('email');
+        $mailer = new BaseMailer([
+            'to' => $email_list,
+            'from' => [$this->config->config['system_email'], $this->config->config['email_sender_name']],
+            'subject' => $subject,
+            'message' => $message,
+        ]);
 
-		$this->email->to($email_list);
-		$this->email->from($this->config->config['system_email'], $this->config->config['email_sender_name']);
-		$this->email->subject($subject);
-		$this->email->message($message);
-
-		if($this->email->send()) {
-			return true;
-		} else {
-			//echo $this->email->print_debugger();
-			return false;
-		}
+        return (bool)$mailer->send();
     }
 }
