@@ -31,9 +31,6 @@
  */
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-use \Myth\Events\Events as Events;
-use Myth\Mail\Mail as Mail;
-
 //--------------------------------------------------------------------
 // EVENTS
 //--------------------------------------------------------------------
@@ -43,42 +40,6 @@ use Myth\Mail\Mail as Mail;
 // These Events are separate from CodeIgniter's built-in Hooks, and are
 // slightly more flexible, using features in PHP 5.4+.
 //
-
-//--------------------------------------------------------------------
-// User Authentication Events
-//--------------------------------------------------------------------
-
-// Send New User Registration Email
-Events::on('didRegisterUser', function($data) {
-
-    if ($data['method'] != 'email')
-    {
-        return true;
-    }
-
-    return Mail::deliver('UserMailer:didRegister', [$data]);
-
-}, EVENTS_PRIORITY_NORMAL);
-
-//--------------------------------------------------------------------
-
-// Send Forgotten Password email
-Events::on('didRemindUser', function($user, $token) {
-
-    return Mail::deliver('UserMailer:remindUser', [$user, $token]);
-
-}, EVENTS_PRIORITY_NORMAL);
-
-//--------------------------------------------------------------------
-
-// Send Reset Password notice
-Events::on('didResetPassword', function($user) {
-
-    return Mail::deliver('UserMailer:resetPassword', [$user]);
-
-}, EVENTS_PRIORITY_NORMAL);
-
-
 
 //--------------------------------------------------------------------
 // Cron Job Events
