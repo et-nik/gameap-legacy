@@ -158,10 +158,12 @@ class BaseMailer {
         if (! empty($this->cc))         $this->service->cc($this->cc);
         if (! empty($this->bcc))        $this->service->bcc($this->bcc);
 
-        if (is_array($this->reply_to)) {
-            $this->service->reply_to($this->reply_to[0], $this->reply_to[1]);
-        } else {
-            $this->service->reply_to($this->reply_to);
+        if (!empty($this->reply_to)) {
+            if (is_array($this->reply_to)) {
+                $this->service->reply_to($this->reply_to[0], $this->reply_to[1]);
+            } else {
+                $this->service->reply_to($this->reply_to);
+            }
         }
 
         if (empty($this->message)) {
@@ -182,7 +184,7 @@ class BaseMailer {
             $this->themer->set(array_merge(['message' => $this->message], $this->data));
 
             // Render the view into a var we can pass to the layout.
-            $content = $this->themer->display($view .'.html.php');
+            $content = $this->themer->display($this->view .'.html.php');
 
             $this->themer->set('content', $content);
 
@@ -256,7 +258,13 @@ class BaseMailer {
             throw new \RuntimeException( sprintf( lang('mail.invalid_service'), $service_name) );
         }
 
-        $this->service = new $service_name();
+        $service_config = config_item('mail.service_config');
+
+        if (!empty($service_config) && is_array($service_config)) {
+            $this->service = new $service_name($service_config);
+        } else {
+            $this->service = new $service_name();
+        }
 
         if (!$this->service instanceof MailServiceInterface) {
             throw new \RuntimeException("Mail service must be implemented at MailServiceInterface");

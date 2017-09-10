@@ -192,7 +192,13 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 // The default MailService to use when sending any emails through
 // Myth\Mail\Mail commands. Must include the full namespace of the class.
 //
-    $config['mail.default_service'] = '\Myth\Mail\LogMailService';
+    $config['mail.default_service'] = '\Myth\Mail\CIMailService';
+
+//--------------------------------------------------------------------
+// MailService Config
+//--------------------------------------------------------------------
+//
+    $config['mail.service_config'] = [];
 
 //--------------------------------------------------------------------
 // Mail: Pretend to send
