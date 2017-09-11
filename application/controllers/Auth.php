@@ -561,19 +561,19 @@ class Auth extends BaseController {
 			/* -------------------------------------- */
 
 			// Загрузка моделей
-			$this->load->library('email');
 			$this->load->helper('url');
-				
-			$this->email->from($this->config->config['system_email'], 'АдминПанель');
-			$this->email->to($user_list[0]['email']); 
 
-			$this->email->subject(lang('auth_recovery_password'));
-			$url_recovery = site_url('auth/recovery_password/' . $recovery_code);
-			$this->email->message(lang('auth_recovery_mail_goto_link') . ': ' . $url_recovery);	
-			
 			if(count($this->panel_log->get_log(array('date >' => time() - 86400, 'user_name' => $user_list[0]['login'], 'msg' => 'Send Recovery Code. Email: ' . $user_list[0]['email']))) < 1 ) {
-				
-				if($this->email->send()){
+
+                $url_recovery = site_url('auth/recovery_password/' . $recovery_code);
+
+                $result = $this->users->send_mail(
+                    lang('auth_recovery_password'),
+                    lang('auth_recovery_mail_goto_link') . ': ' . $url_recovery,
+                    $user_list['0']['id']
+                );
+
+				if($result){
 					$this->_show_message(lang('recovery_recovery_msg_accept_send') . ' ' . $user_list[0]['email'] , site_url('auth/in'), lang('next'));
 					$log_data['msg'] = 'Send Recovery Code. Email: ' . $user_list[0]['email'];
 				}else{
