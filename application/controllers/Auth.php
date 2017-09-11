@@ -441,6 +441,7 @@ class Auth extends BaseController {
 
 	/**
 	 * Восстановление пароля
+     * TODO: REFACTORING NEEDED!
 	*/ 
 	function recovery_password($code = false)
 	{
@@ -478,19 +479,12 @@ class Auth extends BaseController {
 				$this->users->update_user($user_data, $user_list['0']['id']);
 				
 				// Загрузка моделей
-				$this->load->library('email');
 				$this->load->helper('url');
-					
-				$this->email->from($this->config->config['system_email'], 'АдминПанель');
-				$this->email->to($user_list[0]['email']); 
 
-				$this->email->subject(lang('auth_recovery_password'));
-				
-				$email_message = "Новые данные \nЛогин: " . $user_list['0']['login'] . "\nПароль: " . $new_password ;
-				
-				$this->email->message($email_message);	
+                $email_message = "Новые данные \nЛогин: " . $user_list['0']['login'] . "\nПароль: " . $new_password ;
+				$result = $this->users->send_mail(lang('auth_recovery_password'), $email_message, $user_list['0']['id']);
 					
-				if($this->email->send()){
+				if($result){
 					$log_data['msg'] = 'Recovery Password Successful';  // Сообщение для логов
 					
 					// Обновляем код восстановления
