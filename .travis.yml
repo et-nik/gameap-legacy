@@ -1,13 +1,12 @@
 language: php
 
 php:
-  - 5.3
   - 5.4
   - 5.5
   - 5.6
   - 7
   - 7.1
-  - hhvm
+  - 7.2
   
 env:
   - DB=mysqli
@@ -25,12 +24,7 @@ script:
   - php sprint database refresh app
   - php sprint database seed UserSeeder
   - vendor/bin/codecept --no-interaction run acceptance
-
-matrix:
-  allow_failures:
-    - php: 5.3
-    - php: hhvm
-
+  
 addons:
   artifacts:
     paths:
