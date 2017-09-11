@@ -213,27 +213,20 @@ class Auth extends BaseController {
 							
 							$user_code = $this->users->get_user_recovery_code(array('login' => $user_data['login']));
 							$user_data = $this->users->get_user_data(array('login' => $user_data['login']));
-							
-							$this->load->library('email');
-							
-							$this->email->from($this->config->config['system_email'], 'АдминПанель');
-							$this->email->to($user_data['email']); 
 
-							$this->email->subject(lang('auth_account_unblock'));
-							
-							$email_message = lang('auth_mail_goto_link') . site_url() . 'auth/in/' . $user_code ;
-							
-							$this->email->message($email_message);
+                            $result = $this->users->send_mail(
+                                lang('auth_account_unblock'),
+                                $email_message = lang('auth_mail_goto_link') . site_url() . 'auth/in/' . $user_code ,
+                                $user_data['login']['id']
+                            );
 			
-							if($this->email->send()) {
+							if($result) {
 								$this->_show_message(lang('auth_bruteforce_email_send'));
 								$log_data['msg'] = 'Bruteforce. Reset code sended';
 							} else {
 								$this->_show_message(lang('auth_bruteforce_authorization_error'));
 								$log_data['msg'] = 'Bruteforce. Reset code send failure';
 							}
-							
-							//print_r($this->email->print_debugger());
 
 							// Сохраняем логи отправки email, чтобы не отправлять 1000 раз
 							$log_data['type'] = 'auth';
@@ -496,10 +489,7 @@ class Auth extends BaseController {
 					$this->panel_log->save_log($log_data);
 					
 					$this->_show_message(lang('auth_recovery_msg_send') . ' ' . $user_list[0]['email'], site_url('auth/in'), 'Далее');
-					
-					/* Пригодится для дебага */
-					//echo $this->email->print_debugger();
-			
+
 					return true;
 					
 				} else {
@@ -513,7 +503,7 @@ class Auth extends BaseController {
 					$log_data['msg'] = 'Mail Send Error';				// Сообщение для логов
 					$log_data['type'] = 'recovery_password';
 					$log_data['user_name'] = $user_list[0]['login'];
-					$log_data['log_data'] = $this->email->print_debugger();
+					$log_data['log_data'] = "";
 					$this->panel_log->save_log($log_data);
 					return false;
 				}
@@ -563,7 +553,7 @@ class Auth extends BaseController {
 			// Загрузка моделей
 			$this->load->helper('url');
 
-			if(count($this->panel_log->get_log(array('date >' => time() - 86400, 'user_name' => $user_list[0]['login'], 'msg' => 'Send Recovery Code. Email: ' . $user_list[0]['email']))) < 1 ) {
+			if(count($this->panel_log->get_log(array('date >' => time() - 86400, 'user_name' => $user_list[0]['login'], 'msg' => 'Send Recovery Code. Email: ' . $user_list[0]['email']))) < 3 ) {
 
                 $url_recovery = site_url('auth/recovery_password/' . $recovery_code);
 
@@ -580,10 +570,7 @@ class Auth extends BaseController {
 					$this->_show_message(lang('auth_recovery_msg_send_error'), site_url('auth/in'), 'Далее');
 					$log_data['msg'] = 'Mail Send Error';				// Сообщение для логов
 				}
-					
-				/* Пригодится для дебага */
-				//echo $this->email->print_debugger();
-				
+
 				// Сохраняем логи
 				$log_data['type'] = 'recovery_password';
 				$log_data['user_name'] = $user_list[0]['login'];
