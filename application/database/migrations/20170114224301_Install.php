@@ -783,6 +783,7 @@ class Migration_install extends CI_Migration {
         $this->dbforge->drop_table('logs', true);
         $this->dbforge->drop_table('modules', true);
         $this->dbforge->drop_table('servers', true);
+        $this->dbforge->drop_table('servers_stats', true);
         $this->dbforge->drop_table('servers_privileges', true);
         $this->dbforge->drop_table('settings', true);
         $this->dbforge->drop_table('sessions', true);
