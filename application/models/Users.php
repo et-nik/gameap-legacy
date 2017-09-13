@@ -1014,12 +1014,12 @@ class Users extends CI_Model {
 
         } catch (\Exception $e) {
             $this->panel_log->save_log([
-                'type' => 'send_mail',
+                'type' => 'admin_msg',
                 'command' => 'send_mail',
                 'msg' => 'Send mail error',
                 'log_data' => $e->getMessage()
             ]);
- 
+
             $result = false;
         }
 
