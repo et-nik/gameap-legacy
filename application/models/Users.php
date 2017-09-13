@@ -945,8 +945,6 @@ class Users extends CI_Model {
     */
 	function send_mail($subject = '<empty>', $message = '', $user_id = false)
 	{
-		$this->load->library('email');
-
 		if ($user_id) {
 			if ($user_id != $this->auth_id) {
 				$user_data = $this->get_user_data($user_id, false, true);
@@ -961,14 +959,28 @@ class Users extends CI_Model {
 		$message = str_replace('{user_name}', $user_name, $message);
 		$message = str_replace('{user_balance}', $user_data['balance'], $message);
 
-		$mailer = new BaseMailer([
-		    'to' => $user_data['email'],
-            'from' => [$this->config->config['system_email'], $this->config->config['email_sender_name']],
-            'subject' => $subject,
-            'message' => $message,
-        ]);
+		try {
+            $mailer = new BaseMailer([
+                'to' => $user_data['email'],
+                'from' => [$this->config->config['system_email'], $this->config->config['email_sender_name']],
+                'subject' => $subject,
+                'message' => $message,
+            ]);
 
-		return (bool)$mailer->send();
+            $result = (bool)$mailer->send();
+
+        } catch (\Exception $e) {
+            $this->panel_log->save_log([
+                'type' => 'send_mail',
+                'command' => 'send_mail',
+                'msg' => 'Send mail error',
+                'log_data' => $e->getMessage()
+            ]);
+
+            $result = false;
+        }
+
+		return $result;
 	}
 
     // ----------------------------------------------------------------
@@ -990,13 +1002,27 @@ class Users extends CI_Model {
 			$email_list[] = $admin_data['email'];
 		}
 
-        $mailer = new BaseMailer([
-            'to' => $email_list,
-            'from' => [$this->config->config['system_email'], $this->config->config['email_sender_name']],
-            'subject' => $subject,
-            'message' => $message,
-        ]);
+		try {
+            $mailer = new BaseMailer([
+                'to' => $email_list,
+                'from' => [$this->config->config['system_email'], $this->config->config['email_sender_name']],
+                'subject' => $subject,
+                'message' => $message,
+            ]);
 
-        return (bool)$mailer->send();
+            $result = (bool)$mailer->send();
+
+        } catch (\Exception $e) {
+            $this->panel_log->save_log([
+                'type' => 'send_mail',
+                'command' => 'send_mail',
+                'msg' => 'Send mail error',
+                'log_data' => $e->getMessage()
+            ]);
+ 
+            $result = false;
+        }
+
+        return $result;
     }
 }
