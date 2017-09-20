@@ -2435,29 +2435,24 @@ class Adm_servers extends CI_Controller {
 		if ($confirm == $this->security->get_csrf_hash()) {
 			
 			/* Удаление директории на выделенном сервере */
-			//~ if (isset($this->servers->server_data['dir'])) {
-				//~ switch($this->servers->server_data['os']) {
-				//~ case 'Windows':
-					//~ $command = 'rmdir /S ' . $this->servers->server_data['dir'];
-					//~ break;
-				//~ default:
-					//~ // Linux
-					//~ $command = 'rm -rf ' . $this->servers->server_data['dir'];
-					//~ break;
-				//~ }
-			//~ }
-			//~ 
-			//~ try {
-				//~ $result = send_command($command, $this->servers->server_data);
-			//~ } catch (Exception $e) {
-				//~ // Директория не удалена
-			//~ }
-			
-			// Остановка сервера
+			if (isset($this->servers->server_data['dir'])) {
+				switch($this->servers->server_data['os']) {
+				case 'Windows':
+					$command = 'rmdir /S ' . $this->servers->server_data['dir'];
+					break;
+				default:
+					// Linux
+					$command = 'rm -rf ' . $this->servers->server_data['dir'];
+					break;
+				}
+			}
+
 			try {
-				$this->servers->stop($id);
+                $this->servers->stop($id);
+                // Send deleting commands
+				send_command($command, $this->servers->server_data);
 			} catch (Exception $e) {
-				// Сохраняем логи
+				// Error
 				$log_data['type'] = 'server_command';
 				$log_data['command'] = 'stop';
 				$log_data['user_name'] = $this->users->auth_login;
