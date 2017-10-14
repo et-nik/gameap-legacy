@@ -167,7 +167,7 @@ class Adm_servers extends BaseController {
 	*/
 	public function found_ftp_path($server_id = false)
 	{
-		if(!$server_data){
+		if(!$server_id){
 			show_404();
 		}
 	}
@@ -181,7 +181,7 @@ class Adm_servers extends BaseController {
 	*/
 	public function found_sftp_path($server_id = false)
 	{
-		if(!$server_data){
+		if(!$server_id){
 			show_404();
 		}
 	}
