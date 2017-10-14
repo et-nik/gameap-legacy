@@ -47,7 +47,7 @@ class Tasks extends BaseController {
             $this->_send_error('Invalid data');
         }
 
-        $this->renderJson($response);
+        $this->renderJson($array);
     }
 
     // -----------------------------------------------------------------
