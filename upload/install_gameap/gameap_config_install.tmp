@@ -16,17 +16,19 @@ $config['email_change_confirm']			= true;							// Подверждение см
 
 $config['register_users'] 				= false;						// Разрешить регистрацию пользователей
 
-$config['delete_server_on_reinstall']	= true;							// Удалять серверы при перезагрузке
+$config['delete_server_on_reinstall']	= true;							// Удалять серверы при переустановке
+// $config['send_command_before_reinstall_linux'] = '';                 // Отправить команду на сервер перед переустановкой
 $config['disable_sftp_search']			= false;						// Отключить sftp поиск файлов
 
 $config['captcha_driver']				= 'codeigniter';				// Капча
 
 // IP с которых можно авторизоваться под администратором
-//~ $config['admin_ip']					= array('127.0.1.1', '127.0.0.1', '127.0.0.0/12', '133.7.0.0');
+// $config['admin_ip']					= array('127.0.1.1', '127.0.0.1', '127.0.0.0/12', '133.7.0.0');
 
 // SteamCMD
 //$config['steamcmd_login']				= 'example';
 //$config['steamcmd_password']			= 'passexample123';
+
 
 /* End of file gameap_config.php */
 /* Location: ./application/config/gameap_config.php */

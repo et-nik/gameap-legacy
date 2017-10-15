@@ -2435,22 +2435,29 @@ class Adm_servers extends CI_Controller {
 		if ($confirm == $this->security->get_csrf_hash()) {
 			
 			/* Удаление директории на выделенном сервере */
-			if (isset($this->servers->server_data['dir'])) {
-				switch($this->servers->server_data['os']) {
-				case 'Windows':
-					$command = 'rmdir /S ' . $this->servers->server_data['dir'];
-					break;
-				default:
-					// Linux
-					$command = 'rm -rf ' . $this->servers->server_data['dir'];
-					break;
+			if (isset($this->servers->server_data['dir']) && $this->config->item('delete_server_on_reinstall')) {
+				switch(strtolower($this->servers->server_data['os'])) {
+                    case 'windows':
+                        $remove_command = 'rmdir /S ' . $this->servers->server_data['dir'];
+                        break;
+                    default:
+                        // Linux
+                        $remove_command = 'rm -rf ' . $this->servers->server_data['dir'];
+                        break;
 				}
 			}
 
 			try {
                 $this->servers->stop($id);
                 // Send deleting commands
-				send_command($command, $this->servers->server_data);
+
+                if ($this->config->item('send_command_before_reinstall_' . strtolower($this->servers->server_data['os']))) {
+                    send_command($this->config->item('send_command_before_reinstall_' . strtolower($this->servers->server_data['os'])), $this->servers->server_data);
+                }
+
+                if ($this->config->item('delete_server_on_reinstall')) {
+                    send_command($remove_command, $this->servers->server_data);
+                }
 			} catch (Exception $e) {
 				// Error
 				$log_data['type'] = 'server_command';
