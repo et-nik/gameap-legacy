@@ -1336,7 +1336,9 @@ class Cron extends MX_Controller {
 							$stop_response = $this->servers->stop($this->servers_data[$server_id]);
 							
 							// Отправка команды удаления
+                            $this->gameap_hooks->run('pre_server_delete_files', array('server_data' => $this->servers_data, 'server_id' => $server_id));
 							$delete_response = send_command($command, $this->servers_data[$server_id]);
+                            $this->gameap_hooks->run('post_server_delete_files', array('server_data' => $this->servers_data, 'server_id' => $server_id));
 							
 							$this->_cmd_output('---Task: server #' . $server_id . '  delete success');
 							$cron_stats['success'] ++;
