@@ -130,6 +130,8 @@ class Gameap_hooks {
             $method_name        = $exp[2];
 
             $file = APPPATH . 'modules' . '/' . $module_name . '/hooks/' . $file_name . EXT;
+
+            $this->load->_add_module_paths($module_name);
         
             if (!$this->_load_file($file)) {
                 continue;
