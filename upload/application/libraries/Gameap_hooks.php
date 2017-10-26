@@ -131,7 +131,8 @@ class Gameap_hooks {
 
             $file = APPPATH . 'modules' . '/' . $module_name . '/hooks/' . $file_name . EXT;
 
-            $this->load->_add_module_paths($module_name);
+            $CI =& get_instance();
+            $CI->load->_add_module_paths($module_name);
         
             if (!$this->_load_file($file)) {
                 continue;
