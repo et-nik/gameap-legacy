@@ -788,6 +788,7 @@ class Cron extends MX_Controller {
 			
 			/* Выполняем cron скрипт из модуля */
 			$this->_cmd_output("--Start {$value['short_name']}");
+            $this->load->_add_module_paths($value['short_name']);
 			echo modules::run($value['short_name'] . '/' . $value['cron_script'] . '/index');
 		}
 	}
