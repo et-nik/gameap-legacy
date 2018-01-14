@@ -39,9 +39,9 @@
 */
 class Cron extends MX_Controller {
 
-	var $servers_data = array();
+	public $servers_data = array();
 	
-	var $_cron_result = '';
+	private $_cron_result = array();
 	private $_commands_result = array();
 	private $_install_result = '';
 
@@ -1339,7 +1339,7 @@ class Cron extends MX_Controller {
                             $this->gameap_hooks->run('pre_server_delete_files', array('server_data' => $this->servers_data, 'server_id' => $server_id));
 							$delete_response = send_command($command, $this->servers_data[$server_id]);
                             $this->gameap_hooks->run('post_server_delete_files', array('server_data' => $this->servers_data, 'server_id' => $server_id));
-							
+
 							$this->_cmd_output('---Task: server #' . $server_id . '  delete success');
 							$cron_stats['success'] ++;
 							$log_data['msg'] = 'Delete successful';
