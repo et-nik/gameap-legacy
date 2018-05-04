@@ -1465,7 +1465,8 @@ class Cron extends MX_Controller {
 				if ($this->servers_data[$server_id]['installed'] == '0') {
 					// Сервер не установлен
 					$this->_install_server($server_id);
-				}
+                    $this->gameap_hooks->run('post_server_install', array('server_id' => $server_id, 'server_data' => $this->servers_data[$server_id]));
+                }
 
 				/*==================================================*/
 				/*     Перезапуск сервера в случае падения          */
