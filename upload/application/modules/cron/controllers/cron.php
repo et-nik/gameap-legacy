@@ -1226,9 +1226,9 @@ class Cron extends MX_Controller {
 						// Обновление - установка файлов поверх существующих
 						$this->servers->stop($this->servers_data[$server_id]);
 
-                        $this->gameap_hooks->run('pre_server_update', array('server_id' => $server_id));
+                        $this->gameap_hooks->run('pre_server_update', array('server_id' => $server_id, 'server_data' => $this->servers_data[$server_id]));
 						$this->_install_server($server_id, true);
-						$this->gameap_hooks->run('post_server_update', array('server_id' => $server_id));
+						$this->gameap_hooks->run('post_server_update', array('server_id' => $server_id, 'server_data' => $this->servers_data[$server_id]));
                         
 						$cron_success = true;
 						$cron_stats['success'] ++;
