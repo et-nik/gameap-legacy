@@ -93,7 +93,7 @@ if ( ! function_exists('replace_shotcodes'))
 		$command = str_replace('{ram_limit}', 	strip_quotes($server_data['ram_limit']) 	, $command);
 		$command = str_replace('{net_limit}', 	strip_quotes($server_data['net_limit']) 	, $command);
 		
-		$command = str_replace('{game}', 	    strip_quotes($server_data['game']) 	,         $command);
+		$command = str_replace('{game_id}', 	    strip_quotes($server_data['game']) 	,         $command);
 		$command = str_replace('{game_type}', 	strip_quotes($server_data['game_type']) 	, $command);
 		$command = str_replace('{game_type_id}', strip_quotes($server_data['game_type']) 	, $command);
 
