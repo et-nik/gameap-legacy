@@ -63,6 +63,8 @@ if ( ! function_exists('replace_shotcodes'))
 		isset($server_data['ram_limit']) 		OR $server_data['ram_limit'] 		= '';
 		isset($server_data['net_limit']) 		OR $server_data['net_limit'] 		= '';
 		
+		isset($server_data['game']) 		    OR $server_data['game'] 		= '';
+		
 		// Команда запуска игрового сервера (напр. "hlds_run -game valve +ip 127.0.0.1 +port 27015 +map crossfire")
 		$command = str_replace('{command}', 	$server_data['start_command'] , $command);
 		// ID сервера
@@ -90,6 +92,10 @@ if ( ! function_exists('replace_shotcodes'))
 		$command = str_replace('{cpu_limit}', 	strip_quotes($server_data['cpu_limit']) 	, $command);
 		$command = str_replace('{ram_limit}', 	strip_quotes($server_data['ram_limit']) 	, $command);
 		$command = str_replace('{net_limit}', 	strip_quotes($server_data['net_limit']) 	, $command);
+		
+		$command = str_replace('{game}', 	    strip_quotes($server_data['game']) 	,         $command);
+		$command = str_replace('{game_type}', 	strip_quotes($server_data['game_type']) 	, $command);
+		$command = str_replace('{game_type_id}', strip_quotes($server_data['game_type']) 	, $command);
 
 		/*-------------------*/
 		/* Замена по алиасам */
