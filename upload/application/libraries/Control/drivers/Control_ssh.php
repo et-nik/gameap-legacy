@@ -28,7 +28,7 @@ class Control_ssh extends CI_Driver {
 	var $ip				= false;
 	var $port 			= 22;
 	
-	var $_connection 	= false;
+	var $_connection 	= null;
 	var $errors 		= '';
 	
 	private $_auth		= false;
@@ -222,12 +222,20 @@ class Control_ssh extends CI_Driver {
 		if (!$command) {
 			throw new Exception(lang('server_command_empty_command') . ' (SSH)');
 		}
+
+		if ($this->os == "linux") {
+            $command .= "; echo \"Exited with $?\"";
+        }
 		
 		$stream = ssh2_exec($this->_connection, $command);
+        $errorStream = ssh2_fetch_stream($stream, SSH2_STREAM_STDERR);
 
 		stream_set_blocking($stream, true);
-		$data = stream_get_contents($stream);	
-		
+		stream_set_blocking($errorStream, true);
+
+		$data = stream_get_contents($stream);
+		$data .= stream_get_contents($errorStream);
+
 		return $data;
 	}
 	

@@ -151,7 +151,8 @@ class Control_local extends CI_Driver {
 			throw new Exception(lang('server_command_empty_command') . ' (Local)');
 		}
 		
-		exec($command, $output);
+		exec($command, $output, $return_code);
+		$output[] = "Exited with {$return_code}";
 		return implode("\n", $output);
 	}
 	
