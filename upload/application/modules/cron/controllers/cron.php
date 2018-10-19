@@ -1665,13 +1665,15 @@ class Cron extends MX_Controller {
 		$this->db->delete('logs', array('date <' => now()-(604800*8))); 
 		
 		$this->_cmd_output("Cron end");
-		
-		$log_data['server_id'] = 0;
-		$log_data['type'] = 'cron';
-		$log_data['command'] = 'cron work';
-		$log_data['msg'] = 'Cron end working';
-		$log_data['log_data'] = implode("\n", $this->_cron_result);
-		$this->panel_log->save_log($log_data);
+
+		if ($this->config->item('mute_cron_work_log')) {
+            $log_data['server_id'] = 0;
+            $log_data['type'] = 'cron';
+            $log_data['command'] = 'cron work';
+            $log_data['msg'] = 'Cron end working';
+            $log_data['log_data'] = implode("\n", $this->_cron_result);
+            $this->panel_log->save_log($log_data);
+        }
 	}
 	
 }

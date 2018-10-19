@@ -29,6 +29,8 @@ $config['captcha_driver']				= 'codeigniter';				// Капча
 //$config['steamcmd_login']				= 'example';
 //$config['steamcmd_password']			= 'passexample123';
 
+$config['mute_cron_work_log']           = false;
+
 
 /* End of file gameap_config.php */
 /* Location: ./application/config/gameap_config.php */
