@@ -335,16 +335,18 @@ class Server_control extends CI_Controller {
 		
 		if ($this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['query_port'])) {
 			$this->servers->server_data['server_status'] = 1;
-			
-			$this->rcon->set_variables(
-										$this->servers->server_data['server_ip'],
-										$this->servers->server_data['rcon_port'],
-										$this->servers->server_data['rcon'], 
-										$this->servers->servers->server_data['engine'],
-										$this->servers->servers->server_data['engine_version']
-			);
 
-			$rcon_connect = $this->rcon->connect();
+            if ($this->config->item('disable_rcon_server_control_main')) {
+                $this->rcon->set_variables(
+                    $this->servers->server_data['server_ip'],
+                    $this->servers->server_data['rcon_port'],
+                    $this->servers->server_data['rcon'],
+                    $this->servers->servers->server_data['engine'],
+                    $this->servers->servers->server_data['engine_version']
+                );
+
+                $rcon_connect = $this->rcon->connect();
+            }
 			
 		} else {
 			$this->servers->server_data['server_status'] = 0;
@@ -356,11 +358,13 @@ class Server_control extends CI_Controller {
 			$local_tpl['users_list'] 	= array();
 			$local_tpl['players_list'] = array();
 			
-			if ($users_list = $this->rcon->get_players()){
-				$local_tpl['users_list'] = $users_list;
-				$local_tpl['players_list'] = $users_list;
-			}
-			
+			if ($this->config->item('disable_rcon_server_control_main')) {
+                if ($users_list = $this->rcon->get_players()) {
+                    $local_tpl['users_list'] = $users_list;
+                    $local_tpl['players_list'] = $users_list;
+                }
+            }
+            
 			if ($local_tpl['users_list']) {
 				$this->players = 1;
 			}
@@ -369,11 +373,18 @@ class Server_control extends CI_Controller {
 			$local_tpl['users_list1'] =& $local_tpl['users_list'];
 			$local_tpl['users_list2'] =& $local_tpl['users_list'];
 
-			$local_tpl['maps_list']	= $this->_get_maps_list();
-			$local_tpl['frcon_list'] 	= $this->_get_frcon_list();
-			$local_tpl['base_cvars'] 	= $this->_get_base_cvars();
-			$this->rcon->disconnect();
-			
+            $local_tpl['maps_list']	= array();
+            $local_tpl['frcon_list'] 	= array();
+            $local_tpl['base_cvars'] 	= array();
+
+            if ($this->config->item('disable_rcon_server_control_main')) {
+                $local_tpl['maps_list'] = $this->_get_maps_list();
+                $local_tpl['frcon_list'] = $this->_get_frcon_list();
+                $local_tpl['base_cvars'] = $this->_get_base_cvars();
+                
+                $this->rcon->disconnect();
+            }
+
 		} else {
 			// Ошибка соединения с сервером
 			//~ $this->tpl_data['content'] .= lang('server_control_server_down');
