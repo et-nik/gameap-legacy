@@ -55,29 +55,31 @@ class Server_control extends CI_Controller {
 			show_404();
 		}
     }
-    
+
     // -----------------------------------------------------------------------
-	
-	/**
-	 * Обрезка пустых строк консоли
-	*/
-	private function _crop_console($console_text)
-	{
-		$console_data = explode("\n", $console_text);
-		
-		$i = 0;
-		$count_console_data = count($console_data);
-		while ($i < $count_console_data) {
-			if ($console_data[$i] != "") {
-				break;
-			}
-			
-			unset($console_data[$i]);
-			$i ++;
-		}
-		
-		return implode("\n", $console_data);
-	}
+
+    /**
+     * Обрезка пустых и лишних строк консоли
+     */
+    private function _crop_console($console_text)
+    {
+        $console_data = explode("\n", $console_text);
+
+        $i = 0;
+        $count_console_data = count($console_data);
+        while ($i < $count_console_data) {
+            if ($console_data[$i] != ""
+                && strpos($console_data[$i], 'Exited with') === false
+            ) {
+                break;
+            }
+
+            unset($console_data[$i]);
+            $i ++;
+        }
+
+        return implode("\n", $console_data);
+    }
     
     /**
 	 * 
