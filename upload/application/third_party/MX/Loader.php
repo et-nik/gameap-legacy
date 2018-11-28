@@ -83,13 +83,15 @@ class MX_Loader extends CI_Loader
 				array_unshift($this->_ci_model_paths, $module_path);
 			}
 		}
-		
+
 		/* Modify by ET-NiK
 		 * Добавление в массив с library путями путь к модулю.
 		 * Чтобы загружались драйверы из директории с модулем
 		 */
 		if (isset($module_path) && !in_array($module_path, $this->_ci_library_paths)) {
 			$this->_ci_library_paths[] = $module_path;
+
+			$this->config->_config_paths[] = $module_path . '/';
 		}
 	}	
 	
