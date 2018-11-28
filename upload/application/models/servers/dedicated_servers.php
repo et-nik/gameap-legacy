@@ -114,6 +114,9 @@ class Dedicated_servers extends CI_Model {
 	function add_dedicated_server($data)
 	{
 		$data = $this->_encrypt_passwords($data);
+
+		$data['disabled']   = isset($data['disabled']) ? $data['disabled']: 0;
+
 		return (bool)$this->db->insert('dedicated_servers', $data);
 	}
 	
