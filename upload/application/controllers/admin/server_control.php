@@ -336,7 +336,7 @@ class Server_control extends CI_Controller {
 		if ($this->servers->server_status($this->servers->server_data['server_ip'], $this->servers->server_data['query_port'])) {
 			$this->servers->server_data['server_status'] = 1;
 
-            if ($this->config->item('disable_rcon_server_control_main')) {
+            if (!$this->config->item('disable_rcon_server_control_main')) {
                 $this->rcon->set_variables(
                     $this->servers->server_data['server_ip'],
                     $this->servers->server_data['rcon_port'],
@@ -358,7 +358,7 @@ class Server_control extends CI_Controller {
 			$local_tpl['users_list'] 	= array();
 			$local_tpl['players_list'] = array();
 			
-			if ($this->config->item('disable_rcon_server_control_main')) {
+			if (!$this->config->item('disable_rcon_server_control_main')) {
                 if ($users_list = $this->rcon->get_players()) {
                     $local_tpl['users_list'] = $users_list;
                     $local_tpl['players_list'] = $users_list;
@@ -377,7 +377,7 @@ class Server_control extends CI_Controller {
             $local_tpl['frcon_list'] 	= array();
             $local_tpl['base_cvars'] 	= array();
 
-            if ($this->config->item('disable_rcon_server_control_main')) {
+            if (!$this->config->item('disable_rcon_server_control_main')) {
                 $local_tpl['maps_list'] = $this->_get_maps_list();
                 $local_tpl['frcon_list'] = $this->_get_frcon_list();
                 $local_tpl['base_cvars'] = $this->_get_base_cvars();
