@@ -150,6 +150,10 @@ class Control_local extends CI_Driver {
 		if (!$command) {
 			throw new Exception(lang('server_command_empty_command') . ' (Local)');
 		}
+
+        if ($this->os == "linux") {
+            $command .= " 2>&1";
+        }
 		
 		exec($command, $output, $return_code);
 		$output[] = "Exited with {$return_code}";
