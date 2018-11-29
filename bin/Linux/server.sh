@@ -145,7 +145,7 @@ function cpu_limit()
 }
 
 # Получение опций
-while getopts 't:d:n:i:p:c:u:m:f:s:' opt ;
+while getopts 't:d:n:i:p:c:umfs' opt ;
 do
 	case $opt in
 		t)
