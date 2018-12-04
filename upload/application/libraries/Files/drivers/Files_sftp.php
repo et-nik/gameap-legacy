@@ -28,14 +28,15 @@ class Files_sftp extends CI_Driver {
 	var $username	= '';
 	var $password	= '';
 	var $port		= 22;
-	var $debug		= FALSE;
-	var $conn		= FALSE;
-	var $conn_sftp	= FALSE;
-        var $login_via_key = FALSE;
-        var $public_key_url = '';
-        var $private_key_url = '';
-        
-        var $buffer_size = 4096;
+	var $debug		= false;
+	var $conn		= null;
+	var $conn_sftp	= null;
+
+    var $login_via_key = false;
+    var $public_key_url = '';
+    var $private_key_url = '';
+
+    var $buffer_size = 4096;
 	
 	/**
 	 * Constructor - Sets Preferences
@@ -97,7 +98,7 @@ class Files_sftp extends CI_Driver {
 	{
 		if ($this->conn && $config['hostname'] == $this->hostname) {
 			// Уже соединен с этим сервером, повторно соединяться не требуется
-			return;
+			return true;
 		}
 		
 		if (count($config) > 0) {
@@ -205,8 +206,8 @@ class Files_sftp extends CI_Driver {
 	 */
 	function file_size($file)
 	{
-		$sftp = $this->conn_sftp;
-		return filesize("ssh2.sftp://$sftp$file");
+		$sftp = intval($this->conn_sftp);
+		return filesize("ssh2.sftp://{$sftp}{$file}");
 	}
 	
 	// --------------------------------------------------------------------
@@ -216,8 +217,8 @@ class Files_sftp extends CI_Driver {
 	 */
 	function file_exists($file)
 	{
-		$sftp = $this->conn_sftp;
-		return file_exists("ssh2.sftp://$sftp$file");
+		$sftp = intval($this->conn_sftp);
+		return file_exists("ssh2.sftp://{$sftp}{$file}");
 	}
 	
 	// --------------------------------------------------------------------
@@ -271,8 +272,8 @@ class Files_sftp extends CI_Driver {
 			return FALSE;
 		}
 		
-		$sftp = $this->conn_sftp;
-		$stream = @fopen("ssh2.sftp://$sftp$rempath", 'w');
+		$sftp = intval($this->conn_sftp);
+		$stream = @fopen("ssh2.sftp://{$sftp}{$rempath}", 'w');
 		
 		if ($stream === FALSE)
 		{
@@ -310,9 +311,9 @@ class Files_sftp extends CI_Driver {
 			return FALSE;
 		}
 		
-		$sftp = $this->conn_sftp;
+		$sftp = intval($this->conn_sftp);
 		
-		$stream = @fopen("ssh2.sftp://$sftp$rempath", 'r');
+		$stream = @fopen("ssh2.sftp://{$sftp}{$rempath}", 'r');
 		
 		if ($stream === false)
 		{
@@ -371,8 +372,8 @@ class Files_sftp extends CI_Driver {
 			return FALSE;
 		}
 		
-		$sftp = $this->conn_sftp;
-		$result = unlink("ssh2.sftp://$sftp$filepath");
+		$sftp = intval($this->conn_sftp);
+		$result = unlink("ssh2.sftp://{$sftp}{$filepath}");
 		
 		if ($result === FALSE)
 		{
@@ -422,22 +423,22 @@ class Files_sftp extends CI_Driver {
 	 * @access	public
 	 * @param	string
 	 * @param	bool
-	 * @return	array
+	 * @return	array|bool
 	 */
 	function list_files($path = '.', $recursive = FALSE)
 	{
 		if ( ! $this->_is_conn())
 		{
-			return FALSE;
-		}
-		
-		$sftp = $this->conn_sftp;
-		$dir = "ssh2.sftp://$sftp$path";
-		
-		if (!is_dir($dir)) {
 			return false;
 		}
 		
+		$sftp = intval($this->conn_sftp);
+		$dir = "ssh2.sftp://{$sftp}{$path}";
+
+		if (!is_dir($dir)) {
+			return false;
+		}
+
 		$directory = $this->_scan_directory($dir, $recursive);
 
 		sort($directory);
@@ -455,8 +456,8 @@ class Files_sftp extends CI_Driver {
 	 */
 	function list_files_full_info($path = '.', $extensions = array()) 
 	{
-		$sftp = $this->conn_sftp;
-		$dir = "ssh2.sftp://$sftp$path";
+		$sftp = intval($this->conn_sftp);;
+		$dir = "ssh2.sftp://{$sftp}{$path}";
 		
 		if (!file_exists($dir)) {
 			$this->_error('server_files_directory_not_found');
@@ -514,9 +515,8 @@ class Files_sftp extends CI_Driver {
 			return FALSE;
 		}
 		
-		$sftp = $this->conn_sftp;
-		
-		$stream = @fopen("ssh2.sftp://$sftp$rempath", 'w');
+		$sftp = intval($this->conn_sftp);
+		$stream = @fopen("ssh2.sftp://{$sftp}{$rempath}", 'w');
 		
 		if ($stream === FALSE)
 		{
@@ -572,9 +572,9 @@ class Files_sftp extends CI_Driver {
 		
 		$list_files = $this->list_files($dir);
 		$list_base_name = array();
-		
+
 		if (!is_array($list_files)) {
-			return;
+			return false;
 		}
 		
 		// Избавляемся от пути, оставляем лишь имя файла
@@ -589,7 +589,7 @@ class Files_sftp extends CI_Driver {
 				}
 			}
 		} else {
-			if (in_array($sfile, $list_base_name)) {
+			if (in_array($file, $list_base_name)) {
 				return $dir;
 			}
 		}
@@ -607,6 +607,8 @@ class Files_sftp extends CI_Driver {
 			
 			unset($sftp_dir);
 		}
+
+		return array();
 	}
 
 }
