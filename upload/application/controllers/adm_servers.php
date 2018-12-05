@@ -1925,12 +1925,19 @@ class Adm_servers extends CI_Controller {
 						$sftp_config['username'] 	= $sql_data['ssh_login'];
 						$sftp_config['password'] 	= $ssh_password;
 						$sftp_config['debug'] 		= false;
-						
-						if (!$sql_data['ssh_path'] = $this->_found_sftp_path($sql_data['ssh_path'], $sftp_config)) {
-							$this->_show_message(lang('adm_servers_sftp_path_not_found'), 'javascript:history.back()');
-							return false;
-						}
-						
+
+                        if (isset($this->config->config['disable_sftp_search']) && $this->config->config['disable_sftp_search']) {
+                            if (!$sql_data['ssh_path'] = $this->_found_sftp_path($sql_data['ssh_path'], $sftp_config)) {
+                                $this->_show_message(lang('adm_servers_sftp_path_not_found'), 'javascript:history.back()');
+                                return false;
+                            }
+                        } else {
+                            // Поиск sftp отключен, значит поле не должно быть пустым
+                            if (!$sql_data['ssh_path']) {
+                                $this->_show_message('Empty SFTP path.', 'javascript:history.back()');
+                                return false;
+                            }
+                        }
 					}
 					
 					// FTP
