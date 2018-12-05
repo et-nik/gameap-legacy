@@ -71,7 +71,7 @@ class Server_control extends CI_Controller {
             if ($console_data[$i] != ""
                 && strpos($console_data[$i], 'Exited with') === false
             ) {
-                break;
+                continue;
             }
 
             unset($console_data[$i]);
