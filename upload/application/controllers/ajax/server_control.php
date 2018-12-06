@@ -65,17 +65,14 @@ class Server_control extends CI_Controller {
     {
         $console_data = explode("\n", $console_text);
 
-        $i = 0;
-        $count_console_data = count($console_data);
-        while ($i < $count_console_data) {
-            if ($console_data[$i] != ""
-                && strpos($console_data[$i], 'Exited with') === false
+        foreach ($console_data as &$line) {
+            if ($line != ""
+                && strpos($line, 'Exited with') === false
             ) {
                 continue;
             }
 
-            unset($console_data[$i]);
-            $i ++;
+            unset($line);
         }
 
         return implode("\n", $console_data);
