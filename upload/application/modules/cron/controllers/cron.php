@@ -305,7 +305,7 @@ class Cron extends MX_Controller {
 				
 				$rep_info = pathinfo($this->games->games_list[0]['local_repository']);
 				
-				$this->_cmd_output("---Install from local repository");
+				$this->_cmd_output("---Install game from local repository");
 				
 				try {
 					if (isset($rep_info['extension'])) {
@@ -319,14 +319,14 @@ class Cron extends MX_Controller {
 					
 					$server_installed = true;
 				} catch (Exception $e) {
-					$this->_cmd_output("---Install from local repository failed. Message: " . $e->getMessage());
+					$this->_cmd_output("---Install game from local repository failed. Message: " . $e->getMessage());
 					$server_installed = false;
 				}
 				
 			} elseif ($this->games->games_list[0]['remote_repository']) {
 				/* Установка из удаленного репозитория */
 				
-				$this->_cmd_output("---Install from remote repository");
+				$this->_cmd_output("---Install game from remote repository");
 				
 				try {
 					$this->_wget_files($server_id, $this->games->games_list[0]['remote_repository'], 'remote');
@@ -371,10 +371,18 @@ class Cron extends MX_Controller {
 			if (isset($this->game_types->game_types_list[0]['local_repository'])
 				&& $this->game_types->game_types_list[0]['local_repository']
 			) {
-				
+
+                $rep_info = pathinfo($this->game_types->game_types_list[0]['local_repository']);
+
+                $this->_cmd_output("---Install modification from local repository");
+
 				try {
-					$this->_wget_files($server_id, $this->game_types->game_types_list[0]['local_repository'], 'local');
-					$this->_unpack_files($server_id, $this->game_types->game_types_list[0]['local_repository']);
+                    if (isset($rep_info['extension'])) {
+                        $this->_wget_files($server_id, $this->game_types->game_types_list[0]['local_repository'], 'local');
+                        $this->_unpack_files($server_id, $this->game_types->game_types_list[0]['local_repository']);
+                    } else {
+                        $this->_copy_files($server_id, $this->games->games_list[0]['local_repository']);
+                    }
 				} catch (Exception $e) {
 					$this->_cmd_output('---Install modification from local repository failed. Message: ' . $e->getMessage());
 				}
@@ -382,7 +390,8 @@ class Cron extends MX_Controller {
 			} elseif (isset($this->game_types->game_types_list[0]['remote_repository'])
 						&& $this->game_types->game_types_list[0]['remote_repository']
 			) {
-				
+                $this->_cmd_output("---Install modification from remote repository");
+
 				try {
 					$this->_wget_files($server_id, $this->game_types->game_types_list[0]['remote_repository'], 'remote');
 					$this->_unpack_files($server_id, $this->game_types->game_types_list[0]['remote_repository']);
@@ -1239,8 +1248,8 @@ class Cron extends MX_Controller {
 						$log_data['type'] 		= 'server_command';
 						$log_data['command'] 	= 'update';
 						$log_data['server_id'] 	= $server_id;
-						$log_data['msg'] 		= $message;
-						$log_data['log_data'] 	= $response;
+						$log_data['msg'] 		= '';
+						$log_data['log_data'] 	= '';
 						$this->panel_log->save_log($log_data);
 						
 					} catch (Exception $e) {
@@ -1329,7 +1338,7 @@ class Cron extends MX_Controller {
 						}
 						
 						$log_data['type'] = 'server_command';
-						$log_data['command'] = $task_list[$i]['command'];
+						$log_data['command'] = $task_list[$i]['code'];
 						$log_data['server_id'] = $server_id;
 						
 						try {
@@ -1337,9 +1346,9 @@ class Cron extends MX_Controller {
 							$stop_response = $this->servers->stop($this->servers_data[$server_id]);
 							
 							// Отправка команды удаления
-                            $this->gameap_hooks->run('pre_server_delete_files', array('server_data' => $this->servers_data, 'server_id' => $server_id));
+                            $this->gameap_hooks->run('pre_server_delete_files', array('server_data' => $this->servers_data[$server_id], 'server_id' => $server_id));
 							$delete_response = send_command($command, $this->servers_data[$server_id]);
-                            $this->gameap_hooks->run('post_server_delete_files', array('server_data' => $this->servers_data, 'server_id' => $server_id));
+                            $this->gameap_hooks->run('post_server_delete_files', array('server_data' => $this->servers_data[$server_id], 'server_id' => $server_id));
 
 							$this->_cmd_output('---Task: server #' . $server_id . '  delete success');
 							$cron_stats['success'] ++;
