@@ -120,7 +120,7 @@ class Server_command extends CI_Controller {
         $exit_code = isset($match[1]) ? $match[1] : null;
         unset($match);
 
-        if ($exit_code != 0) {
+        if ($exit_code != null && $exit_code !== 0) {
             return lang('server_command_error');
         }
 
