@@ -116,6 +116,14 @@ class Server_command extends CI_Controller {
 	 */
 	private function _get_message($response = '', $server_id = '')
 	{
+        preg_match("/Exited with (\d*)/", $response, $match);
+        $exit_code = isset($match[1]) ? $match[1] : null;
+        unset($match);
+
+        if ($exit_code != 0) {
+            return lang('server_command_error');
+        }
+
 		if (strpos($response, 'Server is already running') !== false) {
 			/* Сервер запущен ранее */
 			$message = lang('server_command_server_is_already_running', site_url('server_command/restart/'. $server_id), site_url('server_command/stop/' . $server_id));

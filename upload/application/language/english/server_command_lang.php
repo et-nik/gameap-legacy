@@ -90,3 +90,5 @@ $lang['server_command_gs_disabled']							= 'This game server is disabled. Pleas
 $lang['server_command_ds_disabled']							= 'This server is disabled. Please contact administration';
 
 $lang['server_command_get_response_failed']					= 'Response failed successfully.';
+
+$lang['server_command_error']                               = 'Server command error. See logs or contact administrator';

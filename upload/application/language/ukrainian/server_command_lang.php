@@ -81,3 +81,5 @@ $lang['server_command_file_not_executable'] = 'Немає прав на вико
 
 // 0.9.3
 $lang['server_command_player_not_found'] = 'Равець не є знайдений.';
+
+$lang['server_command_error']                               = 'Помилка при виконанні команди. Дивіться логи або зв\'яжіться з адміністратором';
