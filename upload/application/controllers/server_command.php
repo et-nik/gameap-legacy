@@ -117,10 +117,10 @@ class Server_command extends CI_Controller {
 	private function _get_message($response = '', $server_id = '')
 	{
         preg_match("/Exited with (\d*)/", $response, $match);
-        $exit_code = isset($match[1]) ? $match[1] : null;
+        $exit_code = isset($match[1]) ? (int)$match[1] : null;
         unset($match);
 
-        if ($exit_code != null && $exit_code !== 0) {
+        if (!is_null($exit_code) && $exit_code !== 0) {
             return lang('server_command_error');
         }
 
@@ -173,15 +173,11 @@ class Server_command extends CI_Controller {
     {
         $console_data = explode("\n", $console_text);
 
-        foreach ($console_data as &$line) {
-            if ($line != ""
-                && strpos($line, 'Exited with') === false
-            ) {
-                continue;
+        $console_data = array_filter($console_data, function($v) {
+            if ($v != "" && strpos($v, 'Exited with') === false) {
+                return true;
             }
-
-            unset($line);
-        }
+        });
 
         return implode("\n", $console_data);
     }
