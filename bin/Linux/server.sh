@@ -225,8 +225,10 @@ case "$TYPE" in
 		if [ "$(server_start)" == "Server started" ] ;
 			then
 			echo -e "Server restarted"
+			exit 0
 		else
 			echo -e "Server not restarted"
+			exit 1
 		fi
 		
 		;;
@@ -235,8 +237,10 @@ case "$TYPE" in
 		if [ "$(server_status)" == 1 ] ;
 			then
 		   echo "Server is UP"
+		   exit 0
 		else
 		   echo "Server is Down"
+		   exit 1
 		fi
 		;;
 		
