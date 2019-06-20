@@ -261,7 +261,7 @@ main()
         get_console)
             su $UUSER -c "screen -U -S $SNAME -X -p 0 hardcopy -h $DIR/gap_console.txt && chmod 666 $DIR/gap_console.txt"
             sed -i '/^$/d' $DIR/gap_console.txt
-            cat $DIR/gap_console.txt
+            iconv -c -f utf-8 -t utf-8 $DIR/gap_console.txt
             ;;
             
         send_command)
