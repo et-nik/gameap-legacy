@@ -174,7 +174,7 @@ parse_options()
                 shift
             ;;
             -u|--user)
-                COMMAND="$2"
+                UUSER="$2"
                 shift
                 shift
             ;;
@@ -259,19 +259,22 @@ main()
             ;;
             
         get_console)
-            su $UUSER -c "screen -U -S $SNAME -X -p 0 hardcopy -h $DIR/gap_console.txt && chmod 666 $DIR/gap_console.txt"
-            sed -i '/^$/d' $DIR/gap_console.txt
-            iconv -c -f utf-8 -t utf-8 $DIR/gap_console.txt
+            screen_id=$(su gameap -c "screen -ls | grep $SNAME" | head | cut -d. -f1 | tr -d '\t')
+            
+            su $UUSER -c "screen -U -S ${screen_id} -X -p 0 hardcopy -h ${DIR}/gap_console.txt && chmod 666 ${DIR}/gap_console.txt"
+            sed -i '/^$/d' "${DIR}/gap_console.txt"
+            iconv -c -f utf-8 -t utf-8 "${DIR}/gap_console.txt"
             ;;
             
         send_command)
+            screen_id=$(su gameap -c "screen -ls | grep $SNAME" | head | cut -d. -f1 | tr -d '\t')
             # Screen version 4.00.03jw4 (FAU) 2-May-06
             #~ su $USER "-c screen -p 0 -S $SNAME -X stuff '$COMMAND'$'\n'"
         
             # Screen version 4.01.00devel (GNU) 2-May-06
             #~ su $USER "-c screen -p 0 -S $SNAME -X stuff '$COMMAND\n'"
     
-            su $UUSER "-c screen -U -p 0 -S $SNAME -X stuff '$COMMAND
+            su $UUSER "-c screen -U -p 0 -S ${screen_id} -X stuff '${COMMAND}
             '"
             
             ;;
